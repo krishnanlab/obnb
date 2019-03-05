@@ -8,6 +8,15 @@ class IDmap:
 	def __contains__(self, key):
 		return key in self._data
 
+	def __getitem__(self, key):
+		if isinstance(key, (list,np.ndarray)):
+			idx = []
+			for i in key:
+				idx.append(self._data[i])
+			return np.array(idx)
+		else:
+			return self._data[key]
+
 	@property
 	def size(self):
 		return len(self._data)
@@ -20,22 +29,10 @@ class IDmap:
 	def lst(self):
 		return self._lst
 	
-	def newID(self, ID):
+	def addID(self, ID):
 		assert ID not in self,"ID:\t'%s'\texist"%ID
 		self._data[ID] = self.size
 		self._lst.append(ID)
 
-	def ID2idx(self, ID):
-		return self._data[ID]
-
 	def idx2ID(self, idx):
-		return self._lst[idx]
-
-	def IDary2idxary( self, ID ):
-		idx = []
-		try:
-			for i in ID:
-				idx.append(self.ID2idx(i))
-		except TypeError:
-			idx.append(self.ID2idx(ID))
-		return np.array(idx)
+		return self._lst[idx]		
