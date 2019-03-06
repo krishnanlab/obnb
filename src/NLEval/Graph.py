@@ -15,6 +15,10 @@ class SparseGraph:
 		self._edge_data.append({})
 
 	def addEdge(self, ID1, ID2, weight, directed):
+		for ID in [ID1, ID2]:
+			#check if ID exists, add new if not
+			if ID not in self.IDmap:
+				self.addID(ID)
 		try:
 			#check if edge exists
 			print("Warning: edge between '%s' and '%s' exists with weight '%.2f', overwriting with '%.2f'"%\
@@ -24,52 +28,38 @@ class SparseGraph:
 			if not directed:
 				self._edge_data[self.IDmap[ID2]][self.IDmap[ID1]] = weight
 
-	def read_edglst(self, edg_file, weighted, directed):
+	@staticmethod
+	def edglst_reader(edg_file, weighted, directed, cut_threshold):
 		'''
-		Construct sparse graph from edge list file
-		Read line by line and implicitly discard zero weighted edges
+		Read line by line from a edge list file and yield ID1, ID2, weight
 		'''
 		with open(edg_file, 'r') as f:
-
-			"""print('Loading edgelist file {}...'.format(edg_file))
-			tic = time.time()"""
-
 			for line in f:
 				try:
 					ID1, ID2, weight = line.split('\t')
 					weight = float(weight)
-					if weight == 0:
+					if weight <= cut_threshold:
 						continue
 					if not weighted:
 						weight = float(1)
 				except ValueError:
 					ID1, ID2 = line.split('\t')
 					weight = float(1)
-
 				ID1 = ID1.strip()
 				ID2 = ID2.strip()
-				
-				for ID in [ID1,ID2]:
-					if ID not in self.IDmap:
-						self.addID(ID)
+				yield ID1, ID2, weight
 
-				self.addEdge(ID1, ID2, weight, directed)
-
-		"""toc = time.time() - tic
-		print('Done, took %.2f seconds to load.' % toc)
-		print('There are %d nodes in the graph.' % len(self.IDlst))"""
-
-	def read_npy(self, mat, weighted, directed):
+	@staticmethod
+	def npy_reader(mat, weighted, directed, cut_threshold):
 		'''
-		Construct sparse graph from numpy matrix, first column of the matrix should be the IDs
+		Load an numpy matrix and yield ID1, ID2, weight
+		Matrix should be in shape (N, N+1), where N is number of nodes
+		First column of the matrix encodes IDs
 		'''
 		if isinstance(mat, str):
-			#load numpy matrix from file first
+			#load numpy matrix from file if provided path instead of numpy matrix
 			mat = np.load(mat)
 		Nnodes = mat.shape[0]
-
-		for ID in mat[:,0]:
-			self.addID(ID)
 
 		for i in range(Nnodes):
 			ID1 = mat[i,0]
@@ -81,8 +71,29 @@ class SparseGraph:
 			for j in range(jstart,Nnodes):
 				ID2 = mat[j,0]
 				weight = mat[i,j]
-				if weight > 0:
-					self.addEdge(ID1, ID2, float(weight), directed)
+				if weight > cut_threshold:
+					yield ID1, ID2, weight
+
+	def read(self, file, weighted, directed, reader='edglst', cut_threshold=0):
+		'''
+		Construct sparse graph from edge list file
+		Read line by line and implicitly discard zero weighted edges
+		Input:
+			- file:			(str) path to edge file
+			- weighted:		(bool) if not weighted, all weights are set to 1
+			- directed:		(bool) if not directed, automatically add 2 edges
+			- reader:		generator function that yield edges from file, or 
+							specify 'edglst' for default edge list reader or
+							specify 'npy' for default numpy matrix reader
+			- cut_threshold:(float) threshold beyound which edge are not consider as exist
+		'''
+		if reader is 'edglst':
+			reader = SparseGraph.edglst_reader
+		elif reader == 'npy':
+			reader = SparseGraph.npy_reader
+
+		for ID1, ID2, weight in reader(file, weighted, directed, cut_threshold):
+			self.addEdge(ID1, ID2, weight, directed)
 
 	def save_edg(self, outpth, weighted, cut_threshold=-np.inf):
 		with open( outpth, 'w' ) as f:

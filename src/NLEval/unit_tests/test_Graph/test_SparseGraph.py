@@ -14,7 +14,7 @@ class TestIDmap(unittest.TestCase):
 		self.graph = None
 
 	def test_read_edglst_unweighted1(self):
-		self.graph.read_edglst(self.t1u_pth, weighted=False, directed=False)
+		self.graph.read(self.t1u_pth, weighted=False, directed=False)
 		self.assertEqual(self.graph.IDmap.lst, self.IDlst1)
 		self.assertEqual(self.graph.edge_data, self.data_unweighted1)
 
