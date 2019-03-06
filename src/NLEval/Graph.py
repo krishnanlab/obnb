@@ -200,9 +200,8 @@ class FeatureVec(BaseGraph):
 	'''
 	Feature vectors with ID maps
 	'''
-	def __init__(self):
-		self.mat = None
-		self.IDmap = IDmap()
+	def __init__(self, IDmap, mat):
+		super().__init__(IDmap, mat)
 
 	def __getitem__(self, ID):
 		return self.mat[ID2idx[ID]]
