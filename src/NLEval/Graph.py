@@ -2,30 +2,59 @@ from util.IDmap import IDmap
 import numpy as np
 
 class SparseGraph:
-	def __init__(self):
+	def __init__(self, weighted=True, directed=False):
 		self._edge_data = []
 		self.IDmap = IDmap()
+		self.weighted = weighted
+		self.directed = directed
 
 	@property
 	def edge_data(self):
 		return self._edge_data
 
+	@property
+	def weighted(self):
+		return self._weighted
+	
+	@property
+	def directed(self):
+		return self._directed
+
+	@weighted.setter
+	def weighted(self, val):
+		self.check_bool('weighted',val)
+		self._weighted = val
+
+	@directed.setter
+	def directed(self, val):
+		self.check_bool('directed',val)
+		self._directed = val
+
+	@staticmethod
+	def check_bool(name, val):
+		if not isinstance(val, bool):
+			raise TypeError("Argument for '%s' must be bool type, not '%s'"%\
+				(name, type(val)))
+
 	def addID(self, ID):
 		self.IDmap.addID(ID)
 		self._edge_data.append({})
 
-	def addEdge(self, ID1, ID2, weight, directed):
+	def addEdge(self, ID1, ID2, weight):
 		for ID in [ID1, ID2]:
 			#check if ID exists, add new if not
 			if ID not in self.IDmap:
 				self.addID(ID)
 		try:
-			#check if edge exists
-			print("Warning: edge between '%s' and '%s' exists with weight '%.2f', overwriting with '%.2f'"%\
-				(self.IDmap[ID1], self.IDmap[ID2], self._edge_data[self.IDmap[ID1]][self.IDmap[ID2]], weight))
+			old_weight = self._edge_data[self.IDmap[ID1]][self.IDmap[ID2]]
+			if old_weight != weight:
+				#check if edge exists
+				print("Warning: edge between '%s' and '%s' exists with weight \
+					'%.2f', overwriting with '%.2f'"%\
+					(self.IDmap[ID1], self.IDmap[ID2], old_weight, weight))
 		except KeyError:
 			self._edge_data[self.IDmap[ID1]][self.IDmap[ID2]] = weight
-			if not directed:
+			if not self.directed:
 				self._edge_data[self.IDmap[ID2]][self.IDmap[ID1]] = weight
 
 	@staticmethod
@@ -52,7 +81,8 @@ class SparseGraph:
 	@staticmethod
 	def npy_reader(mat, weighted, directed, cut_threshold):
 		'''
-		Load an numpy matrix and yield ID1, ID2, weight
+		Load an numpy matrix (either from file path or numpy matrix directly) 
+		and yield ID1, ID2, weight
 		Matrix should be in shape (N, N+1), where N is number of nodes
 		First column of the matrix encodes IDs
 		'''
@@ -63,18 +93,17 @@ class SparseGraph:
 
 		for i in range(Nnodes):
 			ID1 = mat[i,0]
-			if directed:
-				jstart = 0
-			else:
-				jstart = i
 
-			for j in range(jstart,Nnodes):
+			for j in range(Nnodes):
 				ID2 = mat[j,0]
-				weight = mat[i,j]
+				weight = mat[i,j+1]
 				if weight > cut_threshold:
-					yield ID1, ID2, weight
+					try:
+						yield str(int(ID1)), str(int(ID2)), weight
+					except TypeError:
+						yield str(ID1), str(ID2), weight
 
-	def read(self, file, weighted, directed, reader='edglst', cut_threshold=0):
+	def read(self, file, reader='edglst', cut_threshold=0):
 		'''
 		Construct sparse graph from edge list file
 		Read line by line and implicitly discard zero weighted edges
@@ -92,21 +121,41 @@ class SparseGraph:
 		elif reader == 'npy':
 			reader = SparseGraph.npy_reader
 
-		for ID1, ID2, weight in reader(file, weighted, directed, cut_threshold):
-			self.addEdge(ID1, ID2, weight, directed)
+		for ID1, ID2, weight in reader(file, self.weighted, self.directed, cut_threshold):
+			self.addEdge(ID1, ID2, weight)
 
-	def save_edg(self, outpth, weighted, cut_threshold=-np.inf):
-		with open( outpth, 'w' ) as f:
-			for src_idx, src_nbrs in enumerate(self._edge_data):
-				for dst_idx in src_nbrs:
-					src = self.IDlst[ src_idx ]
-					dst = self.IDlst[ dst_idx ]
-					if weighted:
-						weight = src_nbrs[dst_idx]
-						if weight > cut_threshold:
-							f.write('%d\t%d\t%.12f\n'%(src,dst,weight))
-					else:
-						f.write('%d\t%d\n'%(src,dst))
+	@staticmethod
+	def edglst_writer(outpth, edge_gen, weighted, directed, cut_threshold):
+		with open(outpth, 'w') as f:
+			for srcID, dstID, weight in edge_gen():
+				if weighted:
+					if weight > cut_threshold:
+						f.write('%s\t%s\t%.12f\n'%(srcID, dstID, weight))
+				else:
+					f.write('%s\t%s\n'%(srcID, dstID))
+
+	@staticmethod
+	def npy_writer():
+		pass
+
+	def edge_gen(self):
+		edge_data_copy = self._edge_data[:]
+		for src_idx in range(len(edge_data_copy)):
+			src_nbrs = edge_data_copy[src_idx]
+			srcID = self.IDmap.idx2ID(src_idx)
+			for dst_idx in src_nbrs:
+				dstID = self.IDmap.idx2ID(dst_idx)
+				if not self.directed:
+					edge_data_copy[dst_idx].pop(src_idx)
+				weight = edge_data_copy[src_idx][dst_idx]
+				yield srcID, dstID, weight
+
+	def save(self, outpth, writer='edglst', cut_threshold=0):
+		if writer == 'edglst':
+			writer = self.edglst_writer
+		elif writer == 'npy':
+			writer = self.npy_writer
+		writer(outpth, self.edge_gen, self.weighted, self.directed, cut_threshold)
 
 	def to_adjmat(self):
 		'''
