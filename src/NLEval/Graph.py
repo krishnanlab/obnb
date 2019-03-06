@@ -45,9 +45,11 @@ class SparseGraph:
 				except ValueError:
 					ID1, ID2 = line.split('\t')
 					weight = float(1)
+
+				ID1 = ID1.strip()
+				ID2 = ID2.strip()
 				
 				for ID in [ID1,ID2]:
-					ID.strip() #clean up white spaces
 					if ID not in self.IDmap:
 						self.addID(ID)
 
@@ -58,6 +60,9 @@ class SparseGraph:
 		print('There are %d nodes in the graph.' % len(self.IDlst))"""
 
 	def read_npy(self, mat, weighted, directed):
+		'''
+		Construct sparse graph from numpy matrix, first column of the matrix should be the IDs
+		'''
 		if isinstance(mat, str):
 			#load numpy matrix from file first
 			mat = np.load(mat)
@@ -77,7 +82,7 @@ class SparseGraph:
 				ID2 = mat[j,0]
 				weight = mat[i,j]
 				if weight > 0:
-					self.addEdge(ID1, ID2, weight, directed)
+					self.addEdge(ID1, ID2, float(weight), directed)
 
 	def save_edg(self, outpth, weighted, cut_threshold=-np.inf):
 		with open( outpth, 'w' ) as f:
@@ -107,15 +112,23 @@ class SparseGraph:
 class BaseGraph:
 	def __init__(self, IDmap, mat):
 		self.IDmap = IDmap
-		self.mat = mat
+		self._mat = mat
 
+	@property
+	def mat(self):
+		return self._mat
+	
 	@classmethod
-	def from_npy(cls, path_to_npy):
-		mat = np.load(path_to_npy)
+	def from_mat(cls, mat):
 		idmap = IDmap()
 		for ID in mat[:,0]:
 			idmap.addID(ID)
-		return cls(idmap, mat[:,1:])
+		return cls(idmap, mat[:,1:].astype(float))
+
+	@classmethod
+	def from_npy(cls, path_to_npy, **kwargs):
+		mat = np.load(path_to_npy, **kwargs)
+		return BaseGraph.from_mat(mat)
 
 	@classmethod
 	def from_edglst(cls, path_to_edglst, weighted, directed):
@@ -124,11 +137,29 @@ class BaseGraph:
 		return cls(graph.IDmap, graph.to_adjmat())
 
 class FeatureVec(BaseGraph):
-	pass
+	'''
+	Feature vectors with ID maps
+	'''
+	def __init__(self):
+		self.mat = None
+		self.IDmap = IDmap()
 
+	def __getitem__(self, ID):
+		return self.mat[ID2idx[ID]]
 
-
-
+	def addVec(self, ID, vec):
+		'''
+		Add a new feature vector
+		'''
+		self.IDmap.addID(ID)
+		if self.mat is not None:
+			self.mat = np.append(self.mat, vec.copy(), axis=0)
+		else:
+			self.mat = vec.copy()
+	
+	@classmethod
+	def from_npy(cls, path_to_npy, **kwargs):
+		return super(BaseGraph, cls).from_npy(path_to_npy, **kwargs)
 
 
 
