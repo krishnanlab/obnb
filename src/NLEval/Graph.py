@@ -1,4 +1,4 @@
-from util.IDmap import IDmap
+from NLEval.util.IDmap import IDmap
 import numpy as np
 
 class SparseGraph:

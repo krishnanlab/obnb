@@ -1,5 +1,5 @@
 from sklearn import model_selection as ms
-from .Base import *
+from NLEval.valsplit.Base import *
 
 class sklSKF(BaseInterface):
 	'''
