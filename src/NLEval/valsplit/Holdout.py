@@ -1,5 +1,5 @@
-from ..util import checkers
-from .Base import *
+from NLEval.util import checkers
+from NLEval.valsplit.Base import *
 import numpy as np
 
 class BinHold(BaseHoldout):

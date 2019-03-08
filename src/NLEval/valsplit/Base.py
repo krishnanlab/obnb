@@ -1,4 +1,4 @@
-from ..util import checkers
+from NLEval.util import checkers
 import numpy as np
 
 class BaseValSplit:
