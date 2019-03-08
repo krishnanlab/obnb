@@ -2,8 +2,18 @@
 
 def checkType(name, targetType, val):
 	if not isinstance(val, targetType):
-		raise TypeError("'%s' should be type '%s', not '%s'"%\
-			(name, targetType, type(val)))
+		if isinstance(targetType, tuple):
+			#multiple types
+			typeString = ""
+			for idx, typeName in enumerate(targetType):
+				if idx == 0:
+					typeString += "type %s"%repr(typeName)
+				else:
+					typeString += " or type %s"%repr(typeName)
+		else:
+			typeString += "type %s"%repr(typeName)
+
+		raise TypeError("'%s' should be %s, not %s"%(name, typeString, repr(type(val))))
 
 def checkTypeErrNone(name, targetType, val):
 	if val is not None:
