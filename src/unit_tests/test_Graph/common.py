@@ -5,6 +5,7 @@ lst = pwd.split('/')
 idx = lst.index('src') + 1
 src_pth = '/'.join(lst[:idx])
 path.append(src_pth)
-from NLEval.util import IDmap
 import unittest
 import numpy as np
+
+SAMPLE_DATA_PATH = src_pth + '/unit_tests/sample_data/' 
