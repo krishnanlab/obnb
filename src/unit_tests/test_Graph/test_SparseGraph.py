@@ -1,5 +1,5 @@
 from common import *
-from Graph import SparseGraph
+from NLEval.Graph import SparseGraph
 
 class TestIDmap(unittest.TestCase):
 	def setUp(self):
