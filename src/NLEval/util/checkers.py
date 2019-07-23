@@ -11,7 +11,7 @@ def checkType(name, targetType, val):
 				else:
 					typeString += " or type %s"%repr(typeName)
 		else:
-			typeString += "type %s"%repr(typeName)
+			typeString = "type %s"%repr(targetType)
 
 		raise TypeError("'%s' should be %s, not %s"%(name, typeString, repr(type(val))))
 

@@ -1,4 +1,5 @@
 import numpy as np
+from NLEval.util import checkers
 
 class IDmap:
 	def __init__(self):
@@ -15,6 +16,7 @@ class IDmap:
 				idx.append(self._data[i])
 			return np.array(idx)
 		else:
+			checkers.checkType('key', (str, list, np.ndarray), key)
 			return self._data[key]
 
 	@property
