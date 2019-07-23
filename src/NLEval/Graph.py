@@ -110,7 +110,7 @@ class AdjLst:
 	def read(self, file, reader='edglst', cut_threshold=0):
 		"""Read data and construct sparse graph
 
-		Attributes:
+		Args:
 			file(str): path to input file
 			weighted(bool): if not weighted, all weights are set to 1
 			directed(bool): if not directed, automatically add 2 edges
@@ -166,7 +166,7 @@ class AdjLst:
 	def save(self, outpth, writer='edglst', cut_threshold=0):
 		"""Save graph to file
 
-		Attributes:
+		Args:
 			outpth(str): path to output file
 			writer: writer function (or name of default writer) to generate file
 						- 'edglst': edge list writer
@@ -200,7 +200,7 @@ class SparseGraph(AdjLst):
 		"""Construct and return a specific row vector of 
 		adjacency matrix using correspondingadjacency list
 
-		Attribtues:
+		Args:
 			src_idx(int): index of row
 		"""
 		checkers.checkType('src_idx', int, src_idx)
@@ -212,7 +212,7 @@ class SparseGraph(AdjLst):
 	def __getitem__(self, key):
 		"""Return slices of constructed adjacency matrix
 
-		Attributes:
+		Args:
 			key(str): key of ID
 			key(:obj:`list` of :obj:`str`): list of keys of IDs
 		"""
@@ -235,7 +235,7 @@ class BaseGraph:
 	def __getitem__(self, key):
 		"""Return slices of graph
 
-		Attributes:
+		Args:
 			key(str): key of ID
 			key(:obj:`list` of :obj:`str`): list of keys of IDs
 		"""
