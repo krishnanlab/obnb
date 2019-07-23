@@ -1,7 +1,7 @@
 from NLEval.util.IDmap import IDmap
 import numpy as np
 
-class SparseGraph:
+class AdjLst:
 	def __init__(self, weighted=True, directed=False):
 		self._edge_data = []
 		self.IDmap = IDmap()
@@ -117,9 +117,9 @@ class SparseGraph:
 			- cut_threshold:(float) threshold beyound which edge are not consider as exist
 		'''
 		if reader is 'edglst':
-			reader = SparseGraph.edglst_reader
+			reader = AdjLst.edglst_reader
 		elif reader == 'npy':
-			reader = SparseGraph.npy_reader
+			reader = AdjLst.npy_reader
 
 		for ID1, ID2, weight in reader(file, self.weighted, self.directed, cut_threshold):
 			self.addEdge(ID1, ID2, weight)
@@ -192,7 +192,7 @@ class BaseGraph:
 
 	@classmethod
 	def from_edglst(cls, path_to_edglst, weighted, directed):
-		graph = SparseGraph()
+		graph = AdjLst()
 		graph.read_edglst(path_to_edglst, weighted, directed)
 		return cls(graph.IDmap, graph.to_adjmat())
 

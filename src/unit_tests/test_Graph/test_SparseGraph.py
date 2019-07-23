@@ -1,5 +1,5 @@
 from common import *
-from NLEval.Graph import SparseGraph
+from NLEval.Graph import AdjLst
 
 class TestIDmap(unittest.TestCase):
 	def setUp(self):
@@ -20,19 +20,19 @@ class TestIDmap(unittest.TestCase):
 		self.graph = None
 
 	def test_read_edglst_unweighted1(self):
-		self.graph = SparseGraph(weighted=False, directed=False)
+		self.graph = AdjLst(weighted=False, directed=False)
 		self.graph.read(self.t1u_pth)
 		self.assertEqual(self.graph.IDmap.lst, self.IDlst1)
 		self.assertEqual(self.graph.edge_data, self.data_unweighted1)
 
 	def test_read_edglst_weighted1(self):
-		self.graph = SparseGraph(weighted=True, directed=False)
+		self.graph = AdjLst(weighted=True, directed=False)
 		self.graph.read(self.t1w_pth)
 		self.assertEqual(self.graph.IDmap.lst, self.IDlst1)
 		self.assertEqual(self.graph.edge_data, self.data_weighted1)
 
 	def test_read_npymat_weighted1(self):
-		self.graph = SparseGraph(weighted=False, directed=False)
+		self.graph = AdjLst(weighted=False, directed=False)
 		self.graph.read(self.data_mat1, reader='npy')
 		self.assertEqual(self.graph.IDmap.lst, self.IDlst1)
 		self.assertEqual(self.graph.edge_data, self.data_weighted1)
