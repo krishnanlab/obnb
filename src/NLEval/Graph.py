@@ -1,7 +1,9 @@
 from NLEval.util.IDmap import IDmap
+from NLEval.util import checkers
 import numpy as np
 
 class AdjLst:
+	"""Adjacency List object for efficient data retrieving"""
 	def __init__(self, weighted=True, directed=False):
 		self._edge_data = []
 		self.IDmap = IDmap()
@@ -10,31 +12,28 @@ class AdjLst:
 
 	@property
 	def edge_data(self):
+		""":obj:`list` of :obj:`dict`: adjacency list data"""
 		return self._edge_data
 
 	@property
 	def weighted(self):
+		"""bool: Indicate whether weights (3rd column in edgelist) are available"""
 		return self._weighted
 	
 	@property
 	def directed(self):
+		"""bool: Indicate whether edges are directed or not"""
 		return self._directed
 
 	@weighted.setter
 	def weighted(self, val):
-		self.check_bool('weighted',val)
+		checkers.checkType('weighted',bool,val)
 		self._weighted = val
 
 	@directed.setter
 	def directed(self, val):
-		self.check_bool('directed',val)
+		checkers.checkType('directed',bool,val)
 		self._directed = val
-
-	@staticmethod
-	def check_bool(name, val):
-		if not isinstance(val, bool):
-			raise TypeError("Argument for '%s' must be bool type, not '%s'"%\
-				(name, type(val)))
 
 	def addID(self, ID):
 		self.IDmap.addID(ID)
@@ -58,11 +57,11 @@ class AdjLst:
 				self._edge_data[self.IDmap[ID2]][self.IDmap[ID1]] = weight
 
 	@staticmethod
-	def edglst_reader(edg_file, weighted, directed, cut_threshold):
-		'''
+	def edglst_reader(edg_fp, weighted, directed, cut_threshold):
+		"""Edge list file reader
 		Read line by line from a edge list file and yield ID1, ID2, weight
-		'''
-		with open(edg_file, 'r') as f:
+		"""
+		with open(edg_fp, 'r') as f:
 			for line in f:
 				try:
 					ID1, ID2, weight = line.split('\t')
@@ -80,12 +79,12 @@ class AdjLst:
 
 	@staticmethod
 	def npy_reader(mat, weighted, directed, cut_threshold):
-		'''
+		"""Numpy reader
 		Load an numpy matrix (either from file path or numpy matrix directly) 
 		and yield ID1, ID2, weight
 		Matrix should be in shape (N, N+1), where N is number of nodes
 		First column of the matrix encodes IDs
-		'''
+		"""
 		if isinstance(mat, str):
 			#load numpy matrix from file if provided path instead of numpy matrix
 			mat = np.load(mat)
@@ -104,18 +103,17 @@ class AdjLst:
 						yield str(ID1), str(ID2), weight
 
 	def read(self, file, reader='edglst', cut_threshold=0):
-		'''
-		Construct sparse graph from edge list file
-		Read line by line and implicitly discard zero weighted edges
-		Input:
-			- file:			(str) path to edge file
-			- weighted:		(bool) if not weighted, all weights are set to 1
-			- directed:		(bool) if not directed, automatically add 2 edges
-			- reader:		generator function that yield edges from file, or 
-							specify 'edglst' for default edge list reader or
-							specify 'npy' for default numpy matrix reader
-			- cut_threshold:(float) threshold beyound which edge are not consider as exist
-		'''
+		"""Read data and construct sparse graph
+
+		Attributes:
+			file(str): path to input file
+			weighted(bool): if not weighted, all weights are set to 1
+			directed(bool): if not directed, automatically add 2 edges
+			reader: generator function (or name of default reader) that yield edges from file
+						- 'edglst': edge list reader
+						- 'npy': numpy reader
+			cut_threshold(float): threshold below which edges are not considered
+		"""
 		if reader is 'edglst':
 			reader = AdjLst.edglst_reader
 		elif reader == 'npy':
@@ -126,6 +124,9 @@ class AdjLst:
 
 	@staticmethod
 	def edglst_writer(outpth, edge_gen, weighted, directed, cut_threshold):
+		"""Edge list file writer
+		Write line by line to edge list
+		"""
 		with open(outpth, 'w') as f:
 			for srcID, dstID, weight in edge_gen():
 				if weighted:
@@ -136,7 +137,7 @@ class AdjLst:
 
 	@staticmethod
 	def npy_writer():
-		pass
+		raise NotImplementedError
 
 	def edge_gen(self):
 		edge_data_copy = self._edge_data[:]
@@ -151,6 +152,15 @@ class AdjLst:
 				yield srcID, dstID, weight
 
 	def save(self, outpth, writer='edglst', cut_threshold=0):
+		"""Save graph to file
+
+		Attributes:
+			outpth(str): path to output file
+			writer: writer function (or name of default writer) to generate file
+						- 'edglst': edge list writer
+						- 'npy': numpy writer
+			cut_threshold(float): threshold below which edges are not considered
+		"""
 		if writer == 'edglst':
 			writer = self.edglst_writer
 		elif writer == 'npy':
