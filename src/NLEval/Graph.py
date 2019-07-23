@@ -11,6 +11,11 @@ class AdjLst:
 		self.directed = directed
 
 	@property
+	def size(self):
+		"""int: number of nodes in graph"""
+		return self.IDmap.size
+
+	@property
 	def edge_data(self):
 		""":obj:`list` of :obj:`dict`: adjacency list data"""
 		return self._edge_data
@@ -27,12 +32,12 @@ class AdjLst:
 
 	@weighted.setter
 	def weighted(self, val):
-		checkers.checkType('weighted',bool,val)
+		checkers.checkType('weighted', bool, val)
 		self._weighted = val
 
 	@directed.setter
 	def directed(self, val):
-		checkers.checkType('directed',bool,val)
+		checkers.checkType('directed', bool, val)
 		self._directed = val
 
 	def addID(self, ID):
@@ -109,18 +114,25 @@ class AdjLst:
 			file(str): path to input file
 			weighted(bool): if not weighted, all weights are set to 1
 			directed(bool): if not directed, automatically add 2 edges
-			reader: generator function (or name of default reader) that yield edges from file
-						- 'edglst': edge list reader
-						- 'npy': numpy reader
+			reader: generator function that yield edges from file
 			cut_threshold(float): threshold below which edges are not considered
 		"""
-		if reader is 'edglst':
-			reader = AdjLst.edglst_reader
-		elif reader == 'npy':
-			reader = AdjLst.npy_reader
-
 		for ID1, ID2, weight in reader(file, self.weighted, self.directed, cut_threshold):
 			self.addEdge(ID1, ID2, weight)
+
+	@classmethod
+	def from_edglst(cls, path_to_edglst, weighted, directed, cut_threshold=0):
+		graph = cls(weighted=weighted, directed=directed)
+		reader = cls.edglst_reader
+		graph.read(path_to_edglst, reader=reader, cut_threshold=cut_threshold)
+		return graph
+
+	@classmethod
+	def from_npy(cls, npy, weighted, directed, cut_threshold=0):
+		graph = cls(weighted=weighted, directed=directed)
+		reader = cls.npy_reader
+		graph.read(npy, reader=reader, cut_threshold=cut_threshold)
+		return graph
 
 	@staticmethod
 	def edglst_writer(outpth, edge_gen, weighted, directed, cut_threshold):
@@ -161,10 +173,13 @@ class AdjLst:
 						- 'npy': numpy writer
 			cut_threshold(float): threshold below which edges are not considered
 		"""
-		if writer == 'edglst':
-			writer = self.edglst_writer
-		elif writer == 'npy':
-			writer = self.npy_writer
+		if isinstance(writer, str):
+			if writer == 'edglst':
+				writer = self.edglst_writer
+			elif writer == 'npy':
+				writer = self.npy_writer
+			else:
+				raise ValueError('Unknown writer function name %s'%repr(writer))
 		writer(outpth, self.edge_gen, self.weighted, self.directed, cut_threshold)
 
 	def to_adjmat(self):
@@ -179,17 +194,69 @@ class AdjLst:
 				mat[src_node, dst_node] = src_nbrs[dst_node]
 		return mat
 
+class SparseGraph(AdjLst):
+	"""Sparse Graph object with data stored as adjacency list"""
+	def construct_adj_vec(self, src_idx):
+		"""Construct and return a specific row vector of 
+		adjacency matrix using correspondingadjacency list
+
+		Attribtues:
+			src_idx(int): index of row
+		"""
+		checkers.checkType('src_idx', int, src_idx)
+		fvec = np.zeros(self.size)
+		for nbr_idx, weight in self.edge_data[src_idx].items():
+			fvec[nbr_idx] = weight
+		return fvec
+
+	def __getitem__(self, key):
+		"""Return slices of constructed adjacency matrix
+
+		Attributes:
+			key(str): key of ID
+			key(:obj:`list` of :obj:`str`): list of keys of IDs
+		"""
+		idx = self.IDmap[key]
+		print(idx)
+		if isinstance(idx, int):
+			fvec = self.construct_adj_vec(idx)
+		else:
+			fvec_lst = []
+			fvec_lst = [self.construct_adj_vec(int(i)) for i in idx]
+			fvec = np.asarray(fvec_lst)
+		return fvec
+
 class BaseGraph:
+	"""Base Graph object that stores data as adjacency matrix using numpy array"""
 	def __init__(self, IDmap, mat):
 		self.IDmap = IDmap
 		self._mat = mat
 
+	def __getitem__(self, key):
+		"""Return slices of graph
+
+		Attributes:
+			key(str): key of ID
+			key(:obj:`list` of :obj:`str`): list of keys of IDs
+		"""
+		idx = self.IDmap[key]
+		return self.G.mat[idx]
+
+	@property
+	def size(self):
+		"""int: number of nodes in graph"""
+		return self.IDmap.size
+	
 	@property
 	def mat(self):
+		""":obj:`numpy.ndarray`: graph matrix where ij entry denotes association from i to j"""
 		return self._mat
 	
 	@classmethod
 	def from_mat(cls, mat):
+		"""Construct BaseGraph object from numpy array
+		First column of mat encodes ID
+		"""
 		idmap = IDmap()
 		for ID in mat[:,0]:
 			idmap.addID(ID)
@@ -197,24 +264,21 @@ class BaseGraph:
 
 	@classmethod
 	def from_npy(cls, path_to_npy, **kwargs):
+		"""Read numpy array from .npy file and construct BaseGraph"""
 		mat = np.load(path_to_npy, **kwargs)
-		return BaseGraph.from_mat(mat)
+		return cls.from_mat(mat)
 
 	@classmethod
 	def from_edglst(cls, path_to_edglst, weighted, directed):
+		"""Read from edgelist and construct BaseGraph"""
 		graph = AdjLst()
 		graph.read_edglst(path_to_edglst, weighted, directed)
 		return cls(graph.IDmap, graph.to_adjmat())
 
 class FeatureVec(BaseGraph):
-	'''
-	Feature vectors with ID maps
-	'''
+	"""Feature vectors with ID maps"""
 	def __init__(self, IDmap, mat):
 		super().__init__(IDmap, mat)
-
-	def __getitem__(self, ID):
-		return self.mat[ID2idx[ID]]
 
 	def addVec(self, ID, vec):
 		'''
@@ -229,9 +293,3 @@ class FeatureVec(BaseGraph):
 	@classmethod
 	def from_npy(cls, path_to_npy, **kwargs):
 		return super(BaseGraph, cls).from_npy(path_to_npy, **kwargs)
-
-
-
-
-
-
