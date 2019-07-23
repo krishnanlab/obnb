@@ -1,5 +1,5 @@
 from sys import path
-path.append('../../util/')
+path.append('../../')
 import unittest
 import numpy as np
 

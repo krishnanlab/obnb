@@ -1,5 +1,5 @@
 from common import *
-from IDmap import IDmap
+from NLEval.util.IDmap import IDmap
 
 class TestIDmap(unittest.TestCase):
 	def setUp(self):
