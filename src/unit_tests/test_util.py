@@ -40,6 +40,8 @@ class TestIDmap(unittest.TestCase):
 		self.assertEqual(self.IDmap[np.array(['a','b'])][0], 0)
 		self.assertEqual(self.IDmap[np.array(['a','b'])][1], 1)
 
+class TestCheckers(unittest.TestCase):
+	pass
 
 if __name__ == '__main__':
 	unittest.main()

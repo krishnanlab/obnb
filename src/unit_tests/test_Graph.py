@@ -1,7 +1,7 @@
 from common import *
 from NLEval.Graph import AdjLst
 
-class TestIDmap(unittest.TestCase):
+class TestAdjLst(unittest.TestCase):
 	def setUp(self):
 		self.t1w_pth = SAMPLE_DATA_PATH + 'toy1_weighted.edg'
 		self.t1u_pth = SAMPLE_DATA_PATH + 'toy1_unweighted.edg'
@@ -35,6 +35,12 @@ class TestIDmap(unittest.TestCase):
 		self.graph.read(self.data_mat1, reader='npy')
 		self.assertEqual(self.graph.IDmap.lst, self.IDlst1)
 		self.assertEqual(self.graph.edge_data, self.data_weighted1)
+
+class TestBaseGraph(unittest.TestCase):
+	pass
+
+class TestFeatureVec(unittest.TestCase):
+	pass
 
 if __name__ == '__main__':
 	unittest.main()
