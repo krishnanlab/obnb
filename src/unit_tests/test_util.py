@@ -40,6 +40,25 @@ class TestIDmap(unittest.TestCase):
 		self.assertEqual(self.IDmap[np.array(['a','b'])][0], 0)
 		self.assertEqual(self.IDmap[np.array(['a','b'])][1], 1)
 
+	def test_contains(self):
+		self.assertTrue('a' in self.IDmap)
+		self.assertFalse('b' in self.IDmap)
+		self.IDmap.addID('b')
+		self.assertTrue('b' in self.IDmap)
+
+	def test_eq(self):
+		self.IDmap.addID('b')
+		idmap = IDmap()
+		idmap.addID('b')
+		idmap.addID('a')
+		self.assertTrue(self.IDmap == idmap)
+		self.IDmap.addID('c')
+		self.IDmap.addID('d')
+		idmap.addID('d')
+		self.assertFalse(self.IDmap == idmap)
+		idmap.addID('c')
+		self.assertTrue(self.IDmap == idmap)
+
 class TestCheckers(unittest.TestCase):
 	pass
 
