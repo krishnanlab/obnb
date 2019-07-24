@@ -6,6 +6,10 @@ class IDmap:
 		self._data = {}
 		self._lst = []
 
+	def __iter__(self):
+		"""Yield all IDs"""
+		return self.lst.__iter__()
+
 	def __eq__(self, idmap):
 		"""Return true if two idmaps have same set of IDs"""
 		return set(self.lst) == set(idmap.lst)

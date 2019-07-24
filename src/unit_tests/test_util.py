@@ -59,6 +59,14 @@ class TestIDmap(unittest.TestCase):
 		idmap.addID('c')
 		self.assertTrue(self.IDmap == idmap)
 
+	def test_iter(self):
+		self.IDmap.addID('b')
+		self.IDmap.addID('x')
+		lst = ['a', 'b', 'x']
+		for i, j in enumerate(self.IDmap):
+			with self.subTest(i=i):
+				self.assertEqual(j, lst[i])
+
 class TestCheckers(unittest.TestCase):
 	pass
 
