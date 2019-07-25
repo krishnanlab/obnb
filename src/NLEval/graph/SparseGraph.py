@@ -1,19 +1,15 @@
-from NLEval.util.IDmap import IDmap
+from NLEval.graph.BaseGraph import BaseGraph
 from NLEval.util import checkers
 import numpy as np
 
-class AdjLst:
-	"""Adjacency List object for efficient data retrieving"""
+class SparseGraph(BaseGraph):
+	"""Sparse Graph object with data stored as adjacency list
+	for efficient data retrieving and processing"""
 	def __init__(self, weighted=True, directed=False):
+		super().__init__()
 		self._edge_data = []
-		self.IDmap = IDmap()
 		self.weighted = weighted
 		self.directed = directed
-
-	@property
-	def size(self):
-		"""int: number of nodes in graph"""
-		return self.IDmap.size
 
 	@property
 	def edge_data(self):
@@ -40,6 +36,36 @@ class AdjLst:
 		checkers.checkType('directed', bool, val)
 		self._directed = val
 
+	def __getitem__(self, key):
+		"""Return slices of constructed adjacency matrix
+
+		Args:
+			key(str): key of ID
+			key(:obj:`list` of :obj:`str`): list of keys of IDs
+		"""
+		idx = self.IDmap[key]
+		print(idx)
+		if isinstance(idx, int):
+			fvec = self.construct_adj_vec(idx)
+		else:
+			fvec_lst = []
+			fvec_lst = [self.construct_adj_vec(int(i)) for i in idx]
+			fvec = np.asarray(fvec_lst)
+		return fvec
+
+	def construct_adj_vec(self, src_idx):
+		"""Construct and return a specific row vector of 
+		adjacency matrix using correspondingadjacency list
+
+		Args:
+			src_idx(int): index of row
+		"""
+		checkers.checkType('src_idx', int, src_idx)
+		fvec = np.zeros(self.size)
+		for nbr_idx, weight in self.edge_data[src_idx].items():
+			fvec[nbr_idx] = weight
+		return fvec
+
 	def addID(self, ID):
 		self.IDmap.addID(ID)
 		self._edge_data.append({})
@@ -60,6 +86,12 @@ class AdjLst:
 			self._edge_data[self.IDmap[ID1]][self.IDmap[ID2]] = weight
 			if not self.directed:
 				self._edge_data[self.IDmap[ID2]][self.IDmap[ID1]] = weight
+
+	def get_edge(self, ID1, ID2):
+		try:
+			return self.edge_data[self.IDmap[ID1]][self.IDmap[ID2]]
+		except KeyError:
+				return 0
 
 	@staticmethod
 	def edglst_reader(edg_fp, weighted, directed, cut_threshold):
@@ -182,114 +214,15 @@ class AdjLst:
 				raise ValueError('Unknown writer function name %s'%repr(writer))
 		writer(outpth, self.edge_gen, self.weighted, self.directed, cut_threshold)
 
-	def to_adjmat(self):
-		'''
-		Construct adjacency matrix from edgelist data
-		TODO: prompt for default value instead of implicitely set to 0
-		'''
+	def to_adjmat(self, default_val=0):
+		"""Construct adjacency matrix from edgelist data
+
+		Args:
+			default_val(float): default value for missing edges
+		"""
 		Nnodes = self.IDmap.size
-		mat = np.zeros((Nnodes, Nnodes))
+		mat = np.ones((Nnodes, Nnodes)) * default_val
 		for src_node, src_nbrs in enumerate(self._edge_data):
 			for dst_node in src_nbrs:
 				mat[src_node, dst_node] = src_nbrs[dst_node]
 		return mat
-
-class SparseGraph(AdjLst):
-	"""Sparse Graph object with data stored as adjacency list"""
-	def construct_adj_vec(self, src_idx):
-		"""Construct and return a specific row vector of 
-		adjacency matrix using correspondingadjacency list
-
-		Args:
-			src_idx(int): index of row
-		"""
-		checkers.checkType('src_idx', int, src_idx)
-		fvec = np.zeros(self.size)
-		for nbr_idx, weight in self.edge_data[src_idx].items():
-			fvec[nbr_idx] = weight
-		return fvec
-
-	def __getitem__(self, key):
-		"""Return slices of constructed adjacency matrix
-
-		Args:
-			key(str): key of ID
-			key(:obj:`list` of :obj:`str`): list of keys of IDs
-		"""
-		idx = self.IDmap[key]
-		print(idx)
-		if isinstance(idx, int):
-			fvec = self.construct_adj_vec(idx)
-		else:
-			fvec_lst = []
-			fvec_lst = [self.construct_adj_vec(int(i)) for i in idx]
-			fvec = np.asarray(fvec_lst)
-		return fvec
-
-class BaseGraph:
-	"""Base Graph object that stores data as adjacency matrix using numpy array"""
-	def __init__(self, IDmap, mat):
-		self.IDmap = IDmap
-		self._mat = mat
-
-	def __getitem__(self, key):
-		"""Return slices of graph
-
-		Args:
-			key(str): key of ID
-			key(:obj:`list` of :obj:`str`): list of keys of IDs
-		"""
-		idx = self.IDmap[key]
-		return self.mat[idx]
-
-	@property
-	def size(self):
-		"""int: number of nodes in graph"""
-		return self.IDmap.size
-	
-	@property
-	def mat(self):
-		""":obj:`numpy.ndarray`: graph matrix where ij entry denotes association from i to j"""
-		return self._mat
-	
-	@classmethod
-	def from_mat(cls, mat):
-		"""Construct BaseGraph object from numpy array
-		First column of mat encodes ID
-		"""
-		idmap = IDmap()
-		for ID in mat[:,0]:
-			idmap.addID(ID)
-		return cls(idmap, mat[:,1:].astype(float))
-
-	@classmethod
-	def from_npy(cls, path_to_npy, **kwargs):
-		"""Read numpy array from .npy file and construct BaseGraph"""
-		mat = np.load(path_to_npy, **kwargs)
-		return cls.from_mat(mat)
-
-	@classmethod
-	def from_edglst(cls, path_to_edglst, weighted, directed):
-		"""Read from edgelist and construct BaseGraph"""
-		graph = AdjLst()
-		graph.read_edglst(path_to_edglst, weighted, directed)
-		return cls(graph.IDmap, graph.to_adjmat())
-
-class FeatureVec(BaseGraph):
-	"""Feature vectors with ID maps"""
-	def __init__(self, IDmap, mat):
-		super().__init__(IDmap, mat)
-
-	def addVec(self, ID, vec):
-		'''
-		Add a new feature vector
-		'''
-		self.IDmap.addID(ID)
-		if self.mat is not None:
-			self.mat = np.append(self.mat, vec.copy(), axis=0)
-		else:
-			self.mat = vec.copy()
-	
-	@classmethod
-	def from_npy(cls, path_to_npy, **kwargs):
-		return super(BaseGraph, cls).from_npy(path_to_npy, **kwargs)
