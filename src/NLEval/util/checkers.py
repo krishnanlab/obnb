@@ -7,19 +7,8 @@ ITERABLE_TYPE = Iterable
 
 def checkType(name, targetType, val):
 	if not isinstance(val, targetType):
-		if isinstance(targetType, ITERABLE_TYPE):
-			#multiple types
-			typeString = ""
-			for idx, typeName in enumerate(targetType):
-				if idx == 0:
-					typeString += "type %s"%repr(typeName)
-				else:
-					typeString += " or type %s"%repr(typeName)
-		else:
-			typeString = "type %s"%repr(targetType)
-
 		raise TypeError("%s should be %s, not %s"%
-						(repr(name), typeString, repr(type(val))))
+				(repr(name), targetType, repr(type(val))))
 
 def checkTypeErrNone(name, targetType, val):
 	if val is not None:
@@ -40,8 +29,8 @@ def checkNumpyArrayNDim(name, targetNDim, ary):
 	checkType(name, np.ndarray, ary)
 	NDim = len(ary.shape)
 	if NDim != targetNDim:
-		raise ValueError("%s should be %d dimensional array, not \
-			%d dimensional"%(repr(name), targetNDim, NDim))
+		raise ValueError("%s should be %d dimensional array, not %d dimensional"%
+			(repr(name), targetNDim, NDim))
 
 def checkNumpyArrayShape(name, targetShape, ary):
 	if isinstance(targetShape, ITERABLE_TYPE):
