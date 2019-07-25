@@ -30,9 +30,10 @@ class test_case1:
 			[5,		0,		0,		0.1,	0,		0]])
 
 class TestSparseGraph(unittest.TestCase):
-	def setUp(self):
-		self.case = test_case1()
-		self.lst = [['1','4'], ['2','5'], ['5','3','2']]
+	@classmethod
+	def setUpClass(cls):
+		cls.case = test_case1()
+		cls.lst = [['1','4'], ['2','5'], ['5','3','2']]
 
 	def test_read_edglst_unweighted(self):
 		graph = SparseGraph.SparseGraph.from_edglst(self.case.tu_fp, weighted=False, directed=False)
