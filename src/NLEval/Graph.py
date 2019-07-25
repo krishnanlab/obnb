@@ -240,7 +240,7 @@ class BaseGraph:
 			key(:obj:`list` of :obj:`str`): list of keys of IDs
 		"""
 		idx = self.IDmap[key]
-		return self.G.mat[idx]
+		return self.mat[idx]
 
 	@property
 	def size(self):
