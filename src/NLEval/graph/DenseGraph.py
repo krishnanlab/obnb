@@ -8,6 +8,7 @@ class DenseGraph(BaseGraph):
 	"""Base Graph object that stores data using numpy array"""
 	def __init__(self):
 		super().__init__()
+		self.mat = np.array([])
 	
 	def __getitem__(self, key):
 		"""Return slice of graph

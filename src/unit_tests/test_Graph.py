@@ -43,6 +43,26 @@ class test_case1:
 			[2,		0,		0.3,	0,		0,		0],
 			[5,		0,		0,		0.1,	0,		0]])
 
+class TestBaseGraph(unittest.TestCase):
+	def setUp(self):
+		self.graph = BaseGraph.BaseGraph()
+
+	def test_IDmap_setter(self):
+		with self.assertRaises(TypeError):
+			self.graph.IDmap = 'asdg'
+
+	def test_size(self):
+		self.assertEqual(self.graph.size, 0)
+		for i in range(5):
+			with self.subTest(i=i):
+				self.graph.IDmap.addID(i)
+				self.assertEqual(self.graph.size, i+1)
+
+	def test_isempty(self):
+		self.assertTrue(self.graph.isempty())
+		self.graph.IDmap.addID('a')
+		self.assertFalse(self.graph.isempty())
+
 class TestSparseGraph(unittest.TestCase):
 	@classmethod
 	def setUpClass(cls):
@@ -70,8 +90,8 @@ class TestSparseGraph(unittest.TestCase):
 		if not lst:
 			lst = graph.IDmap.lst
 		for ID_lst in graph.IDmap.lst:
-			with self.subTest(i=ID_lst):
-				idx_lst = graph.IDmap[ID_lst]
+			idx_lst = graph.IDmap[ID_lst]
+			with self.subTest(ID_lst=ID_lst, idx_lst=idx_lst):
 				self.assertEqual(list(graph[ID_lst]), list(adjmat[idx_lst]))
 
 	def test_construct_adj_vec_weighted(self):
@@ -100,10 +120,6 @@ class TestDenseGraph(unittest.TestCase):
 	@classmethod
 	def setUpClass(cls):
 		cls.case = test_case1()
-
-	def test_size(self):
-		graph = DenseGraph.DenseGraph.from_edglst(self.case.tw_fp, weighted=True, directed=False)
-		self.assertEqual(graph.size, len(self.case.IDlst))
 
 	def check_graph(self, graph):
 		"""compare graph with data, true if identical"""

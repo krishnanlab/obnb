@@ -40,3 +40,8 @@ class BaseGraph:
 	def size(self):
 		"""int: number of nodes in graph"""
 		return self.IDmap.size
+
+	def isempty(self):
+		"""bool: true if graph is empty, indicated by empty IDmap"""
+		return not self.size
+	
