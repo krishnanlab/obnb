@@ -47,6 +47,11 @@ class IDmap:
 		"""Add new ID, append last"""
 		#check if ID already exist
 		assert ID not in self,"ID:\t'%s'\texist"%ID
+		try:
+			#convert to int string if numeric
+			ID = str(int(ID))
+		except ValueError:
+			checkers.checkType('ID', (str,int), ID)
 		self._data[ID] = self.size
 		self._lst.append(ID)
 
