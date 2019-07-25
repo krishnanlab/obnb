@@ -33,6 +33,7 @@ class test_case1:
 	def __init__(self):
 		self.tw_fp = SAMPLE_DATA_PATH + 'toy1_weighted.edg'
 		self.tu_fp = SAMPLE_DATA_PATH + 'toy1_unweighted.edg'
+		self.temd_fp = SAMPLE_DATA_PATH + 'toy_STRING-EXP.emd'
 		self.IDlst = ['1','3','4','2','5']
 		self.data_unweighted = [{1:1,2:1},{0:1,4:1},{3:1,0:1},{2:1},{1:1}]
 		self.data_weighted = [{1:0.4},{0:0.4,4:0.1},{3:0.3},{2:0.3},{1:0.1}]
@@ -149,7 +150,19 @@ class TestDenseGraph(unittest.TestCase):
 		self.assertFalse(graph == graph2)
 
 class TestFeatureVec(unittest.TestCase):
-	pass
+	@classmethod
+	def setUpClass(cls):
+		cls.case = test_case1()
+		cls.graph = DenseGraph.FeatureVec.from_emd(cls.case.temd_fp)
+
+	def test_dim(self):
+		#test type int --> success
+		#test type np.int --> success
+		#test type np.int64 --> success
+		#test type float --> error
+		#test type str --> error
+		#test type np.float --> error
+		pass
 
 if __name__ == '__main__':
 	unittest.main()

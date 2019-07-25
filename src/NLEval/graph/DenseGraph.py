@@ -29,6 +29,8 @@ class DenseGraph(BaseGraph):
 	@mat.setter
 	def mat(self, val):
 		checkers.checkType('val', np.ndarray, val)
+		if val.size > 0:
+			checkers.checkNumpyArrayNDim('val', 2, val)
 		self._mat = val
 
 	def get_edge(self, ID1, ID2):
@@ -63,3 +65,58 @@ class DenseGraph(BaseGraph):
 		"""Read from edgelist and construct BaseGraph"""
 		graph = SparseGraph.from_edglst(path_to_edglst, weighted, directed, **kwargs)
 		return cls.construct_graph(graph.IDmap, graph.to_adjmat())
+
+class FeatureVec(DenseGraph):
+	"""Feature vectors with ID maps"""
+	def __init__(self, dim=None):
+		super().__init__()
+		self.dim = dim
+
+	@property
+	def dim(self):
+		"""int: dimension of feature vectors"""
+		return self._dim
+
+	@dim.setter
+	def dim(self, d):
+		checkers.checkTypeAllowNone('d', (int, np.integer), d)
+		if not self.isempty():
+			if d != self.mat.shape[1]:
+				if self.dim != self.mat.shape[1]:
+					#self.dim should always in sync with actual dimension of feature vectors
+					print("CRITICAL: This should never happen!")
+				raise ValueError("Inconsistent dimension between input (%d) and data (%d)"%\
+					(d, self.mat.shape[1]))
+		self._dim = d
+
+	@DenseGraph.mat.setter
+	def mat(self, val):
+		DenseGraph.mat.fset(self, val)
+		if val.size > 0:
+			self.dim = val.shape[1]
+
+	def addVec(self, ID, vec):
+		"""Add a new feature vector"""
+		if self.isempty():
+			if self.dim is not None:
+				checkers.checkNumpyArrayShape('vec', self.dim, vec)
+			else:
+				self.dim = vec.shape[0]
+			self.mat = vec.copy()
+		else:
+			self.mat = np.vstack([self.mat, vec])
+		self.IDmap.addID(ID)
+
+	@classmethod
+	def from_emd(cls, path_to_emd, **kwargs):
+		fvec_lst = []
+		idmap = IDmap()
+		with open(path_to_emd, 'r') as f:
+			f.readline() # skip header
+			for line in f:
+				terms = line.split(' ')
+				ID = terms[0].strip()
+				idmap.addID(ID)
+				fvec_lst.append(np.array(terms[1:], dtype=float))
+		mat = np.asarray(fvec_lst)
+		return cls.construct_graph(idmap, mat)
