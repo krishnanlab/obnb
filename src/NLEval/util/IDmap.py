@@ -44,14 +44,17 @@ class IDmap:
 		return self._lst
 	
 	def addID(self, ID):
-		"""Add new ID, append last"""
+		"""Add new ID as string, append last"""
 		#check if ID already exist
-		assert ID not in self,"ID:\t'%s'\texist"%ID
+		valid_type = checkers.INT_TYPE + checkers.FLOAT_TYPE + (str,)
+		checkers.checkType('ID', valid_type, ID)
 		try:
-			#convert to int string if numeric
-			ID = str(int(ID))
+			num = float(ID)
+			#convert to int string if numeric and is int
+			ID = str(int(num)) if num % 1 == 0 else str(num)
 		except ValueError:
-			checkers.checkType('ID', (str,int), ID)
+			pass
+		assert ID not in self, "ID %s exist"%repr(ID)
 		self._data[ID] = self.size
 		self._lst.append(ID)
 

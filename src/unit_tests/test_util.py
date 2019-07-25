@@ -25,8 +25,15 @@ class TestIDmap(unittest.TestCase):
 		self.IDmap.addID('b')
 		self.assertEqual(self.IDmap.lst, ['a','b'])
 
-	def test_newID(self):
+	def test_addID(self):
+		self.assertRaises(TypeError, self.IDmap.addID, (1, 2, 3))
+		self.assertRaises(TypeError, self.IDmap.addID, [1, 2, 3])
 		self.assertRaises(AssertionError, self.IDmap.addID, 'a')
+		self.IDmap.addID('10.0')
+		self.assertRaises(AssertionError, self.IDmap.addID, 10)
+		self.IDmap.addID('10.1')
+		self.IDmap.addID('abc')
+		self.assertEqual(self.IDmap.lst, ['a', '10', '10.1', 'abc'])
 
 	def test_getitem(self):
 		self.assertEqual(self.IDmap['a'], 0)
