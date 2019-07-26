@@ -195,13 +195,33 @@ class TestFeatureVec(unittest.TestCase):
 		cls.graph = DenseGraph.FeatureVec.from_emd(cls.case.temd_fp)
 
 	def test_dim(self):
+		graph = DenseGraph.FeatureVec()
 		#test type int --> success
+		graph.dim = int(10)
+		self.assertEqual(graph.dim, 10)
 		#test type np.int --> success
+		graph.dim = np.int(9)
+		self.assertEqual(graph.dim, 9)
 		#test type np.int64 --> success
+		graph.dim = np.int64(10)
+		self.assertEqual(graph.dim, 10)
+		#test int less than 1 --> error
+		with self.assertRaises(ValueError):
+			graph.dim = 0
+		with self.assertRaises(ValueError):
+			graph.dim = int(-10)
 		#test type float --> error
+		with self.assertRaises(TypeError):
+			graph.dim = float(5)
+		self.assertEqual(graph.dim, 10)
 		#test type str --> error
+		with self.assertRaises(TypeError):
+			graph.dim = '5'
+		self.assertEqual(graph.dim, 10)
 		#test type np.float --> error
-		pass
+		with self.assertRaises(TypeError):
+			graph.dim = np.float(5)
+		self.assertEqual(graph.dim, 10)
 
 if __name__ == '__main__':
 	unittest.main()

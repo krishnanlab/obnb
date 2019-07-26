@@ -97,13 +97,18 @@ class FeatureVec(DenseGraph):
 
 	@dim.setter
 	def dim(self, d):
-		checkers.checkTypeAllowNone('d', (int, np.integer), d)
+		checkers.checkTypeAllowNone('d', checkers.INT_TYPE, d)
+		if d is not None:
+			if d < 1:
+				raise ValueError("Feature dimension must be " + \
+					"greater than 1, input: %d"%d)
 		if not self.isempty():
 			if d != self.mat.shape[1]:
 				if self.dim != self.mat.shape[1]:
-					#self.dim should always in sync with actual dimension of feature vectors
+					#self.dim should always in sync with actual dim of feature vec
 					print("CRITICAL: This should never happen!")
-				raise ValueError("Inconsistent dimension between input (%d) and data (%d)"%\
+				raise ValueError("Inconsistent dimension " + \
+					"between input (%d) and data (%d)"%\
 					(d, self.mat.shape[1]))
 		self._dim = d
 
