@@ -1,5 +1,6 @@
 import numpy as np
 from NLEval.util import checkers
+from copy import deepcopy
 
 class IDmap:
 	def __init__(self):
@@ -13,6 +14,20 @@ class IDmap:
 	def __eq__(self, idmap):
 		"""Return true if two idmaps have same set of IDs"""
 		return set(self.lst) == set(idmap.lst)
+
+	def __add__(self, other):
+		new = self.copy()
+		for ID in other:
+			if ID not in new:
+				new.addID(ID)
+		return new
+
+	def __sub__(self, other):
+		new = self.__class__()
+		for ID in self:
+			if ID not in other:
+				new.addID(ID)
+		return new
 
 	def __contains__(self, key):
 		return key in self._data
@@ -42,6 +57,15 @@ class IDmap:
 	def lst(self):
 		"""(:obj:`list` of :obj:`str`): list of IDs in index order"""
 		return self._lst
+
+	def copy(self):
+		return deepcopy(self)
+
+	def pop(self, ID):
+		idx = self.data.pop(ID)
+		self.lst.pop(idx)
+		for i, ID in enumerate(self.lst[idx:]):
+			self.data[ID] = idx + i
 	
 	def addID(self, ID):
 		"""Add new ID as string, append last"""

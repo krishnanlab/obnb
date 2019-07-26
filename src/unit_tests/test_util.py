@@ -75,6 +75,46 @@ class TestIDmap(unittest.TestCase):
 			with self.subTest(i=i):
 				self.assertEqual(j, lst[i])
 
+	def test_copy(self):
+		idmap_shallow_copy = self.IDmap
+		idmap_deep_copy = self.IDmap.copy()
+		#shallow
+		self.IDmap.addID('b')
+		self.assertEqual(idmap_shallow_copy, self.IDmap)
+		#deep
+		self.assertNotEqual(idmap_deep_copy, self.IDmap)
+
+	def test_pop(self):
+		self.IDmap.addID('b')
+		self.IDmap.addID('c')
+		self.assertEqual(self.IDmap.lst, ['a', 'b', 'c'])
+		self.assertEqual(self.IDmap.data, {'a':0, 'b':1, 'c':2})
+		self.assertRaises(KeyError, self.IDmap.pop, 'd')
+		self.IDmap.pop('b')
+		#make sure both lst and data poped
+		self.assertEqual(self.IDmap.lst, ['a', 'c'])
+		#make sure data updated with new mapping
+		self.assertEqual(self.IDmap.data, {'a':0, 'c':1})
+		pass
+
+	def test_add(self):
+		idmap = IDmap()
+		idmap.addID('b')
+		idmap_combined = self.IDmap + idmap
+		self.assertEqual(idmap_combined.data, {'a':0, 'b':1})
+		self.assertEqual(idmap_combined.lst, ['a', 'b'])
+
+	def test_sub(self):
+		idmap = self.IDmap.copy()
+		idmap.addID('b')
+		self.IDmap.addID('c')
+		diff = idmap - self.IDmap
+		self.assertEqual(diff.data, {'b':0})
+		self.assertEqual(diff.lst, ['b'])
+		diff = self.IDmap - idmap
+		self.assertEqual(diff.data, {'c':0})
+		self.assertEqual(diff.lst, ['c'])
+
 class TestCheckers(unittest.TestCase):
 	@classmethod
 	def setUpClass(self):
