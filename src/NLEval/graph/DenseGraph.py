@@ -2,6 +2,7 @@ from NLEval.graph.BaseGraph import BaseGraph
 from NLEval.graph.SparseGraph import SparseGraph
 from NLEval.util.IDmap import IDmap
 from NLEval.util import checkers
+from scipy.spatial import distance
 import numpy as np
 
 class DenseGraph(BaseGraph):
@@ -114,21 +115,51 @@ class FeatureVec(DenseGraph):
 
 	@DenseGraph.mat.setter
 	def mat(self, val):
+		"""Setter for FeatureVec.mat
+		Note: matrix must match dimension of both self.IDmap and self.dim
+		"""
+		mat_bkp = self.mat #create backup copy
 		DenseGraph.mat.fset(self, val)
 		if val.size > 0:
-			self.dim = val.shape[1]
+			if self.dim is None: #set dim
+				self.dim = val.shape[1]
+			elif self.mat.shape[1] != self.dim: #check dim of input
+				self._mat = mat_bkp
+				raise ValueError("Inconsistent dimension between " + \
+					"input (%d) and specified dimension (%d)"%\
+					(val.shape[1], self.dim))
+
+	def get_edge(self, ID1, ID2, dist_fun=distance.cosine):
+		"""Return pairwise similarity of two features as 'edge'
+		
+		Args:
+			ID1(str): ID of first node
+			ID2(str): ID of second node
+			dist_fun: function to calculate distance between two vectors
+						default as cosine similarity
+		"""
+		return dist_fun(self[ID1], self[ID2])
 
 	def addVec(self, ID, vec):
 		"""Add a new feature vector"""
+		checkers.checkNumpyArrayNDim('vec', 1, vec)
+		checkers.checkNumpyArrayIsNumeric('vec', vec)
+
+		#check size consistency between IDmap and mat
+		assert self.size == self.mat.shape[0], \
+			"Inconsistent number of IDs (%d) and matrix entries (%d)"%\
+			(self.IDmap.size, self.mat.shape[0])
+
 		if self.isempty():
 			if self.dim is not None:
 				checkers.checkNumpyArrayShape('vec', self.dim, vec)
 			else:
 				self.dim = vec.shape[0]
-			self.mat = vec.copy()
+			new_mat = vec.copy().reshape((1, vec.size))
 		else:
-			self.mat = np.vstack([self.mat, vec])
+			new_mat = np.vstack([self.mat, vec])
 		self.IDmap.addID(ID)
+		self.mat = new_mat
 
 	@classmethod
 	def from_emd(cls, path_to_emd, **kwargs):

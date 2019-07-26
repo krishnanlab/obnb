@@ -3,6 +3,7 @@ from collections.abc import Iterable
 
 INT_TYPE = (int, np.integer)
 FLOAT_TYPE = (float, np.floating)
+NUMERIC_TYPE = INT_TYPE + FLOAT_TYPE
 ITERABLE_TYPE = Iterable
 
 def checkType(name, targetType, val):
@@ -23,6 +24,12 @@ def checkTypeAllowNone(name, targetType, val):
 def checkTypesInIterable(name, targetType, val):
 	checkType(name, ITERABLE_TYPE, val)
 	all(checkType(name + " values", targetType, i) for i in val)
+
+def checkNumpyArrayIsNumeric(name, ary):
+	checkType(name, np.ndarray, ary)
+	if not any([ary.dtype == i for i in NUMERIC_TYPE]):
+		raise TypeError("%s should be numeric, not type %s"%
+			(repr(name), repr(ary.dtype)))
 
 def checkNumpyArrayNDim(name, targetNDim, ary):
 	checkType("targetNDim", INT_TYPE, targetNDim)
