@@ -219,5 +219,28 @@ class TestCheckers(unittest.TestCase):
 		self.assertRaises(ValueError, checkers.checkNumpyArrayShape, 'ary2', (2, 1), ary2)
 		self.assertRaises(ValueError, checkers.checkNumpyArrayShape, 'ary3', 1, ary3)
 
+	def test_checkNumpyArrayIsNumeric(self):
+		#test numpy numeric array --> success
+		ary1 = np.random.random(3).astype(int)
+		ary2 = np.random.random((3, 3)).astype(float)
+		ary3 = np.random.random(5)
+		checkers.checkNumpyArrayIsNumeric('ar1', ary1)
+		checkers.checkNumpyArrayIsNumeric('ar2', ary2)
+		checkers.checkNumpyArrayIsNumeric('ar3', ary3)
+
+		#test numpy string array --> error
+		ary1 = np.ones(3, dtype=str)
+		ary2 = np.ones((3,3), dtype=str)
+		self.assertRaises(TypeError, checkers.checkNumpyArrayIsNumeric, 'ar1', ary1)
+		self.assertRaises(TypeError, checkers.checkNumpyArrayIsNumeric, 'ar2', ary2)
+
+		#test list --> error
+		lst = [1,2,3]
+		self.assertRaises(TypeError, checkers.checkNumpyArrayIsNumeric, 'lst', lst)
+
+		#test string --> error
+		string = 'asdfgasdglafknklasd'
+		self.assertRaises(TypeError, checkers.checkNumpyArrayIsNumeric, 'string', string)
+
 if __name__ == '__main__':
 	unittest.main()
