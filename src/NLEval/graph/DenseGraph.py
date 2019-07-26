@@ -8,7 +8,7 @@ class DenseGraph(BaseGraph):
 	"""Base Graph object that stores data using numpy array"""
 	def __init__(self):
 		super().__init__()
-		self.mat = np.array([])
+		self._mat = np.array([])
 	
 	def __getitem__(self, key):
 		"""Return slice of graph
@@ -24,16 +24,34 @@ class DenseGraph(BaseGraph):
 
 	@property
 	def mat(self):
+		"""Node information stored as numpy matrix"""
 		return self._mat
 	
 	@mat.setter
 	def mat(self, val):
-		checkers.checkType('val', np.ndarray, val)
+		"""Setter for DenseGraph.mat
+		Note: need to construct IDmap (self.IDmap) first before 
+		loading matrix (self.mat), which should have same number of 
+		entires (rows) as size of IDmap, riases exption other wise
+
+		Args:
+			val(:obj:`numpy.ndarray`): 2D numpy array
+		"""
+		checkers.checkNumpyArrayIsNumeric('val', val)
 		if val.size > 0:
 			checkers.checkNumpyArrayNDim('val', 2, val)
-		self._mat = val
+			if self.IDmap.size != val.shape[0]:
+				raise ValueError("Expecting %d entries, not %d"%\
+					(self.IDmap.size, val.shape[0]))
+		self._mat = val.copy()
 
 	def get_edge(self, ID1, ID2):
+		"""Return edge weight between ID1 and ID2
+		
+		Args:
+			ID1(str): ID of first node
+			ID2(str): ID of second node
+		"""
 		return self.mat[self.IDmap[ID1], self.IDmap[ID2]]
 
 	@classmethod

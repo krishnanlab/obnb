@@ -19,11 +19,11 @@ def shuffle_dense(graph):
 	n = graph.size
 	shuffle_idx = np.random.choice(n, size=n, replace=False)
 	new_graph = DenseGraph.DenseGraph()
-	new_graph.mat = np.zeros(graph.mat.shape)
 
 	for i in shuffle_idx:
 		ID = graph.IDmap.lst[i]
 		new_graph.IDmap.addID(ID)
+	new_graph.mat = np.zeros(graph.mat.shape)
 	for idx1_new, idx1_old in enumerate(shuffle_idx):
 		for idx2_new, idx2_old in enumerate(shuffle_idx):
 			new_graph.mat[idx1_new, idx2_new] = graph.mat[idx1_old, idx2_old]
@@ -130,6 +130,45 @@ class TestDenseGraph(unittest.TestCase):
 			for idx2, ID2 in enumerate(IDlst):
 				with self.subTest(idx1=idx1, idx2=idx2, ID1=type(ID1), ID2=ID2):
 					self.assertEqual(mat[idx1, idx2], graph.get_edge(ID1, ID2))
+
+	def test_mat(self):
+		graph = DenseGraph.DenseGraph()
+		graph.IDmap.addID('a')
+		graph.IDmap.addID('b')
+		graph.mat = np.random.random((2,2))
+		#test type check: only numpy array allowed
+		with self.assertRaises(TypeError):
+			graph.mat = [[1,5],[2,5]]
+		#test dtype check: only numeric numpy array allowed
+		with self.assertRaises(TypeError):
+			graph.mat = np.ones((2,2),dtype=str)
+		#test ndim check: only 2D or empty matrix allowed
+		with self.assertRaises(ValueError):
+			graph.mat = np.ones((2,2,2))
+		#test shape check: matrix should have same number of rows as the size of IDmap
+		with self.assertRaises(ValueError):
+			graph.mat = np.ones((3,2))
+		graph.mat = np.random.random((2,2))
+
+	def test_get_edge(self):
+		graph = DenseGraph.DenseGraph.from_mat(self.case.data_mat)
+		mat = self.case.data_mat[:,1:]
+		for i in range(mat.shape[0]):
+			for j in range(mat.shape[1]):
+				ID1 = graph.IDmap.lst[i]
+				ID2 = graph.IDmap.lst[j]
+				self.assertEqual(graph.get_edge(ID1, ID2), mat[i,j])
+
+	def test_construc_graph(self):
+		idmap = DenseGraph.IDmap()
+		idmap.addID('a')
+		idmap.addID('b')
+		mat1 = np.random.random((2,2))
+		mat2 = np.random.random((3,2))
+		#test consistent size input --> success
+		graph = DenseGraph.DenseGraph.construct_graph(idmap, mat1)
+		#test inconsistent size input --> error
+		self.assertRaises(AssertionError, DenseGraph.DenseGraph.construct_graph, idmap, mat2)
 
 	def test_from_edglst(self):
 		graph = DenseGraph.DenseGraph.from_edglst(self.case.tw_fp, weighted=True, directed=False)
