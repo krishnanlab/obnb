@@ -84,18 +84,17 @@ class TestIDmap(unittest.TestCase):
 		#deep
 		self.assertNotEqual(idmap_deep_copy, self.IDmap)
 
-	def test_pop(self):
+	def test_popID(self):
 		self.IDmap.addID('b')
 		self.IDmap.addID('c')
 		self.assertEqual(self.IDmap.lst, ['a', 'b', 'c'])
 		self.assertEqual(self.IDmap.data, {'a':0, 'b':1, 'c':2})
-		self.assertRaises(KeyError, self.IDmap.pop, 'd')
-		self.IDmap.pop('b')
+		self.assertRaises(KeyError, self.IDmap.popID, 'd')
+		self.IDmap.popID('b')
 		#make sure both lst and data poped
 		self.assertEqual(self.IDmap.lst, ['a', 'c'])
 		#make sure data updated with new mapping
 		self.assertEqual(self.IDmap.data, {'a':0, 'c':1})
-		pass
 
 	def test_add(self):
 		idmap = IDmap()

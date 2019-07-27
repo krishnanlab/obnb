@@ -61,7 +61,7 @@ class IDmap:
 	def copy(self):
 		return deepcopy(self)
 
-	def pop(self, ID):
+	def popID(self, ID):
 		idx = self.data.pop(ID)
 		self.lst.pop(idx)
 		for i, ID in enumerate(self.lst[idx:]):
