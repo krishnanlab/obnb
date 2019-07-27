@@ -82,6 +82,6 @@ class IDmap:
 		self._data[ID] = self.size
 		self._lst.append(ID)
 
-	def idx2ID(self, idx):
+	def getID(self, idx):
 		"""Return ID at index"""
 		return self._lst[idx]

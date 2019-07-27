@@ -38,8 +38,8 @@ class TestIDmap(unittest.TestCase):
 	def test_getitem(self):
 		self.assertEqual(self.IDmap['a'], 0)
 
-	def test_idx2ID(self):
-		self.assertEqual(self.IDmap.idx2ID(0), 'a')
+	def test_getID(self):
+		self.assertEqual(self.IDmap.getID(0), 'a')
 
 	def test_IDary2idxary(self):
 		self.IDmap.addID('b')
