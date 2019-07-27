@@ -31,6 +31,7 @@ class IDlst(object):
 		return new
 
 	def __contains__(self, ID):
+		"""Return true if ID exist in current list"""
 		return ID in self.lst
 
 	def __getitem__(self, ID):
@@ -56,16 +57,21 @@ class IDlst(object):
 
 	@property
 	def lst(self):
+		""":obj:`list` of :obj:`str`: list of IDs.
+		No setter, use `addID` or `popID` to modify"""
 		return self._lst
 	
 	@property
 	def size(self):
+		"""int: number of IDs in list"""
 		return len(self.lst)
 
 	def copy(self):
+		"""Return a deepcopy of self"""
 		return deepcopy(self)
 
 	def popID(self, ID):
+		"""Pop an ID out of list of IDs"""
 		checkers.checkType('ID', str, ID)
 		assert ID in self, "Unknown ID: %s"%repr(ID)
 		self.lst.pop(self[ID])
@@ -84,6 +90,7 @@ class IDlst(object):
 		self._lst.append(ID)
 
 	def getID(self, idx):
+		"""Return ID by its index"""
 		return self.lst[idx]
 
 class IDmap(IDlst):
