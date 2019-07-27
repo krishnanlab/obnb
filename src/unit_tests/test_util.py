@@ -104,6 +104,9 @@ class TestIDlst(unittest.TestCase):
 		self.assertRaises(AssertionError, self.IDlst1.addID, '10')
 		#test type checking
 		self.assertRaises(TypeError, self.IDlst1.addID, (1,2,))
+		#test strippint
+		self.assertRaises(AssertionError, self.IDlst1.addID, '   a  ')
+		self.assertRaises(AssertionError, self.IDlst1.addID, '   10')
 
 	def test_getID(self):
 		for idx, ID in enumerate(self.lst):

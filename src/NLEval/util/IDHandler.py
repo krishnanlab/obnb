@@ -87,7 +87,7 @@ class IDlst(object):
 			#convert to int string if numeric and is int
 			ID = str(int(num)) if num % 1 == 0 else str(num)
 		except ValueError:
-			pass
+			ID = ID.strip()
 		#check if ID already exist after clean up format
 		assert ID not in self, "ID %s exist"%repr(ID)
 		self._lst.append(ID)
