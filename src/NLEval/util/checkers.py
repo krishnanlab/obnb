@@ -23,7 +23,10 @@ def checkTypeAllowNone(name, targetType, val):
 
 def checkTypesInIterable(name, targetType, val):
 	checkType(name, ITERABLE_TYPE, val)
-	all(checkType(name + " values", targetType, i) for i in val)
+	for idx, i in enumerate(val):
+		if not isinstance(i, targetType):
+			raise TypeError("All instances in %s must be type %s, invalid type %s found at position (%d)"%\
+				(repr(name), repr(targetType), repr(type(i)), idx))
 
 def checkNumpyArrayIsNumeric(name, ary):
 	checkType(name, np.ndarray, ary)
