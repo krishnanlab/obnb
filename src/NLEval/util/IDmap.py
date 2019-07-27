@@ -2,18 +2,19 @@ import numpy as np
 from NLEval.util import checkers
 from copy import deepcopy
 
-class IDmap:
+class IDlst(object):
+	"""docstring for IDlst"""
 	def __init__(self):
-		self._map = {}
+		super(IDlst, self).__init__()
 		self._lst = []
 
 	def __iter__(self):
 		"""Yield all IDs"""
 		return self.lst.__iter__()
 
-	def __eq__(self, idmap):
-		"""Return true if two idmaps have same set of IDs"""
-		return set(self.lst) == set(idmap.lst)
+	def __eq__(self, other):
+		"""Return true if two IDlst have same set of IDs"""
+		return set(self.lst) == set(other.lst)
 
 	def __add__(self, other):
 		new = self.copy()
@@ -29,59 +30,88 @@ class IDmap:
 				new.addID(ID)
 		return new
 
-	def __contains__(self, key):
-		return key in self._map
+	def __contains__(self, ID):
+		return ID in self.lst
 
-	def __getitem__(self, key):
-		"""Return (array of) index of key"""
-		if isinstance(key, (list,np.ndarray)):
-			idx = []
-			for i in key:
-				idx.append(self._map[i])
-			return np.array(idx)
+	def __getitem__(self, ID):
+		"""Return (array of) index of ID"""
+		if isinstance(ID, str):
+			return self.__getitem_sinlge(ID)
+		elif isinstance(ID, checkers.ITERABLE_TYPE):
+			return self.__getitem_multiple(ID)
 		else:
-			checkers.checkType('key', (str, list, np.ndarray), key)
-			return self._map[key]
+			raise TypeError("ID keys must be stirng or iterables of string, not %s"%\
+					repr(type(ID)))
 
-	@property
-	def size(self):
-		"""int: number of IDs in map"""
-		return len(self._map)
+	def __getitem_sinlge(self, ID):
+		assert ID in self, "Unknown ID: %s"%repr(ID)
+		return self._lst.index(ID)
 
-	@property
-	def map(self):
-		"""(dict of str:int): map from ID to index"""
-		return self._map
-	
+	def __getitem_multiple(self, IDs):
+		checkers.checkTypesInIterable('IDs', str, IDs)
+		idx_lst = []
+		for ID in IDs:
+			idx_lst.append(self.__getitem_sinlge(ID))
+		return idx_lst
+
 	@property
 	def lst(self):
-		"""(:obj:`list` of :obj:`str`): list of IDs in index order"""
 		return self._lst
+	
+	@property
+	def size(self):
+		return len(self.lst)
 
 	def copy(self):
 		return deepcopy(self)
 
 	def popID(self, ID):
-		idx = self.map.pop(ID)
-		self.lst.pop(idx)
-		for i, ID in enumerate(self.lst[idx:]):
-			self.map[ID] = idx + i
-	
+		checkers.checkType('ID', str, ID)
+		assert ID in self, "Unknown ID: %s"%repr(ID)
+		self.lst.pop(self[ID])
+
 	def addID(self, ID):
 		"""Add new ID as string, append last"""
-		#check if ID already exist
-		valid_type = checkers.INT_TYPE + checkers.FLOAT_TYPE + (str,)
-		checkers.checkType('ID', valid_type, ID)
+		checkers.checkType('ID', checkers.NUMSTRING_TYPE, ID)
 		try:
 			num = float(ID)
 			#convert to int string if numeric and is int
 			ID = str(int(num)) if num % 1 == 0 else str(num)
 		except ValueError:
 			pass
+		#check if ID already exist after clean up format
 		assert ID not in self, "ID %s exist"%repr(ID)
-		self._map[ID] = self.size
 		self._lst.append(ID)
 
 	def getID(self, idx):
-		"""Return ID at index"""
-		return self._lst[idx]
+		return self.lst[idx]
+
+class IDmap(IDlst):
+	"""IDmap object that implements dictionary for more efficient mapping
+	from ID to index"""
+	def __init__(self):
+		super(IDmap, self).__init__()
+		self._map = {}
+
+	def __contains__(self, ID):
+		return ID in self.map
+
+	def __getitem_sinlge(self, ID):
+		assert ID in self, "Unknown ID: %s"%repr(ID)
+		return self.map[ID]
+
+	@property
+	def map(self):
+		"""(dict of str:int): map from ID to index"""
+		return self._map
+
+	def popID(self, ID):
+		super(IDmap, self).popID(ID)
+		idx = self.map.pop(ID)
+		for i, ID in enumerate(self.lst[idx:]):
+			self.map[ID] = idx + i
+	
+	def addID(self, ID):
+		new_idx = self.size
+		super(IDmap, self).addID(ID)
+		self._map[self.lst[-1]] = new_idx

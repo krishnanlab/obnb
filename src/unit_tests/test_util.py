@@ -1,10 +1,10 @@
 from common import *
-from NLEval.util.IDmap import IDmap
+from NLEval.util import IDmap
 from NLEval.util import checkers
 
 class TestIDmap(unittest.TestCase):
 	def setUp(self):
-		self.IDmap = IDmap()
+		self.IDmap = IDmap.IDmap()
 		self.IDmap.addID('a')
 
 	def tearDown(self):
@@ -56,7 +56,7 @@ class TestIDmap(unittest.TestCase):
 
 	def test_eq(self):
 		self.IDmap.addID('b')
-		idmap = IDmap()
+		idmap = IDmap.IDmap()
 		idmap.addID('b')
 		idmap.addID('a')
 		self.assertTrue(self.IDmap == idmap)
@@ -89,7 +89,7 @@ class TestIDmap(unittest.TestCase):
 		self.IDmap.addID('c')
 		self.assertEqual(self.IDmap.lst, ['a', 'b', 'c'])
 		self.assertEqual(self.IDmap.map, {'a':0, 'b':1, 'c':2})
-		self.assertRaises(KeyError, self.IDmap.popID, 'd')
+		self.assertRaises(AssertionError, self.IDmap.popID, 'd')
 		self.IDmap.popID('b')
 		#make sure both lst and data poped
 		self.assertEqual(self.IDmap.lst, ['a', 'c'])
@@ -97,7 +97,7 @@ class TestIDmap(unittest.TestCase):
 		self.assertEqual(self.IDmap.map, {'a':0, 'c':1})
 
 	def test_add(self):
-		idmap = IDmap()
+		idmap = IDmap.IDmap()
 		idmap.addID('b')
 		idmap_combined = self.IDmap + idmap
 		self.assertEqual(idmap_combined.map, {'a':0, 'b':1})
