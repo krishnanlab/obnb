@@ -14,9 +14,11 @@ class IDlst(object):
 
 	def __eq__(self, other):
 		"""Return true if two IDlst have same set of IDs"""
+		checkers.checkType('other', self.__class__, other)
 		return set(self.lst) == set(other.lst)
 
 	def __add__(self, other):
+		checkers.checkType('other', self.__class__, other)
 		new = self.copy()
 		for ID in other:
 			if ID not in new:
@@ -24,6 +26,7 @@ class IDlst(object):
 		return new
 
 	def __sub__(self, other):
+		checkers.checkType('other', self.__class__, other)
 		new = self.__class__()
 		for ID in self:
 			if ID not in other:
@@ -53,7 +56,7 @@ class IDlst(object):
 		idx_lst = []
 		for ID in IDs:
 			idx_lst.append(self.__getitem_sinlge(ID))
-		return idx_lst
+		return np.array(idx_lst)
 
 	@property
 	def lst(self):

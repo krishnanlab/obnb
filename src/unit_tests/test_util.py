@@ -2,6 +2,115 @@ from common import *
 from NLEval.util import IDHandler
 from NLEval.util import checkers
 
+class TestIDlst(unittest.TestCase):
+	def setUp(self):
+		self.IDlst1 = IDHandler.IDlst()
+		self.IDlst2 = IDHandler.IDlst()
+		self.IDlst3 = IDHandler.IDlst()
+		self.IDlst4 = IDHandler.IDlst()
+		self.lst = ['a','b','c']
+		for i in self.lst:
+			self.IDlst1.addID(i)
+			self.IDlst2.addID(i)
+		self.IDlst3.addID('a')
+		self.IDlst3.addID('b')
+		self.IDlst4.addID('c')
+
+	def test_iter(self):
+		for i, j in zip(self.IDlst1, self.lst):
+			self.assertEqual(i, j)
+
+	def template_test_type_consistency(self, fun):
+		self.assertRaises(TypeError, fun, self.lst)
+		self.assertRaises(TypeError, fun, 10)
+
+	def test_eq(self):
+		self.assertTrue(self.IDlst1 == self.IDlst2)
+		self.assertFalse(self.IDlst1 != self.IDlst2)
+		self.IDlst1.addID('d')
+		self.assertTrue(self.IDlst1 != self.IDlst2)
+		self.IDlst2.addID('d')
+		self.assertTrue(self.IDlst1 == self.IDlst2)
+		#test if orders matter
+		self.IDlst1.addID('e')
+		self.IDlst1.addID('f')
+		self.IDlst2.addID('f')
+		self.IDlst2.addID('e')
+		self.assertTrue(self.IDlst1 == self.IDlst2)
+		self.template_test_type_consistency(self.IDlst1.__eq__)
+
+	def test_add(self):
+		self.assertTrue(self.IDlst1 == self.IDlst3 + self.IDlst4)
+		self.IDlst4.addID('d')
+		self.assertFalse(self.IDlst1 == self.IDlst3 + self.IDlst4)
+		self.IDlst1.addID('d')
+		self.assertTrue(self.IDlst1 == self.IDlst3 + self.IDlst4)
+		self.template_test_type_consistency(self.IDlst1.__add__)
+
+	def test_sub(self):
+		self.assertTrue(self.IDlst3 == self.IDlst1 - self.IDlst4)
+		self.assertTrue(self.IDlst4 == self.IDlst1 - self.IDlst3)
+		self.assertTrue(IDHandler.IDlst() == self.IDlst1 - self.IDlst1)
+		self.template_test_type_consistency(self.IDlst1.__sub__)
+
+	def test_contains(self):
+		for i in self.lst:
+			self.assertTrue(i in self.IDlst1)
+		self.assertTrue('c' not in self.IDlst3)
+
+	def test_getitem(self):
+		for idx, ID in enumerate(self.lst):
+			self.assertEqual(self.IDlst1[ID], idx)
+		self.assertRaises(AssertionError, self.IDlst1.__getitem__, 'd')
+		self.assertTrue(all(self.IDlst1[self.lst] == np.array([0, 1, 2])))
+		self.assertRaises(AssertionError, self.IDlst3.__getitem__, self.lst)
+		self.assertRaises(TypeError, self.IDlst3.__getitem__, ['a', 0])
+
+	def test_size(self):
+		self.assertEqual(self.IDlst1.size, 3)
+		self.assertEqual(self.IDlst3.size, 2)
+		self.assertEqual(IDHandler.IDlst().size, 0)
+
+	def test_copy(self):
+		idlst_shallow_copy = self.IDlst1
+		idlst_deep_copy = self.IDlst1.copy()
+		#shallow
+		self.IDlst1.addID('d')
+		self.assertEqual(idlst_shallow_copy, self.IDlst1)
+		#deep
+		self.assertNotEqual(idlst_deep_copy, self.IDlst1)
+
+	def test_popID(self):
+		self.IDlst1.popID('c')
+		self.assertEqual(self.IDlst1, self.IDlst3)
+		self.assertRaises(AssertionError, self.IDlst1.popID, 'c')
+		self.assertRaises(TypeError, self.IDlst1.popID, 1)
+
+	def test_addID(self):
+		self.assertEqual(self.IDlst1.lst, ['a', 'b', 'c'])
+		#test basic addID with string
+		self.IDlst1.addID('d')
+		self.assertEqual(self.IDlst1.lst, ['a', 'b', 'c', 'd'])
+		#test addID with transformation from int to string
+		self.IDlst1.addID(10)
+		self.assertEqual(self.IDlst1.lst, ['a', 'b', 'c', 'd', '10'])
+		#test addID with transformation from float type inteter to string
+		self.IDlst1.addID(11.0)
+		self.assertEqual(self.IDlst1.lst, ['a', 'b', 'c', 'd', '10', '11'])
+		#test addID with transformation from float to string
+		self.IDlst1.addID(11.1)
+		self.assertEqual(self.IDlst1.lst, ['a', 'b', 'c', 'd', '10', '11', '11.1'])
+		#test add existing ID --> error
+		self.assertRaises(AssertionError, self.IDlst1.addID, '10')
+		#test type checking
+		self.assertRaises(TypeError, self.IDlst1.addID, (1,2,))
+
+	def test_getID(self):
+		for idx, ID in enumerate(self.lst):
+			self.assertEqual(self.IDlst1.getID(idx), ID)
+		#test type check
+		self.assertRaises(TypeError, self.IDlst1.getID, 'asdf')
+
 class TestIDmap(unittest.TestCase):
 	def setUp(self):
 		self.IDmap = IDHandler.IDmap()
