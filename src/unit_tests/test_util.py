@@ -15,10 +15,10 @@ class TestIDmap(unittest.TestCase):
 		self.IDmap.addID('b')
 		self.assertEqual(self.IDmap.size, 2)
 
-	def test_data(self):
-		self.assertEqual(self.IDmap.data, {'a':0})
+	def test_map(self):
+		self.assertEqual(self.IDmap.map, {'a':0})
 		self.IDmap.addID('b')
-		self.assertEqual(self.IDmap.data, {'a':0,'b':1})
+		self.assertEqual(self.IDmap.map, {'a':0,'b':1})
 
 	def test_lst(self):
 		self.assertEqual(self.IDmap.lst, ['a'])
@@ -88,19 +88,19 @@ class TestIDmap(unittest.TestCase):
 		self.IDmap.addID('b')
 		self.IDmap.addID('c')
 		self.assertEqual(self.IDmap.lst, ['a', 'b', 'c'])
-		self.assertEqual(self.IDmap.data, {'a':0, 'b':1, 'c':2})
+		self.assertEqual(self.IDmap.map, {'a':0, 'b':1, 'c':2})
 		self.assertRaises(KeyError, self.IDmap.popID, 'd')
 		self.IDmap.popID('b')
 		#make sure both lst and data poped
 		self.assertEqual(self.IDmap.lst, ['a', 'c'])
 		#make sure data updated with new mapping
-		self.assertEqual(self.IDmap.data, {'a':0, 'c':1})
+		self.assertEqual(self.IDmap.map, {'a':0, 'c':1})
 
 	def test_add(self):
 		idmap = IDmap()
 		idmap.addID('b')
 		idmap_combined = self.IDmap + idmap
-		self.assertEqual(idmap_combined.data, {'a':0, 'b':1})
+		self.assertEqual(idmap_combined.map, {'a':0, 'b':1})
 		self.assertEqual(idmap_combined.lst, ['a', 'b'])
 
 	def test_sub(self):
@@ -108,10 +108,10 @@ class TestIDmap(unittest.TestCase):
 		idmap.addID('b')
 		self.IDmap.addID('c')
 		diff = idmap - self.IDmap
-		self.assertEqual(diff.data, {'b':0})
+		self.assertEqual(diff.map, {'b':0})
 		self.assertEqual(diff.lst, ['b'])
 		diff = self.IDmap - idmap
-		self.assertEqual(diff.data, {'c':0})
+		self.assertEqual(diff.map, {'c':0})
 		self.assertEqual(diff.lst, ['c'])
 
 class TestCheckers(unittest.TestCase):

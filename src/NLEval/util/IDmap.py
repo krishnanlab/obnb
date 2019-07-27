@@ -4,7 +4,7 @@ from copy import deepcopy
 
 class IDmap:
 	def __init__(self):
-		self._data = {}
+		self._map = {}
 		self._lst = []
 
 	def __iter__(self):
@@ -30,28 +30,28 @@ class IDmap:
 		return new
 
 	def __contains__(self, key):
-		return key in self._data
+		return key in self._map
 
 	def __getitem__(self, key):
 		"""Return (array of) index of key"""
 		if isinstance(key, (list,np.ndarray)):
 			idx = []
 			for i in key:
-				idx.append(self._data[i])
+				idx.append(self._map[i])
 			return np.array(idx)
 		else:
 			checkers.checkType('key', (str, list, np.ndarray), key)
-			return self._data[key]
+			return self._map[key]
 
 	@property
 	def size(self):
 		"""int: number of IDs in map"""
-		return len(self._data)
+		return len(self._map)
 
 	@property
-	def data(self):
+	def map(self):
 		"""(dict of str:int): map from ID to index"""
-		return self._data
+		return self._map
 	
 	@property
 	def lst(self):
@@ -62,10 +62,10 @@ class IDmap:
 		return deepcopy(self)
 
 	def popID(self, ID):
-		idx = self.data.pop(ID)
+		idx = self.map.pop(ID)
 		self.lst.pop(idx)
 		for i, ID in enumerate(self.lst[idx:]):
-			self.data[ID] = idx + i
+			self.map[ID] = idx + i
 	
 	def addID(self, ID):
 		"""Add new ID as string, append last"""
@@ -79,7 +79,7 @@ class IDmap:
 		except ValueError:
 			pass
 		assert ID not in self, "ID %s exist"%repr(ID)
-		self._data[ID] = self.size
+		self._map[ID] = self.size
 		self._lst.append(ID)
 
 	def getID(self, idx):

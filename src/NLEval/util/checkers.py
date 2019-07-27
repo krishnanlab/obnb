@@ -4,6 +4,7 @@ from collections.abc import Iterable
 INT_TYPE = (int, np.integer)
 FLOAT_TYPE = (float, np.floating)
 NUMERIC_TYPE = INT_TYPE + FLOAT_TYPE
+NUMSTRING_TYPE = INT_TYPE + FLOAT_TYPE + (str,)
 ITERABLE_TYPE = Iterable
 
 def checkType(name, targetType, val):
