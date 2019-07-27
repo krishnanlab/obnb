@@ -1,7 +1,6 @@
 from NLEval.graph.BaseGraph import BaseGraph
 from NLEval.graph.SparseGraph import SparseGraph
-from NLEval.util.IDmap import IDmap
-from NLEval.util import checkers
+from NLEval.util import checkers, IDHandler
 from scipy.spatial import distance
 import numpy as np
 
@@ -68,7 +67,7 @@ class DenseGraph(BaseGraph):
 		"""Construct BaseGraph object from numpy array
 		First column of mat encodes ID
 		"""
-		idmap = IDmap()
+		idmap = IDHandler.IDmap()
 		for ID in mat[:,0]:
 			idmap.addID(ID)
 		return cls.construct_graph(idmap, mat[:,1:].astype(float))
@@ -164,7 +163,7 @@ class FeatureVec(DenseGraph):
 	@classmethod
 	def from_emd(cls, path_to_emd, **kwargs):
 		fvec_lst = []
-		idmap = IDmap()
+		idmap = IDHandler.IDmap()
 		with open(path_to_emd, 'r') as f:
 			f.readline() # skip header
 			for line in f:

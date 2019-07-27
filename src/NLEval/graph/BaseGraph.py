@@ -1,4 +1,4 @@
-from NLEval.util.IDmap import IDmap
+from NLEval.util import IDHandler
 from NLEval.util import checkers
 import numpy as np
 
@@ -6,7 +6,7 @@ class BaseGraph:
 	"""Base Graph object that contains basic graph operations"""
 	def __init__(self):
 		super().__init__()
-		self.IDmap = IDmap()
+		self.IDmap = IDHandler.IDmap()
 		
 	@property
 	def IDmap(self):
@@ -14,7 +14,7 @@ class BaseGraph:
 
 	@IDmap.setter
 	def IDmap(self, idmap):
-		checkers.checkType('idmap', IDmap, idmap)
+		checkers.checkType('idmap', IDHandler.IDmap, idmap)
 		self._IDmap = idmap
 
 	def __contains__(self, graph):

@@ -1,10 +1,10 @@
 from common import *
-from NLEval.util import IDmap
+from NLEval.util import IDHandler
 from NLEval.util import checkers
 
 class TestIDmap(unittest.TestCase):
 	def setUp(self):
-		self.IDmap = IDmap.IDmap()
+		self.IDmap = IDHandler.IDmap()
 		self.IDmap.addID('a')
 
 	def tearDown(self):
@@ -56,7 +56,7 @@ class TestIDmap(unittest.TestCase):
 
 	def test_eq(self):
 		self.IDmap.addID('b')
-		idmap = IDmap.IDmap()
+		idmap = IDHandler.IDmap()
 		idmap.addID('b')
 		idmap.addID('a')
 		self.assertTrue(self.IDmap == idmap)
@@ -97,7 +97,7 @@ class TestIDmap(unittest.TestCase):
 		self.assertEqual(self.IDmap.map, {'a':0, 'c':1})
 
 	def test_add(self):
-		idmap = IDmap.IDmap()
+		idmap = IDHandler.IDmap()
 		idmap.addID('b')
 		idmap_combined = self.IDmap + idmap
 		self.assertEqual(idmap_combined.map, {'a':0, 'b':1})
