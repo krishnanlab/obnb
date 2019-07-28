@@ -35,6 +35,7 @@ class IDlst(object):
 
 	def __contains__(self, ID):
 		"""Return true if ID exist in current list"""
+		checkers.checkType('ID', str, ID)
 		return ID in self.lst
 
 	def __getitem__(self, ID):

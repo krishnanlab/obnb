@@ -57,6 +57,10 @@ class TestIDlst(unittest.TestCase):
 		for i in self.lst:
 			self.assertTrue(i in self.IDlst1)
 		self.assertTrue('c' not in self.IDlst3)
+		#test type check
+		self.IDlst1.addID(10)
+		self.assertRaises(TypeError, self.IDlst1.__contains__, 10)
+		self.assertTrue('10' in self.IDlst1)
 
 	def test_getitem(self):
 		for idx, ID in enumerate(self.lst):
