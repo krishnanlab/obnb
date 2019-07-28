@@ -82,7 +82,9 @@ class IDlst(object):
 		"""Pop an ID out of list of IDs"""
 		checkers.checkType('ID', str, ID)
 		assert ID in self, "Unknown ID: %s"%repr(ID)
-		self.lst.pop(self[ID])
+		idx = self[ID]
+		self.lst.pop(idx)
+		return idx
 
 	def addID(self, ID):
 		"""Add new ID as string, append last"""
@@ -94,7 +96,7 @@ class IDlst(object):
 		except ValueError:
 			ID = ID.strip()
 		#check if ID already exist after clean up format
-		assert ID not in self, "ID %s exist"%repr(ID)
+		assert ID not in self, "ID %s exists"%repr(ID)
 		self._lst.append(ID)
 
 	def getID(self, idx):
@@ -125,6 +127,7 @@ class IDmap(IDlst):
 		idx = self.map.pop(ID)
 		for i, ID in enumerate(self.lst[idx:]):
 			self.map[ID] = idx + i
+		return idx
 	
 	def addID(self, ID):
 		new_idx = self.size

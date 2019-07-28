@@ -93,7 +93,7 @@ class TestIDlst(unittest.TestCase):
 		self.assertNotEqual(idlst_deep_copy, self.IDlst1)
 
 	def test_popID(self):
-		self.IDlst1.popID('c')
+		self.assertEqual(self.IDlst1.popID('c'), 2)
 		self.assertEqual(self.IDlst1, self.IDlst3)
 		self.assertRaises(AssertionError, self.IDlst1.popID, 'c')
 		self.assertRaises(TypeError, self.IDlst1.popID, 1)
@@ -214,7 +214,7 @@ class TestIDmap(unittest.TestCase):
 		self.assertEqual(self.IDmap.lst, ['a', 'b', 'c'])
 		self.assertEqual(self.IDmap.map, {'a':0, 'b':1, 'c':2})
 		self.assertRaises(AssertionError, self.IDmap.popID, 'd')
-		self.IDmap.popID('b')
+		self.assertEqual(self.IDmap.popID('b'), 1)
 		#make sure both lst and data poped
 		self.assertEqual(self.IDmap.lst, ['a', 'c'])
 		#make sure data updated with new mapping
