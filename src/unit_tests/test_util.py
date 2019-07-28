@@ -126,6 +126,16 @@ class TestIDlst(unittest.TestCase):
 		#test type check
 		self.assertRaises(TypeError, self.IDlst1.getID, 'asdf')
 
+	def test_from_list(self):
+		idlst = IDHandler.IDlst.from_list(self.lst)
+		self.assertEqual(idlst, self.IDlst1)
+		#test type check
+		tpl = ('a', 'b', 'c')
+		self.assertRaises(TypeError, IDHandler.IDlst.from_list, tpl)
+		#test redundant input
+		lst = ['a', 'b', 'c', 'a']
+		self.assertRaises(AssertionError, IDHandler.IDlst.from_list, lst)
+
 class TestIDmap(unittest.TestCase):
 	def setUp(self):
 		self.IDmap = IDHandler.IDmap()

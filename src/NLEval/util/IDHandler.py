@@ -103,6 +103,14 @@ class IDlst(object):
 		"""Return ID by its index"""
 		return self.lst[idx]
 
+	@classmethod
+	def from_list(cls, lst):
+		checkers.checkType("ID list", list, lst)
+		obj = cls()
+		for ID in lst:
+			obj.addID(ID)
+		return obj
+
 class IDmap(IDlst):
 	"""IDmap object that implements dictionary for more efficient mapping
 	from ID to index"""
