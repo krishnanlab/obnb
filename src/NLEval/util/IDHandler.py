@@ -133,3 +133,124 @@ class IDmap(IDlst):
 		new_idx = self.size
 		super(IDmap, self).addID(ID)
 		self._map[self.lst[-1]] = new_idx
+
+class IDprop(IDmap):
+	"""ID properties object that stores property information of IDs"""
+	def __init__(self):
+		super(IDprop, self).__init__()
+		self._prop_default_val = {}
+		self._prop_default_type = {}
+		self._prop = {}
+
+	def __eq__(self, other):
+		"""Return true if two object have same set of IDs with same properties"""
+		#check if two objects have same set of IDs
+		if not super(IDprop, self).__eq__(other):
+			return False
+		#check if two objects have same set of properties
+		if not set(self.propLst) == set(other.propLst):
+			return False
+		#check if properties have same values
+		for prop in self.propLst:
+			for ID in self.lst:
+				if self.getProp(ID, prop) != other.getProp(ID, prop):
+					return False
+		return True
+
+	def __add__(self, other):
+		raise NotImplementedError
+
+	def __sub__(self, other):
+		raise NotImplementedError
+
+	@property
+	def prop_default_val(self):
+		"""(dict of str:obj): dictionary mapping from property name to 
+		default property value"""
+		return self._prop_default_val.copy()
+	
+	@property
+	def prop_default_type(self):
+		return self._prop_default_type.copy()
+
+	@property
+	def prop(self):
+		"""(dict of str: :obj:`list` of :obj:): dictionary mapping from 
+		property name to list of property values in the order of ID list
+
+		Note: the returned list is a copy of self._prop to prevent userside
+		maniputation on data, use self.setProp to modify properties
+
+		"""
+		return self._prop.copy()
+
+	@property
+	def propLst(self):
+		""":obj:`list` of :obj:`str`: list of properties names"""
+		return list(self._prop)
+
+	def newProp(self, prop_name, default_val=None, default_type=None):
+		"""Create a new property
+		
+		Args:
+			prop_name(str): name of property
+			default_val: default value to set if property not specified
+
+		"""
+		checkers.checkType("Property name", str, prop_name)
+		assert prop_name not in self.propLst, "Property %s exists"%prop_name
+		if default_type is not None:
+			checkers.checkType("Default type", type, default_type)
+			if not isinstance(default_val, default_type):
+				raise TypeError("Inconsistent type between default values %s and default type %s"%\
+					(type(default_val), default_type))
+		if not self.isempty():
+			prop_lst = [deepcopy(default_val) for i in range(self.size)]
+		else:
+			prop_lst = []
+		self._prop_default_val[prop_name] = default_val
+		self._prop_default_type[prop_name] = default_type
+		self._prop[prop_name] = prop_lst
+
+	def setProp(self, ID, prop_name, prop_val):
+		"""Set a pericif property value of an ID, must match default type if available"""
+		self.getProp(ID, prop_name) #check ID and prop_name validity
+		if self.prop_default_type[prop_name] is not None:
+			checkers.checkType("Property value for %s"%repr(prop_name), \
+				self.prop_default_type[prop_name], prop_val)
+		self._prop[prop_name][self[ID]] = prop_val
+
+	def getProp(self, ID, prop_name):
+		"""Return a specific properties associated with an ID"""
+		checkers.checkType('ID', str, ID)
+		assert ID in self, "Unknown ID: %s"%repr(ID)
+		checkers.checkType('Property name', str, prop_name)
+		assert prop_name in self.propLst, "Unknown property name: %s"%repr(prop_name)
+		return self._prop[prop_name][self[ID]]
+
+	def getAllProp(self, ID):
+		"""Return all properties associated with an ID"""
+		return {prop:self.getProp(ID, prop) for prop in self.propLst}
+
+	def popID(self, ID):
+		idx = super(IDprop, self).popID(ID)
+		for prop in self.propLst:
+			self._prop[prop].pop(idx)
+		return idx
+
+	def addID(self, ID, prop=None):
+		if prop is not None:
+			checkers.checkType("Properties", dict, prop)
+			checkers.checkTypesInIterable("Properties Keys", str, prop)
+			assert set(prop) == set(self.propLst), \
+				"Input properties must be in %s, not %s"%\
+				(set(self.propLst), set(prop))
+			#chekc type of prop val
+			for prop_name, default_type in self.prop_default_type.items():
+				if default_type is not None:
+					checkers.checkType("Properties Values", default_type, prop[prop_name])
+		else:
+			prop = self.prop_default_val
+		super(IDprop, self).addID(ID)
+		for prop_name, prop_val in prop.items():
+			self._prop[prop_name].append(prop_val)

@@ -238,6 +238,163 @@ class TestIDmap(unittest.TestCase):
 		self.assertEqual(diff.map, {'c':0})
 		self.assertEqual(diff.lst, ['c'])
 
+class TestIDprop(unittest.TestCase):
+	def setUp(self):
+		self.IDprop1 = IDHandler.IDprop()
+		self.IDprop2 = IDHandler.IDprop()
+
+	def test_eq(self):
+		#test if two object have same set of IDs
+		self.IDprop1.addID('a')
+		self.IDprop1.addID('b')
+		self.IDprop2.addID('a')
+		self.assertNotEqual(self.IDprop1, self.IDprop2)
+		#test if two object have same set of props
+		self.IDprop2.addID('b')
+		self.assertEqual(self.IDprop1, self.IDprop2)
+		self.IDprop1._prop = {'p1':[None, None],'p2':[None, None]}
+		self.assertNotEqual(self.IDprop1, self.IDprop2)
+		self.IDprop2._prop = {'p2':[None, None]}
+		self.assertNotEqual(self.IDprop1, self.IDprop2)
+		self.IDprop2._prop = {'p2':[None, None],'p1':[None, None]}
+		self.assertEqual(self.IDprop1, self.IDprop2)
+		#test if two object have same prop values
+		self.IDprop1._prop = {'p1':[1, None],'p2':[None, 2]}
+		self.assertNotEqual(self.IDprop1, self.IDprop2)
+		self.IDprop2._prop = {'p2':[1, None],'p1':[None, 2]}
+		self.assertNotEqual(self.IDprop1, self.IDprop2)
+		self.IDprop2._prop = {'p2':[None, 2],'p1':[1, None]}
+		self.assertEqual(self.IDprop1, self.IDprop2)
+		#test type check
+		self.assertRaises(TypeError, self.IDprop1, IDHandler.IDlst())
+		self.assertRaises(TypeError, self.IDprop1, IDHandler.IDmap())
+		self.assertRaises(TypeError, self.IDprop1, ['a', 'b', 'c'])
+
+	def test_propLst(self):
+		self.IDprop1.newProp('x')
+		self.IDprop1.newProp('y')
+		self.IDprop1.newProp('z')
+		self.assertEqual(self.IDprop1.propLst, ['x', 'y', 'z'])
+
+	def test_newProp(self):
+		#test property name type check
+		self.assertRaises(TypeError, self.IDprop1.newProp, 10)
+		self.IDprop1.newProp('10')
+		#test property existance check
+		self.assertRaises(AssertionError, self.IDprop1.newProp, '10')
+		#test type consistency between default value and type
+		self.assertRaises(TypeError, self.IDprop1.newProp, 'x', \
+			default_val=int(10), default_type=float)
+		self.IDprop1.newProp('x', default_val=int(10), default_type=int)
+		#test newProp on empty object
+		self.IDprop1.addID('a')
+		self.IDprop1.addID('b')
+		#test newProp on object with some IDs
+		self.IDprop2.addID('a')
+		self.IDprop2.addID('b')
+		self.IDprop2.newProp('x', default_val=int(10), default_type=int)
+		self.assertEqual(self.IDprop1._prop['x'], self.IDprop2._prop['x'])
+		#test deepcopy of default val
+		self.IDprop1.newProp('y', default_val=[], default_type=list)
+		self.IDprop1._prop['y'][0].append(1)
+		self.assertEqual(self.IDprop1._prop['y'], [[1],[]])
+		#test if default values and types set correctly
+		with self.subTest(mst='Check if default properties values set correctly'):
+			self.assertEqual(self.IDprop1.prop_default_val, {'10':None, 'x':10, 'y':[]})
+		with self.subTest(mst='Check if default properties types set correctly'):
+			self.assertEqual(self.IDprop1.prop_default_type, \
+				{'10':None, 'x':type(int()), 'y':type(list())})
+
+	def test_setProp(self):
+		self.IDprop1.addID('a')
+		self.IDprop1.newProp('x', 1, int)
+		#test wrong ID type --> TypeError
+		self.assertRaises(TypeError, self.IDprop1.setProp, 1, 'x', 10)
+		#test not exist ID --> AssertionError
+		self.assertRaises(AssertionError, self.IDprop1.setProp, 'b', 'x', 10)
+		#test wrong prop name type --> TypeError
+		self.assertRaises(TypeError, self.IDprop1.setProp, 'a', 1, 10)
+		#test not exist prop name --> AssertionError
+		self.assertRaises(AssertionError, self.IDprop1.setProp, 'a', 'y', 10)
+		#test wrong prop val type --> TypeError
+		self.assertRaises(TypeError, self.IDprop1.setProp, 'a', 'x', '10')
+		self.assertRaises(TypeError, self.IDprop1.setProp, 'a', 'x', 10.0)
+		#test if correct val set
+		self.IDprop1.setProp('a', 'x', 10)
+		self.assertEqual(self.IDprop1.prop, {'x':[10]})
+		self.IDprop1.addID('b')
+		self.IDprop1.setProp('b', 'x', 34)
+		self.assertEqual(self.IDprop1.prop, {'x':[10, 34]})
+
+	def test_getProp(self):
+		self.IDprop1.addID('a')
+		self.IDprop1.newProp('x', 10, int)
+		#test wrong ID type --> TypeError
+		self.assertRaises(TypeError, self.IDprop1.getProp, 1, 'x')
+		#test not exist ID value --> AssertionError
+		self.assertRaises(AssertionError, self.IDprop1.getProp, 'b', 'x')
+		#test wrong prop name type --> TypeError
+		self.assertRaises(TypeError, self.IDprop1.getProp, 'a', 1)
+		#test not exist prop name --> AssertionError
+		self.assertRaises(AssertionError, self.IDprop1.getProp, 'a', 'y')
+		#test if correct val retrieved
+		self.assertEqual(self.IDprop1.getProp('a', 'x'), 10)
+		self.IDprop1.setProp('a', 'x', 20)
+		self.assertEqual(self.IDprop1.getProp('a', 'x'), 20)
+
+	def test_getAllProp(self):
+		self.IDprop1.addID('a')
+		self.IDprop1.newProp('x', 10, int)
+		self.IDprop1.newProp('y', 20.0, float)
+		#test wrong ID type --> TypeError
+		self.assertRaises(TypeError, self.IDprop1.getAllProp, 1)
+		#test wrong ID val --> AssertionError
+		self.assertRaises(AssertionError, self.IDprop1.getAllProp, 'b')
+		#test if all prop val retrieved correctly
+		self.assertEqual(self.IDprop1.getAllProp('a'), {'x':10, 'y':20.0})
+
+	def test_popID(self):
+		self.IDprop1.newProp('x', 1, int)
+		self.IDprop1.newProp('y', '1', str)
+		self.IDprop1.addID('a')
+		self.IDprop1.addID('b', {'x': 2, 'y': '2'})
+		self.IDprop1.addID('c', {'x': 3, 'y': '3'})
+		#test wrong ID type --> TypeError
+		self.assertRaises(TypeError, self.IDprop1.popID, 1)
+		#test wrong ID val --> AssertionError
+		self.assertRaises(AssertionError, self.IDprop1.popID, 'd')
+		#test if poped correctly
+		self.assertEqual(self.IDprop1.popID('b'), 1)
+		self.assertEqual(self.IDprop1.lst, ['a', 'c'])
+		self.assertEqual(self.IDprop1.propLst, ['x', 'y'])
+		self.assertEqual(self.IDprop1._prop, {'x':[1, 3], 'y':['1', '3']})
+		self.IDprop1.popID('a')
+		self.IDprop1.popID('c')
+		self.assertEqual(self.IDprop1._prop, {'x':[], 'y':[]})
+
+	def test_addID(self):
+		self.IDprop1.newProp('x', 1, int)
+		self.IDprop1.newProp('y', '1', str)
+		self.IDprop1.addID('a')
+		self.IDprop1.addID('b', {'x': 2, 'y': '2'})
+		#test wrong ID type --> TypeError
+		self.assertRaises(TypeError, self.IDprop1.addID, (1,2,3))
+		#test addd existed ID --> AssertionError
+		self.assertRaises(AssertionError, self.IDprop1.addID, 'a')
+		#test wrong prop type --> TypeError
+		self.assertRaises(TypeError, self.IDprop1.addID, 'c', ('x', 'y'))
+		#test wrong prop keys --> AssertionError
+		self.assertRaises(AssertionError, self.IDprop1.addID, 'c', \
+			{'x': 3, 'z': '3'})
+		#test wrong prop val type --> TypeError
+		self.assertRaises(TypeError, self.IDprop1.addID, 'c', \
+			{'x': 3, 'y': 3.0})
+		#test if prop updated correctly
+		self.assertEqual(self.IDprop1.getProp('a', 'x'), 1)
+		self.assertEqual(self.IDprop1.getProp('a', 'y'), '1')
+		self.assertEqual(self.IDprop1.getProp('b', 'x'), 2)
+		self.assertEqual(self.IDprop1.getProp('b', 'y'), '2')
+
 class TestCheckers(unittest.TestCase):
 	@classmethod
 	def setUpClass(self):
