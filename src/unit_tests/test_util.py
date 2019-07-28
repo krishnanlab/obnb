@@ -71,6 +71,14 @@ class TestIDlst(unittest.TestCase):
 		self.assertEqual(self.IDlst3.size, 2)
 		self.assertEqual(IDHandler.IDlst().size, 0)
 
+	def test_size(self):
+		idlst = IDHandler.IDlst()
+		self.assertTrue(idlst.isempty())
+		idlst.addID('a')
+		self.assertFalse(idlst.isempty())
+		idlst.popID('a')
+		self.assertTrue(idlst.isempty())
+
 	def test_copy(self):
 		idlst_shallow_copy = self.IDlst1
 		idlst_deep_copy = self.IDlst1.copy()

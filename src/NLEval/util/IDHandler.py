@@ -73,6 +73,10 @@ class IDlst(object):
 		"""Return a deepcopy of self"""
 		return deepcopy(self)
 
+	def isempty(self):
+		"""Return true if ID list is empty"""
+		return self.size == 0
+
 	def popID(self, ID):
 		"""Pop an ID out of list of IDs"""
 		checkers.checkType('ID', str, ID)
