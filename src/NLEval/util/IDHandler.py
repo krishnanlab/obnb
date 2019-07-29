@@ -10,12 +10,12 @@ class IDlst(object):
 
 	def __iter__(self):
 		"""Yield all IDs"""
-		return self.lst.__iter__()
+		return self._lst.__iter__()
 
 	def __eq__(self, other):
 		"""Return true if two IDlst have same set of IDs"""
 		checkers.checkType('other', self.__class__, other)
-		return set(self.lst) == set(other.lst)
+		return set(self._lst) == set(other._lst)
 
 	def __add__(self, other):
 		checkers.checkType('other', self.__class__, other)
@@ -36,7 +36,7 @@ class IDlst(object):
 	def __and__(self, other):
 		checkers.checkType('other', self.__class__, other)
 		new = self.__class__()
-		for ID in set(self.lst) & set(other.lst):
+		for ID in set(self._lst) & set(other._lst):
 			new.addID(ID)
 		return new
 
@@ -46,14 +46,14 @@ class IDlst(object):
 	def __xor__(self, other):
 		checkers.checkType('other', self.__class__, other)
 		new = self.__class__()
-		for ID in set(self.lst) ^ set(other.lst):
+		for ID in set(self._lst) ^ set(other._lst):
 			new.addID(ID)
 		return new
 
 	def __contains__(self, ID):
 		"""Return true if ID exist in current list"""
 		checkers.checkType('ID', str, ID)
-		return ID in self.lst
+		return ID in self._lst
 
 	def __getitem__(self, ID):
 		"""Return (array of) index of ID"""
@@ -79,13 +79,17 @@ class IDlst(object):
 	@property
 	def lst(self):
 		""":obj:`list` of :obj:`str`: list of IDs.
-		No setter, use `addID` or `popID` to modify"""
-		return self._lst
+
+		Note: the returned list is a copy of self._lst to prevent userside
+		maniputation on data, use `.addID()` or `.popID()` to modify data
+
+		"""
+		return self._lst.copy()
 	
 	@property
 	def size(self):
 		"""int: number of IDs in list"""
-		return len(self.lst)
+		return len(self._lst)
 
 	def copy(self):
 		"""Return a deepcopy of self"""
@@ -100,7 +104,7 @@ class IDlst(object):
 		checkers.checkType('ID', str, ID)
 		assert ID in self, "Unknown ID: %s"%repr(ID)
 		idx = self[ID]
-		self.lst.pop(idx)
+		self._lst.pop(idx)
 		return idx
 
 	def addID(self, ID):
@@ -118,7 +122,7 @@ class IDlst(object):
 
 	def getID(self, idx):
 		"""Return ID by its index"""
-		return self.lst[idx]
+		return self._lst[idx]
 
 	@classmethod
 	def from_list(cls, lst):
@@ -136,28 +140,33 @@ class IDmap(IDlst):
 		self._map = {}
 
 	def __contains__(self, ID):
-		return ID in self.map
+		return ID in self._map
 
 	def __getitem_sinlge(self, ID):
 		assert ID in self, "Unknown ID: %s"%repr(ID)
-		return self.map[ID]
+		return self._map[ID]
 
 	@property
 	def map(self):
-		"""(dict of str:int): map from ID to index"""
-		return self._map
+		"""(dict of str:int): map from ID to index
+		
+		Note: the returned dict is a copy of self._map to prevent userside
+		maniputation on data, use `.addID()` or `.popID()` to modify data
+
+		"""
+		return self._map.copy()
 
 	def popID(self, ID):
 		super(IDmap, self).popID(ID)
-		idx = self.map.pop(ID)
+		idx = self._map.pop(ID)
 		for i, ID in enumerate(self.lst[idx:]):
-			self.map[ID] = idx + i
+			self._map[ID] = idx + i
 		return idx
 	
 	def addID(self, ID):
 		new_idx = self.size
 		super(IDmap, self).addID(ID)
-		self._map[self.lst[-1]] = new_idx
+		self._map[self._lst[-1]] = new_idx
 
 class IDprop(IDmap):
 	"""ID properties object that stores property information of IDs"""
@@ -177,7 +186,7 @@ class IDprop(IDmap):
 			return False
 		#check if properties have same values
 		for prop in self.propLst:
-			for ID in self.lst:
+			for ID in self:
 				if self.getProp(ID, prop) != other.getProp(ID, prop):
 					return False
 		return True
