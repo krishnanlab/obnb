@@ -3,7 +3,7 @@ from NLEval.util import checkers
 from copy import deepcopy
 
 class IDlst(object):
-	"""docstring for IDlst"""
+	"""ID list object that stores a list of IDs"""
 	def __init__(self):
 		super(IDlst, self).__init__()
 		self._lst = []
@@ -31,6 +31,23 @@ class IDlst(object):
 		for ID in self:
 			if ID not in other:
 				new.addID(ID)
+		return new
+
+	def __and__(self, other):
+		checkers.checkType('other', self.__class__, other)
+		new = self.__class__()
+		for ID in set(self.lst) & set(other.lst):
+			new.addID(ID)
+		return new
+
+	def __or__(self, other):
+		return self.__add__(other)
+
+	def __xor__(self, other):
+		checkers.checkType('other', self.__class__, other)
+		new = self.__class__()
+		for ID in set(self.lst) ^ set(other.lst):
+			new.addID(ID)
 		return new
 
 	def __contains__(self, ID):

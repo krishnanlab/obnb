@@ -53,6 +53,17 @@ class TestIDlst(unittest.TestCase):
 		self.assertTrue(IDHandler.IDlst() == self.IDlst1 - self.IDlst1)
 		self.template_test_type_consistency(self.IDlst1.__sub__)
 
+	def test_and(self):
+		self.assertEqual(IDHandler.IDlst(), self.IDlst3 & self.IDlst4)
+		self.assertEqual(self.IDlst4, self.IDlst1 & self.IDlst4)
+		self.assertEqual(self.IDlst3, self.IDlst1 & self.IDlst3)
+
+	def test_xor(self):
+		self.assertEqual(self.IDlst1, self.IDlst3 ^ self.IDlst4)
+		self.IDlst4.addID('b')
+		self.IDlst1.popID('b')
+		self.assertEqual(self.IDlst1, self.IDlst3 ^ self.IDlst4)
+
 	def test_contains(self):
 		for i in self.lst:
 			self.assertTrue(i in self.IDlst1)
