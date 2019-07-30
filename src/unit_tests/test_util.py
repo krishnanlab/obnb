@@ -69,9 +69,7 @@ class TestIDlst(unittest.TestCase):
 			self.assertTrue(i in self.IDlst1)
 		self.assertTrue('c' not in self.IDlst3)
 		#test type check
-		self.IDlst1.addID(10)
 		self.assertRaises(TypeError, self.IDlst1.__contains__, 10)
-		self.assertTrue('10' in self.IDlst1)
 
 	def test_getitem(self):
 		for idx, ID in enumerate(self.lst):
@@ -114,22 +112,10 @@ class TestIDlst(unittest.TestCase):
 		#test basic addID with string
 		self.IDlst1.addID('d')
 		self.assertEqual(self.IDlst1.lst, ['a', 'b', 'c', 'd'])
-		#test addID with transformation from int to string
-		self.IDlst1.addID(10)
-		self.assertEqual(self.IDlst1.lst, ['a', 'b', 'c', 'd', '10'])
-		#test addID with transformation from float type inteter to string
-		self.IDlst1.addID(11.0)
-		self.assertEqual(self.IDlst1.lst, ['a', 'b', 'c', 'd', '10', '11'])
-		#test addID with transformation from float to string
-		self.IDlst1.addID(11.1)
-		self.assertEqual(self.IDlst1.lst, ['a', 'b', 'c', 'd', '10', '11', '11.1'])
+		#test addID with with int --> TypeError
+		self.assertRaises(TypeError, self.IDlst1.addID, 10)
 		#test add existing ID --> error
-		self.assertRaises(AssertionError, self.IDlst1.addID, '10')
-		#test type checking
-		self.assertRaises(TypeError, self.IDlst1.addID, (1,2,))
-		#test strippint
-		self.assertRaises(AssertionError, self.IDlst1.addID, '   a  ')
-		self.assertRaises(AssertionError, self.IDlst1.addID, '   10')
+		self.assertRaises(AssertionError, self.IDlst1.addID, 'a')
 
 	def test_getID(self):
 		for idx, ID in enumerate(self.lst):
@@ -173,9 +159,9 @@ class TestIDmap(unittest.TestCase):
 	def test_addID(self):
 		self.assertRaises(TypeError, self.IDmap.addID, (1, 2, 3))
 		self.assertRaises(TypeError, self.IDmap.addID, [1, 2, 3])
+		self.assertRaises(TypeError, self.IDmap.addID, 10)
 		self.assertRaises(AssertionError, self.IDmap.addID, 'a')
-		self.IDmap.addID('10.0')
-		self.assertRaises(AssertionError, self.IDmap.addID, 10)
+		self.IDmap.addID('10')
 		self.IDmap.addID('10.1')
 		self.IDmap.addID('abc')
 		self.assertEqual(self.IDmap.lst, ['a', '10', '10.1', 'abc'])

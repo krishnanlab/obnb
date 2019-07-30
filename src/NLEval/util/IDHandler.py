@@ -108,15 +108,11 @@ class IDlst(object):
 		return idx
 
 	def addID(self, ID):
-		"""Add new ID as string, append last"""
-		checkers.checkType('ID', checkers.NUMSTRING_TYPE, ID)
-		try:
-			num = float(ID)
-			#convert to int string if numeric and is int
-			ID = str(int(num)) if num % 1 == 0 else str(num)
-		except ValueError:
-			ID = ID.strip()
-		#check if ID already exist after clean up format
+		"""Add new ID to end of list
+
+		Note: raises AssertionError if ID exists
+
+		"""
 		assert ID not in self, "ID %s exists"%repr(ID)
 		self._lst.append(ID)
 
@@ -140,6 +136,7 @@ class IDmap(IDlst):
 		self._map = {}
 
 	def __contains__(self, ID):
+		checkers.checkType('ID', str, ID)
 		return ID in self._map
 
 	def __getitem_sinlge(self, ID):
