@@ -1,6 +1,5 @@
 from common import *
-from NLEval.util import IDHandler
-from NLEval.util import checkers
+from NLEval.util import IDHandler, checkers, Exceptions
 
 class TestIDlst(unittest.TestCase):
 	def setUp(self):
@@ -74,9 +73,9 @@ class TestIDlst(unittest.TestCase):
 	def test_getitem(self):
 		for idx, ID in enumerate(self.lst):
 			self.assertEqual(self.IDlst1[ID], idx)
-		self.assertRaises(AssertionError, self.IDlst1.__getitem__, 'd')
+		self.assertRaises(Exceptions.IDNotExistError, self.IDlst1.__getitem__, 'd')
 		self.assertTrue(all(self.IDlst1[self.lst] == np.array([0, 1, 2])))
-		self.assertRaises(AssertionError, self.IDlst3.__getitem__, self.lst)
+		self.assertRaises(Exceptions.IDNotExistError, self.IDlst3.__getitem__, self.lst)
 		self.assertRaises(TypeError, self.IDlst3.__getitem__, ['a', 0])
 
 	def test_size(self):
@@ -104,7 +103,7 @@ class TestIDlst(unittest.TestCase):
 	def test_popID(self):
 		self.assertEqual(self.IDlst1.popID('c'), 2)
 		self.assertEqual(self.IDlst1, self.IDlst3)
-		self.assertRaises(AssertionError, self.IDlst1.popID, 'c')
+		self.assertRaises(Exceptions.IDNotExistError, self.IDlst1.popID, 'c')
 		self.assertRaises(TypeError, self.IDlst1.popID, 1)
 
 	def test_addID(self):
@@ -115,7 +114,7 @@ class TestIDlst(unittest.TestCase):
 		#test addID with with int --> TypeError
 		self.assertRaises(TypeError, self.IDlst1.addID, 10)
 		#test add existing ID --> error
-		self.assertRaises(AssertionError, self.IDlst1.addID, 'a')
+		self.assertRaises(Exceptions.IDExistsError, self.IDlst1.addID, 'a')
 
 	def test_getID(self):
 		for idx, ID in enumerate(self.lst):
@@ -131,7 +130,7 @@ class TestIDlst(unittest.TestCase):
 		self.assertRaises(TypeError, IDHandler.IDlst.from_list, tpl)
 		#test redundant input
 		lst = ['a', 'b', 'c', 'a']
-		self.assertRaises(AssertionError, IDHandler.IDlst.from_list, lst)
+		self.assertRaises(Exceptions.IDExistsError, IDHandler.IDlst.from_list, lst)
 
 class TestIDmap(unittest.TestCase):
 	def setUp(self):
@@ -160,7 +159,7 @@ class TestIDmap(unittest.TestCase):
 		self.assertRaises(TypeError, self.IDmap.addID, (1, 2, 3))
 		self.assertRaises(TypeError, self.IDmap.addID, [1, 2, 3])
 		self.assertRaises(TypeError, self.IDmap.addID, 10)
-		self.assertRaises(AssertionError, self.IDmap.addID, 'a')
+		self.assertRaises(Exceptions.IDExistsError, self.IDmap.addID, 'a')
 		self.IDmap.addID('10')
 		self.IDmap.addID('10.1')
 		self.IDmap.addID('abc')
@@ -220,7 +219,7 @@ class TestIDmap(unittest.TestCase):
 		self.IDmap.addID('c')
 		self.assertEqual(self.IDmap.lst, ['a', 'b', 'c'])
 		self.assertEqual(self.IDmap.map, {'a':0, 'b':1, 'c':2})
-		self.assertRaises(AssertionError, self.IDmap.popID, 'd')
+		self.assertRaises(Exceptions.IDNotExistError, self.IDmap.popID, 'd')
 		self.assertEqual(self.IDmap.popID('b'), 1)
 		#make sure both lst and data poped
 		self.assertEqual(self.IDmap.lst, ['a', 'c'])
@@ -288,7 +287,7 @@ class TestIDprop(unittest.TestCase):
 		self.assertRaises(TypeError, self.IDprop1.newProp, 10)
 		self.IDprop1.newProp('10')
 		#test property existance check
-		self.assertRaises(AssertionError, self.IDprop1.newProp, '10')
+		self.assertRaises(Exceptions.IDExistsError, self.IDprop1.newProp, '10')
 		#test type consistency between default value and type
 		self.assertRaises(TypeError, self.IDprop1.newProp, 'x', \
 			default_val=int(10), default_type=float)
@@ -317,12 +316,12 @@ class TestIDprop(unittest.TestCase):
 		self.IDprop1.newProp('x', 1, int)
 		#test wrong ID type --> TypeError
 		self.assertRaises(TypeError, self.IDprop1.setProp, 1, 'x', 10)
-		#test not exist ID --> AssertionError
-		self.assertRaises(AssertionError, self.IDprop1.setProp, 'b', 'x', 10)
+		#test not exist ID --> Exceptions.IDNotExistError
+		self.assertRaises(Exceptions.IDNotExistError, self.IDprop1.setProp, 'b', 'x', 10)
 		#test wrong prop name type --> TypeError
 		self.assertRaises(TypeError, self.IDprop1.setProp, 'a', 1, 10)
-		#test not exist prop name --> AssertionError
-		self.assertRaises(AssertionError, self.IDprop1.setProp, 'a', 'y', 10)
+		#test not exist prop name --> Exceptions.IDNotExistError
+		self.assertRaises(Exceptions.IDNotExistError, self.IDprop1.setProp, 'a', 'y', 10)
 		#test wrong prop val type --> TypeError
 		self.assertRaises(TypeError, self.IDprop1.setProp, 'a', 'x', '10')
 		self.assertRaises(TypeError, self.IDprop1.setProp, 'a', 'x', 10.0)
@@ -338,12 +337,12 @@ class TestIDprop(unittest.TestCase):
 		self.IDprop1.newProp('x', 10, int)
 		#test wrong ID type --> TypeError
 		self.assertRaises(TypeError, self.IDprop1.getProp, 1, 'x')
-		#test not exist ID value --> AssertionError
-		self.assertRaises(AssertionError, self.IDprop1.getProp, 'b', 'x')
+		#test not exist ID value --> Exceptions.IDNotExistError
+		self.assertRaises(Exceptions.IDNotExistError, self.IDprop1.getProp, 'b', 'x')
 		#test wrong prop name type --> TypeError
 		self.assertRaises(TypeError, self.IDprop1.getProp, 'a', 1)
-		#test not exist prop name --> AssertionError
-		self.assertRaises(AssertionError, self.IDprop1.getProp, 'a', 'y')
+		#test not exist prop name --> Exceptions.IDNotExistError
+		self.assertRaises(Exceptions.IDNotExistError, self.IDprop1.getProp, 'a', 'y')
 		#test if correct val retrieved
 		self.assertEqual(self.IDprop1.getProp('a', 'x'), 10)
 		self.IDprop1.setProp('a', 'x', 20)
@@ -355,8 +354,8 @@ class TestIDprop(unittest.TestCase):
 		self.IDprop1.newProp('y', 20.0, float)
 		#test wrong ID type --> TypeError
 		self.assertRaises(TypeError, self.IDprop1.getAllProp, 1)
-		#test wrong ID val --> AssertionError
-		self.assertRaises(AssertionError, self.IDprop1.getAllProp, 'b')
+		#test wrong ID val --> Exceptions.IDNotExistError
+		self.assertRaises(Exceptions.IDNotExistError, self.IDprop1.getAllProp, 'b')
 		#test if all prop val retrieved correctly
 		self.assertEqual(self.IDprop1.getAllProp('a'), {'x':10, 'y':20.0})
 
@@ -368,8 +367,8 @@ class TestIDprop(unittest.TestCase):
 		self.IDprop1.addID('c', {'x': 3, 'y': '3'})
 		#test wrong ID type --> TypeError
 		self.assertRaises(TypeError, self.IDprop1.popID, 1)
-		#test wrong ID val --> AssertionError
-		self.assertRaises(AssertionError, self.IDprop1.popID, 'd')
+		#test wrong ID val --> Exceptions.IDNotExistError
+		self.assertRaises(Exceptions.IDNotExistError, self.IDprop1.popID, 'd')
 		#test if poped correctly
 		self.assertEqual(self.IDprop1.popID('b'), 1)
 		self.assertEqual(self.IDprop1.lst, ['a', 'c'])
@@ -386,12 +385,12 @@ class TestIDprop(unittest.TestCase):
 		self.IDprop1.addID('b', {'x': 2, 'y': '2'})
 		#test wrong ID type --> TypeError
 		self.assertRaises(TypeError, self.IDprop1.addID, (1,2,3))
-		#test addd existed ID --> AssertionError
-		self.assertRaises(AssertionError, self.IDprop1.addID, 'a')
+		#test addd existed ID --> Exceptions.IDExistsError
+		self.assertRaises(Exceptions.IDExistsError, self.IDprop1.addID, 'a')
 		#test wrong prop type --> TypeError
 		self.assertRaises(TypeError, self.IDprop1.addID, 'c', ('x', 'y'))
-		#test wrong prop keys --> AssertionError
-		self.assertRaises(AssertionError, self.IDprop1.addID, 'c', \
+		#test wrong prop keys --> Exceptions.IDNotExistError
+		self.assertRaises(Exceptions.IDNotExistError, self.IDprop1.addID, 'c', \
 			{'x': 3, 'z': '3'})
 		#test wrong prop val type --> TypeError
 		self.assertRaises(TypeError, self.IDprop1.addID, 'c', \

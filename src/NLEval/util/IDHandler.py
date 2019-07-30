@@ -1,4 +1,5 @@
 import numpy as np
+from NLEval.util.Exceptions import IDNotExistError, IDExistsError
 from NLEval.util import checkers
 from copy import deepcopy
 
@@ -56,25 +57,34 @@ class IDlst(object):
 		return ID in self._lst
 
 	def __getitem__(self, ID):
-		"""Return (array of) index of ID"""
+		"""Return single or multiple (as numpy array) indices of ID
+		depending on input type"""
 		if isinstance(ID, str):
-			return self.__getitem_sinlge(ID)
+			return self._getitem_sinlge(ID)
 		elif isinstance(ID, checkers.ITERABLE_TYPE):
-			return self.__getitem_multiple(ID)
+			return self._getitem_multiple(ID)
 		else:
-			raise TypeError("ID keys must be stirng or iterables of string, not %s"%\
+			raise TypeError("ID key(s) must be stirng or iterables of string, not %s"%\
 					repr(type(ID)))
 
-	def __getitem_sinlge(self, ID):
-		assert ID in self, "Unknown ID: %s"%repr(ID)
+	def _getitem_sinlge(self, ID):
+		self._check_ID_existence(ID, True)
 		return self._lst.index(ID)
 
-	def __getitem_multiple(self, IDs):
+	def _getitem_multiple(self, IDs):
 		checkers.checkTypesInIterable('IDs', str, IDs)
 		idx_lst = []
 		for ID in IDs:
-			idx_lst.append(self.__getitem_sinlge(ID))
+			idx_lst.append(self._getitem_sinlge(ID))
 		return np.array(idx_lst)
+
+	def _check_ID_existence(self, ID, existence):
+		"""Check existence of ID and raise exceptions depending on 
+		desired existence of ID"""
+		if (not existence) & (ID in self):
+			raise IDExistsError("Existing ID %s"%repr(ID))
+		elif existence & (ID not in self):
+			raise IDNotExistError("Unknown ID %s"%repr(ID))
 
 	@property
 	def lst(self):
@@ -101,8 +111,7 @@ class IDlst(object):
 
 	def popID(self, ID):
 		"""Pop an ID out of list of IDs"""
-		checkers.checkType('ID', str, ID)
-		assert ID in self, "Unknown ID: %s"%repr(ID)
+		self._check_ID_existence(ID, True)
 		idx = self[ID]
 		self._lst.pop(idx)
 		return idx
@@ -110,10 +119,10 @@ class IDlst(object):
 	def addID(self, ID):
 		"""Add new ID to end of list
 
-		Note: raises AssertionError if ID exists
+		Note: raises IDExistsError if ID exists
 
 		"""
-		assert ID not in self, "ID %s exists"%repr(ID)
+		self._check_ID_existence(ID, False)
 		self._lst.append(ID)
 
 	def getID(self, idx):
@@ -139,8 +148,8 @@ class IDmap(IDlst):
 		checkers.checkType('ID', str, ID)
 		return ID in self._map
 
-	def __getitem_sinlge(self, ID):
-		assert ID in self, "Unknown ID: %s"%repr(ID)
+	def _getitem_sinlge(self, ID):
+		self._check_ID_existence(ID, True)
 		return self._map[ID]
 
 	@property
@@ -154,6 +163,7 @@ class IDmap(IDlst):
 		return self._map.copy()
 
 	def popID(self, ID):
+		self._check_ID_existence(ID, True)
 		super(IDmap, self).popID(ID)
 		idx = self._map.pop(ID)
 		for i, ID in enumerate(self.lst[idx:]):
@@ -189,10 +199,20 @@ class IDprop(IDmap):
 		return True
 
 	def __add__(self, other):
+		"""Not Implemented"""
 		raise NotImplementedError
 
 	def __sub__(self, other):
+		"""Not Implemented"""
 		raise NotImplementedError
+
+	def _check_prop_existence(self, prop_name, existence):
+		"""Check existence of property name and raise exceptions depending 
+		on desired existence of property name"""
+		if (not existence) & (prop_name in self._prop):
+			raise IDExistsError("Existing property name %s"%repr(prop_name))
+		elif existence & (prop_name not in self._prop):
+			raise IDNotExistError("Unknown property name %s"%repr(prop_name))
 
 	@property
 	def prop_default_val(self):
@@ -229,7 +249,7 @@ class IDprop(IDmap):
 
 		"""
 		checkers.checkType("Property name", str, prop_name)
-		assert prop_name not in self.propLst, "Property %s exists"%prop_name
+		self._check_prop_existence(prop_name, False)
 		if default_type is not None:
 			checkers.checkType("Default type", type, default_type)
 			if not isinstance(default_val, default_type):
@@ -254,9 +274,9 @@ class IDprop(IDmap):
 	def getProp(self, ID, prop_name):
 		"""Return a specific properties associated with an ID"""
 		checkers.checkType('ID', str, ID)
-		assert ID in self, "Unknown ID: %s"%repr(ID)
+		self._check_ID_existence(ID, True)
 		checkers.checkType('Property name', str, prop_name)
-		assert prop_name in self.propLst, "Unknown property name: %s"%repr(prop_name)
+		self._check_prop_existence(prop_name, True)
 		return self._prop[prop_name][self[ID]]
 
 	def getAllProp(self, ID):
@@ -273,13 +293,16 @@ class IDprop(IDmap):
 		if prop is not None:
 			checkers.checkType("Properties", dict, prop)
 			checkers.checkTypesInIterable("Properties Keys", str, prop)
-			assert set(prop) == set(self.propLst), \
-				"Input properties must be in %s, not %s"%\
-				(set(self.propLst), set(prop))
+			prop = prop.copy()
+			for prop_name in prop:
+				self._check_prop_existence(prop_name, True)
 			#chekc type of prop val
 			for prop_name, default_type in self.prop_default_type.items():
-				if default_type is not None:
-					checkers.checkType("Properties Values", default_type, prop[prop_name])
+				if prop_name in prop:
+					if default_type is not None:
+						checkers.checkType("Properties Values", default_type, prop[prop_name])
+					else:
+						prop[prop_name] = self.prop_default_val[prop_name]
 		else:
 			prop = self.prop_default_val
 		super(IDprop, self).addID(ID)
