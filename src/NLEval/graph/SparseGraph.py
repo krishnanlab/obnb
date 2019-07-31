@@ -44,7 +44,6 @@ class SparseGraph(BaseGraph):
 			key(:obj:`list` of :obj:`str`): list of keys of IDs
 		"""
 		idx = self.IDmap[key]
-		print(idx)
 		if isinstance(idx, int):
 			fvec = self.construct_adj_vec(idx)
 		else:
