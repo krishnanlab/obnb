@@ -398,8 +398,14 @@ class TestIDprop(unittest.TestCase):
 	def test_addID(self):
 		self.IDprop1.newProp('x', 1, int)
 		self.IDprop1.newProp('y', '1', str)
+		#no specification of properties, use all default values
 		self.IDprop1.addID('a')
+		self.assertEqual(self.IDprop1.getProp('a', 'x'), 1)
+		self.assertEqual(self.IDprop1.getProp('a', 'y'), '1')
+		#fully specified properties
 		self.IDprop1.addID('b', {'x': 2, 'y': '2'})
+		self.assertEqual(self.IDprop1.getProp('b', 'x'), 2)
+		self.assertEqual(self.IDprop1.getProp('b', 'y'), '2')
 		#test wrong ID type --> TypeError
 		self.assertRaises(TypeError, self.IDprop1.addID, (1,2,3))
 		#test addd existed ID --> Exceptions.IDExistsError
@@ -416,11 +422,10 @@ class TestIDprop(unittest.TestCase):
 		self.IDprop1.addID('c', {'x':3}) #only 'x' specified, 'y' will be default
 		self.assertEqual(self.IDprop1.getProp('c', 'x'), 3)
 		self.assertEqual(self.IDprop1.getProp('c', 'y'), '1')
-		#test if prop updated correctly
-		self.assertEqual(self.IDprop1.getProp('a', 'x'), 1)
-		self.assertEqual(self.IDprop1.getProp('a', 'y'), '1')
-		self.assertEqual(self.IDprop1.getProp('b', 'x'), 2)
-		self.assertEqual(self.IDprop1.getProp('b', 'y'), '2')
+		#test empty property dictionary, should be same as no `prop=None`
+		self.IDprop1.addID('d', {})
+		self.assertEqual(self.IDprop1.getProp('d', 'x'), 1)
+		self.assertEqual(self.IDprop1.getProp('d', 'y'), '1')
 
 class TestCheckers(unittest.TestCase):
 	@classmethod
