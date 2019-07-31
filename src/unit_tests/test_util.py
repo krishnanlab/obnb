@@ -412,6 +412,10 @@ class TestIDprop(unittest.TestCase):
 		#test wrong prop val type --> TypeError
 		self.assertRaises(TypeError, self.IDprop1.addID, 'c', \
 			{'x': 3, 'y': 3.0})
+		#test partial specification, use default values for unspecified properties
+		self.IDprop1.addID('c', {'x':3}) #only 'x' specified, 'y' will be default
+		self.assertEqual(self.IDprop1.getProp('c', 'x'), 3)
+		self.assertEqual(self.IDprop1.getProp('c', 'y'), '1')
 		#test if prop updated correctly
 		self.assertEqual(self.IDprop1.getProp('a', 'x'), 1)
 		self.assertEqual(self.IDprop1.getProp('a', 'y'), '1')

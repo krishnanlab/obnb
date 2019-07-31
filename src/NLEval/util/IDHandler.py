@@ -340,13 +340,13 @@ class IDprop(IDmap):
 			prop = prop.copy()
 			for prop_name in prop:
 				self._check_prop_existence(prop_name, True)
-			#chekc type of prop val
+			#chekc type of prop val and fill in missing properties
 			for prop_name, default_type in self.prop_default_type.items():
 				if prop_name in prop:
 					if default_type is not None:
 						checkers.checkType("Properties Values", default_type, prop[prop_name])
-					else:
-						prop[prop_name] = self.prop_default_val[prop_name]
+				else:
+					prop[prop_name] = self.prop_default_val[prop_name]
 		else:
 			prop = self.prop_default_val
 		super(IDprop, self).addID(ID)
