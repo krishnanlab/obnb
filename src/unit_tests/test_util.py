@@ -132,6 +132,23 @@ class TestIDlst(unittest.TestCase):
 		lst = ['a', 'b', 'c', 'a']
 		self.assertRaises(Exceptions.IDExistsError, IDHandler.IDlst.from_list, lst)
 
+	def test_update(self):
+		#test type check
+		self.assertRaises(TypeError, self.IDlst1.update, 1)
+		self.assertRaises(TypeError, self.IDlst1.update, 'a')
+		#test type check in list
+		self.assertRaises(TypeError, self.IDlst1.update, [1, 2, 3])
+		self.assertRaises(TypeError, self.IDlst1.update, ['1', '2', 3])
+		#test all overlap --> same as original 
+		self.assertEqual(self.IDlst1.update(self.lst), 0)
+		self.assertEqual(self.IDlst1.lst, self.lst)
+		#test partial overlap --> same as xor
+		self.assertEqual(self.IDlst1.update(['b', 'c', 'd']), 1)
+		self.assertEqual(self.IDlst1.lst, ['a', 'b', 'c', 'd'])
+		#test not overlap --> same as or
+		self.assertEqual(self.IDlst1.update(['e', 'f']), 2)
+		self.assertEqual(self.IDlst1.lst, ['a', 'b', 'c', 'd', 'e', 'f'])
+
 class TestIDmap(unittest.TestCase):
 	def setUp(self):
 		self.IDmap = IDHandler.IDmap()

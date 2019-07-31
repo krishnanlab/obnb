@@ -125,6 +125,27 @@ class IDlst(object):
 		self._check_ID_existence(ID, False)
 		self._lst.append(ID)
 
+	def update(self, IDs):
+		"""Update ID list
+		Loop over all IDs and add to list if not yet existed
+
+		Args:
+			IDs(:obj:`list` of :obj:`str`): list of ID to be added, 
+			can be redundant
+
+		Returns:
+			n(int): number of newly added IDs
+
+		"""
+		checkers.checkType("IDs", list, IDs)
+		checkers.checkTypesInIterable("IDs", str, IDs)
+		n = 0
+		for ID in IDs:
+			if ID not in self:
+				self.addID(ID)
+				n += 1
+		return n
+
 	def getID(self, idx):
 		"""Return ID by its index"""
 		return self._lst[idx]
