@@ -2,6 +2,7 @@ from common import *
 from copy import deepcopy
 from scipy.spatial import distance
 from NLEval.graph import BaseGraph, SparseGraph, DenseGraph
+from NLEval.util import Exceptions, IDHandler
 
 def shuffle_sparse(graph):
 	n = graph.size
@@ -57,7 +58,7 @@ class TestBaseGraph(unittest.TestCase):
 		self.assertEqual(self.graph.size, 0)
 		for i in range(5):
 			with self.subTest(i=i):
-				self.graph.IDmap.addID(i)
+				self.graph.IDmap.addID(str(i))
 				self.assertEqual(self.graph.size, i+1)
 
 	def test_isempty(self):
@@ -161,7 +162,7 @@ class TestDenseGraph(unittest.TestCase):
 				self.assertEqual(graph.get_edge(ID1, ID2), mat[i,j])
 
 	def test_construc_graph(self):
-		idmap = DenseGraph.IDmap()
+		idmap = IDHandler.IDmap()
 		idmap.addID('a')
 		idmap.addID('b')
 		mat1 = np.random.random((2,2))
