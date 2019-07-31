@@ -365,9 +365,9 @@ class IDprop(IDmap):
 					if default_type is not None:
 						checkers.checkType("Properties Values", default_type, prop[prop_name])
 				else:
-					prop[prop_name] = self.prop_default_val[prop_name]
+					prop[prop_name] = deepcopy(self.prop_default_val[prop_name])
 		else:
-			prop = self.prop_default_val
+			prop = deepcopy(self.prop_default_val)
 		super(IDprop, self).addID(ID)
 		for prop_name, prop_val in prop.items():
 			self._prop[prop_name].append(prop_val)

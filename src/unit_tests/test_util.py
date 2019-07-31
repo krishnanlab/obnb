@@ -427,6 +427,22 @@ class TestIDprop(unittest.TestCase):
 		self.assertEqual(self.IDprop1.getProp('d', 'x'), 1)
 		self.assertEqual(self.IDprop1.getProp('d', 'y'), '1')
 
+		#test if deepcopy used for fill in default properties for existing entities
+		self.IDprop2.addID('a')
+		self.IDprop2.addID('b')
+		self.IDprop2.newProp('x', list())
+		self.IDprop2.getProp('a', 'x').append(1)
+		self.assertEqual(self.IDprop2.getProp('a', 'x'), [1])
+		self.assertEqual(self.IDprop2.getProp('b', 'x'), [])
+		#test if deepcopy used for filling in missing properties of new ID
+		self.IDprop2.addID('c')
+		self.IDprop2.addID('d')
+		self.IDprop2.getProp('c', 'x').append(2)
+		self.assertEqual(self.IDprop2.getProp('a', 'x'), [1])
+		self.assertEqual(self.IDprop2.getProp('b', 'x'), [])
+		self.assertEqual(self.IDprop2.getProp('c', 'x'), [2])
+		self.assertEqual(self.IDprop2.getProp('d', 'x'), [])
+
 class TestCheckers(unittest.TestCase):
 	@classmethod
 	def setUpClass(self):
