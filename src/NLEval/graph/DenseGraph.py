@@ -69,7 +69,9 @@ class DenseGraph(BaseGraph):
 		"""
 		idmap = IDHandler.IDmap()
 		for ID in mat[:,0]:
-			idmap.addID(ID)
+			if int(ID) != ID:
+				raise ValueError("ID must be int type")
+			idmap.addID(str(int(ID)))
 		return cls.construct_graph(idmap, mat[:,1:].astype(float))
 
 	@classmethod
