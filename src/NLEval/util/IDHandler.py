@@ -235,7 +235,15 @@ class IDprop(IDmap):
 
 	def _check_prop_existence(self, prop_name, existence):
 		"""Check existence of property name and raise exceptions depending 
-		on desired existence of property name"""
+		on desired existence of property name
+
+		Raises:
+			IDExistsError: if desired existence of `prop_name` int `self._prop`
+				is `False` and `prop_name` exists
+			IDNotExitError: if desired existence of `prop_name` in `self._prop`
+				is `True` and `prop_name` not yet existed 
+
+		"""
 		if (not existence) & (prop_name in self._prop):
 			raise IDExistsError("Existing property name %s"%repr(prop_name))
 		elif existence & (prop_name not in self._prop):
@@ -274,6 +282,11 @@ class IDprop(IDmap):
 			prop_name(str): name of property
 			default_val: default value to set if property not specified
 
+		Raises:
+			TypeError: if prop_name is not `str` type, or if default_type
+				is not `type` type, or if default_val type is inconsistent
+				withspecified default_type
+
 		"""
 		checkers.checkType("Property name", str, prop_name)
 		self._check_prop_existence(prop_name, False)
@@ -299,7 +312,13 @@ class IDprop(IDmap):
 		self._prop[prop_name][self[ID]] = prop_val
 
 	def getProp(self, ID, prop_name):
-		"""Return a specific properties associated with an ID"""
+		"""Return a specific properties associated with an ID
+
+		Raises:
+			IDNotExistError: if either ID or prop_name does not exist
+			TypeError: if either ID or prop_name is not string type
+
+		"""
 		checkers.checkType('ID', str, ID)
 		self._check_ID_existence(ID, True)
 		checkers.checkType('Property name', str, prop_name)
