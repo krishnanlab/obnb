@@ -19,6 +19,7 @@ class IDlst(object):
 		return set(self._lst) == set(other._lst)
 
 	def __add__(self, other):
+		"""Combine two ID list and return a copy"""
 		checkers.checkType('other', self.__class__, other)
 		new = self.copy()
 		for ID in other:
@@ -27,6 +28,8 @@ class IDlst(object):
 		return new
 
 	def __sub__(self, other):
+		"""Return a copy of ID list that does not contain any
+		IDs from the `other` ID list"""
 		checkers.checkType('other', self.__class__, other)
 		new = self.__class__()
 		for ID in self:
@@ -35,6 +38,7 @@ class IDlst(object):
 		return new
 
 	def __and__(self, other):
+		"""Return a copy of ID list with IDs that exist in both lists"""
 		checkers.checkType('other', self.__class__, other)
 		new = self.__class__()
 		for ID in set(self._lst) & set(other._lst):
@@ -42,9 +46,11 @@ class IDlst(object):
 		return new
 
 	def __or__(self, other):
+		"""Same as `__add__`"""
 		return self.__add__(other)
 
 	def __xor__(self, other):
+		"""Return a copy of ID list with IDs that are unique"""
 		checkers.checkType('other', self.__class__, other)
 		new = self.__class__()
 		for ID in set(self._lst) ^ set(other._lst):
@@ -305,12 +311,29 @@ class IDprop(IDmap):
 		return {prop:self.getProp(ID, prop) for prop in self.propLst}
 
 	def popID(self, ID):
+		"""Pop ID from ID list, and all properties lists."""
 		idx = super(IDprop, self).popID(ID)
 		for prop in self.propLst:
 			self._prop[prop].pop(idx)
 		return idx
 
 	def addID(self, ID, prop=None):
+		"""Add a new ID to list, optional input of properties
+
+		Note: input properties must be one of the existing properties,
+		`IDNotExistError` raised other wise. Use `.newProp()` to add new
+		property.
+
+		Args:
+			ID(str): ID to be added
+			prop(:obj:`dict` of str:obj): dictionary specifying property(s)
+				of the input ID. Corresponding properties must follow default
+				type as specified in `.prop_default_type` if any. If `None` 
+				specified for `prop` (or `prop` doesn't contain all properties
+				needed), default input from `.prop_default_val` is used to set
+				(or fill in missing properties of) new ID properties.
+
+		"""
 		if prop is not None:
 			checkers.checkType("Properties", dict, prop)
 			checkers.checkTypesInIterable("Properties Keys", str, prop)
