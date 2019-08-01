@@ -365,6 +365,34 @@ class TestIDprop(unittest.TestCase):
 		self.IDprop1.setProp('a', 'x', 20)
 		self.assertEqual(self.IDprop1.getProp('a', 'x'), 20)
 
+	def test_delProp(self):
+		self.IDprop1.newProp('x', 1, int)
+		self.IDprop1.newProp('y', '1', str)
+		self.IDprop1.newProp('z', [1], list)
+		self.assertEqual(self.IDprop1.prop_default_val, {'x':1, 'y':'1', 'z':[1]})
+		self.assertEqual(self.IDprop1.prop_default_type, {'x':int, 'y':str, 'z':list})
+		self.assertEqual(self.IDprop1.prop, {'x':[], 'y':[], 'z':[]})
+		#test if property deleted properly on empty ID list
+		self.IDprop1.delProp('y')
+		self.assertEqual(self.IDprop1.prop_default_val, {'x':1, 'z':[1]})
+		self.assertEqual(self.IDprop1.prop_default_type, {'x':int, 'z':list})
+		self.assertEqual(self.IDprop1.prop, {'x':[], 'z':[]})
+		#test wrong ID type --> TypeError
+		self.assertRaises(TypeError, self.IDprop1.delProp, 1)
+		self.assertRaises(TypeError, self.IDprop1.delProp, [1,2])
+		#test not exist prop name --> Exceptions.IDNotExistError
+		self.assertRaises(Exceptions.IDNotExistError, self.IDprop1.delProp, 'X')
+		self.assertRaises(Exceptions.IDNotExistError, self.IDprop1.delProp, 'Z')
+		#test if property deleted properly on filled IDlist
+		self.IDprop1.addID('a')
+		self.IDprop1.addID('b')
+		self.IDprop1.addID('c')
+		self.assertEqual(self.IDprop1.prop, {'x':[1, 1, 1], 'z':[[1], [1], [1]]})
+		self.IDprop1.delProp('z')
+		self.assertEqual(self.IDprop1.prop, {'x':[1, 1, 1]})
+		self.IDprop1.delProp('x')
+		self.assertEqual(self.IDprop1.prop, {})
+
 	def test_getAllProp(self):
 		self.IDprop1.addID('a')
 		self.IDprop1.newProp('x', 10, int)

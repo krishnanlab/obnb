@@ -323,6 +323,13 @@ class IDprop(IDmap):
 		self._check_prop_existence(prop_name, True)
 		return self._prop[prop_name][self[ID]]
 
+	def delProp(self, prop_name):
+		"""Delete a property, along with its default type and value"""
+		self._check_prop_existence(prop_name, True)
+		self._prop.pop(prop_name)
+		self._prop_default_val.pop(prop_name)
+		self._prop_default_type.pop(prop_name)
+
 	def getAllProp(self, ID):
 		"""Return all properties associated with an ID"""
 		return {prop:self.getProp(ID, prop) for prop in self.propLst}
