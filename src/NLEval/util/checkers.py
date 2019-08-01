@@ -9,8 +9,8 @@ ITERABLE_TYPE = Iterable
 
 def checkType(name, targetType, val):
 	if not isinstance(val, targetType):
-		raise TypeError("%s should be %s, not %s"%
-				(repr(name), targetType, repr(type(val))))
+		raise TypeError("%s should be %s, not %s: %s"%
+				(repr(name), repr(targetType), repr(type(val)), repr(val)))
 
 def checkTypeErrNone(name, targetType, val):
 	if val is not None:

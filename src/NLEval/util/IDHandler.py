@@ -265,8 +265,8 @@ class IDprop(IDmap):
 		"""(dict of str: :obj:`list` of :obj:): dictionary mapping from 
 		property name to list of property values in the order of ID list
 
-		Note: the returned list is a copy of self._prop to prevent userside
-		maniputation on data, use self.setProp to modify properties
+		Note: the returned dict is a copy of self._prop to prevent userside
+		maniputation on data, use `.setProp` to modify properties
 
 		"""
 		return self._prop.copy()
