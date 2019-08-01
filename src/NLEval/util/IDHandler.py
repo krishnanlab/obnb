@@ -244,6 +244,7 @@ class IDprop(IDmap):
 				is `True` and `prop_name` not yet existed 
 
 		"""
+		checkers.checkType("Property name", str, prop_name)
 		if (not existence) & (prop_name in self._prop):
 			raise IDExistsError("Existing property name %s"%repr(prop_name))
 		elif existence & (prop_name not in self._prop):
@@ -288,7 +289,6 @@ class IDprop(IDmap):
 				withspecified default_type
 
 		"""
-		checkers.checkType("Property name", str, prop_name)
 		self._check_prop_existence(prop_name, False)
 		if default_type is not None:
 			checkers.checkType("Default type", type, default_type)
@@ -319,9 +319,7 @@ class IDprop(IDmap):
 			TypeError: if either ID or prop_name is not string type
 
 		"""
-		checkers.checkType('ID', str, ID)
 		self._check_ID_existence(ID, True)
-		checkers.checkType('Property name', str, prop_name)
 		self._check_prop_existence(prop_name, True)
 		return self._prop[prop_name][self[ID]]
 
@@ -355,7 +353,6 @@ class IDprop(IDmap):
 		"""
 		if prop is not None:
 			checkers.checkType("Properties", dict, prop)
-			checkers.checkTypesInIterable("Properties Keys", str, prop)
 			prop = prop.copy()
 			for prop_name in prop:
 				self._check_prop_existence(prop_name, True)
