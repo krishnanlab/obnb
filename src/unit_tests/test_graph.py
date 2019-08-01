@@ -2,7 +2,7 @@ from common import *
 from copy import deepcopy
 from scipy.spatial import distance
 from NLEval.graph import BaseGraph, SparseGraph, DenseGraph
-from NLEval.util import Exceptions, IDHandler
+from NLEval.util import IDHandler
 
 def shuffle_sparse(graph):
 	n = graph.size
