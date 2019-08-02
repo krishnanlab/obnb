@@ -1,19 +1,21 @@
 from common import *
 from NLEval.label import LabelsetCollection
 
-class TestLabelsetCollection(unittest.TestCase):
+class TestBaseLSC(unittest.TestCase):
 	@classmethod
 	def setUpClass(self):
-		self.toy1_fp = SAMPLE_DATA_PATH + 'toy1.gmt'
+		self.toy1_gmt_fp = SAMPLE_DATA_PATH + 'toy1.gmt'
+		self.toy1_prop_fp = SAMPLE_DATA_PATH + 'toy1_property.tsv'
 		self.toy1_labelIDlst = ['Group1', 'Group2', 'Group3', 'Group4']
 		self.toy1_InfoLst = ['Description1', 'Description2', 'Description3', 'Description4']
 		self.toy1_labelsets = [ {'ID1', 'ID2', 'ID3'}, \
 								{'ID2', 'ID4', 'ID5', 'ID6'}, \
 								{'ID2', 'ID6'}, \
 								{'ID7'}]
+		self.toy1_property = [1, 0, 9, 2]
 
 	def setUp(self):
-		self.lsc = LabelsetCollection.LabelsetCollection()
+		self.lsc = LabelsetCollection.BaseLSC()
 		self.lsc.addLabelset(['a', 'b', 'c'], 'Labelset1', 'Description1')
 		self.lsc.addLabelset(['b', 'd'], 'Labelset2', 'Description2')
 		
@@ -43,11 +45,40 @@ class TestLabelsetCollection(unittest.TestCase):
 		self.assertEqual(self.lsc.getNoccur('c'), 1)
 		self.assertEqual(self.lsc.getNoccur('d'), 1)
 
+	def test_popEntity(self):
+		self.template_test_input_for_getters(self.lsc.popEntity)
+		self.lsc.popEntity('b')
+		self.assertEqual(self.lsc.entity.map, {'a':0, 'c':1, 'd':2})
+		self.assertEqual(self.lsc.getLabelset('Labelset1'), {'a','c'})
+		self.assertEqual(self.lsc.getLabelset('Labelset2'), {'d'})
+
+	def test_getNegative(self):
+		self.template_test_input_for_getters(self.lsc.getNegative)
+		#test unspecified negative
+		self.assertEqual(self.lsc.getNegative('Labelset1'), {'d'})
+		self.assertEqual(self.lsc.getNegative('Labelset2'), {'a', 'c'})
+		#test specified negative
+		self.lsc.setNegative(['a'], 'Labelset2')
+		self.assertEqual(self.lsc.getNegative('Labelset2'), {'a'})
+
+	def test_setNegative(self):
+		#test with known entity ID
+		self.lsc.setNegative(['a'], 'Labelset2')
+		self.assertEqual(self.lsc.getNegative('Labelset2'), {'a'})
+		self.lsc.setNegative(['c'], 'Labelset2')
+		self.assertEqual(self.lsc.getNegative('Labelset2'), {'c'})
+		#test with knwon positive ID --> IDExistsError
+		self.assertRaises(IDExistsError, self.lsc.setNegative, ['b'], 'Labelset2')
+		self.assertRaises(IDExistsError, self.lsc.setNegative, ['a', 'd'], 'Labelset2')
+		#test with unknown entity ID --> IDNotExistError
+		self.assertRaises(IDNotExistError, self.lsc.setNegative, ['e'], 'Labelset2')
+		self.assertRaises(IDNotExistError, self.lsc.setNegative, ['a', 'e'], 'Labelset2')
+
 	def test_eq(self):
 		#make two identical labelset collections by shuffling the order of labelset
 		shuffle_idx = [3, 0, 2, 1]
-		lsc1 = LabelsetCollection.LabelsetCollection()
-		lsc2 = LabelsetCollection.LabelsetCollection()
+		lsc1 = LabelsetCollection.BaseLSC()
+		lsc2 = LabelsetCollection.BaseLSC()
 		for idx1 in range(4):
 			idx2 = shuffle_idx[idx1]
 			for lsc, idx in zip((lsc1, lsc2), (idx1, idx2)):
@@ -66,9 +97,10 @@ class TestLabelsetCollection(unittest.TestCase):
 		self.assertEqual(lsc1, lsc2)
 
 	def test_from_gmt(self):
-		lsc = LabelsetCollection.LabelsetCollection.from_gmt(self.toy1_fp)
-		lsc2 = LabelsetCollection.LabelsetCollection.from_gmt(self.toy1_fp)
-		self.assertEqual(lsc, lsc2)
+		lsc = LabelsetCollection.BaseLSC.from_gmt(self.toy1_gmt_fp)
+		self.assertEqual(lsc.labelIDlst, self.toy1_labelIDlst)
+		self.assertEqual(lsc.prop['Info'], self.toy1_InfoLst)
+		self.assertEqual(lsc.prop['Labelset'], self.toy1_labelsets)
 
 	def test_addLabelset(self):
 		with self.subTest(msg='Input checks'):
@@ -152,6 +184,17 @@ class TestLabelsetCollection(unittest.TestCase):
 		self.assertEqual(self.lsc.labelIDlst, ['Labelset1', 'Labelset2'])
 		#make sure entities that are nolongler in any labelset are popped
 		self.assertEqual(self.lsc.entity.map, {'b':0, 'd':1})
+
+	def test_load_entity_properties(self):
+		self.lsc.load_entity_properties(self.toy1_prop_fp, 'toy1_prop', 0, int)
+		self.assertEqual(self.lsc.entity.prop['toy1_prop'], self.toy1_property)
+		#test loading property with existing property name --> IDExistsError
+		self.assertRaises(IDExistsError, self.lsc.load_entity_properties, \
+			self.toy1_prop_fp, 'toy1_prop', 0, int)
+		#make sure entity with properties different from default don't get popped
+		self.lsc.popLabelset('Labelset1')
+		self.lsc.popLabelset('Labelset2')
+		self.assertEqual(self.lsc.entity.map, {'a':0, 'c':1, 'd':2})
 
 if __name__ == '__main__':
 	unittest.main()

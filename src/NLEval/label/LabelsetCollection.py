@@ -1,7 +1,8 @@
+from NLEval.util.Exceptions import IDExistsError, IDNotExistError
 from NLEval.util import checkers, IDHandler
 import numpy as np
 
-class LabelsetCollection(IDHandler.IDprop):
+class BaseLSC(IDHandler.IDprop):
 	"""Collection of labelsets
 
 	This class is used for managing collection of labelsets.
@@ -29,11 +30,12 @@ class LabelsetCollection(IDHandler.IDprop):
 
 	"""
 	def __init__(self):
-		super(LabelsetCollection, self).__init__()
+		super(BaseLSC, self).__init__()
 		self.entity = IDHandler.IDprop()
 		self.entity.newProp('Noccur', 0, int)
 		self.newProp('Info', 'NA', str)
 		self.newProp('Labelset', set(), set)
+		self.newProp('Negative', set(), set)
 
 	def _show(self):
 		"""Debugging prints"""
@@ -115,12 +117,16 @@ class LabelsetCollection(IDHandler.IDprop):
 		"""
 		lbset = self.getLabelset(labelID)
 		for ID in lbset:
-			noccur = self.getNoccur(ID)
-			if noccur == 1:
+			self.entity.setProp(ID, 'Noccur', self.getNoccur(ID) - 1)
+			if self.entity.getAllProp(ID) == self.entity.prop_default_val:
 				self.entity.popID(ID)
-			else:
-				self.entity.setProp(ID, 'Noccur', noccur - 1)
 		lbset.clear()
+
+	def popEntity(self, ID):
+		"""Pop an entity, remove from all labelsets"""
+		self.entity.popID(ID)
+		for labelID in self.labelIDlst:
+			lbset = self.getLabelset(labelID).difference_update([ID])
 
 	def getInfo(self, labelID):
 		"""Return description of a labelset"""
@@ -129,6 +135,27 @@ class LabelsetCollection(IDHandler.IDprop):
 	def getLabelset(self, labelID):
 		"""Return set of entities associated with a label"""
 		return self.getProp(labelID, 'Labelset')
+
+	def getNegative(self, labelID):
+		"""Return set of negative samples of a labelset
+		
+		Note:
+			If negative samples not available, use complement of labelset
+
+		"""
+		neg = self.getProp(labelID, 'Negative')
+		return neg if neg else set(self.entity.map) - self.getLabelset(labelID)
+
+	def setNegative(self, lst, labelID):
+		checkers.checkTypesInList("Negative entity list", str, lst)
+		lbset = self.getLabelset(labelID)
+		for ID in lst:
+			self.entity._check_ID_existence(ID, True)
+			if ID in lbset:
+				#raise Exception(repr(ID), repr(labelID))
+				raise IDExistsError("Entity %s is positive in labelset %s, "%\
+				 	(repr(ID), repr(labelID)) + "cannot be set to negative")
+		self.setProp(labelID, 'Negative', set(lst))
 
 	def getNoccur(self, ID):
 		"""Return the number of labelsets in which an entity participates"""
@@ -141,12 +168,29 @@ class LabelsetCollection(IDHandler.IDprop):
 	def export(self, fp):
 		pass
 
-	def to_label_matrix(self):
-		pass
+	def load_entity_properties(self, fp, prop_name, \
+			default_val, default_type, interpreter=int):
+		"""Load entity properties from file.
+		The file is tab seprated with two columns, first column 
+		contains entities IDs, second column contains corresponding 
+		properties of entities.
 
-	@classmethod
-	def from_label_matrix(cls):
-		pass
+		Args:
+			fp(str): path to the entity properties file.
+			default_val: default value of property of an entity 
+				if not specified.
+			default_type(type): default type of the property.
+			interpreter: function to transfrom property value from
+				string to some other value
+
+		"""
+		self.entity.newProp(prop_name, default_val, default_type)
+		with open(fp, 'r') as f:
+			for line in f:
+				ID, val = line.strip().split()
+				if ID not in self.entity:
+					self.entity.addID(ID)
+				self.entity.setProp(ID, prop_name, interpreter(val))
 
 	@classmethod
 	def from_gmt(cls, fp):
