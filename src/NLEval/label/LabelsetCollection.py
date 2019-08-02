@@ -1,5 +1,7 @@
 from NLEval.util.Exceptions import IDExistsError, IDNotExistError
 from NLEval.util import checkers, IDHandler
+from NLEval.label import Filter
+from NLEval.valsplit import Base
 import numpy as np
 
 class BaseLSC(IDHandler.IDprop):
@@ -161,9 +163,10 @@ class BaseLSC(IDHandler.IDprop):
 		"""Return the number of labelsets in which an entity participates"""
 		return self.entity.getProp(ID, 'Noccur')
 
-	def apply():
+	def apply(self, filter_func):
 		"""Apply filter"""
-		pass
+		checkers.checkType("Filter", Filter.BaseFilter, filter_func)
+		filter_func(self)
 
 	def export(self, fp):
 		pass

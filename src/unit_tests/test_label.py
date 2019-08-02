@@ -1,5 +1,6 @@
 from common import *
-from NLEval.label import LabelsetCollection
+from NLEval.label import LabelsetCollection, Filter
+from NLEval import valsplit
 
 class TestBaseLSC(unittest.TestCase):
 	@classmethod
@@ -195,6 +196,98 @@ class TestBaseLSC(unittest.TestCase):
 		self.lsc.popLabelset('Labelset1')
 		self.lsc.popLabelset('Labelset2')
 		self.assertEqual(self.lsc.entity.map, {'a':0, 'c':1, 'd':2})
+
+class TestFilter(unittest.TestCase):
+	def setUp(self):
+		self.lsc = LabelsetCollection.BaseLSC()
+		self.lsc.addLabelset(['a', 'b', 'c'], 'Group1')
+		self.lsc.addLabelset(['b', 'd'], 'Group2')
+		self.lsc.addLabelset(['e', 'f', 'g'], 'Group3')
+		self.lsc.addLabelset(['a', 'f', 'c'], 'Group4')
+		self.lsc.addLabelset(['a', 'h'], 'Group5')
+		#Noccur=[3, 2, 2, 1, 1, 2, 1, 1]
+		#Size=[3, 2, 3, 3, 2]
+
+	def test_EntityRangeFilterNoccur(self):
+		with self.subTest(min_val=2):
+			lsc = self.lsc.copy()
+			lsc.apply(Filter.EntityRangeFilterNoccur(min_val=2))
+			self.assertEqual(lsc.prop['Labelset'], \
+				[{'a', 'b', 'c'}, {'b'}, {'f'}, {'a', 'f', 'c'}, {'a'}])
+			self.assertEqual(lsc.entity.map, \
+				{'a':0, 'b':1, 'c':2, 'f':3})
+		with self.subTest(min_val=3):
+			lsc = self.lsc.copy()
+			lsc.apply(Filter.EntityRangeFilterNoccur(min_val=3))
+			self.assertEqual(lsc.prop['Labelset'], \
+				[{'a'}, set(), set(), {'a'}, {'a'}])
+			self.assertEqual(lsc.entity.map, {'a':0})
+		with self.subTest(min_val=4):
+			lsc = self.lsc.copy()
+			lsc.apply(Filter.EntityRangeFilterNoccur(min_val=4))
+			self.assertEqual(lsc.prop['Labelset'], \
+				[set(), set(), set(), set(), set()])
+			self.assertEqual(lsc.entity.map, {})
+		with self.subTest(max_val=2):
+			lsc = self.lsc.copy()
+			lsc.apply(Filter.EntityRangeFilterNoccur(max_val=2))
+			self.assertEqual(lsc.prop['Labelset'], \
+				[{'b', 'c'}, {'b', 'd'}, {'e', 'f', 'g'}, {'f', 'c'}, {'h'}])
+			self.assertEqual(lsc.entity.map, \
+				{'b':0, 'c':1, 'd':2, 'e':3, 'f':4, 'g':5, 'h':6})
+		with self.subTest(max_val=1):
+			lsc = self.lsc.copy()
+			lsc.apply(Filter.EntityRangeFilterNoccur(max_val=1))
+			self.assertEqual(lsc.prop['Labelset'], \
+				[set(), {'d'}, {'e', 'g'}, set(), {'h'}])
+			self.assertEqual(lsc.entity.map, \
+				{'d':0, 'e':1, 'g':2, 'h':3})
+		with self.subTest(max_val=0):
+			lsc = self.lsc.copy()
+			lsc.apply(Filter.EntityRangeFilterNoccur(max_val=0))
+			self.assertEqual(lsc.prop['Labelset'], \
+				[set(), set(), set(), set(), set()])
+			self.assertEqual(lsc.entity.map, {})
+		with self.subTest(min_val=2, max_val=2):
+			lsc = self.lsc.copy()
+			lsc.apply(Filter.EntityRangeFilterNoccur(min_val=2, max_val=2))
+			self.assertEqual(lsc.prop['Labelset'], \
+				[{'b', 'c'}, {'b'}, {'f'}, {'f', 'c'}, set()])
+			self.assertEqual(lsc.entity.map, \
+				{'b':0, 'c':1, 'f':2})
+
+	def test_LabelsetRangeFilterSize(self):
+		with self.subTest(min_val=3):
+			lsc = self.lsc.copy()
+			lsc.apply(Filter.LabelsetRangeFilterSize(min_val=3))
+			self.assertEqual(lsc.labelIDlst, ['Group1', 'Group3', 'Group4'])
+			self.assertEqual(lsc.prop['Labelset'], \
+				[{'a', 'b', 'c'}, {'e', 'f', 'g'}, {'a', 'f', 'c'}])
+			self.assertEqual(lsc.entity.map, \
+				{'a':0, 'b':1, 'c':2, 'e':3, 'f':4, 'g':5})
+		with self.subTest(min_val=4):
+			lsc = self.lsc.copy()
+			lsc.apply(Filter.LabelsetRangeFilterSize(min_val=4))
+			self.assertEqual(lsc.labelIDlst, [])
+			self.assertEqual(lsc.prop['Labelset'], [])
+			self.assertEqual(lsc.entity.map, {})
+		with self.subTest(max_val=2):
+			lsc = self.lsc.copy()
+			lsc.apply(Filter.LabelsetRangeFilterSize(max_val=2))
+			self.assertEqual(lsc.labelIDlst, ['Group2', 'Group5'])
+			self.assertEqual(lsc.prop['Labelset'], \
+				[{'b', 'd'}, {'a', 'h'}])
+			self.assertEqual(lsc.entity.map, \
+				{'a':0, 'b':1, 'd':2, 'h':3})
+		with self.subTest(max_val=1):
+			lsc = self.lsc.copy()
+			lsc.apply(Filter.LabelsetRangeFilterSize(max_val=1))
+			self.assertEqual(lsc.labelIDlst, [])
+			self.assertEqual(lsc.prop['Labelset'], [])
+			self.assertEqual(lsc.entity.map, {})
+
+	def test_LabelsetRangeFilterTrainTestPos(self):
+		pass
 
 if __name__ == '__main__':
 	unittest.main()
