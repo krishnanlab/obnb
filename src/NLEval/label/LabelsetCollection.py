@@ -99,8 +99,7 @@ class LabelsetCollection(IDHandler.IDprop):
 				is not `str` type
 
 		"""
-		checkers.checkType("Entity list", list, lst)
-		checkers.checkTypesInIterable("Entity list", str, lst)
+		checkers.checkTypesInList("Entity list", str, lst)
 		lbset = self.getLabelset(labelID)
 		for ID in lst:
 			if ID not in self.entity:

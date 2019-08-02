@@ -143,8 +143,7 @@ class IDlst(object):
 			n(int): number of newly added IDs
 
 		"""
-		checkers.checkType("IDs", list, IDs)
-		checkers.checkTypesInIterable("IDs", str, IDs)
+		checkers.checkTypesInList("IDs", str, IDs)
 		n = 0
 		for ID in IDs:
 			if ID not in self:
