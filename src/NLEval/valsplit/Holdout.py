@@ -1,24 +1,21 @@
-from NLEval.util import checkers
+from NLEval.util import checkers, IDHandler
 from NLEval.valsplit.Base import *
 import numpy as np
 
 class BinHold(BaseHoldout):
-	def __init__(self, bin_num, prop_name, min_pos=10, train_on='top'):
-		'''
-		Input:
-			- bin_num:		num of bins for bin_num mode (see mode)
-			- prop_name:	name of property for guiding holdout
-			- min_pos:		minimum number of positives in both testing and training
-			- train_on
-				- 'top':	train on top, test on bottom
-				- 'bot':	train on bottom, test on top
-		'''
-		super().__init__(bin_num, prop_name, min_pos=min_pos, train_on=train_on)
+	def __init__(self, bin_num, train_on='top'):
+		"""
+
+		Args:
+			bin_num(int): num of bins for bin_num mode (see mode)
+
+		"""
+		super(BinHold, self).__init__(train_on=train_on)
 		self.bin_num = bin_num
 
 	def __repr__(self):
-		return 'BinHold(bin_num=%s, prop_name=%s, min_pos=%s, train_on=%s)'%\
-		(repr(self.bin_num), repr(self.prop_name), repr(self.min_pse), repr(self.train_on))
+		return 'BinHold(bin_num=%s, train_on=%s)'%\
+		(repr(self.bin_num), repr(self.train_on))
 
 	@property
 	def bin_num(self):
@@ -26,132 +23,121 @@ class BinHold(BaseHoldout):
 	
 	@bin_num.setter
 	def bin_num(self, val):
-		checkers.checkTypeErrNone('bin_num', int, val)
-		assert val > 1,"Number of bins must be greater than 1, not '%d'"%val
-		#TODO:max num of bins??
+		checkers.checkTypeErrNone('Number of bins', checkers.INT_TYPE, val)
+		if val < 1:
+			raise ValueError("Number of bins must be greater than 1, not '%d'"%val)
 		self._bin_num = val
-		self.split_criterion = val
 
-	def train_test_setup(self, pos_ID, node_property, **kwargs):
-		'''
-		Input:
-		-   pos_ID: union of entities in a labelset
-		-   node_property:  EmdEval.node_property, dictionary of dictionaries of node property
-				{ property_name: { entity_id: property_value } }
-		'''
-		assert self.prop_name in node_property, 'Unknown property %s'%self.prop_name
-		intersection = set(pos_ID) & set(node_property[self.prop_name])
-		prop = {ID:node_property[self.prop_name][ID] for ID in intersection}
+	def train_test_setup(self, lscIDs, graphIDs, prop_name, **kwargs):
+		"""
 
-		sorted_id_lst = sorted(prop, key=prop.get, reverse=self.reverse)
+		Args:
+			lscIDs(:obj:`NLEval.util.IDHandler.IDprop`)
+			graphIDs(:obj:`NLEval.util.IDHandler.IDmap`)
+			prop_name(str): name of property to be used for splitting
+
+		"""
+		lscIDs._check_prop_existence(prop_name, True)
+		common_ID_list = self.get_common_ID_list(lscIDs, graphIDs)
+		sorted_lst = sorted(common_ID_list, reverse=self.reverse, \
+			key=lambda ID: lscIDs.getProp(ID, prop_name))
 		bin_size = len(sorted_id_lst) // self.bin_num
-
-		test_IDlst = list(set(sorted_id_lst[:bin_size]))
-		train_IDlst = list(set(sorted_id_lst[(bin_size * (self.bin_num - 1)):]))
-
-		self.make_train_test_ary(pos_ID, train_IDlst, test_IDlst)
+		self._test_ID_ary = np.array(sorted_id_lst[:bin_size])
+		self._train_ID_ary = np.array(sorted_id_lst[bin_size:])
 
 class ThreshHold(BaseHoldout):
-	def __init__(self, cut_off, prop_name, min_pos=10, train_on='top'):
-		'''
-		Input:
-			- cut_off:		cut-off point for cut mode, num of bins for bin mode (see mode)
-			- prop_name:	name of node property for guiding holdout
-			- min_pos:		minimum number of positives in both testing and training
-			- train_on
-				- 'top':	train on top, test on bottom
-				- 'bot':	train on bottom, test on top
-		'''
-		super().__init__(cut_off, prop_name, min_pos=min_pos, train_on=train_on)
+	def __init__(self, cut_off,train_on='top'):
+		"""
+
+		Args:
+			cut_off:		cut-off point for cut mode, num of bins for bin mode (see mode)
+
+		"""
+		super(ThreshHold, self).__init__(train_on=train_on)
+		self.cut_off = cut_off
 
 	def __repr__(self):
-		return 'ThreshHold(cut_off=%s, prop_name=%s, min_pos=%s, train_on=%s)'%\
-		(repr(self.cut_off), repr(self.prop_name), repr(self.min_pos), repr(self.train_on))
+		return 'ThreshHold(cut_off=%s, prop_name=%s, train_on=%s)'%\
+		(repr(self.cut_off), repr(self.prop_name), repr(self.train_on))
 
-	def train_test_setup(self, pos_ID, node_property, **kwargs):
-		'''
-		Input:
-		-   pos_ID: union of entities in a labelset
-		-   node_property:  EmdEval.node_property, dictionary of dictionaries of node property
-				{ property_name: { entity_id: property_value } }
-		'''
-		assert self.holdout in node_property, 'Unknown property %s'%self.holdout
-		intersection = set(pos_ID) & set(node_property[self.holdout])
-		prop = {ID:node_property[self.holdout][ID] for ID in intersection}
+	@property
+	def cut_off(self):
+		return self._cut_off
+	
+	@cut_off.setter
+	def cut_off(self, val):
+		checkers.checkTypeErrNone('Cut off', checkers.NUMERIC_TYPE, val)
+		self._cut_off = val
 
-		top_lst = []
-		bot_lst = []
-		for ID, prop_val in prop.items():
-			if prop_val >= self.split:
-				top_lst.append( ID )
-			else:
-				bot_lst.append( ID )
-		if self.reverse:
-			self.make_train_test_ary(pos_ID, top_lst, bot_lst)
-		else:
-			self.make_train_test_ary(pos_ID, bot_lst, top_lst)
+	def train_test_setup(self, lscIDs, graphIDs, prop_name, **kwargs):
+		"""
+
+		Args:
+			lscIDs(:obj:`NLEval.util.IDHandler.IDprop`)
+			graphIDs(:obj:`NLEval.util.IDHandler.IDmap`)
+			prop_name(str): name of property to be used for splitting
+
+		"""
+		lscIDs._check_prop_existence(prop_name, True)
+		top_list = []
+		bot_list = []
+		for ID in graphIDs.lst:
+			if ID in lscIDs:
+				if lscIDs.getProp(ID, 'Noccur') > 0:
+					if lscIDs.getProp(ID, prop_name) >= self.cut_off:
+						top_list.append(ID)
+					else:
+						bot_list.append(ID)
+		self._train_ID_ary = np.array(top_list) if self.reverse else np.array(bot_list)
+		self._test_ID_ary = np.array(bot_list) if self.reverse else np.array(top_list)
 
 class CustomHold(BaseHoldout):
-	def __init__(self, train_IDlst=[], test_IDlst=[], min_pos=10):
-		'''
-		User defined training and testing
-		'''
-		super().__init__(0, 'NA', min_pos=min_pos)
-		self.train_IDlst = train_IDlst
-		self.test_IDlst = test_IDlst
+	def __init__(self, custom_train_ID_list, custom_test_ID_list):
+		"""User defined training and testing samples"""
+		super(CustomHold, self).__init__()
+		self.custom_train_ID_ary = custom_train_ID_ary
+		self.custom_test_ID_ary = custom_test_ID_ary
 
 	def __repr__(self):
 		return 'CustomHold(min_pos=%s)'%repr(self.min_pos)
 
 	@property
-	def train_IDlst(self):
-		return self._train_IDlst
+	def custom_train_ID_ary(self):
+		return self._custom_train_ID_ary
+
+	@custom_train_ID_ary.setter
+	def custom_train_ID_ary(self, ID_list):
+		checkers.checkTypesInSet("Training data ID list", str, ID_list)
+		self._custom_train_ID_ary = np.array(ID_list)
 
 	@property
-	def test_IDlst(self):
-		return self._test_IDlst
+	def custom_test_ID_ary(self):
+		return self._custom_test_ID_ary
 
-	@train_IDlst.setter
-	def train_IDlst(self, IDlst):
-		checkers.checkTypeErrNone('train_IDlst', list, IDlst)
-		for ID in IDlst:
-			self.addTrainID(ID)
+	@custom_test_ID_ary.setter
+	def custom_test_ID_ary(self, ID_list):
+		checkers.checkTypesInSet('Testing data ID list', str, ID_list)
+		self._custom_test_ID_ary = np.array(ID_list)
 
-	@test_IDlst.setter
-	def test_IDlst(self, IDlst):
-		checkers.checkTypeErrNone('test_IDlst', list, IDlst)
-		for ID in IDlst:
-			self.addTestID(ID)
-
-	def addTrainID(self, ID):
-		checkers.checkTypeErrNone('Training ID', str, IDlst)
-		self._train_IDlst.append(ID)
-
-	def addTestID(self, ID):
-		checkers.checkTypeErrNone('Testing ID', str, IDlst)
-		self._test_IDlst.append(ID)
-
-	def train_test_setup(self, pos_ID, **kwargs):
-		self.make_train_test_ary(pos_ID, self.train_IDlst, self.test_IDlst)
+	def train_test_setup(self, lscIDs, graphIDs, **kwargs):
+		common_ID_list = self.get_common_ID_list(lscIDs, graphIDs)
+		self._train_idx_ary = np.intersect1d(self.custom_train_ID_ary, common_ID_list)
+		self._test_idx_ary = np.intersect1d(self.custom_test_ID_ary, common_ID_list)
 
 class TrainTestAll(BaseHoldout):
-	def __init__(self, min_pos=10):
-		'''
-		Train and test on all
-		'''
-		super().__init__(0, 'NA', min_pos=min_pos)
+	def __init__(self):
+		"""Train and test on all data"""
+		super(TrainTestAll, self).__init__()
 
-	def __repr__(self):
-		return 'TrainTestAll(min_pos=%s)'%repr(self.min_pos)
+	def train_test_setup(self, lscIDs, graphIDs, **kwargs):
+		common_ID_list = self.get_common_ID_list(lscIDs, graphIDs)
+		self._train_idx_ary = self._test_idx_ary = np.array(common_ID_list)
 
-	def train_test_setup(self, pos_ID, **kwargs):
-		self.make_train_test_ary(pos_ID, pos_ID, pos_ID)
-
-"""
+'''
 class HoldoutChildTemplate(BaseHoldout):
-	'''
+	"""
 	This is a template for BaseHoldout children class
-	'''
+	"""
 	def __init__(self, **args, min_pos=10, **kwargs):
 		super().__init__(min_pos=min_pos)
 	
@@ -166,7 +152,6 @@ class HoldoutChildTemplate(BaseHoldout):
 	def foo(self, val):
 		self._foo = val
 
-	def train_test_setup(self, pos_ID, **kwargs):
-		#setup train_IDlst and test_IDlst and 
-		pass
-"""
+	def train_test_setup(self, lscIDs, graphIDs, prop_name, **kwargs):
+		#setup train_ID_ary and test_ID_ary
+'''

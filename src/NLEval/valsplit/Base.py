@@ -1,102 +1,69 @@
-from NLEval.util import checkers
+from NLEval.util import checkers, IDHandler
 import numpy as np
 
 class BaseValSplit:
-	class Wrapper:
-		def __init__(self, split_gen, min_pos):
-			self.split_gen = split_gen
-			self.min_pos = min_pos
+	def __init__(self):
+		super(BaseValSplit, self).__init__()
 
-		def filter_pos_below_min(self, pad, label):
-			num_pos_test = label.sum()
-			num_pos_train = label.sum()
-			for train, test in self.split_gen(pad, label):
-				if (num_pos_train < self.min_pos) | (num_pos_test < self.min_pos):
-					yield None, None
-				else:
-					yield train, test
+	def split(self, ID_ary, label_ary):
+		"""Split samples into training and testing sets
 
-	def __init__(self, min_pos=10):
-		'''
-		Input:
-			- min_pos:		minimum number of positives in both testing and training
-		'''
-		self.min_pos = min_pos
+		Note:
+			ID_ary and label_ary are coulpled, such that a particular entry
+			in label_ary corresponds to the label of the ID in the same entry
+			in ID_ary.
 
-	@property
-	def min_pos(self):
-		return self._min_pos
-	
-	@min_pos.setter
-	def min_pos(self, val):
-		checkers.checkTypeAllowNone('min_pos', int, val)
-		if val is None:
-			val = 0
-		self._min_pos = val
-	
-	def __repr__(self):
-		return 'ValSplit(min_pos=%s)'%repr(self.min_pos)
+		Args:
+			ID_ary(:obj:`numpy.ndarray` of :obj:`str`): array of entity IDs
+			label_ary(:obj:`numpy.ndarray` of :obj:`bool`):
+				boolean/binary array of indicating positive samples
 
-	def train_test_setup(self, pos_ID, node_property):
-		pass
+		Yields:
+			train_ID_ary(:obj:`numpy.ndarray` of :obj:`str`):
+				numpy array of training IDs
+			train_label_ary(:obj:`numpy.ndarray` of :obj:`bool`):
+				numpy array of training labels
+			test_ID_ary(:obj:`numpy.ndarray` of :obj:`str`):
+				numpy array of testing IDs
+			test_label_ary(:obj:`numpy.ndarray` of :obj:`bool`):
+				numpy array of testing labels
 
-	def wrap(self, split_gen):
-		wrapper = self.Wrapper(split_gen, self.min_pos)
-		return wrapper.filter_pos_below_min
-
-	def get_split_gen(self):
-		assert False,"This is base validation split object, no split generators are defined"
+		"""
+		for train_idx_ary, test_idx_ary in self.get_split_idx_ary(ID_list, label_ary):
+			train_ID_ary = ID_ary[train_idx_ary]
+			train_label_ary = label_ary[train_idx_ary]
+			test_ID_ary = ID_ary[test_idx_ary]
+			test_label_ary = label_ary[test_idx_ary]
+			yield train_ID_ary, train_label_ary, test_ID_ary, test_label_ary
 
 class BaseHoldout(BaseValSplit):
-	def __init__(self, split_criterion, prop_name, min_pos=10, train_on='top'):
-		'''
-		Generic holdout validation object
-			- min_pos:			minimum number of positives in both testing and training
-			- split_criterion:	splitting criterion, type int or float
-			- prop_name:		name of node property for guiding holdout
-		'''
-		super().__init__(min_pos=min_pos)
-		self.min_pos = min_pos
-		self.split_criterion = split_criterion
-		self.prop_name = prop_name
+	def __init__(self, train_on='top'):
+		"""Generic holdout validation object
+
+		Split based on some numeric properties of the samples, train on 
+		either top or bottom set and test on the other, depending on 
+		user specification of `train_on`. If 'top' specified, those samples 
+		with properties of larger values are used for training, and those 
+		with smaller values are used for testing, vice versa.
+
+		Args:
+			train_on(str):
+				- 'top':	train on top, test on bottom
+				- 'bot':	train on bottom, test on top
+
+		"""
+		super(BaseHoldout, self).__init__()
 		self.train_on = train_on
-		self._test_idx_ary = None
-		self._train_idx_ary = None
-
-	def __repr__(self):
-		return 'HoldoutSplit(split_criterion=%s, prop_name=%s, \
-		min_pos=%s, train_on=%s)'%(repr(self.split_criterion), \
-		repr(self.prop_name), repr(self.min_pos), repr(self.train_on))
+		self._test_ID_ary = None
+		self._train_ID_ary = None
 
 	@property
-	def test_idx_ary(self):
-		return self._test_idx_ary.copy()
+	def train_ID_ary(self):
+		return self._train_ID_ary.copy()
 	
 	@property
-	def train_idx_ary(self):
-		return self._train_idx_ary.copy()
-
-	def make_train_test_ary(self, pos_ID, train_IDlst, test_IDlst):
-		self._test_idx_ary = np.array([idx for idx,ID in enumerate(pos_ID) if ID in test_IDlst], dtype=int)
-		self._train_idx_ary = np.array([idx for idx,ID in enumerate(pos_ID) if ID in train_IDlst], dtype=int)
-
-	@property
-	def split_criterion(self):
-		return self._cut_off
-	
-	@split_criterion.setter
-	def split_criterion(self, val):
-		checkers.checkTypeErrNone('split_criterion', (float,int), val)
-		self._cut_off = val
-
-	@property
-	def prop_name(self):
-		return self._prop_name
-	
-	@prop_name.setter
-	def prop_name(self, val):
-		checkers.checkTypeErrNone('prop_name', str, val)
-		self._prop_name = val
+	def test_ID_ary(self):
+		return self._test_ID_ary.copy()
 
 	@property
 	def train_on(self):
@@ -113,38 +80,37 @@ class BaseHoldout(BaseValSplit):
 	@property
 	def reverse(self):
 		return self._reverse
+
+	def get_common_ID_list(self. lscIDs, graphIDs):
+		"""Get list of common IDs between labelset collection and graph
+
+		Args:
+			lscIDs(:obj:`NLEval.util.IDHandler.IDprop`):
+			graphIDs(:obj:`NLEval.util.IDHandler.IDmap`):
+
+		"""
+		checkers.checkType("ID for labelset collection entities", IDHandler.IDprop, lscIDs)
+		checkers.checkType("ID for graph entities", IDHandler.IDmap, graphIDs)
+		common_ID_list = []
+		for ID in graphIDs.lst:
+			if ID in lscIDs:
+				#make sure entity is part of at least one labelset
+				if lscIDs.getProp(ID, 'Noccur') > 0:
+					common_ID_list.append(ID)
+		return common_ID_list
+
+	def get_split_idx_ary(ID_ary, label_ary):
+		assert (self._test_idx_ary is not None) | (self._train_idx_ary is not None),\
+			"Training or testing sets not available, run `train_test_setup` first"
+		train_idx_ary = np.in1d(ID_list, self.train_ID_ary)
+		test_idx_ary = np.in1d(ID_list, self.test_ID_ary)
+		return train_idx_ary, test_idx_ary
 	
-	def holdout_split(self, pad, label):
-		'''
-		Input:
-			- pad:		for compatibility with StratifiedKFold, 
-						zeros with size n (number of total sample)
-			- label:	boolean/binary array of indicator of positives, size n
-		'''
-		assert (self._test_idx_ary is not None) & (self._train_idx_ary is not None),\
-		 "Training and testing sets not available, run train_test_setup first"
-		num_pos_test = label[self._test_idx_ary].sum()
-		num_pos_train = label[self._train_idx_ary].sum()
-		yield self.train_idx_ary, self.test_idx_ary
-
-	def train_test_setup(self, **kwargs):
-		assert False,"This is base holdout split object, train_test_setup is not defined"
-
-	def get_split_gen(self):
-		return self.wrap(self.holdout_split)
 
 class BaseInterface(BaseValSplit):
-	def __init__(self, obj, min_pos=10):
-		'''
-		Interface for other split generating objects
-		'''
-		super().__init__(min_pos=min_pos)
-		self.model = obj
+	"""Base interface with user defined validation split generator"""
+	def __init__(self):
+		super(BaseInterface, self).__init__()
 
-	def __repr__(self):
-		return "BaseInterface(%s, min_pos=%s)"%(repr(obj), repr(min_pos))
-
-	def get_split_gen(self):
-		return self.wrap(self.model.split)
-
-
+	def setup_split_func(self, split_func):
+		self.get_split_idx_ary = lambda ID_ary, label_ary: split_func(ID_ary, label_ary)
