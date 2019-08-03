@@ -26,12 +26,18 @@ def checkTypesInIterable(name, targetType, val):
 	checkType(name, ITERABLE_TYPE, val)
 	for idx, i in enumerate(val):
 		if not isinstance(i, targetType):
-			raise TypeError("All instances in %s must be type %s, invalid type %s found at position (%d)"%\
-				(repr(name), repr(targetType), repr(type(i)), idx))
+			raise TypeError("All instances in %s must be type %s, "%\
+				(repr(name), repr(targetType)) + \
+				"invalid type %s found at position (%d): %s"%\
+				(repr(type(i)), idx, repr(i)))
 
 def checkTypesInList(name, targetType, val):
 	checkType(name, list, val)
 	checkTypesInIterable(name, targetType, val)
+
+def checkTypesInSet(name, targetType, val):
+	checkType(name, set, val)
+	checkTypesInIterable(name, targetType, val)	
 
 def checkNumpyArrayIsNumeric(name, ary):
 	checkType(name, np.ndarray, ary)
