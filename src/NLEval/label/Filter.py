@@ -78,7 +78,8 @@ class LabelsetRangeFilterTrainTestPos(RangeFilter):
 
 	@staticmethod
 	def get_val_getter(lsc):
-		return lambda labelID: min([min(tr.sum(), ts.sum()) for _,tr,_,ts in lsc.split(labelID)])
+		return lambda labelID: min([min(tr.sum(), ts.sum()) for \
+			_,tr,_,ts in lsc.splitLabelset(labelID)])
 
 	@staticmethod
 	def get_IDs(lsc):
@@ -86,7 +87,7 @@ class LabelsetRangeFilterTrainTestPos(RangeFilter):
 
 	@staticmethod
 	def get_pop_fun(lsc):
-		return lsc.popEntity #replace with soft filter
+		return lsc.popLabelset #replace with soft filter
 
 class ValueFilter(BaseFilter):
 	"""Filter based on certain values
