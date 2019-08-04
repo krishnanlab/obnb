@@ -3,14 +3,14 @@ from NLEval.valsplit.Base import *
 import numpy as np
 
 class BinHold(BaseHoldout):
-	def __init__(self, bin_num, train_on='top'):
+	def __init__(self, bin_num, train_on='top', shuffle=False):
 		"""
 
 		Args:
 			bin_num(int): num of bins for bin_num mode (see mode)
 
 		"""
-		super(BinHold, self).__init__(train_on=train_on)
+		super(BinHold, self).__init__(train_on=train_on, shuffle=shuffle)
 		self.bin_num = bin_num
 
 	def __repr__(self):
@@ -46,14 +46,14 @@ class BinHold(BaseHoldout):
 		self._train_ID_ary = np.array(sorted_id_lst[bin_size:])
 
 class ThreshHold(BaseHoldout):
-	def __init__(self, cut_off,train_on='top'):
+	def __init__(self, cut_off, train_on='top', shuffle=False):
 		"""
 
 		Args:
 			cut_off:		cut-off point for cut mode, num of bins for bin mode (see mode)
 
 		"""
-		super(ThreshHold, self).__init__(train_on=train_on)
+		super(ThreshHold, self).__init__(train_on=train_on, shuffle=shuffle)
 		self.cut_off = cut_off
 
 	def __repr__(self):
@@ -92,9 +92,9 @@ class ThreshHold(BaseHoldout):
 		self._test_ID_ary = np.array(bot_list) if self.reverse else np.array(top_list)
 
 class CustomHold(BaseHoldout):
-	def __init__(self, custom_train_ID_list, custom_test_ID_list):
+	def __init__(self, custom_train_ID_list, custom_test_ID_list, shuffle=False):
 		"""User defined training and testing samples"""
-		super(CustomHold, self).__init__()
+		super(CustomHold, self).__init__(shuffle=shuffle)
 		self.custom_train_ID_ary = custom_train_ID_ary
 		self.custom_test_ID_ary = custom_test_ID_ary
 
@@ -125,9 +125,9 @@ class CustomHold(BaseHoldout):
 		self._test_idx_ary = np.intersect1d(self.custom_test_ID_ary, common_ID_list)
 
 class TrainTestAll(BaseHoldout):
-	def __init__(self):
+	def __init__(self, shuffle=False):
 		"""Train and test on all data"""
-		super(TrainTestAll, self).__init__()
+		super(TrainTestAll, self).__init__(shuffle=shuffle)
 
 	def train_test_setup(self, lscIDs, graphIDs, **kwargs):
 		common_ID_list = self.get_common_ID_list(lscIDs, graphIDs)

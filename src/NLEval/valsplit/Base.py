@@ -2,8 +2,19 @@ from NLEval.util import checkers, IDHandler
 import numpy as np
 
 class BaseValSplit:
-	def __init__(self):
+	def __init__(self, shuffle=False):
 		super(BaseValSplit, self).__init__()
+		self.shuffle = shuffle
+
+	@property
+	def shuffle(self):
+		"""bool: shufle train/test indices when splitting"""
+		return self._shuffle
+	
+	@shuffle.setter
+	def shuffle(self, val):
+		checkers.checkType("shuffle", bool, val)
+		self._shuffle = val
 
 	def split(self, ID_ary, label_ary):
 		"""Split samples into training and testing sets
@@ -30,6 +41,9 @@ class BaseValSplit:
 
 		"""
 		for train_idx_ary, test_idx_ary in self.get_split_idx_ary(ID_list, label_ary):
+			if self.shuffle:
+				np.random.shuffle(train_idx_ary)
+				np.random.shuffle(test_idx_ary)
 			train_ID_ary = ID_ary[train_idx_ary]
 			train_label_ary = label_ary[train_idx_ary]
 			test_ID_ary = ID_ary[test_idx_ary]
@@ -37,7 +51,7 @@ class BaseValSplit:
 			yield train_ID_ary, train_label_ary, test_ID_ary, test_label_ary
 
 class BaseHoldout(BaseValSplit):
-	def __init__(self, train_on='top'):
+	def __init__(self, train_on='top', shuffle=False):
 		"""Generic holdout validation object
 
 		Split based on some numeric properties of the samples, train on 
@@ -46,13 +60,8 @@ class BaseHoldout(BaseValSplit):
 		with properties of larger values are used for training, and those 
 		with smaller values are used for testing, vice versa.
 
-		Args:
-			train_on(str):
-				- 'top':	train on top, test on bottom
-				- 'bot':	train on bottom, test on top
-
 		"""
-		super(BaseHoldout, self).__init__()
+		super(BaseHoldout, self).__init__(shuffle=shuffle)
 		self.train_on = train_on
 		self._test_ID_ary = None
 		self._train_ID_ary = None
@@ -67,6 +76,10 @@ class BaseHoldout(BaseValSplit):
 
 	@property
 	def train_on(self):
+		"""str: train on top or bottom sample sets
+			- 'top': train on top, test on bottom
+			- 'bot': train on bottom, test on top
+		"""
 		return self._train_on
 	
 	@train_on.setter
@@ -109,8 +122,8 @@ class BaseHoldout(BaseValSplit):
 
 class BaseInterface(BaseValSplit):
 	"""Base interface with user defined validation split generator"""
-	def __init__(self):
-		super(BaseInterface, self).__init__()
+	def __init__(self, shuffle=False):
+		super(BaseInterface, self).__init__(shuffle=shuffle)
 
 	def setup_split_func(self, split_func):
 		self.get_split_idx_ary = lambda ID_ary, label_ary: split_func(ID_ary, label_ary)
