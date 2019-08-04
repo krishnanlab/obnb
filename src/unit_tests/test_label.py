@@ -1,5 +1,6 @@
 from common import *
 from NLEval.label import LabelsetCollection, Filter
+from NLEval.util import IDHandler
 from NLEval import valsplit
 
 class TestBaseLSC(unittest.TestCase):
@@ -199,7 +200,7 @@ class TestBaseLSC(unittest.TestCase):
 
 class TestFilter(unittest.TestCase):
 	def setUp(self):
-		self.lsc = LabelsetCollection.BaseLSC()
+		self.lsc = LabelsetCollection.SplitLSC()
 		self.lsc.addLabelset(['a', 'b', 'c'], 'Group1')
 		self.lsc.addLabelset(['b', 'd'], 'Group2')
 		self.lsc.addLabelset(['e', 'f', 'g'], 'Group3')
@@ -210,47 +211,40 @@ class TestFilter(unittest.TestCase):
 
 	def test_EntityRangeFilterNoccur(self):
 		with self.subTest(min_val=2):
-			lsc = self.lsc.copy()
-			lsc.apply(Filter.EntityRangeFilterNoccur(min_val=2))
+			lsc = self.lsc.apply(Filter.EntityRangeFilterNoccur(min_val=2), inplace=False)
 			self.assertEqual(lsc.prop['Labelset'], \
 				[{'a', 'b', 'c'}, {'b'}, {'f'}, {'a', 'f', 'c'}, {'a'}])
 			self.assertEqual(lsc.entity.map, \
 				{'a':0, 'b':1, 'c':2, 'f':3})
 		with self.subTest(min_val=3):
-			lsc = self.lsc.copy()
-			lsc.apply(Filter.EntityRangeFilterNoccur(min_val=3))
+			lsc = self.lsc.apply(Filter.EntityRangeFilterNoccur(min_val=3), inplace=False)
 			self.assertEqual(lsc.prop['Labelset'], \
 				[{'a'}, set(), set(), {'a'}, {'a'}])
 			self.assertEqual(lsc.entity.map, {'a':0})
 		with self.subTest(min_val=4):
-			lsc = self.lsc.copy()
-			lsc.apply(Filter.EntityRangeFilterNoccur(min_val=4))
+			lsc = self.lsc.apply(Filter.EntityRangeFilterNoccur(min_val=4), inplace=False)
 			self.assertEqual(lsc.prop['Labelset'], \
 				[set(), set(), set(), set(), set()])
 			self.assertEqual(lsc.entity.map, {})
 		with self.subTest(max_val=2):
-			lsc = self.lsc.copy()
-			lsc.apply(Filter.EntityRangeFilterNoccur(max_val=2))
+			lsc = self.lsc.apply(Filter.EntityRangeFilterNoccur(max_val=2), inplace=False)
 			self.assertEqual(lsc.prop['Labelset'], \
 				[{'b', 'c'}, {'b', 'd'}, {'e', 'f', 'g'}, {'f', 'c'}, {'h'}])
 			self.assertEqual(lsc.entity.map, \
 				{'b':0, 'c':1, 'd':2, 'e':3, 'f':4, 'g':5, 'h':6})
 		with self.subTest(max_val=1):
-			lsc = self.lsc.copy()
-			lsc.apply(Filter.EntityRangeFilterNoccur(max_val=1))
+			lsc = self.lsc.apply(Filter.EntityRangeFilterNoccur(max_val=1), inplace=False)
 			self.assertEqual(lsc.prop['Labelset'], \
 				[set(), {'d'}, {'e', 'g'}, set(), {'h'}])
 			self.assertEqual(lsc.entity.map, \
 				{'d':0, 'e':1, 'g':2, 'h':3})
 		with self.subTest(max_val=0):
-			lsc = self.lsc.copy()
-			lsc.apply(Filter.EntityRangeFilterNoccur(max_val=0))
+			lsc = self.lsc.apply(Filter.EntityRangeFilterNoccur(max_val=0), inplace=False)
 			self.assertEqual(lsc.prop['Labelset'], \
 				[set(), set(), set(), set(), set()])
 			self.assertEqual(lsc.entity.map, {})
 		with self.subTest(min_val=2, max_val=2):
-			lsc = self.lsc.copy()
-			lsc.apply(Filter.EntityRangeFilterNoccur(min_val=2, max_val=2))
+			lsc = self.lsc.apply(Filter.EntityRangeFilterNoccur(min_val=2, max_val=2), inplace=False)
 			self.assertEqual(lsc.prop['Labelset'], \
 				[{'b', 'c'}, {'b'}, {'f'}, {'f', 'c'}, set()])
 			self.assertEqual(lsc.entity.map, \
@@ -258,36 +252,54 @@ class TestFilter(unittest.TestCase):
 
 	def test_LabelsetRangeFilterSize(self):
 		with self.subTest(min_val=3):
-			lsc = self.lsc.copy()
-			lsc.apply(Filter.LabelsetRangeFilterSize(min_val=3))
+			lsc = self.lsc.apply(Filter.LabelsetRangeFilterSize(min_val=3), inplace=False)
 			self.assertEqual(lsc.labelIDlst, ['Group1', 'Group3', 'Group4'])
 			self.assertEqual(lsc.prop['Labelset'], \
 				[{'a', 'b', 'c'}, {'e', 'f', 'g'}, {'a', 'f', 'c'}])
 			self.assertEqual(lsc.entity.map, \
 				{'a':0, 'b':1, 'c':2, 'e':3, 'f':4, 'g':5})
 		with self.subTest(min_val=4):
-			lsc = self.lsc.copy()
-			lsc.apply(Filter.LabelsetRangeFilterSize(min_val=4))
+			lsc = self.lsc.apply(Filter.LabelsetRangeFilterSize(min_val=4), inplace=False)
 			self.assertEqual(lsc.labelIDlst, [])
 			self.assertEqual(lsc.prop['Labelset'], [])
 			self.assertEqual(lsc.entity.map, {})
 		with self.subTest(max_val=2):
-			lsc = self.lsc.copy()
-			lsc.apply(Filter.LabelsetRangeFilterSize(max_val=2))
+			lsc = self.lsc.apply(Filter.LabelsetRangeFilterSize(max_val=2), inplace=False)
 			self.assertEqual(lsc.labelIDlst, ['Group2', 'Group5'])
 			self.assertEqual(lsc.prop['Labelset'], \
 				[{'b', 'd'}, {'a', 'h'}])
 			self.assertEqual(lsc.entity.map, \
 				{'a':0, 'b':1, 'd':2, 'h':3})
 		with self.subTest(max_val=1):
-			lsc = self.lsc.copy()
-			lsc.apply(Filter.LabelsetRangeFilterSize(max_val=1))
+			lsc = self.lsc.apply(Filter.LabelsetRangeFilterSize(max_val=1), inplace=False)
 			self.assertEqual(lsc.labelIDlst, [])
 			self.assertEqual(lsc.prop['Labelset'], [])
 			self.assertEqual(lsc.entity.map, {})
 
 	def test_LabelsetRangeFilterTrainTestPos(self):
-		pass
+		train_ID_ary = np.array(['a','b','c','d'])
+		test_ID_ary = np.array(['e','f','g','h'])
+		with self.subTest(train=train_ID_ary, test=test_ID_ary):
+			splitter = valsplit.Holdout.CustomHold(train_ID_ary, test_ID_ary)
+			splitter._train_ID_ary = splitter.custom_train_ID_ary
+			splitter._test_ID_ary = splitter.custom_test_ID_ary
+			self.lsc.valsplit = splitter
+			lsc = self.lsc.apply(Filter.LabelsetRangeFilterTrainTestPos(min_val=1), inplace=False)
+			self.assertEqual(lsc.labelIDlst, ['Group4', 'Group5'])
+			self.assertEqual(lsc.prop['Labelset'], [{'a', 'f', 'c'}, {'a', 'h'}])
+			self.assertEqual(lsc.entity.map, {'a':0, 'c':1, 'f':2, 'h':3})
+
+		train_ID_ary = np.array(['a','c','e'])
+		test_ID_ary = np.array(['b','d','f'])
+		with self.subTest(train=train_ID_ary, test=test_ID_ary):
+			splitter = valsplit.Holdout.CustomHold(train_ID_ary, test_ID_ary)
+			splitter._train_ID_ary = splitter.custom_train_ID_ary
+			splitter._test_ID_ary = splitter.custom_test_ID_ary
+			self.lsc.valsplit = splitter
+			lsc = self.lsc.apply(Filter.LabelsetRangeFilterTrainTestPos(min_val=1), inplace=False)
+			self.assertEqual(lsc.labelIDlst, ['Group1', 'Group3', 'Group4'])
+			self.assertEqual(lsc.prop['Labelset'], [{'a', 'b', 'c'}, {'e', 'f', 'g'}, {'a', 'f', 'c'}])
+			self.assertEqual(lsc.entity.map, {'a':0, 'b':1, 'c':2, 'e':3, 'f':4, 'g':5})
 
 if __name__ == '__main__':
 	unittest.main()

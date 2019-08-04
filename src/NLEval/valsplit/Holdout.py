@@ -92,7 +92,7 @@ class ThreshHold(BaseHoldout):
 		self._test_ID_ary = np.array(bot_list) if self.reverse else np.array(top_list)
 
 class CustomHold(BaseHoldout):
-	def __init__(self, custom_train_ID_list, custom_test_ID_list, shuffle=False):
+	def __init__(self, custom_train_ID_ary, custom_test_ID_ary, shuffle=False):
 		"""User defined training and testing samples"""
 		super(CustomHold, self).__init__(shuffle=shuffle)
 		self.custom_train_ID_ary = custom_train_ID_ary
@@ -106,23 +106,23 @@ class CustomHold(BaseHoldout):
 		return self._custom_train_ID_ary
 
 	@custom_train_ID_ary.setter
-	def custom_train_ID_ary(self, ID_list):
-		checkers.checkTypesInSet("Training data ID list", str, ID_list)
-		self._custom_train_ID_ary = np.array(ID_list)
+	def custom_train_ID_ary(self, ID_ary):
+		checkers.checkTypesInNumpyArray("Training data ID list", str, ID_ary)
+		self._custom_train_ID_ary = ID_ary
 
 	@property
 	def custom_test_ID_ary(self):
 		return self._custom_test_ID_ary
 
 	@custom_test_ID_ary.setter
-	def custom_test_ID_ary(self, ID_list):
-		checkers.checkTypesInSet('Testing data ID list', str, ID_list)
-		self._custom_test_ID_ary = np.array(ID_list)
+	def custom_test_ID_ary(self, ID_ary):
+		checkers.checkTypesInNumpyArray('Testing data ID list', str, ID_ary)
+		self._custom_test_ID_ary = ID_ary
 
 	def train_test_setup(self, lscIDs, graphIDs, **kwargs):
 		common_ID_list = self.get_common_ID_list(lscIDs, graphIDs)
-		self._train_idx_ary = np.intersect1d(self.custom_train_ID_ary, common_ID_list)
-		self._test_idx_ary = np.intersect1d(self.custom_test_ID_ary, common_ID_list)
+		self._train_ID_ary = np.intersect1d(self.custom_train_ID_ary, common_ID_list)
+		self._test_ID_ary = np.intersect1d(self.custom_test_ID_ary, common_ID_list)
 
 class TrainTestAll(BaseHoldout):
 	def __init__(self, shuffle=False):
@@ -131,7 +131,7 @@ class TrainTestAll(BaseHoldout):
 
 	def train_test_setup(self, lscIDs, graphIDs, **kwargs):
 		common_ID_list = self.get_common_ID_list(lscIDs, graphIDs)
-		self._train_idx_ary = self._test_idx_ary = np.array(common_ID_list)
+		self._train_ID_ary = self._test_ID_ary = np.array(common_ID_list)
 
 '''
 class HoldoutChildTemplate(BaseHoldout):

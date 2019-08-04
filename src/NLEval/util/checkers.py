@@ -39,6 +39,10 @@ def checkTypesInSet(name, targetType, val):
 	checkType(name, set, val)
 	checkTypesInIterable(name, targetType, val)	
 
+def checkTypesInNumpyArray(name, targetType, val):
+	checkType(name, np.ndarray, val)
+	checkTypesInIterable(name, targetType, val)	
+
 def checkNumpyArrayIsNumeric(name, ary):
 	checkType(name, np.ndarray, ary)
 	if not any([ary.dtype == i for i in NUMERIC_TYPE]):
