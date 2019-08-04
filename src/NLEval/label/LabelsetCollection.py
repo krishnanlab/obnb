@@ -261,4 +261,4 @@ class SplitLSC(BaseLSC):
 		ID_ary = np.array(pos_ID_list, + neg_ID_list)
 		label_ary = np.zeros(len(ID_list), dtype=bool)
 		label_ary[:len(pos_ID_list)] = True
-		return self.valsplit.split(ID_list, label_ary):
+		return self.valsplit.split(ID_list, label_ary)
