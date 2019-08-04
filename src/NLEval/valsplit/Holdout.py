@@ -39,11 +39,11 @@ class BinHold(BaseHoldout):
 		"""
 		lscIDs._check_prop_existence(prop_name, True)
 		common_ID_list = self.get_common_ID_list(lscIDs, graphIDs)
-		sorted_lst = sorted(common_ID_list, reverse=self.reverse, \
+		sorted_ID_list = sorted(common_ID_list, reverse=self.reverse, \
 			key=lambda ID: lscIDs.getProp(ID, prop_name))
-		bin_size = len(sorted_id_lst) // self.bin_num
-		self._test_ID_ary = np.array(sorted_id_lst[:bin_size])
-		self._train_ID_ary = np.array(sorted_id_lst[bin_size:])
+		bin_size = len(sorted_ID_list) // self.bin_num
+		self._test_ID_ary = np.array(sorted_ID_list[:bin_size])
+		self._train_ID_ary = np.array(sorted_ID_list[bin_size:])
 
 class ThreshHold(BaseHoldout):
 	def __init__(self, cut_off, train_on='top', shuffle=False):

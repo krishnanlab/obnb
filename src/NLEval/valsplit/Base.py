@@ -40,7 +40,7 @@ class BaseValSplit:
 				numpy array of testing labels
 
 		"""
-		for train_idx_ary, test_idx_ary in self.get_split_idx_ary(ID_list, label_ary):
+		for train_idx_ary, test_idx_ary in self.get_split_idx_ary(ID_ary, label_ary):
 			if self.shuffle:
 				np.random.shuffle(train_idx_ary)
 				np.random.shuffle(test_idx_ary)
@@ -112,12 +112,12 @@ class BaseHoldout(BaseValSplit):
 					common_ID_list.append(ID)
 		return common_ID_list
 
-	def get_split_idx_ary(ID_ary, label_ary):
-		assert (self._test_idx_ary is not None) | (self._train_idx_ary is not None),\
+	def get_split_idx_ary(self, ID_ary, label_ary):
+		assert (self._test_ID_ary is not None) & (self._train_ID_ary is not None), \
 			"Training or testing sets not available, run `train_test_setup` first"
-		train_idx_ary = np.in1d(ID_list, self.train_ID_ary)
-		test_idx_ary = np.in1d(ID_list, self.test_ID_ary)
-		return train_idx_ary, test_idx_ary
+		train_idx_ary = np.where(np.in1d(ID_ary, self.train_ID_ary))[0]
+		test_idx_ary = np.where(np.in1d(ID_ary, self.test_ID_ary))[0]
+		yield train_idx_ary, test_idx_ary
 	
 
 class BaseInterface(BaseValSplit):
