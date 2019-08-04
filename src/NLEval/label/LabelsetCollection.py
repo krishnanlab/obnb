@@ -163,16 +163,30 @@ class BaseLSC(IDHandler.IDprop):
 		"""Return the number of labelsets in which an entity participates"""
 		return self.entity.getProp(ID, 'Noccur')
 
-	def apply(self, filter_func):
-		"""Apply filter"""
+	def apply(self, filter_func, inplace=True):
+		"""Apply filter to labelsets, see `NLEval.label.Filter` for more info
+
+		Args:
+			filter_func
+			inplace(bool): whether or not to modify original object
+				- `True`: apply filter directly on the original object
+				- `False`: apply filter on a copy of the original object
+
+		Returns:
+			Labelset coolection object after filtering.
+
+		"""
 		checkers.checkType("Filter", Filter.BaseFilter, filter_func)
-		filter_func(self)
+		checkers.checkType("inplace", bool, inplace)
+		obj = self if inplace else self.copy()
+		filter_func(obj)
+		return obj
 
 	def export(self, fp):
 		pass
 
-	def load_entity_properties(self, fp, prop_name, \
-			default_val, default_type, interpreter=int):
+	def load_entity_properties(self, fp, prop_name, default_val, \
+			default_type, interpreter=int, comment='#', skiprows=0):
 		"""Load entity properties from file.
 		The file is tab seprated with two columns, first column 
 		contains entities IDs, second column contains corresponding 
@@ -189,7 +203,9 @@ class BaseLSC(IDHandler.IDprop):
 		"""
 		self.entity.newProp(prop_name, default_val, default_type)
 		with open(fp, 'r') as f:
-			for line in f:
+			for i, line in enumerate(f):
+				if (i < skiprows) | line.startswith(comment):
+					continue
 				ID, val = line.strip().split()
 				if ID not in self.entity:
 					self.entity.addID(ID)
@@ -230,7 +246,7 @@ class SplitLSC(BaseLSC):
 		checkers.checkType("Validation split generator", Base.BaseValSplit, obj)
 		self._valsplit = obj
 
-	def train_test_setup(graph, prop_name=None, min_pos=10):
+	def train_test_setup(self, graph, prop_name=None, min_pos=10):
 		"""Setup training and testing IDs, filter labelsets based on train/test samples
 
 		Args:
@@ -248,7 +264,7 @@ class SplitLSC(BaseLSC):
 		if min_pos is not None:
 			self.apply(Filter.LabelsetRangeFilterTrainTestPos(min_pos))
 
-	def splitLablset(labelID):
+	def splitLabelset(self, labelID):
 		"""Split up a labelset by training and testing sets
 		
 		Returns:
@@ -258,7 +274,7 @@ class SplitLSC(BaseLSC):
 		"""
 		pos_ID_list = list(self.getLabelset(labelID))
 		neg_ID_list = list(self.getNegative(labelID))
-		ID_ary = np.array(pos_ID_list, + neg_ID_list)
-		label_ary = np.zeros(len(ID_list), dtype=bool)
+		ID_ary = np.array(pos_ID_list + neg_ID_list)
+		label_ary = np.zeros(len(ID_ary), dtype=bool)
 		label_ary[:len(pos_ID_list)] = True
-		return self.valsplit.split(ID_list, label_ary)
+		return self.valsplit.split(ID_ary, label_ary)
