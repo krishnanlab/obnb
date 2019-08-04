@@ -94,7 +94,7 @@ class BaseHoldout(BaseValSplit):
 	def reverse(self):
 		return self._reverse
 
-	def get_common_ID_list(self. lscIDs, graphIDs):
+	def get_common_ID_list(self, lscIDs, graphIDs):
 		"""Get list of common IDs between labelset collection and graph
 
 		Args:

@@ -210,3 +210,55 @@ class BaseLSC(IDHandler.IDprop):
 				labelID, labelInfo, *lst = line.strip().split('\t')
 				lsc.addLabelset(lst, labelID, labelInfo)
 		return lsc
+
+class SplitLSC(BaseLSC):
+	def __init__(self):
+		"""Labelset collection with splitting utility to generate 
+		train/test split for each labelset"""
+		super(SplitLSC, self).__init__()
+		self._valsplit = None
+		self._filter_switch = False
+		
+	@property
+	def valsplit(self):
+		""":obj:`NLEval.valsplit.Base.BaseValSplit`: validation split
+			generator used to generat train/test split for labelsets"""
+		return self._valsplit
+	
+	@valsplit.setter
+	def valsplit(self, obj):
+		checkers.checkType("Validation split generator", Base.BaseValSplit, obj)
+		self._valsplit = obj
+
+	def train_test_setup(graph, prop_name=None, min_pos=10):
+		"""Setup training and testing IDs, filter labelsets based on train/test samples
+
+		Args:
+			prop_name(str): name of entity properties used for generating splits
+			min_pos(int): minimum number of positive in both training and testing
+				sets of a given labelset below which labelset is discarded. If
+				`None` specified, no filtering will be done.
+
+		"""
+		if self.valsplit is None:
+			raise AttributeError("'valsplit' not configured, " + \
+				"assign validation split generator first. " + \
+				"See `NLEval.valsplit` for more info.")
+		self.valsplit.train_test_setup(self.entity, graph.IDmap, prop_name)
+		if min_pos is not None:
+			self.apply(Filter.LabelsetRangeFilterTrainTestPos(min_pos))
+
+	def splitLablset(labelID):
+		"""Split up a labelset by training and testing sets
+		
+		Returns:
+			A generator that yeilds train/test IDs and labels, see
+			`NLEval.valsplit.Base.BaseValSplit.split` for more info.
+
+		"""
+		pos_ID_list = list(self.getLabelset(labelID))
+		neg_ID_list = list(self.getNegative(labelID))
+		ID_ary = np.array(pos_ID_list, + neg_ID_list)
+		label_ary = np.zeros(len(ID_list), dtype=bool)
+		label_ary[:len(pos_ID_list)] = True
+		return self.valsplit.split(ID_list, label_ary):
