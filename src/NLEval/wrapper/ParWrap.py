@@ -58,7 +58,7 @@ class ParDat:
 
 	@iter_obj.setter
 	def iter_obj(self, obj):
-		iter(obj) #check if iterable
+		iter(obj) # check if iterable
 		self._iter_obj = obj
 
 	@property

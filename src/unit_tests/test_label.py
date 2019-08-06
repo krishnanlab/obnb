@@ -24,10 +24,10 @@ class TestBaseLSC(unittest.TestCase):
 	def template_test_input_for_getters(self, fun):
 		"""Template for testing inputs for methods with only one positional 
 		argument as ID, i.e. `.getInfo`, `getLabelset`, and `getNoccur`."""
-		#input type other than str --> TypeError
+		# input type other than str --> TypeError
 		self.assertRaises(TypeError, fun, 1)
 		self.assertRaises(TypeError, fun, ['1'])
-		#input unknown ID --> IDNotExistError
+		# input unknown ID --> IDNotExistError
 		self.assertRaises(IDNotExistError, fun, '1')
 
 	def test_getInfo(self):
@@ -56,28 +56,28 @@ class TestBaseLSC(unittest.TestCase):
 
 	def test_getNegative(self):
 		self.template_test_input_for_getters(self.lsc.getNegative)
-		#test unspecified negative
+		# test unspecified negative
 		self.assertEqual(self.lsc.getNegative('Labelset1'), {'d'})
 		self.assertEqual(self.lsc.getNegative('Labelset2'), {'a', 'c'})
-		#test specified negative
+		# test specified negative
 		self.lsc.setNegative(['a'], 'Labelset2')
 		self.assertEqual(self.lsc.getNegative('Labelset2'), {'a'})
 
 	def test_setNegative(self):
-		#test with known entity ID
+		# test with known entity ID
 		self.lsc.setNegative(['a'], 'Labelset2')
 		self.assertEqual(self.lsc.getNegative('Labelset2'), {'a'})
 		self.lsc.setNegative(['c'], 'Labelset2')
 		self.assertEqual(self.lsc.getNegative('Labelset2'), {'c'})
-		#test with knwon positive ID --> IDExistsError
+		# test with knwon positive ID --> IDExistsError
 		self.assertRaises(IDExistsError, self.lsc.setNegative, ['b'], 'Labelset2')
 		self.assertRaises(IDExistsError, self.lsc.setNegative, ['a', 'd'], 'Labelset2')
-		#test with unknown entity ID --> IDNotExistError
+		# test with unknown entity ID --> IDNotExistError
 		self.assertRaises(IDNotExistError, self.lsc.setNegative, ['e'], 'Labelset2')
 		self.assertRaises(IDNotExistError, self.lsc.setNegative, ['a', 'e'], 'Labelset2')
 
 	def test_eq(self):
-		#make two identical labelset collections by shuffling the order of labelset
+		# make two identical labelset collections by shuffling the order of labelset
 		shuffle_idx = [3, 0, 2, 1]
 		lsc1 = LabelsetCollection.BaseLSC()
 		lsc2 = LabelsetCollection.BaseLSC()
@@ -87,15 +87,15 @@ class TestBaseLSC(unittest.TestCase):
 				lsc.addLabelset(list(self.toy1_labelsets[idx]), \
 					self.toy1_labelIDlst[idx], self.toy1_InfoLst[idx])
 		self.assertEqual(lsc1, lsc2)
-		#test if different description
+		# test if different description
 		lsc3 = lsc2.copy()
 		lsc3.setProp('Group1', 'Info', 'Some other description')
 		self.assertNotEqual(lsc1, lsc3)
-		#test if different labelset with same labelID
+		# test if different labelset with same labelID
 		lsc3 = lsc2.copy()
 		lsc3.updateLabelset(['a'], 'Group1')
 		self.assertNotEqual(lsc1, lsc3)
-		#make sure lsc2 still the same as lsc1
+		# make sure lsc2 still the same as lsc1
 		self.assertEqual(lsc1, lsc2)
 
 	def test_from_gmt(self):
@@ -106,42 +106,42 @@ class TestBaseLSC(unittest.TestCase):
 
 	def test_addLabelset(self):
 		with self.subTest(msg='Input checks'):
-			#test lst input type, only list of string allowed
+			# test lst input type, only list of string allowed
 			self.assertRaises(TypeError, self.lsc.addLabelset, 1, 'Labelset3')
 			self.assertRaises(TypeError, self.lsc.addLabelset, ['1', 2], 'Labelset3')
 			self.assertRaises(TypeError, self.lsc.addLabelset, '123', 'Labelset3')
-			#test label ID input type --> TypeError
+			# test label ID input type --> TypeError
 			self.assertRaises(TypeError, self.lsc.addLabelset, ['a'], 123)
 			self.assertRaises(TypeError, self.lsc.addLabelset, ['a'], [1,2])
 			self.assertRaises(TypeError, self.lsc.addLabelset, ['a'], ['Labelset'])
-			#test label info input type --> TypeError
+			# test label info input type --> TypeError
 			self.assertRaises(TypeError, self.lsc.addLabelset, ['a'], 'Labelset3', [1,2,3])
 			self.assertRaises(TypeError, self.lsc.addLabelset, ['a'], 'Labelset3', ['Description'])
-			#make sure no new label added with exception
+			# make sure no new label added with exception
 			self.assertEqual(self.lsc.labelIDlst, ['Labelset1', 'Labelset2'])
-			#test add existing label ID --> IDExistsError
+			# test add existing label ID --> IDExistsError
 			self.assertRaises(IDExistsError, self.lsc.addLabelset, ['e', 'f'], 'Labelset1')
-			#test label info specification --> Info default to 'NA' if not specified
+			# test label info specification --> Info default to 'NA' if not specified
 			self.lsc.addLabelset(['e'], 'Labelset3')
 			self.assertEqual(self.lsc._prop['Info'], ['Description1', 'Description2', 'NA'])
 		with self.subTest(msg='Labelset loading checks'):
-			#test input empty labelset
+			# test input empty labelset
 			self.lsc.addLabelset([], 'Labelset4')
-			#check if labelset loaded correctly
+			# check if labelset loaded correctly
 			self.assertEqual(self.lsc._prop['Labelset'], [{'a', 'b', 'c'}, {'b', 'd'}, {'e'}, set()])
-			#check if entity map setup correctly
+			# check if entity map setup correctly
 			self.assertEqual(self.lsc.entity.map, {'a':0, 'b':1, 'c':2,'d':3, 'e':4})
 
 	def test_popLabelset(self):
 		with self.subTest(msg='Input checks'):
-			#test wrong labelID type --> TypeError
+			# test wrong labelID type --> TypeError
 			self.assertRaises(TypeError, self.lsc.popLabelset, 1)
 			self.assertRaises(TypeError, self.lsc.popLabelset, ['Labelset1'])
-			#test not exist labelID --> IDNotExistError
+			# test not exist labelID --> IDNotExistError
 			self.assertRaises(IDNotExistError, self.lsc.popLabelset, 'Labelset3')
-			#make sure nothing poped
+			# make sure nothing poped
 			self.assertEqual(self.lsc.lst, ['Labelset1', 'Labelset2'])
-		#make sure enties that are no longer in any labelset are popped
+		# make sure enties that are no longer in any labelset are popped
 		self.lsc.popLabelset('Labelset1')
 		self.assertEqual(self.lsc.labelIDlst, ['Labelset2'])
 		self.assertEqual(self.lsc.entity.map, {'b':0, 'd':1})
@@ -151,49 +151,49 @@ class TestBaseLSC(unittest.TestCase):
 
 	def test_updateLabelset(self):
 		with self.subTest(msg='Input checks'):
-			#test lst input, only list of string allowed
+			# test lst input, only list of string allowed
 			self.assertRaises(TypeError, self.lsc.updateLabelset, 1, 'Labelset1')
 			self.assertRaises(TypeError, self.lsc.updateLabelset, ['1', 2], 'Labelset1')
 			self.assertRaises(TypeError, self.lsc.updateLabelset, '123', 'Labelset1')
-			#test labelID input type
+			# test labelID input type
 			self.assertRaises(TypeError, self.lsc.updateLabelset, ['a'], 123)
 			self.assertRaises(TypeError, self.lsc.updateLabelset, ['a'], [1,2])
 			self.assertRaises(TypeError, self.lsc.updateLabelset, ['a'], ['Labelset1'])
-			#test reset not exist labelID --> IDNotExistError
+			# test reset not exist labelID --> IDNotExistError
 			self.assertRaises(IDNotExistError, self.lsc.updateLabelset, ['a'], 'Labelset3')
-		#test update nothing --> labelset stays the same
+		# test update nothing --> labelset stays the same
 		self.lsc.updateLabelset([], 'Labelset1')
 		self.assertEqual(self.lsc.getLabelset('Labelset1'), {'a', 'b', 'c'})
-		#test update existing --> labelset stays the same
+		# test update existing --> labelset stays the same
 		self.lsc.updateLabelset(['a', 'b', 'c'], 'Labelset1')
 		self.assertEqual(self.lsc.getLabelset('Labelset1'), {'a', 'b', 'c'})
-		#test update partially new
+		# test update partially new
 		self.lsc.updateLabelset(['a', 'd'], 'Labelset1')
 		self.assertEqual(self.lsc.getLabelset('Labelset1'), {'a', 'b', 'c', 'd'})
-		#test update all new
+		# test update all new
 		self.lsc.updateLabelset(['e'], 'Labelset1')
 		self.assertEqual(self.lsc.getLabelset('Labelset1'), {'a', 'b', 'c', 'd', 'e'})
-		#check if new entity added to list
+		# check if new entity added to list
 		self.assertEqual(self.lsc.entity.map, {'a':0, 'b':1, 'c':2, 'd':3, 'e':4})
 
 	def test_resetLabelset(self):
 		self.template_test_input_for_getters(self.lsc.resetLabelset)
-		#check if labelset reset to empty set correctly
+		# check if labelset reset to empty set correctly
 		self.lsc.resetLabelset('Labelset1')
 		self.assertEqual(self.lsc.getLabelset('Labelset1'), set())
 		self.assertEqual(self.lsc.getLabelset('Labelset2'), {'b', 'd'})
-		#makesure list of labelsets untouched
+		# makesure list of labelsets untouched
 		self.assertEqual(self.lsc.labelIDlst, ['Labelset1', 'Labelset2'])
-		#make sure entities that are nolongler in any labelset are popped
+		# make sure entities that are nolongler in any labelset are popped
 		self.assertEqual(self.lsc.entity.map, {'b':0, 'd':1})
 
 	def test_load_entity_properties(self):
 		self.lsc.load_entity_properties(self.toy1_prop_fp, 'toy1_prop', 0, int)
 		self.assertEqual(self.lsc.entity.prop['toy1_prop'], self.toy1_property)
-		#test loading property with existing property name --> IDExistsError
+		# test loading property with existing property name --> IDExistsError
 		self.assertRaises(IDExistsError, self.lsc.load_entity_properties, \
 			self.toy1_prop_fp, 'toy1_prop', 0, int)
-		#make sure entity with properties different from default don't get popped
+		# make sure entity with properties different from default don't get popped
 		self.lsc.popLabelset('Labelset1')
 		self.lsc.popLabelset('Labelset2')
 		self.assertEqual(self.lsc.entity.map, {'a':0, 'c':1, 'd':2})
@@ -206,8 +206,8 @@ class TestFilter(unittest.TestCase):
 		self.lsc.addLabelset(['e', 'f', 'g'], 'Group3')
 		self.lsc.addLabelset(['a', 'f', 'c'], 'Group4')
 		self.lsc.addLabelset(['a', 'h'], 'Group5')
-		#Noccur=[3, 2, 2, 1, 1, 2, 1, 1]
-		#Size=[3, 2, 3, 3, 2]
+		# Noccur=[3, 2, 2, 1, 1, 2, 1, 1]
+		# Size=[3, 2, 3, 3, 2]
 
 	def test_EntityRangeFilterNoccur(self):
 		with self.subTest(min_val=2):

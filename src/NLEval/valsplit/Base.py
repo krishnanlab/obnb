@@ -107,7 +107,7 @@ class BaseHoldout(BaseValSplit):
 		common_ID_list = []
 		for ID in graphIDs.lst:
 			if ID in lscIDs:
-				#make sure entity is part of at least one labelset
+				# make sure entity is part of at least one labelset
 				if lscIDs.getProp(ID, 'Noccur') > 0:
 					common_ID_list.append(ID)
 		return common_ID_list

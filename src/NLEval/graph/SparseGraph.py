@@ -71,13 +71,13 @@ class SparseGraph(BaseGraph):
 
 	def addEdge(self, ID1, ID2, weight):
 		for ID in [ID1, ID2]:
-			#check if ID exists, add new if not
+			# check if ID exists, add new if not
 			if ID not in self.IDmap:
 				self.addID(ID)
 		try:
 			old_weight = self._edge_data[self.IDmap[ID1]][self.IDmap[ID2]]
 			if old_weight != weight:
-				#check if edge exists
+				# check if edge exists
 				print("Warning: edge between '%s' and '%s' exists with weight \
 					'%.2f', overwriting with '%.2f'"%\
 					(self.IDmap[ID1], self.IDmap[ID2], old_weight, weight))
@@ -122,7 +122,7 @@ class SparseGraph(BaseGraph):
 		First column of the matrix encodes IDs
 		"""
 		if isinstance(mat, str):
-			#load numpy matrix from file if provided path instead of numpy matrix
+			# load numpy matrix from file if provided path instead of numpy matrix
 			mat = np.load(mat)
 		Nnodes = mat.shape[0]
 

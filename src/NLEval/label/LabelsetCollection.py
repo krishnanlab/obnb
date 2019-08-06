@@ -73,7 +73,7 @@ class BaseLSC(IDHandler.IDprop):
 		try:
 			self.entity.update(lst)
 		except Exception as e:
-			#if entity list not updated successfully, pop the new labelset
+			# if entity list not updated successfully, pop the new labelset
 			self.popID(labelID)
 			raise e
 		self.updateLabelset(lst, labelID)
@@ -154,7 +154,7 @@ class BaseLSC(IDHandler.IDprop):
 		for ID in lst:
 			self.entity._check_ID_existence(ID, True)
 			if ID in lbset:
-				#raise Exception(repr(ID), repr(labelID))
+				# raise Exception(repr(ID), repr(labelID))
 				raise IDExistsError("Entity %s is positive in labelset %s, "%\
 				 	(repr(ID), repr(labelID)) + "cannot be set to negative")
 		self.setProp(labelID, 'Negative', set(lst))

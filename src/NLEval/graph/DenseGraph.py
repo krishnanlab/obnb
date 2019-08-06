@@ -107,7 +107,7 @@ class FeatureVec(DenseGraph):
 		if not self.isempty():
 			if d != self.mat.shape[1]:
 				if self.dim != self.mat.shape[1]:
-					#self.dim should always in sync with actual dim of feature vec
+					# self.dim should always in sync with actual dim of feature vec
 					print("CRITICAL: This should never happen!")
 				raise ValueError("Inconsistent dimension " + \
 					"between input (%d) and data (%d)"%\
@@ -119,12 +119,12 @@ class FeatureVec(DenseGraph):
 		"""Setter for FeatureVec.mat
 		Note: matrix must match dimension of both self.IDmap and self.dim
 		"""
-		mat_bkp = self.mat #create backup copy
+		mat_bkp = self.mat # create backup copy
 		DenseGraph.mat.fset(self, val)
 		if val.size > 0:
-			if self.dim is None: #set dim
+			if self.dim is None: # set dim
 				self.dim = val.shape[1]
-			elif self.mat.shape[1] != self.dim: #check dim of input
+			elif self.mat.shape[1] != self.dim: # check dim of input
 				self._mat = mat_bkp
 				raise ValueError("Inconsistent dimension between " + \
 					"input (%d) and specified dimension (%d)"%\
@@ -146,7 +146,7 @@ class FeatureVec(DenseGraph):
 		checkers.checkNumpyArrayNDim('vec', 1, vec)
 		checkers.checkNumpyArrayIsNumeric('vec', vec)
 
-		#check size consistency between IDmap and mat
+		# check size consistency between IDmap and mat
 		assert self.size == self.mat.shape[0], \
 			"Inconsistent number of IDs (%d) and matrix entries (%d)"%\
 			(self.IDmap.size, self.mat.shape[0])

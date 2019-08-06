@@ -211,13 +211,13 @@ class IDprop(IDmap):
 
 	def __eq__(self, other):
 		"""Return true if two object have same set of IDs with same properties"""
-		#check if two objects have same set of IDs
+		# check if two objects have same set of IDs
 		if not super(IDprop, self).__eq__(other):
 			return False
-		#check if two objects have same set of properties
+		# check if two objects have same set of properties
 		if not set(self.propLst) == set(other.propLst):
 			return False
-		#check if properties have same values
+		# check if properties have same values
 		for prop in self.propLst:
 			for ID in self:
 				if self.getProp(ID, prop) != other.getProp(ID, prop):
@@ -304,7 +304,7 @@ class IDprop(IDmap):
 
 	def setProp(self, ID, prop_name, prop_val):
 		"""Set a pericif property value of an ID, must match default type if available"""
-		self.getProp(ID, prop_name) #check ID and prop_name validity
+		self.getProp(ID, prop_name) # check ID and prop_name validity
 		if self.prop_default_type[prop_name] is not None:
 			checkers.checkType("Property value for %s"%repr(prop_name), \
 				self.prop_default_type[prop_name], prop_val)
@@ -362,7 +362,7 @@ class IDprop(IDmap):
 			prop = prop.copy()
 			for prop_name in prop:
 				self._check_prop_existence(prop_name, True)
-			#chekc type of prop val and fill in missing properties
+			# chekc type of prop val and fill in missing properties
 			for prop_name, default_type in self.prop_default_type.items():
 				if prop_name in prop:
 					if default_type is not None:
