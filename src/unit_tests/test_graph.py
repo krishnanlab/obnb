@@ -251,7 +251,7 @@ class TestFeatureVec(unittest.TestCase):
 
 	def test_get_edge(self):
 		graph = DenseGraph.FeatureVec.from_emd(self.case.temd_fp)
-		temd_data = np.loadtxt('unit_tests/sample_data/toy1.emd',\
+		temd_data = np.loadtxt(SAMPLE_DATA_PATH  + 'toy1.emd',\
 								delimiter=' ',skiprows=1)[:,1:]
 		for i, ID1 in enumerate(graph.IDmap):
 			for j, ID2 in enumerate(graph.IDmap):
@@ -285,7 +285,7 @@ class TestFeatureVec(unittest.TestCase):
 
 	def test_from_emd(self):
 		graph = DenseGraph.FeatureVec.from_emd(self.case.temd_fp)
-		temd_data = np.loadtxt('unit_tests/sample_data/toy1.emd',\
+		temd_data = np.loadtxt(SAMPLE_DATA_PATH  + 'toy1.emd',\
 								delimiter=' ',skiprows=1)[:,1:]
 		self.assertTrue(np.all(graph.mat==temd_data))
 
