@@ -3,6 +3,8 @@ from NLEval.util.Exceptions import IDNotExistError, IDExistsError
 from NLEval.util import checkers
 from copy import deepcopy
 
+__all__ = ['IDlst', 'IDmap', 'IDprop']
+
 class IDlst(object):
 	"""ID list object that stores a list of IDs"""
 	def __init__(self):

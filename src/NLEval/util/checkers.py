@@ -1,6 +1,24 @@
 import numpy as np
 from collections.abc import Iterable
 
+__all__ = [
+	'INT_TYPE',
+	'FLOAT_TYPE',
+	'NUMERIC_TYPE',
+	'NUMSTRING_TYPE',
+	'ITERABLE_TYPE',
+	'checkType',
+	'checkTypeErrNone',
+	'checkTypeAllowNone',
+	'checkTypesInIterable',
+	'checkTypesInList',
+	'checkTypesInSet',
+	'checkTypesInNumpyArray',
+	'checkNumpyArrayIsNumeric',
+	'checkNumpyArrayNDim',
+	'checkNumpyArrayShape'
+]
+
 INT_TYPE = (int, np.integer)
 FLOAT_TYPE = (float, np.floating)
 NUMERIC_TYPE = INT_TYPE + FLOAT_TYPE

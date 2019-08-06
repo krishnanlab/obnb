@@ -1,2 +1,2 @@
-__all__ = ['BaseModel', 'SupervisedLearning', 'LabelPropagation']
+__all__ = ['SupervisedLearning', 'LabelPropagation']
 from . import *

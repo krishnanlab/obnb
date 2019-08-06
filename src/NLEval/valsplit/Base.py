@@ -1,6 +1,8 @@
 from NLEval.util import checkers, IDHandler
 import numpy as np
 
+__all__ = ['BaseValSplit', 'BaseHoldout', 'BaseInterface']
+
 class BaseValSplit:
 	def __init__(self, shuffle=False):
 		super(BaseValSplit, self).__init__()

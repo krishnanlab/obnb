@@ -3,6 +3,8 @@ from sklearn.svm import LinearSVC
 from sklearn.ensemble import RandomForestClassifier
 from NLEval.model.BaseModel import BaseModel
 
+__all__ = ['SLBase', 'LogReg', 'SVM', 'RF']
+
 class SLBase(BaseModel):
 	def train(self, ID_ary, y):
 		x = self.G[ID_ary]

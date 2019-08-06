@@ -4,6 +4,8 @@ from NLEval.util import checkers, IDHandler
 from scipy.spatial import distance
 import numpy as np
 
+__all__ = ['DenseGraph', 'FeatureVec']
+
 class DenseGraph(BaseGraph):
 	"""Base Graph object that stores data using numpy array"""
 	def __init__(self):

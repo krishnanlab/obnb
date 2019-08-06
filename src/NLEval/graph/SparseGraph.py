@@ -2,6 +2,8 @@ from NLEval.graph.BaseGraph import BaseGraph
 from NLEval.util import checkers
 import numpy as np
 
+__all__ = ['SparseGraph']
+
 class SparseGraph(BaseGraph):
 	"""Sparse Graph object with data stored as adjacency list
 	for efficient data retrieving and processing"""

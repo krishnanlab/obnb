@@ -4,6 +4,8 @@ from NLEval.label import Filter
 from NLEval.valsplit import Base
 import numpy as np
 
+__all__ = ['BaseLSC', 'SplitLSC']
+
 class BaseLSC(IDHandler.IDprop):
 	"""Collection of labelsets
 

@@ -2,6 +2,8 @@ from NLEval.graph import BaseGraph
 from NLEval.util import checkers
 import numpy as np
 
+__all__ = ['BaseModel']
+
 class BaseModel:
 	"""Base model object"""
 	def __init__(self, g):

@@ -1,2 +1,2 @@
-__all__=['Base', 'Holdout', 'Interface']
+__all__=['Holdout', 'Interface']
 from . import *

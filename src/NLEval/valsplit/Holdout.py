@@ -2,6 +2,8 @@ from NLEval.util import checkers, IDHandler
 from NLEval.valsplit.Base import *
 import numpy as np
 
+__all__ = ['BinHold', 'ThreshHold', 'CustomHold', 'TrainTestAll']
+
 class BinHold(BaseHoldout):
 	def __init__(self, bin_num, train_on='top', shuffle=False):
 		"""

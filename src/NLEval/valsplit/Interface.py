@@ -1,6 +1,8 @@
 from sklearn import model_selection as ms
 from NLEval.valsplit.Base import *
 
+__all__ = ['sklSKF', 'sklSSS', 'sklLOO', 'sklLPO']
+
 class sklInterface(BaseInterface):
 	"""Dedicated interface for Scikit Learn splitter"""
 	def __init__(self, sklSplitter, skl_kws={}, shuffle=False):
