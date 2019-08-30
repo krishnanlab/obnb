@@ -30,17 +30,17 @@ class BinHold(BaseHoldout):
 			raise ValueError("Number of bins must be greater than 1, not '%d'"%val)
 		self._bin_num = val
 
-	def train_test_setup(self, lscIDs, graphIDs, prop_name, **kwargs):
+	def train_test_setup(self, lscIDs, nodeIDs, prop_name, **kwargs):
 		"""
 
 		Args:
 			lscIDs(:obj:`NLEval.util.IDHandler.IDprop`)
-			graphIDs(:obj:`NLEval.util.IDHandler.IDmap`)
+			nodeIDs(:obj:`NLEval.util.IDHandler.IDmap`)
 			prop_name(str): name of property to be used for splitting
 
 		"""
 		lscIDs._check_prop_existence(prop_name, True)
-		common_ID_list = self.get_common_ID_list(lscIDs, graphIDs)
+		common_ID_list = self.get_common_ID_list(lscIDs, nodeIDs)
 		sorted_ID_list = sorted(common_ID_list, reverse=self.reverse, \
 			key=lambda ID: lscIDs.getProp(ID, prop_name))
 		bin_size = len(sorted_ID_list) // self.bin_num
@@ -71,19 +71,19 @@ class ThreshHold(BaseHoldout):
 		checkers.checkTypeErrNone('Cut off', checkers.NUMERIC_TYPE, val)
 		self._cut_off = val
 
-	def train_test_setup(self, lscIDs, graphIDs, prop_name, **kwargs):
+	def train_test_setup(self, lscIDs, nodeIDs, prop_name, **kwargs):
 		"""
 
 		Args:
 			lscIDs(:obj:`NLEval.util.IDHandler.IDprop`)
-			graphIDs(:obj:`NLEval.util.IDHandler.IDmap`)
+			nodeIDs(:obj:`NLEval.util.IDHandler.IDmap`)
 			prop_name(str): name of property to be used for splitting
 
 		"""
 		lscIDs._check_prop_existence(prop_name, True)
 		top_list = []
 		bot_list = []
-		for ID in graphIDs.lst:
+		for ID in nodeIDs.lst:
 			if ID in lscIDs:
 				if lscIDs.getProp(ID, 'Noccur') > 0:
 					if lscIDs.getProp(ID, prop_name) >= self.cut_off:
@@ -121,8 +121,8 @@ class CustomHold(BaseHoldout):
 		checkers.checkTypesInNumpyArray('Testing data ID list', str, ID_ary)
 		self._custom_test_ID_ary = ID_ary
 
-	def train_test_setup(self, lscIDs, graphIDs, **kwargs):
-		common_ID_list = self.get_common_ID_list(lscIDs, graphIDs)
+	def train_test_setup(self, lscIDs, nodeIDs, **kwargs):
+		common_ID_list = self.get_common_ID_list(lscIDs, nodeIDs)
 		self._train_ID_ary = np.intersect1d(self.custom_train_ID_ary, common_ID_list)
 		self._test_ID_ary = np.intersect1d(self.custom_test_ID_ary, common_ID_list)
 
@@ -131,8 +131,8 @@ class TrainTestAll(BaseHoldout):
 		"""Train and test on all data"""
 		super(TrainTestAll, self).__init__(shuffle=shuffle)
 
-	def train_test_setup(self, lscIDs, graphIDs, **kwargs):
-		common_ID_list = self.get_common_ID_list(lscIDs, graphIDs)
+	def train_test_setup(self, lscIDs, nodeIDs, **kwargs):
+		common_ID_list = self.get_common_ID_list(lscIDs, nodeIDs)
 		self._train_ID_ary = self._test_ID_ary = np.array(common_ID_list)
 
 '''
@@ -154,6 +154,6 @@ class HoldoutChildTemplate(BaseHoldout):
 	def foo(self, val):
 		self._foo = val
 
-	def train_test_setup(self, lscIDs, graphIDs, prop_name, **kwargs):
+	def train_test_setup(self, lscIDs, nodeIDs, prop_name, **kwargs):
 		#setup train_ID_ary and test_ID_ary
 '''

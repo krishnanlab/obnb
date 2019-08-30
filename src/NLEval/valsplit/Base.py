@@ -96,18 +96,18 @@ class BaseHoldout(BaseValSplit):
 	def reverse(self):
 		return self._reverse
 
-	def get_common_ID_list(self, lscIDs, graphIDs):
+	def get_common_ID_list(self, lscIDs, nodeIDs):
 		"""Get list of common IDs between labelset collection and graph
 
 		Args:
 			lscIDs(:obj:`NLEval.util.IDHandler.IDprop`):
-			graphIDs(:obj:`NLEval.util.IDHandler.IDmap`):
+			nodeIDs(:obj:`NLEval.util.IDHandler.IDmap`):
 
 		"""
 		checkers.checkType("ID for labelset collection entities", IDHandler.IDprop, lscIDs)
-		checkers.checkType("ID for graph entities", IDHandler.IDmap, graphIDs)
+		checkers.checkType("ID for graph entities", IDHandler.IDmap, nodeIDs)
 		common_ID_list = []
-		for ID in graphIDs.lst:
+		for ID in nodeIDs.lst:
 			if ID in lscIDs:
 				# make sure entity is part of at least one labelset
 				if lscIDs.getProp(ID, 'Noccur') > 0:
