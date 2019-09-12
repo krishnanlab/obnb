@@ -39,7 +39,7 @@ class BaseLSC(IDHandler.IDprop):
 		self.entity.newProp('Noccur', 0, int)
 		self.newProp('Info', 'NA', str)
 		self.newProp('Labelset', set(), set)
-		self.newProp('Negative', set(), set)
+		self.newProp('Negative', {None}, set)
 
 	def _show(self):
 		"""Debugging prints"""
@@ -148,7 +148,12 @@ class BaseLSC(IDHandler.IDprop):
 
 		"""
 		neg = self.getProp(labelID, 'Negative')
-		return neg if neg else set(self.entity.map) - self.getLabelset(labelID)
+		
+		if neg == {None}:
+			all_positives = set([i for i in self.entity.map if self.getNoccur(i) > 0])
+			return all_positives - self.getLabelset(labelID)
+		
+		return neg
 
 	def setNegative(self, lst, labelID):
 		checkers.checkTypesInList("Negative entity list", str, lst)
@@ -230,9 +235,9 @@ class BaseLSC(IDHandler.IDprop):
 		return lsc
 
 class SplitLSC(BaseLSC):
+	"""Labelset collection with more functionality including negative selection and 
+	splitting utility to generate train/test split for each labelset"""
 	def __init__(self):
-		"""Labelset collection with splitting utility to generate 
-		train/test split for each labelset"""
 		super(SplitLSC, self).__init__()
 		self._valsplit = None
 		self._filter_switch = False
