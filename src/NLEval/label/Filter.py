@@ -1,21 +1,38 @@
 class BaseFilter:
+	"""Base Filter object containing basic filter operations
+
+	Notes:
+		Loop through all instances (IDs) retrieved by `self.get_IDs` and decide
+		whether or not to apply modification using `self.criterion`, and finally
+		apply modification if passes criterion using `mod_fun`.
+
+	Basic components (methods) needed for children filter classes:
+		criterion: retrun true if the corresponding value of an instance passes
+			the criterion
+		get_IDs: return list of IDs to scan through
+		get_val_getter: return a function that map ID of an instance to some 
+			corresponding values
+		get_mod_fun: return a function that modifies an instance
+
+	All three 'get' methods above take a `LabelsetCollection` object as input
+
+	"""
 	def __init__(self):
-		super(BaseFilter, self).__init__()		
+		super(BaseFilter, self).__init__()
 
 	def __call__(self, lsc):
 		IDs = self.get_IDs(lsc)
 		val_getter = self.get_val_getter(lsc)
-		pop_fun = self.get_pop_fun(lsc)
+		mod_fun = self.get_mod_fun(lsc)
 
-		pop_list = []
 		for ID in IDs:
 			if self.criterion(val_getter(ID)):
-				pop_fun(ID)
+				mod_fun(ID)
 
 class RangeFilter(BaseFilter):
-	"""Filter entities in labelset collection by ???????
+	"""Filter entities in labelset collection by range of values
 
-	Note:
+	Notes:
 		If `None` specified for `min_val` or `max_val`, no filtering
 		will be done on upper/lower bound.
 
@@ -40,6 +57,7 @@ class RangeFilter(BaseFilter):
 		return False
 	
 class EntityRangeFilterNoccur(RangeFilter):
+	"""Pop entities based on number of occurance"""
 	def __init__(self, min_val=None, max_val=None):
 		super(EntityRangeFilterNoccur, self).__init__(min_val, max_val)
 
@@ -52,10 +70,11 @@ class EntityRangeFilterNoccur(RangeFilter):
 		return lsc.entityIDlst
 
 	@staticmethod
-	def get_pop_fun(lsc):
+	def get_mod_fun(lsc):
 		return lsc.popEntity
 
 class LabelsetRangeFilterSize(RangeFilter):
+	"""Pop labelsets based on size"""
 	def __init__(self, min_val=None, max_val=None):
 		super(LabelsetRangeFilterSize, self).__init__(min_val, max_val)
 
@@ -68,11 +87,11 @@ class LabelsetRangeFilterSize(RangeFilter):
 		return lsc.labelIDlst
 
 	@staticmethod
-	def get_pop_fun(lsc):
+	def get_mod_fun(lsc):
 		return lsc.popLabelset
 
 class LabelsetRangeFilterTrainTestPos(RangeFilter):
-	"""Filter based on number of positives in train/test sets"""
+	"""Pop labelsets based on number of positives in train/test sets"""
 	def __init__(self, min_val):
 		super(LabelsetRangeFilterTrainTestPos, self).__init__(min_val=min_val)
 
@@ -86,7 +105,7 @@ class LabelsetRangeFilterTrainTestPos(RangeFilter):
 		return lsc.labelIDlst
 
 	@staticmethod
-	def get_pop_fun(lsc):
+	def get_mod_fun(lsc):
 		return lsc.popLabelset #replace with soft filter
 
 class ValueFilter(BaseFilter):
