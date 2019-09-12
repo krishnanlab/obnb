@@ -75,7 +75,7 @@ class EntityRangeFilterNoccur(RangeFilter):
 
 	@staticmethod
 	def get_IDs(lsc):
-		return lsc.entityIDlst
+		return lsc.entity.lst
 
 	@staticmethod
 	def get_mod_fun(lsc):
@@ -154,7 +154,7 @@ class NegativeFilterHypergeom(BaseFilter):
 		IDs = lsc.labelIDlst
 		num_labelsets = len(IDs)
 		# set of all entities in the labelset collection
-		all_entities = set([i for i in lsc.entityIDlst if lsc.getNoccur(i) > 0])
+		all_entities = set(lsc.entityIDlst)
 
 		def get_pval_mat():
 			M = len(all_entities)

@@ -53,8 +53,9 @@ class BaseLSC(IDHandler.IDprop):
 
 	@property
 	def entityIDlst(self):
-		""":obj:`list` of :obj:`str`: list of all entity IDs"""
-		return self.entity.lst
+		""":obj:`list` of :obj:`str`: list of all entity IDs that
+			are part of at least one labelset"""
+		return [i for i in self.entity if self.getNoccur(i) > 0]
 
 	@property
 	def labelIDlst(self):
