@@ -149,7 +149,7 @@ class BaseLSC(IDHandler.IDprop):
 
 		"""
 		neg = self.getProp(labelID, 'Negative')
-		
+
 		if neg == {None}:
 			all_positives = set([i for i in self.entity.map if self.getNoccur(i) > 0])
 			return all_positives - self.getLabelset(labelID)
@@ -191,7 +191,49 @@ class BaseLSC(IDHandler.IDprop):
 		return obj
 
 	def export(self, fp):
-		pass
+		"""Export as '.lsc' file
+
+		Notes:
+			'.lsc' is a csv file storing entity labels in matrix form, where
+			first column is entity IDs, first and second rows correspond to 
+			label ID and label information respectively. If an entity 'i' is 
+			annotated with a label 'j', the corresponding 'ij' entry is marked 
+			as '1', else if it is considered a negative for that label, it is 
+			marked as '-1', otherwise it is '0', standing for neutral.
+
+			entityIDmap is necessary since not all entities are guaranteed to 
+			be part of at least one labels.
+
+		Input:
+			fp(str): path to file to save, including file name, without extension.
+
+		"""
+		entityIDlst = self.entityIDlst
+		entityIDmap = {ID:idx for idx, ID in enumerate(entityIDlst)}
+		labelIDlst = self.labelIDlst
+		labelInfolst = [self.getInfo(labelID) for labelID in labelIDlst]
+		mat = np.zeros((len(entityIDlst), len(labelIDlst)), dtype=int)
+
+		for j, labelID in enumerate(labelIDlst):
+			positive_set = self.getLabelset(labelID)
+			negative_set = self.getNegative(labelID)
+
+			for sign, labelset in zip(['1', '-1'], [positive_set, negative_set]):
+
+				for entityID in labelset:
+					i = entityIDmap[entityID]
+					mat[i,j] = sign
+			
+		with open(fp + '.lsc', 'w') as f:
+			# headers
+			f.write("Label ID\t%s\n" % '\t'.join(labelIDlst))
+			f.write("Label Info\t%s\n" % '\t'.join(labelInfolst))
+
+			# annotations
+			for i, entityID in enumerate(entityIDlst):
+				indicator_string = '\t'.join(map(str, mat[i]))
+				f.write("%s\t%s\n" % (entityID, indicator_string))
+		
 
 	def load_entity_properties(self, fp, prop_name, default_val, \
 			default_type, interpreter=int, comment='#', skiprows=0):
