@@ -1,3 +1,11 @@
+import numpy as np
+from scipy.stats import hypergeom
+
+__all__ = ['EntityRangeFilterNoccur', 
+			'LabelsetRangeFilterSize', 
+			'LabelsetRangeFilterTrainTestPos', 
+			'NegativeFilterHypergeom']
+
 class BaseFilter:
 	"""Base Filter object containing basic filter operations
 
@@ -124,3 +132,62 @@ class ValueFilter(BaseFilter):
 
 	def criterion(self, val):
 		return True if (val == self.val) is self.remove else False
+
+class NegativeFilterHypergeom(BaseFilter):
+	"""Filter based on enrichment (hypergeometric test)
+	
+	Notes:
+		Given a labelset, compare it with all other labelsets and if p-val
+		from hypergemetric test less than some threshold, exclude genes
+		from that labelset that are not possitive from training/testing sets,
+		i.e. set to neutral.
+
+	Attributes:
+		p_thresh: p-val threshold used for filtering
+
+	"""
+	def __init__(self, p_thresh):
+		self.p_thresh = p_thresh
+
+
+	def __call__(self, lsc):
+		IDs = lsc.labelIDlst
+		num_labelsets = len(IDs)
+		# set of all entities in the labelset collection
+		all_entities = set([i for i in lsc.entityIDlst if lsc.getNoccur(i) > 0])
+
+		def get_pval_mat():
+			M = len(all_entities)
+			pval_mat = np.zeros((num_labelsets, num_labelsets))
+
+			for i in range(num_labelsets):
+				ID1 = IDs[i]
+				labelset1 = lsc.getLabelset(ID1)
+				N = len(labelset1) # size of first labelset
+
+				for j in range(i + 1, num_labelsets):
+					ID2 = IDs[j]
+					labelset2 = lsc.getLabelset(ID2)
+
+					k = len(labelset1 & labelset2) # size of intersection
+					n = len(labelset2) # size of second labelset
+
+					pval_mat[i, j] = pval_mat[j, i] = hypergeom.sf(k - 1, M, n, N)
+
+					#if k >= 1: # for debugging
+					#	print("k = {:>3d}, M = {:>5d}, n = {:>5d}, N = {:>5d}, pval = {:>.4f}".format(k, M, n, N, pval_mat[i,j]))
+
+			return pval_mat
+
+
+		pval_mat = get_pval_mat()
+
+		for i, ID1 in enumerate(IDs):
+			exclude_set = lsc.getLabelset(ID1).copy()
+
+			for j, ID2 in enumerate(IDs):
+				if pval_mat[i, j] < self.p_thresh:
+					exclude_set.update(lsc.getLabelset(ID2))
+
+			negative = list(all_entities - exclude_set)
+			lsc.setNegative(list(negative), ID1)

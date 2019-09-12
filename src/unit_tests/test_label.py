@@ -304,5 +304,20 @@ class TestFilter(unittest.TestCase):
 			self.assertEqual(lsc.prop['Labelset'], [{'a', 'b', 'c'}, {'e', 'f', 'g'}, {'a', 'f', 'c'}])
 			self.assertEqual(lsc.entity.map, {'a':0, 'b':1, 'c':2, 'e':3, 'f':4, 'g':5})
 
+	def test_NegativeFilterHypergeom(self):
+		# p-val threshold set to 0.5 since most large, group1-group4 smallest with pval = 0.286
+		self.lsc.apply(Filter.NegativeFilterHypergeom(p_thresh=0.5))
+		# test wheter negative selected correctly for group1, 'f' should be excluded due to sim with group2
+		self.assertEqual(self.lsc.getNegative('Group1'), {'d', 'e', 'g', 'h'})
+
+		# increase p-val thtreshold to 0.7 will also include group2 and group3, where pval = 0.643
+		self.lsc.apply(Filter.NegativeFilterHypergeom(p_thresh=0.7))
+		self.assertEqual(self.lsc.getNegative('Group1'), {'e', 'g'})
+
+		# set p-val threshold to be greater than 1 -> no negatives should be left
+		self.lsc.apply(Filter.NegativeFilterHypergeom(p_thresh=1.1))
+		self.assertEqual(self.lsc.getNegative('Group1'), set())
+
+
 if __name__ == '__main__':
 	unittest.main()
