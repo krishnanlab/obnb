@@ -205,7 +205,7 @@ class BaseLSC(IDHandler.IDprop):
 			be part of at least one labels.
 
 		Input:
-			fp(str): path to file to save, including file name, without extension.
+			fp(str): path to file to save, including file name, with/without extension.
 
 		"""
 		entityIDlst = self.entityIDlst
@@ -223,8 +223,9 @@ class BaseLSC(IDHandler.IDprop):
 				for entityID in labelset:
 					i = entityIDmap[entityID]
 					mat[i,j] = sign
-			
-		with open(fp + '.lsc', 'w') as f:
+		
+		fp += '' if fp.endswith('.lsc') else '.lsc'
+		with open(fp, 'w') as f:
 			# headers
 			f.write("Label ID\t%s\n" % '\t'.join(labelIDlst))
 			f.write("Label Info\t%s\n" % '\t'.join(labelInfolst))
@@ -233,6 +234,20 @@ class BaseLSC(IDHandler.IDprop):
 			for i, entityID in enumerate(entityIDlst):
 				indicator_string = '\t'.join(map(str, mat[i]))
 				f.write("%s\t%s\n" % (entityID, indicator_string))
+
+
+	def export_gmt(self, fp):
+		"""Export as '.gmt' (Gene Matrix Transpose) file
+
+		Input:
+			fp(str): path to file to save, including file name, with/without extension.
+		"""
+		fp += '' if fp.endswith('.gmt') else '.gmt'
+		with open(fp, 'w') as f:
+			for labelID in self.labelIDlst:
+				labelInfo = self.getInfo(labelID)
+				labelset = self.getLabelset(labelID)
+				f.write("%s\t%s\t%s\n" % (labelID, labelInfo, '\t'.join(labelset)))
 		
 
 	def load_entity_properties(self, fp, prop_name, default_val, \
@@ -314,7 +329,7 @@ class SplitLSC(BaseLSC):
 		if min_pos is not None:
 			self.apply(Filter.LabelsetRangeFilterTrainTestPos(min_pos))
 
-	def splitLabelset(self, labelID):
+	def splitLabelset(self, labelID, entityIDlst=None):
 		"""Split up a labelset by training and testing sets
 		
 		Returns:
@@ -322,9 +337,13 @@ class SplitLSC(BaseLSC):
 			`NLEval.valsplit.Base.BaseValSplit.split` for more info.
 
 		"""
-		pos_ID_list = list(self.getLabelset(labelID))
-		neg_ID_list = list(self.getNegative(labelID))
-		ID_ary = np.array(pos_ID_list + neg_ID_list)
+		if entityIDlst is None:
+			entityIDlst = self.entityIDlst.copy()
+
+		pos_ID_set = set(list(self.getLabelset(labelID))) & set(entityIDlst)
+		neg_ID_set = set(list(self.getNegative(labelID))) & set(entityIDlst)
+
+		ID_ary = np.array(list(pos_ID_set) + list(neg_ID_set))
 		label_ary = np.zeros(len(ID_ary), dtype=bool)
-		label_ary[:len(pos_ID_list)] = True
+		label_ary[:len(pos_ID_set)] = True
 		return self.valsplit.split(ID_ary, label_ary)
