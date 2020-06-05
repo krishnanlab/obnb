@@ -116,9 +116,17 @@ class BaseLSC(IDHandler.IDprop):
 				self.entity.setProp(ID, 'Noccur', self.getNoccur(ID) + 1)
 
 	def resetLabelset(self, labelID):
-		"""Reset an existing labelset to an empty set
-		Decrement `Noccur` property of all entites belonging to the labelset,
-		any entity specific to the popped labelset (`Noccur` == 1) is popped.
+		"""Reset an existing labelset to an empty set, and deecrement `Noccur` of 
+		all entites belonging to the labelset.
+
+		Note: Any entity specific to the popped labelset is popped, which is 
+		indicated by the equality of properties of entity with default property 
+		values. The most important property is `Noccur`, the number of labelset 
+		an entity is presented in, with default value of 0 (see init), which implies 
+		that the entity is no longer present in any labelsets. The use of all 
+		default properfies for comparison to determine popping of entity is just 
+		for generalization purpose.
+
 		"""
 		lbset = self.getLabelset(labelID)
 		for ID in lbset:
@@ -128,10 +136,16 @@ class BaseLSC(IDHandler.IDprop):
 		lbset.clear()
 
 	def popEntity(self, ID):
-		"""Pop an entity, remove from all labelsets"""
+		"""Pop an entity from entity list, and also remove it from all labelsets.
+		
+		Note: Unlike `popLabelset`, if after removal, a labelset beomes empty, the 
+		labelset itself is NOT removed. This is for more convenient comparison of 
+		labelset sizes before and after filtering.
+
+		"""
 		self.entity.popID(ID)
 		for labelID in self.labelIDlst:
-			lbset = self.getLabelset(labelID).difference_update([ID])
+			self.getLabelset(labelID).difference_update([ID])
 
 	def getInfo(self, labelID):
 		"""Return description of a labelset"""
@@ -171,7 +185,7 @@ class BaseLSC(IDHandler.IDprop):
 		"""Return the number of labelsets in which an entity participates"""
 		return self.entity.getProp(ID, 'Noccur')
 
-	def apply(self, filter_func, inplace=True):
+	def apply(self, filter_func, inplace=False):
 		"""Apply filter to labelsets, see `NLEval.label.Filter` for more info
 
 		Args:

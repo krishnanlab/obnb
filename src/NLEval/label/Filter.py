@@ -37,6 +37,62 @@ class BaseFilter:
 			if self.criterion(val_getter(ID)):
 				mod_fun(ID)
 
+class ExistanceFilter(BaseFilter):
+	"""Filter by existance in some given list of targets
+
+	Attributes:
+		target_lst: list (or set) of targets of interest to be preserved
+		remove_existance: boolean value indicating whether or not to remove 
+			tarets in `target_lst`. If True, remove any target present in the 
+			`target_lst` from the labelset collection; if False, preserve only 
+			those target present in the `target_lst`
+
+	"""
+	def __init__(self, target_lst, remove_existance=False):
+		super(ExistanceFilter, self).__init__()
+		self.target_lst = target_lst
+		self.remove_existance = remove_existance
+
+	def criterion(self, val):
+		if self.remove_existance:
+			return val in self.target_lst
+		else:
+			return val not in self.target_lst
+
+class EntityExistanceFilter(ExistanceFilter):
+	"""Filter entities by list of entiteis of interest"""
+	def __init__(self, target_lst, remove_existance=False):
+		super(EntityExistanceFilter, self).__init__(target_lst, remove_existance)
+
+	@staticmethod
+	def get_val_getter(lsc):
+		return lambda x: x # return entity ID itself
+
+	@staticmethod
+	def get_IDs(lsc):
+		return lsc.entity.lst
+
+	@staticmethod
+	def get_mod_fun(lsc):
+		return lsc.popEntity
+
+class LabelsetExistanceFilter(ExistanceFilter):
+	"""Filter labelset by list of labelsets of interest"""
+	def __init__(self, target_lst, remove_existance=False):
+		super(LabelsetExistanceFilter, self).__init__(target_lst, remove_existance)
+
+	@staticmethod
+	def get_val_getter(lsc):
+		return lambda x: x # return labelset ID itself
+
+	@staticmethod
+	def get_IDs(lsc):
+		return lsc.labelIDlst
+
+	@staticmethod
+	def get_mod_fun(lsc):
+		return lsc.popLabelset
+
 class RangeFilter(BaseFilter):
 	"""Filter entities in labelset collection by range of values
 

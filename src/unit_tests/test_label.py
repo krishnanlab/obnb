@@ -212,6 +212,97 @@ class TestFilter(unittest.TestCase):
 		# Noccur=[3, 2, 2, 1, 1, 2, 1, 1]
 		# Size=[3, 2, 3, 3, 2]
 
+	def test_EntityExistanceFilter(self):
+		# make sure default options of remove_existance=False work
+		target_lst = ['a', 'b', 'c']
+		with self.subTest(target_lst=target_lst):
+			lsc = self.lsc.apply(Filter.EntityExistanceFilter(target_lst=target_lst), \
+				inplace=False)
+			self.assertEqual(lsc.prop['Labelset'], \
+				[{'a', 'b', 'c'}, {'b'}, set(), {'a', 'c'}, {'a'}])
+			self.assertEqual(lsc.entity.map, {'a':0, 'b':1, 'c':2})
+
+		target_lst = ['a', 'b', 'c']
+		remove_existance = False
+		with self.subTest(target_lst=target_lst, remove_existance=remove_existance):
+			lsc = self.lsc.apply(Filter.EntityExistanceFilter(target_lst=target_lst, \
+				remove_existance=remove_existance), inplace=False)
+			self.assertEqual(lsc.prop['Labelset'], \
+				[{'a', 'b', 'c'}, {'b'}, set(), {'a', 'c'}, {'a'}])
+			self.assertEqual(lsc.entity.map, {'a':0, 'b':1, 'c':2})
+
+		target_lst = ['a', 'b', 'c']
+		remove_existance = True
+		with self.subTest(target_lst=target_lst, remove_existance=remove_existance):
+			lsc = self.lsc.apply(Filter.EntityExistanceFilter(target_lst=target_lst, \
+				remove_existance=remove_existance), inplace=False)
+			self.assertEqual(lsc.prop['Labelset'], \
+				[set(), {'d'}, {'e', 'f', 'g'}, {'f'}, {'h'}])
+			self.assertEqual(lsc.entity.map, {'d':0, 'e':1, 'f':2, 'g':3, 'h':4})
+
+		target_lst = ['b', 'e', 'h']
+		remove_existance = False
+		with self.subTest(target_lst=target_lst, remove_existance=remove_existance):
+			lsc = self.lsc.apply(Filter.EntityExistanceFilter(target_lst=target_lst, \
+				remove_existance=remove_existance), inplace=False)
+			self.assertEqual(lsc.prop['Labelset'], \
+				[{'b'}, {'b'}, {'e'}, set(), {'h'}])
+			self.assertEqual(lsc.entity.map, {'b':0, 'e':1, 'h':2})
+
+		target_lst = ['b', 'e', 'h']
+		remove_existance = True
+		with self.subTest(target_lst=target_lst, remove_existance=remove_existance):
+			lsc = self.lsc.apply(Filter.EntityExistanceFilter(target_lst=target_lst, \
+				remove_existance=remove_existance), inplace=False)
+			self.assertEqual(lsc.prop['Labelset'], \
+				[{'a', 'c'}, {'d'}, {'f', 'g'}, {'a', 'f', 'c'}, {'a'}])
+			self.assertEqual(lsc.entity.map, {'a':0, 'c':1, 'd':2, 'f':3, 'g':4})
+
+	def test_LabelsetExistanceFilter(self):
+		target_lst = ['Group1', 'Group2']
+		with self.subTest(target_lst=target_lst):
+			lsc = self.lsc.apply(Filter.LabelsetExistanceFilter(target_lst=target_lst), \
+				inplace=False)
+			self.assertEqual(lsc.prop['Labelset'], \
+				[{'a', 'b', 'c'}, {'b', 'd'}])
+			self.assertEqual(lsc.entity.map, {'a':0, 'b':1, 'c':2, 'd':3})
+
+		target_lst = ['Group1', 'Group2']
+		remove_existance = False
+		with self.subTest(target_lst=target_lst):
+			lsc = self.lsc.apply(Filter.LabelsetExistanceFilter(target_lst=target_lst, \
+				remove_existance=remove_existance), inplace=False)
+			self.assertEqual(lsc.prop['Labelset'], \
+				[{'a', 'b', 'c'}, {'b', 'd'}])
+			self.assertEqual(lsc.entity.map, {'a':0, 'b':1, 'c':2, 'd':3})
+
+		target_lst = ['Group1', 'Group2']
+		remove_existance = True
+		with self.subTest(target_lst=target_lst):
+			lsc = self.lsc.apply(Filter.LabelsetExistanceFilter(target_lst=target_lst, \
+				remove_existance=remove_existance), inplace=False)
+			self.assertEqual(lsc.prop['Labelset'], \
+				[{'e', 'f', 'g'}, {'a', 'f', 'c'}, {'a', 'h'}])
+			self.assertEqual(lsc.entity.map, {'a':0, 'c':1, 'e':2, 'f':3, 'g':4, 'h':5})
+
+		target_lst = ['Group2', 'Group5']
+		remove_existance = False
+		with self.subTest(target_lst=target_lst):
+			lsc = self.lsc.apply(Filter.LabelsetExistanceFilter(target_lst=target_lst, \
+				remove_existance=remove_existance), inplace=False)
+			self.assertEqual(lsc.prop['Labelset'], \
+				[{'b', 'd'}, {'a', 'h'}])
+			self.assertEqual(lsc.entity.map, {'a':0, 'b':1, 'd':2, 'h':3})
+
+		target_lst = ['Group2', 'Group5']
+		remove_existance = True
+		with self.subTest(target_lst=target_lst):
+			lsc = self.lsc.apply(Filter.LabelsetExistanceFilter(target_lst=target_lst, \
+				remove_existance=remove_existance), inplace=False)
+			self.assertEqual(lsc.prop['Labelset'], \
+				[{'a', 'b', 'c'}, {'e', 'f', 'g'}, {'a', 'f', 'c'}])
+			self.assertEqual(lsc.entity.map, {'a':0, 'b':1, 'c':2, 'e':3, 'f':4, 'g':5})
+
 	def test_EntityRangeFilterNoccur(self):
 		with self.subTest(min_val=2):
 			lsc = self.lsc.apply(Filter.EntityRangeFilterNoccur(min_val=2), inplace=False)
@@ -306,16 +397,16 @@ class TestFilter(unittest.TestCase):
 
 	def test_NegativeFilterHypergeom(self):
 		# p-val threshold set to 0.5 since most large, group1-group4 smallest with pval = 0.286
-		self.lsc.apply(Filter.NegativeFilterHypergeom(p_thresh=0.5))
+		self.lsc.apply(Filter.NegativeFilterHypergeom(p_thresh=0.5), inplace=True)
 		# test wheter negative selected correctly for group1, 'f' should be excluded due to sim with group2
 		self.assertEqual(self.lsc.getNegative('Group1'), {'d', 'e', 'g', 'h'})
 
 		# increase p-val thtreshold to 0.7 will also include group2 and group3, where pval = 0.643
-		self.lsc.apply(Filter.NegativeFilterHypergeom(p_thresh=0.7))
+		self.lsc.apply(Filter.NegativeFilterHypergeom(p_thresh=0.7), inplace=True)
 		self.assertEqual(self.lsc.getNegative('Group1'), {'e', 'g'})
 
 		# set p-val threshold to be greater than 1 -> no negatives should be left
-		self.lsc.apply(Filter.NegativeFilterHypergeom(p_thresh=1.1))
+		self.lsc.apply(Filter.NegativeFilterHypergeom(p_thresh=1.1), inplace=True)
 		self.assertEqual(self.lsc.getNegative('Group1'), set())
 
 
