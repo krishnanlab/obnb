@@ -34,7 +34,7 @@ __all__ = [
 ]
 
 INT_TYPE = (int, np.integer)
-FLOAT_TYPE = (float, np.floating)
+FLOAT_TYPE = (float, np.floating, np.float32)
 NUMERIC_TYPE = INT_TYPE + FLOAT_TYPE
 NUMSTRING_TYPE = INT_TYPE + FLOAT_TYPE + (str,)
 ITERABLE_TYPE = Iterable
