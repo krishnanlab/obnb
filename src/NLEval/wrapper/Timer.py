@@ -1,5 +1,5 @@
 import time
-from NetGSEA.util import checkers
+from NLEval.util import checkers
 
 class TimeIt:
 	def __init__(self, verbose=True):

@@ -1,4 +1,4 @@
-from NetGSEA.wrapper import ParWrap
+from NLEval.wrapper import ParWrap
 import time
 
 lst = list(range(20))

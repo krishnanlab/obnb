@@ -1,5 +1,5 @@
 import multiprocessing as mp
-from NetGSEA.util import checkers
+from NLEval.util import checkers
 
 class ParDat:
 	def __init__(self, iter_obj, n_jobs=5, verbose=False):
