@@ -1,4 +1,4 @@
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.svm import LinearSVC
 from sklearn.ensemble import RandomForestClassifier
 from NLEval.model.BaseModel import BaseModel
@@ -19,6 +19,11 @@ class LogReg(SLBase, LogisticRegression):
 	def __init__(self, G, **kwargs):
 		SLBase.__init__(self, G)
 		LogisticRegression.__init__(self, **kwargs)
+
+class LogRegCV(SLBase, LogisticRegressionCV):
+	def __init__(self, G, **kwargs):
+		SLBase.__init__(self, G)
+		LogisticRegressionCV.__init__(self, **kwargs)
 
 class SVM(SLBase, LinearSVC):
 	def __init__(self, G, **kwargs):

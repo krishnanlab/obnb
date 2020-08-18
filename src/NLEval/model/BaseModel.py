@@ -41,6 +41,20 @@ class BaseModel:
 		return self.G.mat[idx_ary]
 
 	def test(self, labelset_splitgen):
+		"""Model testing through validation split
+
+		Input:
+			labelset_splitgen: validation split helper objects, see example
+
+		Output:
+			y_true: numpy array of true values
+			y_predict: numpy array of decision values
+
+		TODO:
+			Add example here (the valsplit object is from lsc)
+			Now it only supports single class, how about multiclass predcitions?
+
+		"""
 		y_true = np.array([])
 		y_predict = np.array([])
 		for train_id_ary, train_label_ary, test_id_ary, test_label_ary in labelset_splitgen:
@@ -50,6 +64,22 @@ class BaseModel:
 			decision_ary = self.decision(test_id_ary)
 			y_true = np.append(y_true, test_label_ary)
 			y_predict = np.append(y_predict, decision_ary)
+		return y_true, y_predict
+
+	def test2(self, labelset_splitgen):
+		"""Same as test() above, but return y_true and y_pred as list of
+		lists, grouping based on fold/split instead of merging into a
+		single list"""
+		y_true = []
+		y_predict = []
+		for train_id_ary, train_label_ary, test_id_ary, test_label_ary in labelset_splitgen:
+			if train_id_ary is None:
+				return None, None
+			self.train(train_id_ary, train_label_ary)
+			decision_ary = self.decision(test_id_ary)
+			y_true.append(test_label_ary)
+			y_predict.append(decision_ary)
+			#print(self.C_)
 		return y_true, y_predict
 
 	def predict(self, pos_ID_set, neg_ID_set):
