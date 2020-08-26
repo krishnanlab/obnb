@@ -7,8 +7,7 @@ def prior(y_true):
 def auPRC(y_true, y_predict):
     if skip(y_true, y_predict):
         return np.nan
-    precision, recall, _ = sklearn.metrics.precision_recall_curve(y_true, y_predict)
-    return np.log2(sklearn.metrics.auc(recall, precision) / prior(y_true))
+    return np.log2(sklearn.metrics.average_precision_score(y_true, y_predict) / prior(y_true))
 
 def PTopK(y_true, y_predict):
     if skip(y_true, y_predict):
