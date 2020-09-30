@@ -33,8 +33,8 @@ __all__ = [
 	'checkNumpyArrayShape'
 ]
 
-INT_TYPE = (int, np.integer)
-FLOAT_TYPE = (float, np.floating, np.float32)
+INT_TYPE = (int, np.int32, np.int64)
+FLOAT_TYPE = (float, np.float32, np.float64, np.float128)
 NUMERIC_TYPE = INT_TYPE + FLOAT_TYPE
 NUMSTRING_TYPE = INT_TYPE + FLOAT_TYPE + (str,)
 ITERABLE_TYPE = Iterable
