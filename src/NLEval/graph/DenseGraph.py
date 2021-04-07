@@ -177,3 +177,17 @@ class FeatureVec(DenseGraph):
 				fvec_lst.append(np.array(terms[1:], dtype=float))
 		mat = np.asarray(fvec_lst)
 		return cls.construct_graph(idmap, mat)
+
+class MultiFeatureVec(BaseGraph):
+	"""Multi feature vectors with ID maps
+
+	Note: experimenting feature
+
+	"""
+	def __init__(self):
+		self.mat_list = []
+		self.name_list = []
+
+	def add_feature(self, val, name):
+		self.mat_list.append(val)
+		self.name_list.append(name)
