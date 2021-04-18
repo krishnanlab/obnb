@@ -38,7 +38,7 @@ class CombSLBase(BaseModel):
 			self.mdl_list[i].fit(x,y)
 		self.fit_master_mdl(ID_ary, y)
 
-class CombLogRegCVMean(CombSLBase):
+class CombLogRegCVBagging(CombSLBase):
 	def __init__(self, G, **kwargs):
 		self.base_mdl = LogisticRegressionCV
 		CombSLBase.__init__(self, G, **kwargs)
@@ -54,38 +54,65 @@ class CombLogRegCVMean(CombSLBase):
 		decision_ary /= len(self.mdl_list)
 		return decision_ary
 
-#class CombLogRegCV(BaseModel):
-#	"""LogRegCV with multiple feature sets"""
-#	def __init__(self, G, **kwargs):
-#		# G here should be multi feature set
-#		BaseModel.__init__(self, G)
-#		self.mdl_list = [LogisticRegressionCV(**kwargs) for i in self.G.mat_list]
-#		#self.master_mdl = LogisticRegressionCV(**kwargs)
-#
-#	def train(self, ID_ary, y):
-#		x_master = np.zeros((len(ID_ary), len(self.G.mat_list)))
-#		for i, mat in enumerate(self.G.mat_list):
-#			x = mat[self.G.IDmap[ID_ary]]
-#			self.mdl_list[i].fit(x,y)
-#			x_master[:,i] = self.mdl_list[i].decision_function(x)
-#		#self.master_mdl.fit(x_master, y)
-#		##print(self.master_mdl.coef_)
-#		##for i, j in zip(self.G.name_list, self.master_mdl.coef_[0]):
-#		#		#print(i,j)
-#		##print('')
-#
-#	def decision(self, ID_ary):
-#		#x_master = np.zeros((len(ID_ary), len(self.G.mat_list)))
-#		#for i, mat in enumerate(self.G.mat_list):
-#		#	x = mat[self.G.IDmap[ID_ary]]
-#		#	x_master[:,i] = self.mdl_list[i].decision_function(x)
-#		#decision_ary = self.master_mdl.decision_function(x_master)
-#		decision_ary = np.zeros((len(ID_ary)))
-#		for i, mat in enumerate(self.G.mat_list):
-#			x = mat[self.G.IDmap[ID_ary]]
-#			decision_ary += self.mdl_list[i].decision_function(x)
-#		decision_ary /= len(self.mdl_list)
-#		return decision_ary
+class CombLogRegCVAdaBoost(CombSLBase):
+	def __init__(self, G, **kwargs):
+		self.base_mdl = LogisticRegressionCV
+		CombSLBase.__init__(self, G, **kwargs)
+		self.coef_ = None
+
+	def fit_master_mdl(self, ID_ary, y):
+		n_mdl = len(self.mdl_list)  # total number of models
+		selected_ind = np.zeros(n_mdl, dtype=bool)  # inidvator for selected model
+		w = np.ones(len(ID_ary)) / len(ID_ary)  # data point weights
+		coef = np.zeros(n_mdl)  # model boosting coefficients
+		y_pred_mat = np.zeros((len(ID_ary), n_mdl))  # predictions from all models
+
+		# generate predictions from individual models
+		idx_ary = self.G.IDmap[ID_ary]
+		for i, mdl in enumerate(self.mdl_list):
+			            x = self.G.mat_list[i][idx_ary]
+			            y_pred_mat[:,i] = mdl.predict(x)
+
+		# determine boosting coefficients
+		for i in range(n_mdl):
+			opt_err = np.inf
+			opt_idx = None
+
+			for j in range(n_mdl):
+				if selected_ind[j]:
+					continue
+				err = w[y_pred_mat[:,i] != y].sum()
+				if err < opt_err:
+					opt_err = err
+					opt_idx = j
+
+			a = 0.5 * np.log((1 - opt_err) / opt_err)  # model coefficient
+			if a < 0: print(f"Warning: encountered worse than random prediction, a = {a}, set to 0")
+			y_pred_opt = y_pred_mat[:, opt_idx] == 1  # predictions of optimal model
+			w[y_pred_opt == y] *= np.exp(-a)  # down weight correct predictions
+			w[y_pred_opt != y] *= np.exp(a)  # up weight incorrect predictions
+			w /= w.sum()  # normalize data point weights
+			selected_ind[opt_idx] = True  # remove selected model from candidates
+			#coef[opt_idx] = max(a, 0)
+
+		if coef.sum() == 0:
+			coef = np.ones(n_mdl) / n_mdl
+		else:
+			coef /= coef.sum()
+		#print(coef)
+
+		self.coef_ = coef  # set normalized bossting coefficients
+
+	def decision(self, ID_ary):
+		if self.coef_ is None:
+			raise ValueError("Master model untrained, train first using fit_master_mdl")
+
+		decision_ary = np.zeros((len(ID_ary)))
+		for i, mat in enumerate(self.G.mat_list):
+			x = mat[self.G.IDmap[ID_ary]]
+			decision_ary += self.coef_[i] * self.mdl_list[i].decision_function(x)
+
+		return decision_ary
 
 class SVM(SLBase, LinearSVC):
 	def __init__(self, G, **kwargs):
