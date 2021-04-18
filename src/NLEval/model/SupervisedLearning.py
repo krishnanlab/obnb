@@ -26,38 +26,66 @@ class LogRegCV(SLBase, LogisticRegressionCV):
 		SLBase.__init__(self, G)
 		LogisticRegressionCV.__init__(self, **kwargs)
 
-class CombLogRegCV(BaseModel):
-	"""LogRegCV with multiple feature sets"""
+class CombSLBase(BaseModel):
 	def __init__(self, G, **kwargs):
 		# G here should be multi feature set
 		BaseModel.__init__(self, G)
-		self.mdl_list = [LogisticRegressionCV(**kwargs) for i in self.G.mat_list]
-		#self.master_mdl = LogisticRegressionCV(**kwargs)
+		self.mdl_list = [self.base_mdl(**kwargs) for i in self.G.mat_list]
 
 	def train(self, ID_ary, y):
-		x_master = np.zeros((len(ID_ary), len(self.G.mat_list)))
 		for i, mat in enumerate(self.G.mat_list):
 			x = mat[self.G.IDmap[ID_ary]]
 			self.mdl_list[i].fit(x,y)
-			x_master[:,i] = self.mdl_list[i].decision_function(x)
-		#self.master_mdl.fit(x_master, y)
-		##print(self.master_mdl.coef_)
-		##for i, j in zip(self.G.name_list, self.master_mdl.coef_[0]):
-		#		#print(i,j)
-		##print('')
+		self.fit_master_mdl(ID_ary, y)
+
+class CombLogRegCVMean(CombSLBase):
+	def __init__(self, G, **kwargs):
+		self.base_mdl = LogisticRegressionCV
+		CombSLBase.__init__(self, G, **kwargs)
+
+	def fit_master_mdl(self, ID_ary, y):
+		pass
 
 	def decision(self, ID_ary):
-		#x_master = np.zeros((len(ID_ary), len(self.G.mat_list)))
-		#for i, mat in enumerate(self.G.mat_list):
-		#	x = mat[self.G.IDmap[ID_ary]]
-		#	x_master[:,i] = self.mdl_list[i].decision_function(x)
-		#decision_ary = self.master_mdl.decision_function(x_master)
 		decision_ary = np.zeros((len(ID_ary)))
 		for i, mat in enumerate(self.G.mat_list):
 			x = mat[self.G.IDmap[ID_ary]]
 			decision_ary += self.mdl_list[i].decision_function(x)
 		decision_ary /= len(self.mdl_list)
 		return decision_ary
+
+#class CombLogRegCV(BaseModel):
+#	"""LogRegCV with multiple feature sets"""
+#	def __init__(self, G, **kwargs):
+#		# G here should be multi feature set
+#		BaseModel.__init__(self, G)
+#		self.mdl_list = [LogisticRegressionCV(**kwargs) for i in self.G.mat_list]
+#		#self.master_mdl = LogisticRegressionCV(**kwargs)
+#
+#	def train(self, ID_ary, y):
+#		x_master = np.zeros((len(ID_ary), len(self.G.mat_list)))
+#		for i, mat in enumerate(self.G.mat_list):
+#			x = mat[self.G.IDmap[ID_ary]]
+#			self.mdl_list[i].fit(x,y)
+#			x_master[:,i] = self.mdl_list[i].decision_function(x)
+#		#self.master_mdl.fit(x_master, y)
+#		##print(self.master_mdl.coef_)
+#		##for i, j in zip(self.G.name_list, self.master_mdl.coef_[0]):
+#		#		#print(i,j)
+#		##print('')
+#
+#	def decision(self, ID_ary):
+#		#x_master = np.zeros((len(ID_ary), len(self.G.mat_list)))
+#		#for i, mat in enumerate(self.G.mat_list):
+#		#	x = mat[self.G.IDmap[ID_ary]]
+#		#	x_master[:,i] = self.mdl_list[i].decision_function(x)
+#		#decision_ary = self.master_mdl.decision_function(x_master)
+#		decision_ary = np.zeros((len(ID_ary)))
+#		for i, mat in enumerate(self.G.mat_list):
+#			x = mat[self.G.IDmap[ID_ary]]
+#			decision_ary += self.mdl_list[i].decision_function(x)
+#		decision_ary /= len(self.mdl_list)
+#		return decision_ary
 
 class SVM(SLBase, LinearSVC):
 	def __init__(self, G, **kwargs):
