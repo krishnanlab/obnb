@@ -32,7 +32,7 @@ class CombLogRegCV(BaseModel):
 		# G here should be multi feature set
 		BaseModel.__init__(self, G)
 		self.mdl_list = [LogisticRegressionCV(**kwargs) for i in self.G.mat_list]
-		self.master_mdl = LogisticRegressionCV(**kwargs)
+		#self.master_mdl = LogisticRegressionCV(**kwargs)
 
 	def train(self, ID_ary, y):
 		x_master = np.zeros((len(ID_ary), len(self.G.mat_list)))
@@ -40,18 +40,23 @@ class CombLogRegCV(BaseModel):
 			x = mat[self.G.IDmap[ID_ary]]
 			self.mdl_list[i].fit(x,y)
 			x_master[:,i] = self.mdl_list[i].decision_function(x)
-		self.master_mdl.fit(x_master, y)
-		#print(self.master_mdl.coef_)
-		#for i, j in zip(self.G.name_list, self.master_mdl.coef_[0]):
-				#print(i,j)
-		#print('')
+		#self.master_mdl.fit(x_master, y)
+		##print(self.master_mdl.coef_)
+		##for i, j in zip(self.G.name_list, self.master_mdl.coef_[0]):
+		#		#print(i,j)
+		##print('')
 
 	def decision(self, ID_ary):
-		x_master = np.zeros((len(ID_ary), len(self.G.mat_list)))
+		#x_master = np.zeros((len(ID_ary), len(self.G.mat_list)))
+		#for i, mat in enumerate(self.G.mat_list):
+		#	x = mat[self.G.IDmap[ID_ary]]
+		#	x_master[:,i] = self.mdl_list[i].decision_function(x)
+		#decision_ary = self.master_mdl.decision_function(x_master)
+		decision_ary = np.zeros((len(ID_ary)))
 		for i, mat in enumerate(self.G.mat_list):
 			x = mat[self.G.IDmap[ID_ary]]
-			x_master[:,i] = self.mdl_list[i].decision_function(x)
-		decision_ary = self.master_mdl.decision_function(x_master)
+			decision_ary += self.mdl_list[i].decision_function(x)
+		decision_ary /= len(self.mdl_list)
 		return decision_ary
 
 class SVM(SLBase, LinearSVC):
