@@ -4,6 +4,7 @@ from sklearn.svm import LinearSVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from NLEval.model.BaseModel import BaseModel
+from copy import deepcopy
 
 __all__ = ['SLBase', 'LogReg', 'SVM', 'RF']
 
@@ -56,17 +57,39 @@ class CombLogRegCVBagging(CombSLBase):
 		return decision_ary
 
 class CombLogRegCVAdaBoost(CombSLBase):
-	def __init__(self, G, **kwargs):
+	def __init__(self, G, exclude=True, n_mdl=None, **kwargs):
+		"""Initialize LogisticRegression AdaBoost type ensemble
+
+		Args:
+			G (NLEval.graph.DenseGraph.MultiFeatureVec): multi-feature objects 
+				that contains multiple feature sets
+				exclude (bool): whether or not to exclude feature set upon selection
+			n_mdl (int): number of models to train, default is None, which uses 
+				the number of feature sets as n_mdl. Only used when exclude is 
+				set to be True
+        """
 		self.base_mdl = LogisticRegressionCV
 		CombSLBase.__init__(self, G, **kwargs)
 		self.coef_ = None
+		self.exclude = exclude
+		if self.exclude:
+			if n_mdl is not None:
+				print(f"Warning: n_mdl set to be {repr(n_mdl)} with exclude=False, set to None implicitly.")
+				n_mdl = None
+		self.n_mdl = n_mdl
 
 	def fit_master_mdl(self, ID_ary, y):
-		n_mdl = len(self.mdl_list)  # total number of models
-		selected_ind = np.zeros(n_mdl, dtype=bool)  # inidvator for selected model
+		n_mdl = len(self.mdl_list) if self.n_mdl is None else self.n_mdl  # total number of models
 		w = np.ones(len(ID_ary)) / len(ID_ary)  # data point weights
 		coef = np.zeros(n_mdl)  # model boosting coefficients
 		y_pred_mat = np.zeros((len(ID_ary), n_mdl), dtype=bool)  # predictions from all models
+
+		if self.exclude:
+			selected_ind = np.zeros(n_mdl, dtype=bool)  # inidvator for selected model
+		else:
+			mdl_idx_ary = np.zeros(n_mdl, dtype=int)  # index of features of corresponding boosting coefficients
+			mdl_list = self.mdl_list
+			self.mdl_list = []  # need to make new model list, previously tied to feature set index
 
 		# generate predictions from individual models
 		idx_ary = self.G.IDmap[ID_ary]
@@ -79,14 +102,20 @@ class CombLogRegCVAdaBoost(CombSLBase):
 			opt_err = np.inf
 			opt_idx = None
 
-			for j in range(n_mdl):
-				if selected_ind[j]:
-					continue
+			for j in range(len(self.G.mat_list)):
+				if self.exclude:
+					if selected_ind[j]:
+						continue
+					mdl = self.mdl_list[j]
+				else:
+					mdl = mdl_list[j]
 
 				# retrain model using sample weights
-				mdl = self.mdl_list[j]
+				#mdl = self.mdl_list[j]
 				x = self.G.mat_list[j][idx_ary]
-				mdl.fit(x, y, sample_weight=w)
+				# for first iteration, the model are already train with uniform weight
+				if i > 0:
+					mdl.fit(x, y, sample_weight=w)
 				y_pred_mat[:,j] = mdl.predict(x)
 
 				err = w[y_pred_mat[:,j] != y].sum()
@@ -102,7 +131,11 @@ class CombLogRegCVAdaBoost(CombSLBase):
 			w[y_pred_opt == y] *= np.exp(-a)  # down weight correct predictions
 			w[y_pred_opt != y] *= np.exp(a)  # up weight incorrect predictions
 			w /= w.sum()  # normalize data point weights
-			selected_ind[opt_idx] = True  # remove selected model from candidates
+			if self.exclude:
+				selected_ind[opt_idx] = True  # remove selected model from candidates
+			else:
+				mdl_idx_ary[i] = opt_idx
+				self.mdl_list.append(deepcopy(mdl_list[opt_idx]))
 			coef[opt_idx] = a
 			#print(f"Iter = {i}, optidx = {opt_idx}, optimal error = {opt_err}, accuracy = {(y_pred_opt==y).sum() / len(y)}")
 
@@ -113,14 +146,21 @@ class CombLogRegCVAdaBoost(CombSLBase):
 		#print(coef)
 
 		self.coef_ = coef  # set normalized bossting coefficients
+		if not self.exclude:
+			print(mdl_idx_ary)
+			print(coef)
+			print('')
+			self.mdlidx_ = mdl_idx_ary
 
 	def decision(self, ID_ary):
 		if self.coef_ is None:
 			raise ValueError("Master model untrained, train first using fit_master_mdl")
 
+		idx_ary = self.G.IDmap[ID_ary]
 		decision_ary = np.zeros((len(ID_ary)))
-		for i, mat in enumerate(self.G.mat_list):
-			x = mat[self.G.IDmap[ID_ary]]
+		iter_list = list(range(len(self.G.mat_list))) if self.exclude else self.mdlidx_
+		for i,j in enumerate(iter_list):
+			x = self.G.mat_list[j][idx_ary]
 			decision_ary += self.coef_[i] * self.mdl_list[i].decision_function(x)
 
 		return decision_ary
