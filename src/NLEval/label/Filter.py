@@ -154,6 +154,37 @@ class LabelsetRangeFilterSize(RangeFilter):
 	def get_mod_fun(lsc):
 		return lsc.popLabelset
 
+class LabelsetRangeFilterJaccard(RangeFilter):
+	"""Pop labelsets based on Jaccard indx"""
+	def __init__(self, max_val=None):
+		super(LabelsetRangeFilterJaccard, self).__init__(None, max_val)
+
+	@staticmethod
+	def get_val_getter(lsc):
+		# if jjaccard index greater than threshold, determin whether or not to 
+		# discard depending on the size, only discard the larger one
+		def val_getter(labelID):
+			val = 0
+			labelset = lsc.getLabelset(labelID)
+			for labelID2 in lsc.labelIDlst:
+				if labelID2 == labelID:  # skip self
+					continue
+				labelset2 = lsc.getLabelset(labelID2)
+				jidx = len(labelset & labelset2) / len(labelset | labelset2)
+				if (jidx > val) & (len(labelset) <= len(labelset2)):
+					val = jidx
+			return val
+
+		return val_getter
+
+	@staticmethod
+	def get_IDs(lsc):
+		return lsc.labelIDlst
+
+	@staticmethod
+	def get_mod_fun(lsc):
+		return lsc.popLabelset
+
 class LabelsetRangeFilterTrainTestPos(RangeFilter):
 	"""Pop labelsets based on number of positives in train/test sets"""
 	def __init__(self, min_val):
