@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 from sklearn.svm import LinearSVC
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import average_precision_score
 from NLEval.model.BaseModel import BaseModel
 from copy import deepcopy
 
@@ -133,10 +133,11 @@ class CombLogRegCVAdaBoost(CombSLBase):
 			w /= w.sum()  # normalize data point weights
 			if self.exclude:
 				selected_ind[opt_idx] = True  # remove selected model from candidates
+			    coef[opt_idx] = a
 			else:
 				mdl_idx_ary[i] = opt_idx
 				self.mdl_list.append(deepcopy(mdl_list[opt_idx]))
-			coef[opt_idx] = a
+			    coef[i] = a
 			#print(f"Iter = {i}, optidx = {opt_idx}, optimal error = {opt_err}, accuracy = {(y_pred_opt==y).sum() / len(y)}")
 
 		if coef.sum() == 0:
