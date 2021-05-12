@@ -115,7 +115,7 @@ class CombLogRegCVAdaBoost(CombSLBase):
 				x = self.G.mat_list[j][idx_ary]
 				# for first iteration, the model are already train with uniform weight
 				if i > 0:
-					mdl.fit(x, y, sample_weight=w)
+					mdl.fit(x, y, sample_weight=w/w.sum())
 				y_pred_mat[:,j] = mdl.predict(x)
 
 				err = w[y_pred_mat[:,j] != y].sum()
@@ -229,12 +229,12 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
 				x = self.G.mat_list[j][idx_ary]
 				# for first iteration, the model are already train with uniform weight
 				if i > 0:
-					mdl.fit(x, y, sample_weight=w)
+					mdl.fit(x, y, sample_weight=w/w.sum())
 				y_pred_mat[:,j] = mdl.predict(x)
 
 				#print(f"Normalized w = {w / w.sum()}")
 				r = average_precision_score(y, y_pred_mat[:,j], sample_weight=w/w.sum())
-				#print(f"r = {r}")
+				#print(f"r = {r}, j = {j}, n_pos = {n_pos}, {1 + skew}, w.sum() = {w.sum()}")
 				if r > opt_r:
 					opt_r = r
 					opt_idx = j
@@ -246,8 +246,9 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
 
 			w[y] *= w[y] * np.exp(-a * y_pred_opt[y])  # down weight positives
 			w[y] /= w[y].sum()
-			w[~y] *= skew * w[~y] * np.exp(a * y_pred_opt[~y])  # up weight negatives, weighted by skew
+			w[~y] *= w[~y] * np.exp(a * y_pred_opt[~y])  # up weight negatives, weighted by skew
 			w[~y] /= w[~y].sum()
+			w[~y] *= skew
 
 			if self.exclude:
 				selected_ind[opt_idx] = True  # remove selected model from candidates
@@ -257,8 +258,8 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
 				self.mdl_list.append(deepcopy(mdl_list[opt_idx]))
 				coef[i] = a
 
-			print(f"Iter = {i}, optidx = {opt_idx}, optimal r = {opt_r}, \
-prior = {n_pos / (n_pos + n_neg)}, auPRC = {np.log2(r * (n_pos + n_neg) / n_pos)}")
+			#print(f"Iter = {i}, optidx = {opt_idx}, optimal r = {opt_r}, \
+#prior = {n_pos / (n_pos + n_neg)}, auPRC = {np.log2(r * (n_pos + n_neg) / n_pos)}")
 
 		coef /= coef.sum()
 		#print(coef)
