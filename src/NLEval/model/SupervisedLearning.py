@@ -106,10 +106,8 @@ class CombLogRegCVAdaBoost(CombSLBase):
 					mdl = mdl_list[j]
 
 				# retrain model using sample weights
-				#mdl = self.mdl_list[j]
 				x = self.G.mat_list[j][idx_ary]
-				# for first iteration, the model are already train with uniform weight
-				if i > 0:
+				if i > 0:  # for first iteration, the model are already train with uniform weight
 					mdl.fit(x, y, sample_weight=w/w.sum())
 				y_pred_mat[:,j] = mdl.predict(x)
 
@@ -143,9 +141,7 @@ class CombLogRegCVAdaBoost(CombSLBase):
 
 		self.coef_ = coef  # set normalized bossting coefficients
 		if not self.exclude:
-			#print(mdl_idx_ary)
-			#print(coef)
-			#print('')
+			#print(mdl_idx_ary, '\n', coef, '\n')
 			self.mdlidx_ = mdl_idx_ary
 
 	def decision(self, ID_ary):
@@ -218,22 +214,17 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
 					mdl = mdl_list[j]
 
 				# retrain model using sample weights
-				#mdl = self.mdl_list[j]
 				x = self.G.mat_list[j][idx_ary]
-				# for first iteration, the model are already train with uniform weight
-				if i > 0:
+				if i > 0:  # for first iteration, the model are already train with uniform weight
 					mdl.fit(x, y, sample_weight=w/w.sum())
 				y_pred_mat[:,j] = mdl.predict(x)
 
-				#print(f"Normalized w = {w / w.sum()}")
 				r = average_precision_score(y, y_pred_mat[:,j], sample_weight=w/w.sum())
-				#print(f"r = {r}, j = {j}, n_pos = {n_pos}, {1 + skew}, w.sum() = {w.sum()}")
 				if r > opt_r:
 					opt_r = r
 					opt_idx = j
 
-			opt_r = min(opt_r, 0.99)
-			#print(f"opt_r = {opt_r}")
+			opt_r = min(opt_r, 0.99)  # prevent auprc of 1, causes divide by zero for a
 			a = 0.5 * np.log((1 + opt_r) / (1 - opt_r))  # model coefficient
 			y_pred_opt = y_pred_mat[:, opt_idx]  # decision scores of optimal model
 
@@ -259,9 +250,7 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
 
 		self.coef_ = coef  # set normalized bossting coefficients
 		if not self.exclude:
-			#print(mdl_idx_ary)
-			#print(coef)
-			#print('')
+			#print(mdl_idx_ary, '\n', coef, '\n')
 			self.mdlidx_ = mdl_idx_ary
 
 	def decision(self, ID_ary):
