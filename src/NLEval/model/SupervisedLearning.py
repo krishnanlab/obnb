@@ -123,6 +123,7 @@ class CombLogRegCVAdaBoost(CombSLBase):
 			y_pred_opt = y_pred_mat[:, opt_idx] == 1  # predictions of optimal model
 			w[y_pred_opt == y] *= np.exp(-a)  # down weight correct predictions
 			w[y_pred_opt != y] *= np.exp(a)  # up weight incorrect predictions
+			w[w<0.01] = 0.01  # prevent zero sample weight
 			w /= w.sum()  # normalize data point weights
 			if self.exclude:
 				selected_ind[opt_idx] = True  # remove selected model from candidates
@@ -229,10 +230,13 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
 			y_pred_opt = y_pred_mat[:, opt_idx]  # decision scores of optimal model
 
 			w[y] *= w[y] * np.exp(-a * y_pred_opt[y])  # down weight positives
-			w[y] /= w[y].sum()
 			w[~y] *= w[~y] * np.exp(a * y_pred_opt[~y])  # up weight negatives, weighted by skew
+			w[w<0.01] = 0.01  # prevent zero sample weight
+			w[y] /= w[y].sum()
 			w[~y] /= w[~y].sum()
 			w[~y] *= skew
+			#if (w == 0).sum() > 0:
+			#	print("FK", (w==0).sum(), (w==0).sum()/len(w))
 
 			if self.exclude:
 				selected_ind[opt_idx] = True  # remove selected model from candidates
