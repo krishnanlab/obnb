@@ -83,6 +83,7 @@ class CombLogRegCVAdaBoost(CombSLBase):
 		w = np.ones(len(ID_ary)) / len(ID_ary)  # data point weights
 		coef = np.zeros(n_mdl)  # model boosting coefficients
 		y_pred_mat = np.zeros((len(ID_ary), n_mdl), dtype=bool)  # predictions from all models
+		idx_ary = self.G.IDmap[ID_ary]
 
 		if self.exclude:
 			selected_ind = np.zeros(n_mdl, dtype=bool)  # inidvator for selected model
@@ -90,12 +91,6 @@ class CombLogRegCVAdaBoost(CombSLBase):
 			mdl_idx_ary = np.zeros(n_mdl, dtype=int)  # index of features of corresponding boosting coefficients
 			mdl_list = self.mdl_list
 			self.mdl_list = []  # need to make new model list, previously tied to feature set index
-
-		# generate predictions from individual models
-		idx_ary = self.G.IDmap[ID_ary]
-		for i, mdl in enumerate(self.mdl_list):
-			x = self.G.mat_list[i][idx_ary]
-			y_pred_mat[:,i] = mdl.predict(x)
 
 		# determine boosting coefficients
 		for i in range(n_mdl):
@@ -168,7 +163,10 @@ class CombLogRegCVAdaBoost(CombSLBase):
 
 class CombLogRegCVModifiedRankBoost(CombSLBase):
 	def __init__(self, G, exclude=True, n_mdl=None, **kwargs):
-		"""Initialize LogisticRegression AdaBoost type ensemble
+		"""Initialize LogisticRegression ModifiedRankBoost ensemble
+
+		Notes:
+			This implementation follows from http://pages.cs.wisc.edu/~shavlik/abstracts/oliphant.ilp09.abstract.html
 
 		Args:
 			G (NLEval.graph.DenseGraph.MultiFeatureVec): multi-feature objects 
@@ -197,6 +195,7 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
 		w = np.ones(len(ID_ary)) / n_pos  # data point weights
 		coef = np.zeros(n_mdl)  # model boosting coefficients
 		y_pred_mat = np.zeros((len(ID_ary), n_mdl), dtype=bool)  # predictions from all models
+		idx_ary = self.G.IDmap[ID_ary]
 
 		if self.exclude:
 			selected_ind = np.zeros(n_mdl, dtype=bool)  # inidvator for selected model
@@ -204,12 +203,6 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
 			mdl_idx_ary = np.zeros(n_mdl, dtype=int)  # index of features of corresponding boosting coefficients
 			mdl_list = self.mdl_list
 			self.mdl_list = []  # need to make new model list, previously tied to feature set index
-
-		# generate predictions from individual models
-		idx_ary = self.G.IDmap[ID_ary]
-		for i, mdl in enumerate(self.mdl_list):
-			x = self.G.mat_list[i][idx_ary]
-			y_pred_mat[:,i] = mdl.predict(x)
 
 		# determine boosting coefficients
 		for i in range(n_mdl):
