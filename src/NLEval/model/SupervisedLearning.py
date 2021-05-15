@@ -159,7 +159,7 @@ class CombLogRegCVAdaBoost(CombSLBase):
 		return decision_ary
 
 class CombLogRegCVModifiedRankBoost(CombSLBase):
-	def __init__(self, G, exclude=True, n_mdl=None, **kwargs):
+	def __init__(self, G, exclude=True, n_mdl=None, retrain=True, **kwargs):
 		"""Initialize LogisticRegression ModifiedRankBoost ensemble
 
 		Notes:
@@ -172,11 +172,15 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
 			n_mdl (int): number of models to train, default is None, which uses 
 				the number of feature sets as n_mdl. Only used when exclude is 
 				set to be True
+			retrain (bool): whether or not to retrain model in each iteration
+				using sample weights, default is True
+				
         """
 		self.base_mdl = LogisticRegressionCV
 		CombSLBase.__init__(self, G, **kwargs)
 		self.coef_ = None
 		self.exclude = exclude
+		self.retrain = retrain
 		if self.exclude:
 			if n_mdl is not None:
 				print(f"Warning: n_mdl set to be {repr(n_mdl)} with exclude=False, set to None implicitly.")
@@ -216,7 +220,7 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
 
 				# retrain model using sample weights
 				x = self.G.mat_list[j][idx_ary]
-				if i > 0:  # for first iteration, the model are already train with uniform weight
+				if (i > 0) & self.retrain:
 					mdl.fit(x, y, sample_weight=w/w.sum())
 				y_pred_mat[:,j] = mdl.predict(x)
 
