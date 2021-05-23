@@ -195,7 +195,7 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
 
 		w = np.ones(len(ID_ary)) / n_pos  # data point weights
 		coef = np.zeros(n_mdl)  # model boosting coefficients
-		y_pred_mat = np.zeros((len(ID_ary), n_mdl), dtype=bool)  # predictions from all models
+		y_pred_mat = np.zeros((len(ID_ary), len(self.G.mat_list)), dtype=bool)  # predictions from all features
 		idx_ary = self.G.IDmap[ID_ary]
 
 		if self.exclude:
@@ -219,10 +219,10 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
 					mdl = mdl_list[j]
 
 				# retrain model using sample weights
-				x = self.G.mat_list[j][idx_ary]
 				if (i > 0) & self.retrain:
+					x = self.G.mat_list[j][idx_ary]
 					mdl.fit(x, y, sample_weight=w/w.sum())
-				y_pred_mat[:,j] = mdl.predict(x)
+					y_pred_mat[:,j] = mdl.predict(x)
 
 				r = average_precision_score(y, y_pred_mat[:,j], sample_weight=w/w.sum())
 				if r > opt_r:
