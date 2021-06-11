@@ -18,7 +18,8 @@ class ParDat:
 					job_id = conn.recv()
 				conn.close()
 
-			n_jobs = checkers.checkWorkers(self.n_jobs, len(self.iter_obj))
+			#n_jobs = checkers.checkWorkers(self.n_jobs, len(self.iter_obj))
+			n_jobs = self.n_jobs
 			q = mp.Queue()
 			p = {}
 			PrConn = {}
