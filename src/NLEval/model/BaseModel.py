@@ -83,6 +83,21 @@ class BaseModel:
 		return y_true, y_predict
 
 	def predict(self, pos_ID_set, neg_ID_set):
+		"""Network wise prediction
+
+		Given positive and negative examples, train the model and then generate 
+		predictions for all nodes in the network and return as prediction score 
+		dictionary.
+
+		Input:
+			pos_ID_set (:obj:`set` of :obj:`str`): set of IDs of positive examples.
+			neg_ID_set (:obj:`set` of :obj:`str`): set of IDs of negative examples.
+
+		Output:
+			score_dict (:obj:`dict` of :obj:`str` -> :obj:`float`): dictionary 
+				mapping node IDs to prediction scores
+
+		"""
 		G = self.G
 		ID_list = G.IDmap.lst
 
