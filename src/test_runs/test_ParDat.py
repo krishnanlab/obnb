@@ -1,3 +1,5 @@
+from sys import path
+path.append("../")
 from NLEval.wrapper import ParWrap
 import time
 
