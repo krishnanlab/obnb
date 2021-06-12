@@ -56,6 +56,26 @@ class CombLogRegCVBagging(CombSLBase):
 		decision_ary /= len(self.mdl_list)
 		return decision_ary
 
+class CombLogRegCVPredComb(CombSLBase):
+	def __init__(self, G, mixing_ratio=0.5, **kwargs):
+		if len(G.mat_list) != 2:
+			raise ValueError("PredComb only takes two input features sets, but " \
+							+ f"the input has {len(G.mat_list)} number of feature sets")
+		self.mixing_ratio=0.5
+		self.base_mdl = LogisticRegressionCV
+		CombSLBase.__init__(self, G, **kwargs)
+
+	def fit_master_mdl(self, ID_ary, y):
+		pass
+
+	def decision(self, ID_ary):
+		decision_ary = np.zeros((len(ID_ary)))
+		factors = [self.mixing_ratio, 1 - self.mixing_ratio]
+		for i, mat in enumerate(self.G.mat_list):
+			x = mat[self.G.IDmap[ID_ary]]
+			decision_ary += factors[i] * self.mdl_list[i].decision_function(x)
+		return decision_ary
+
 class CombLogRegCVAdaBoost(CombSLBase):
 	def __init__(self, G, exclude=True, n_mdl=None, **kwargs):
 		"""Initialize LogisticRegression AdaBoost type ensemble
