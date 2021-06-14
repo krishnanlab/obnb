@@ -61,7 +61,7 @@ class CombLogRegCVPredComb(CombSLBase):
 		if len(G.mat_list) != 2:
 			raise ValueError("PredComb only takes two input features sets, but " \
 							+ f"the input has {len(G.mat_list)} number of feature sets")
-		self.mixing_ratio=0.5
+		self.mixing_ratio=mixing_ratio
 		self.base_mdl = LogisticRegressionCV
 		CombSLBase.__init__(self, G, **kwargs)
 
