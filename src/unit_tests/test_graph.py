@@ -205,7 +205,7 @@ class TestFeatureVec(unittest.TestCase):
 		graph.dim = int(10)
 		self.assertEqual(graph.dim, 10)
 		# test type np.int --> success
-		graph.dim = np.int(9)
+		graph.dim = int(9)
 		self.assertEqual(graph.dim, 9)
 		# test type np.int64 --> success
 		graph.dim = np.int64(10)
@@ -225,7 +225,7 @@ class TestFeatureVec(unittest.TestCase):
 		self.assertEqual(graph.dim, 10)
 		# test type np.float --> error
 		with self.assertRaises(TypeError):
-			graph.dim = np.float(5)
+			graph.dim = float(5)
 		self.assertEqual(graph.dim, 10)
 
 	def test_mat(self):

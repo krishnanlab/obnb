@@ -477,10 +477,10 @@ class TestCheckers(unittest.TestCase):
 		self.n = n
 		self.n_str = str(n)
 		self.n_int = int(n)
-		self.n_npint = np.int(n)
+		self.n_npint = int(n)
 		self.n_npint64 = np.int64(n)
 		self.n_float = float(n)
-		self.n_npfloat = np.float(n)
+		self.n_npfloat = float(n)
 		self.n_npfloat128 = np.float128(n)
 		self.n_int_tuple = (int(n), int(n), int(n))
 		self.n_int_lst = [int(n), int(n), int(n)]
