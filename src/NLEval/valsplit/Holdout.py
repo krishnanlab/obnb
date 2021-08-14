@@ -54,11 +54,10 @@ class TrainValTest(BaseHoldout):
 
 		n = len(sorted_ID_list)
 		train_size = np.floor(n * self.train_ratio).astype(int)
-		test_size = np.floor(n * self. test_ratio).astype(int)
-		val_size = n - train_size - test_size
+		test_size = np.floor(n * self.test_ratio).astype(int)
 
 		self._test_ID_ary = np.array(sorted_ID_list[:test_size])
-		self._val_ID_ary = np.array(sorted_ID_list[test_size:-train_size])
+		self._valid_ID_ary = np.array(sorted_ID_list[test_size:-train_size])
 		self._train_ID_ary = np.array(sorted_ID_list[-train_size:])
 
 class BinHold(BaseHoldout):

@@ -18,7 +18,7 @@ class BaseValSplit:
 		checkers.checkType("shuffle", bool, val)
 		self._shuffle = val
 
-	def split(self, ID_ary, label_ary):
+	def split(self, ID_ary, label_ary, valid=False):
 		"""Split labelset into training, testing (and validation) sets
 
 		Given matching arrays of node IDs and label (currently only support 
@@ -34,6 +34,8 @@ class BaseValSplit:
 			ID_ary(:obj:`numpy.ndarray` of :obj:`str`): array of entity IDs
 			label_ary(:obj:`numpy.ndarray` of :obj:`bool`):
 				boolean/binary array of indicating positive samples
+			valid(bool): whether or not to generate validation split, default 
+				is False
 
 		Yields:
 			train_ID_ary(:obj:`numpy.ndarray` of :obj:`str`):
@@ -44,14 +46,14 @@ class BaseValSplit:
 				numpy array of testing IDs
 			test_label_ary(:obj:`numpy.ndarray` of :obj:`bool`):
 				numpy array of testing labels
-			val_ID_ary(:obj:`numpy.ndarray` of :obj:`str`):
-				optional, numpy array of validation IDs
-			val_label_ary(:obj:`numpy.ndarray` of :obj:`bool`):
-				optional, numpy array of validation labels
+			valid_ID_ary(:obj:`numpy.ndarray` of :obj:`str`):
+				for `valid=True`, numpy array of validation IDs
+			valid_label_ary(:obj:`numpy.ndarray` of :obj:`bool`):
+				for `valid=True`, numpy array of validation labels
 
 		"""
 		# train, test (and validation) index arrays
-		for idx_arys in self.get_split_idx_ary(ID_ary, label_ary):
+		for idx_arys in self.get_split_idx_ary(ID_ary, label_ary, valid):
 			out = ()
 			for idx_ary in idx_arys:
 				if self.shuffle:
@@ -75,7 +77,7 @@ class BaseHoldout(BaseValSplit):
 		super(BaseHoldout, self).__init__(shuffle=shuffle)
 		self.train_on = train_on
 		self._test_ID_ary = None
-		self._val_ID_ary = None
+		self._valid_ID_ary = None
 		self._train_ID_ary = None
 
 	@property
@@ -83,8 +85,8 @@ class BaseHoldout(BaseValSplit):
 		return self._train_ID_ary.copy()
 
 	@property
-	def val_ID_ary(self):
-		return self._val_ID_ary.copy()
+	def valid_ID_ary(self):
+		return self._valid_ID_ary.copy()
 	
 	@property
 	def test_ID_ary(self):
@@ -127,12 +129,19 @@ class BaseHoldout(BaseValSplit):
 					common_ID_list.append(ID)
 		return common_ID_list
 
-	def get_split_idx_ary(self, ID_ary, label_ary):
+	def get_split_idx_ary(self, ID_ary, label_ary, valid):
 		assert (self._test_ID_ary is not None) & (self._train_ID_ary is not None), \
 			"Training or testing sets not available, run `train_test_setup` first"
 		train_idx_ary = np.where(np.in1d(ID_ary, self.train_ID_ary))[0]
 		test_idx_ary = np.where(np.in1d(ID_ary, self.test_ID_ary))[0]
-		yield train_idx_ary, test_idx_ary
+		if valid:
+			assert self._valid_ID_ary is not None, \
+				"Validation set is only available for TrainValTest split " + \
+				"type, current split type is %s"%repr(type(self))
+			valid_idx_ary = np.where(np.in1d(ID_ary, self.valid_ID_ary))[0]
+			yield train_idx_ary, valid_idx_ary, test_idx_ary
+		else:
+			yield train_idx_ary, test_idx_ary
 	
 
 class BaseInterface(BaseValSplit):
