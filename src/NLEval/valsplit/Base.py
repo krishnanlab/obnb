@@ -104,11 +104,6 @@ class BaseHoldout(BaseValSplit):
 		if val not in ['top','bot']:
 			raise ValueError("Train on must be 'top' or 'bot', not '%s'"%repr(val))
 		self._train_on = val
-		self._reverse = val == 'bot'
-
-	@property
-	def reverse(self):
-		return self._reverse
 
 	def get_common_ID_list(self, lscIDs, nodeIDs):
 		"""Get list of common IDs between labelset collection and graph

@@ -41,11 +41,11 @@ class BinHold(BaseHoldout):
 		"""
 		lscIDs._check_prop_existence(prop_name, True)
 		common_ID_list = self.get_common_ID_list(lscIDs, nodeIDs)
-		sorted_ID_list = sorted(common_ID_list, reverse=self.reverse, \
+		sorted_ID_list = sorted(common_ID_list, reverse=self.train_on=='bot', \
 			key=lambda ID: lscIDs.getProp(ID, prop_name))
-		bin_size = len(sorted_ID_list) // self.bin_num
+		bin_size = np.floor(len(sorted_ID_list) / self.bin_num)
 		self._test_ID_ary = np.array(sorted_ID_list[:bin_size])
-		self._train_ID_ary = np.array(sorted_ID_list[bin_size:])
+		self._train_ID_ary = np.array(sorted_ID_list[-bin_size:])
 
 class ThreshHold(BaseHoldout):
 	def __init__(self, cut_off, train_on='top', shuffle=False):
@@ -90,8 +90,11 @@ class ThreshHold(BaseHoldout):
 						top_list.append(ID)
 					else:
 						bot_list.append(ID)
-		self._train_ID_ary = np.array(top_list) if self.reverse else np.array(bot_list)
-		self._test_ID_ary = np.array(bot_list) if self.reverse else np.array(top_list)
+
+		if self.train_on == 'top':
+			self._train_ID_ary, self._test_ID_ary = top_list, bot_list
+		else:
+			self._train_ID_ary, self._test_ID_ary = bot_list, top_list
 
 class CustomHold(BaseHoldout):
 	def __init__(self, custom_train_ID_ary, custom_test_ID_ary, shuffle=False):
