@@ -341,7 +341,7 @@ class SplitLSC(BaseLSC):
 				"See `NLEval.valsplit` for more info.")
 		self.valsplit.train_test_setup(self.entity, graph.IDmap, prop_name)
 		if min_pos is not None:
-			self.apply(Filter.LabelsetRangeFilterTrainTestPos(min_pos))
+			self.apply(Filter.LabelsetRangeFilterTrainTestPos(min_pos), inplace=True)
 
 	def splitLabelset(self, labelID, entityIDlst=None):
 		"""Split up a labelset by training and testing sets
