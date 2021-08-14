@@ -4,6 +4,63 @@ import numpy as np
 
 __all__ = ['BinHold', 'ThreshHold', 'CustomHold', 'TrainTestAll']
 
+class TrainValTest(BaseHoldout):
+	"""Split into train-val-test sets by ratios
+
+	Sort the entities based on the desired properties and then prepare the 
+	splits according to the train-val-test ratio.
+
+	"""
+	def __init__(self, train_ratio, test_ratio, train_on='top', shuffle=False):
+		super(TrainValTest, self).__init__(train_on=train_on, shuffle=shuffle)
+		self.train_ratio = train_ratio
+		self.test_ratio = test_ratio
+
+	def __repr__(self):
+		# TODO: make repr a super magic fun, automatically generate for children.
+		return 'TrainValTest(train_ratio=%s, test_ratio=%s, train_on=%s)'%\
+		(repr(self.train_ratio), repr(self.test_ratio), repr(self.train_on))
+
+	@property
+	def train_ratio(self):
+		return self._train_ratio
+
+	@property
+	def test_ratio(self):
+		return self._test_ratio
+	
+	@train_ratio.setter
+	def train_ratio(self, val):
+		checkers.checkTypeErrNone('Training ratio', checkers.FLOAT_TYPE, val)
+		if (val <= 0) | (val > 1):
+			raise ValueError("Training ratio must be between 0 and 1, received value %f"%val)
+		self._train_ratio = val
+	
+	@test_ratio.setter
+	def test_ratio(self, val):
+		checkers.checkTypeErrNone('Testing ratio', checkers.FLOAT_TYPE, val)
+		if (val <= 0) | (val > 1):
+			raise ValueError("Testing ratio must be between 0 and 1, received value %f"%val)
+		if self.train_ratio + val >=1:
+			raise ValueError("Sum of training and testing ratio must be less than 1" + 
+				", received train_raio = %f, and test_ratio = %f"%(self.train_ratio, val))
+		self._test_ratio = val
+
+	def train_test_setup(self, lscIDs, nodeIDs, prop_name, **kwargs):
+		lscIDs._check_prop_existence(prop_name, True)
+		common_ID_list = self.get_common_ID_list(lscIDs, nodeIDs)
+		sorted_ID_list = sorted(common_ID_list, reverse=self.train_on=='bot', \
+			key=lambda ID: lscIDs.getProp(ID, prop_name))
+
+		n = len(sorted_ID_list)
+		train_size = np.floor(n * self.train_ratio).astype(int)
+		test_size = np.floor(n * self. test_ratio).astype(int)
+		val_size = n - train_size - test_size
+
+		self._test_ID_ary = np.array(sorted_ID_list[:test_size])
+		self._val_ID_ary = np.array(sorted_ID_list[test_size:-train_size])
+		self._train_ID_ary = np.array(sorted_ID_list[-train_size:])
+
 class BinHold(BaseHoldout):
 	def __init__(self, bin_num, train_on='top', shuffle=False):
 		"""
@@ -43,7 +100,7 @@ class BinHold(BaseHoldout):
 		common_ID_list = self.get_common_ID_list(lscIDs, nodeIDs)
 		sorted_ID_list = sorted(common_ID_list, reverse=self.train_on=='bot', \
 			key=lambda ID: lscIDs.getProp(ID, prop_name))
-		bin_size = np.floor(len(sorted_ID_list) / self.bin_num)
+		bin_size = np.floor(len(sorted_ID_list) / self.bin_num).astype(int)
 		self._test_ID_ary = np.array(sorted_ID_list[:bin_size])
 		self._train_ID_ary = np.array(sorted_ID_list[-bin_size:])
 
