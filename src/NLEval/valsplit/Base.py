@@ -19,7 +19,11 @@ class BaseValSplit:
 		self._shuffle = val
 
 	def split(self, ID_ary, label_ary):
-		"""Split samples into training and testing sets
+		"""Split labelset into training, testing (and validation) sets
+
+		Given matching arrays of node IDs and label (currently only support 
+		binary labels), this function yields the IDs and label for training, 
+		testing (and validation) splits, by calling ``get_split_idx_ary``.
 
 		Note:
 			ID_ary and label_ary are coulpled, such that a particular entry
@@ -40,17 +44,20 @@ class BaseValSplit:
 				numpy array of testing IDs
 			test_label_ary(:obj:`numpy.ndarray` of :obj:`bool`):
 				numpy array of testing labels
+			val_ID_ary(:obj:`numpy.ndarray` of :obj:`str`):
+				optional, numpy array of validation IDs
+			val_label_ary(:obj:`numpy.ndarray` of :obj:`bool`):
+				optional, numpy array of validation labels
 
 		"""
-		for train_idx_ary, test_idx_ary in self.get_split_idx_ary(ID_ary, label_ary):
-			if self.shuffle:
-				np.random.shuffle(train_idx_ary)
-				np.random.shuffle(test_idx_ary)
-			train_ID_ary = ID_ary[train_idx_ary]
-			train_label_ary = label_ary[train_idx_ary]
-			test_ID_ary = ID_ary[test_idx_ary]
-			test_label_ary = label_ary[test_idx_ary]
-			yield train_ID_ary, train_label_ary, test_ID_ary, test_label_ary
+		# train, test (and validation) index arrays
+		for idx_arys in self.get_split_idx_ary(ID_ary, label_ary):
+			out = ()
+			for idx_ary in idx_arys:
+				if self.shuffle:
+					np.random.shuffle(idx_ary)
+				out += (ID_ary[idx_ary], label_ary[idx_ary])
+			yield out
 
 class BaseHoldout(BaseValSplit):
 	def __init__(self, train_on='top', shuffle=False):
@@ -60,17 +67,24 @@ class BaseHoldout(BaseValSplit):
 		either top or bottom set and test on the other, depending on 
 		user specification of `train_on`. If 'top' specified, those samples 
 		with properties of larger values are used for training, and those 
-		with smaller values are used for testing, vice versa.
+		with smaller values are used for testing, and vice versa. The 
+		``train_ID_ary`` and ``test_ID_ary`` will be constructed by more 
+		specific hold-out class.
 
 		"""
 		super(BaseHoldout, self).__init__(shuffle=shuffle)
 		self.train_on = train_on
 		self._test_ID_ary = None
+		self._val_ID_ary = None
 		self._train_ID_ary = None
 
 	@property
 	def train_ID_ary(self):
 		return self._train_ID_ary.copy()
+
+	@property
+	def val_ID_ary(self):
+		return self._val_ID_ary.copy()
 	
 	@property
 	def test_ID_ary(self):
@@ -99,9 +113,13 @@ class BaseHoldout(BaseValSplit):
 	def get_common_ID_list(self, lscIDs, nodeIDs):
 		"""Get list of common IDs between labelset collection and graph
 
+		Note:
+			Only included IDs that are part of at least one labelset
+
 		Args:
-			lscIDs(:obj:`NLEval.util.IDHandler.IDprop`):
-			nodeIDs(:obj:`NLEval.util.IDHandler.IDmap`):
+			lscIDs(:obj:`NLEval.util.IDHandler.IDprop`): ID list of labelset 
+				collection
+			nodeIDs(:obj:`NLEval.util.IDHandler.IDmap`): ID list of graph
 
 		"""
 		checkers.checkType("ID for labelset collection entities", IDHandler.IDprop, lscIDs)
