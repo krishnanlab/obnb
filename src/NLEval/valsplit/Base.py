@@ -129,20 +129,23 @@ class BaseHoldout(BaseValSplit):
 					common_ID_list.append(ID)
 		return common_ID_list
 
-	def get_split_idx_ary(self, ID_ary, label_ary=None, valid=False):
+	def check_split_setup(self, valid):
 		assert (self._test_ID_ary is not None) & (self._train_ID_ary is not None), \
 			"Training or testing sets not available, run `train_test_setup` first"
-		train_idx_ary = np.where(np.in1d(ID_ary, self.train_ID_ary))[0]
-		test_idx_ary = np.where(np.in1d(ID_ary, self.test_ID_ary))[0]
 		if valid:
 			assert self._valid_ID_ary is not None, \
 				"Validation set is only available for TrainValTest split " + \
 				"type, current split type is %s"%repr(type(self))
+
+	def get_split_idx_ary(self, ID_ary, label_ary=None, valid=False):
+		self.check_split_setup(valid)
+		train_idx_ary = np.where(np.in1d(ID_ary, self.train_ID_ary))[0]
+		test_idx_ary = np.where(np.in1d(ID_ary, self.test_ID_ary))[0]
+		if valid:
 			valid_idx_ary = np.where(np.in1d(ID_ary, self.valid_ID_ary))[0]
 			yield train_idx_ary, valid_idx_ary, test_idx_ary
 		else:
-			yield train_idx_ary, test_idx_ary
-	
+			yield train_idx_ary, test_idx_ary	
 
 class BaseInterface(BaseValSplit):
 	"""Base interface with user defined validation split generator"""
