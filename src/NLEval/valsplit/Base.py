@@ -129,7 +129,7 @@ class BaseHoldout(BaseValSplit):
 					common_ID_list.append(ID)
 		return common_ID_list
 
-	def get_split_idx_ary(self, ID_ary, label_ary, valid):
+	def get_split_idx_ary(self, ID_ary, label_ary=None, valid=False):
 		assert (self._test_ID_ary is not None) & (self._train_ID_ary is not None), \
 			"Training or testing sets not available, run `train_test_setup` first"
 		train_idx_ary = np.where(np.in1d(ID_ary, self.train_ID_ary))[0]
