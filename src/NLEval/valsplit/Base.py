@@ -82,15 +82,15 @@ class BaseHoldout(BaseValSplit):
 
 	@property
 	def train_ID_ary(self):
-		return self._train_ID_ary.copy()
+		return None if self._train_ID_ary is None else self._train_ID_ary.copy()
 
 	@property
 	def valid_ID_ary(self):
-		return self._valid_ID_ary.copy()
+		return None if self._valid_ID_ary is None else self._valid_ID_ary.copy()
 	
 	@property
 	def test_ID_ary(self):
-		return self._test_ID_ary.copy()
+		return None if self._test_ID_ary is None else self._test_ID_ary.copy()
 
 	@property
 	def train_on(self):
