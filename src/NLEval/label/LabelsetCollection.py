@@ -361,3 +361,41 @@ class SplitLSC(BaseLSC):
 		label_ary = np.zeros(len(ID_ary), dtype=bool)
 		label_ary[:len(pos_ID_set)] = True
 		return self.valsplit.split(ID_ary, label_ary)
+
+	def export_splits(self, fp, graph):
+		"""Export (holdout) split information to npz file
+
+		Notes:
+			* Only allow ``Holdout`` split type for now, since it is not 
+				specific for each label
+			* Ignores neutral and set everything not positives as negatives, 
+				in the future, add an option to allow neutral labels by 
+				setting positive, neutral, and negative as +1, 0, and -1, 
+				respectively
+			* Currently not checking whether the validation split is aligned 
+				with the graph, in the future, need to think of a way to make 
+				sure this is checked
+
+		Args:
+			fp(str): output file path
+			graph(:obj:`NLEval.graph`): graph object, more specifically the IDs 
+				of the nodes in the graph, used for filtering IDs
+
+		"""
+		checkers.checkType("Labelset collection splitter (only support Holdout split now)", 
+			Base.BaseHoldout, self.valsplit)
+		valid = False if self.valsplit.valid_ID_ary is None else True
+		self.valsplit.check_split_setup(valid)
+
+		train_idx = graph.IDmap[self.valsplit.train_ID_ary]
+		test_idx = graph.IDmap[self.valsplit.test_ID_ary]
+		valid_idx = graph.IDmap[self.valsplit.valid_ID_ary] if valid else np.NaN
+
+		y = np.zeros((graph.size, len(self.labelIDlst)), dtype=bool)
+		for i, labelID in enumerate(self.labelIDlst):
+			pos_ID_ary = np.array(list(self.getLabelset(labelID)))
+			pos_idx_ary = graph.IDmap[pos_ID_ary]
+			y[pos_idx_ary, i] = True
+
+		np.savez(fp, y=y, train_idx=train_idx, valid_idx=valid_idx, 
+			test_idx=test_idx, IDs=graph.IDmap.lst, labelIDs=self.labelIDlst)
