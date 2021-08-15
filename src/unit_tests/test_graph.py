@@ -167,8 +167,10 @@ class TestDenseGraph(unittest.TestCase):
 		idmap.addID('b')
 		mat1 = np.random.random((2,2))
 		mat2 = np.random.random((3,2))
-		# test consistent size input --> success
+		# test consistent size input, using idmap --> success
 		graph = DenseGraph.DenseGraph.construct_graph(idmap, mat1)
+		# test consistent size input, using idlst --> success
+		graph = DenseGraph.DenseGraph.construct_graph(idmap.lst, mat1)
 		# test inconsistent size input --> error
 		self.assertRaises(AssertionError, DenseGraph.DenseGraph.construct_graph, idmap, mat2)
 

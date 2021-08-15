@@ -57,7 +57,17 @@ class DenseGraph(BaseGraph):
 		return self.mat[self.IDmap[ID1], self.IDmap[ID2]]
 
 	@classmethod
-	def construct_graph(cls, idmap, mat):
+	def construct_graph(cls, ids, mat):
+		"""Construct DenseGraph using ids and adjcency matrix
+
+		Args:
+			ids(list or :obj:`IDHandler.IDmap`): list of IDs or IDmap of the 
+				adjacency matrix
+			mat(:obj:`numpy.ndarray`): 2D numpy array of adjacency matrix
+
+		"""
+		idmap = ids if isinstance(ids, IDHandler.IDmap) \
+			else IDHandler.IDmap.from_list(ids)
 		assert idmap.size == mat.shape[0]
 		graph = cls()
 		graph.IDmap = idmap
@@ -66,8 +76,11 @@ class DenseGraph(BaseGraph):
 
 	@classmethod
 	def from_mat(cls, mat):
-		"""Construct BaseGraph object from numpy array
-		First column of mat encodes ID
+		"""Construct DenseGraph object from numpy array
+
+		Note:
+			First column of mat encodes ID, must be integers
+
 		"""
 		idmap = IDHandler.IDmap()
 		for ID in mat[:,0]:
