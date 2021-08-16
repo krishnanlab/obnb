@@ -9,9 +9,9 @@ class ParDat:
 		self.n_workers = n_workers
 		self.verbose = verbose
 
-		self.q = mp.Queue()
-		self.p = []
-		self.PrConn = []
+		self._q = mp.Queue()
+		self._p = []
+		self._PrConn = []
 
 	def __call__(self, func):
 		def wrapper(**kwargs):
@@ -22,7 +22,7 @@ class ParDat:
 
 			if n_workers > 1:
 				for job_id in range(n_jobs):
-					if len(self.p) < n_workers:
+					if len(self._p) < n_workers:
 						self.spawn(func, kwargs)
 					else:
 						yield self.next(job_id)
@@ -79,28 +79,28 @@ class ParDat:
 		# configure new child process and setup communication
 		PrConn, ChConn = mp.Pipe()
 		new_process = mp.Process(target=ParDat.worker, 
-			args=(ChConn, self.q, self.job_list, func, kwargs))
+			args=(ChConn, self._q, self.job_list, func, kwargs))
 		new_process.daemon = True
 
 		# launch process and send job id
-		worker_id = len(self.p)
+		worker_id = len(self._p)
 		new_process.start()
 		PrConn.send(worker_id)
 
 		# put communication and process to master lists
-		self.PrConn.append(PrConn)
-		self.p.append(new_process)
+		self._PrConn.append(PrConn)
+		self._p.append(new_process)
 
 	def next(self, job_id):
-		worker_id, result = self.q.get()
-		self.PrConn[worker_id].send(job_id)
+		worker_id, result = self._q.get()
+		self._PrConn[worker_id].send(job_id)
 		self.log()
 		return result
 
 	def terminate(self):
-		for _ in self.p:
-			worker_id, result = self.q.get()
-			self.PrConn[worker_id].send(None)
+		for _ in self._p:
+			worker_id, result = self._q.get()
+			self._PrConn[worker_id].send(None)
 			self.log()
 			yield result
 
