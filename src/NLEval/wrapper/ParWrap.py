@@ -17,7 +17,8 @@ class ParDat:
 		def wrapper(**kwargs):
 			#n_workers = checkers.checkWorkers(self.n_workers, len(self.job_list))
 			n_workers = self.n_workers
-			n_jobs = len(self.job_list)
+			n_jobs = self._n_jobs = len(self.job_list)
+			self._n_finished = 0
 
 			if n_workers > 1:
 				for job_id in range(n_jobs):
@@ -29,7 +30,9 @@ class ParDat:
 					yield result
 			else:
 				for job in self.job_list:
+					self.log()
 					yield func(job, **kwargs)
+
 		return wrapper
 
 	@staticmethod
@@ -48,7 +51,9 @@ class ParDat:
 	@n_workers.setter
 	def n_workers(self, n):
 		checkers.checkTypeErrNone('n_workers', int, n)
-		if n < 1:
+		if n == 0:
+			n = mp.cpu_count()
+		elif n < 0:
 			raise ValueError("n_workers must be positive number")
 		self._n_workers = n
 
@@ -77,7 +82,7 @@ class ParDat:
 			args=(ChConn, self.q, self.job_list, func, kwargs))
 		new_process.daemon = True
 
-		# spawn process and send job id
+		# launch process and send job id
 		worker_id = len(self.p)
 		new_process.start()
 		PrConn.send(worker_id)
@@ -89,10 +94,22 @@ class ParDat:
 	def next(self, job_id):
 		worker_id, result = self.q.get()
 		self.PrConn[worker_id].send(job_id)
+		self.log()
 		return result
 
 	def terminate(self):
 		for _ in self.p:
 			worker_id, result = self.q.get()
 			self.PrConn[worker_id].send(None)
+			self.log()
 			yield result
+
+	def log(self):
+		self._n_finished += 1
+		if self.verbose:
+			bar_length = 80
+			filled_length = self._n_finished * bar_length // self._n_jobs
+			empty_length = bar_length - filled_length
+			bar_str = '|' + '#' * filled_length + ' ' * empty_length + '|'
+			progress_str = f"{bar_str} {self._n_finished} / {self._n_jobs} finished"
+			print(progress_str, end='\r', flush=True)
