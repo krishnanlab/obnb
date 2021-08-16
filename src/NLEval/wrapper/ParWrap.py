@@ -4,6 +4,7 @@ mp.set_start_method("fork")
 from NLEval.util import checkers
 
 class ParDat:
+	# TODO: create doc string, with example(s)
 	def __init__(self, job_list, n_workers=5, verbose=False, verb_kws={}):
 		self.job_list = job_list
 		self.n_workers = n_workers
@@ -16,7 +17,6 @@ class ParDat:
 
 	def __call__(self, func):
 		def wrapper(**func_kws):
-			#n_workers = checkers.checkWorkers(self.n_workers, len(self.job_list))
 			n_workers = self.n_workers
 			n_jobs = self._n_jobs = len(self.job_list)
 			self._n_finished = 0
