@@ -4,33 +4,25 @@ mp.set_start_method("fork")
 from NLEval.util import checkers
 
 class ParDat:
-	def __init__(self, iter_obj, n_jobs=5, verbose=False):
-		self.iter_obj = iter_obj
-		self.n_jobs = n_jobs
+	def __init__(self, job_list, n_workers=5, verbose=False):
+		self.job_list = job_list
+		self.n_workers = n_workers
 		self.verbose = verbose
 
 	def __call__(self, func):
 		def wrapper(**kwargs):
-			def worker(conn, q):
-				worker_id = conn.recv()
-				job_id = worker_id
-				while job_id != None:
-					result = func(self.iter_obj[job_id], **kwargs)
-					q.put((worker_id, result))
-					job_id = conn.recv()
-				conn.close()
-
-			#n_jobs = checkers.checkWorkers(self.n_jobs, len(self.iter_obj))
-			n_jobs = self.n_jobs
-			if n_jobs > 1:
+			#n_workers = checkers.checkWorkers(self.n_workers, len(self.job_list))
+			n_workers = self.n_workers
+			if n_workers > 1:
 				q = mp.Queue()
 				p = {}
 				PrConn = {}
 
-				for job_id in range(len(self.iter_obj)):
-					if len(p) < n_jobs:
+				for job_id in range(len(self.job_list)):
+					if len(p) < n_workers:
 						PrConn[job_id], ChConn = mp.Pipe()
-						p[job_id] = mp.Process(target=worker, args=(ChConn, q))
+						p[job_id] = mp.Process(target=ParDat.worker, 
+							args=(ChConn, q, self.job_list, func, kwargs))
 						p[job_id].daemon = True
 						p[job_id].start()
 						PrConn[job_id].send(job_id)
@@ -44,29 +36,39 @@ class ParDat:
 					p[worker_id].join()
 					yield result
 			else:
-				for job in self.iter_obj:
+				for job in self.job_list:
 					yield func(job, **kwargs)
 		return wrapper
 
+	@staticmethod
+	def worker(conn, q, job_list, func, kwargs):
+		worker_id = conn.recv()
+		job_id = worker_id
+		while job_id != None:
+			result = func(job_list[job_id], **kwargs)
+			q.put((worker_id, result))
+			job_id = conn.recv()
+		conn.close()
+
 	@property
-	def n_jobs(self):
-		return self._n_jobs
+	def n_workers(self):
+		return self._n_workers
 	
-	@n_jobs.setter
-	def n_jobs(self, n):
-		checkers.checkTypeErrNone('n_jobs', int, n)
+	@n_workers.setter
+	def n_workers(self, n):
+		checkers.checkTypeErrNone('n_workers', int, n)
 		if n < 1:
-			raise ValueError("n_jobs must be positive number")
-		self._n_jobs = n
+			raise ValueError("n_workers must be positive number")
+		self._n_workers = n
 
 	@property
-	def iter_obj(self):
-		return self._iter_obj
+	def job_list(self):
+		return self._job_list
 
-	@iter_obj.setter
-	def iter_obj(self, obj):
-		iter(obj) # check if iterable
-		self._iter_obj = obj
+	@job_list.setter
+	def job_list(self, obj):
+		checkers.checkTypeErrNone("job_list", list, obj)
+		self._job_list = obj
 
 	@property
 	def verbose(self):
