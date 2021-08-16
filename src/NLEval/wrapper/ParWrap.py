@@ -9,31 +9,23 @@ class ParDat:
 		self.n_workers = n_workers
 		self.verbose = verbose
 
+		self.q = mp.Queue()
+		self.p = {}
+		self.PrConn = {}
+
 	def __call__(self, func):
 		def wrapper(**kwargs):
 			#n_workers = checkers.checkWorkers(self.n_workers, len(self.job_list))
 			n_workers = self.n_workers
-			if n_workers > 1:
-				q = mp.Queue()
-				p = {}
-				PrConn = {}
+			n_jobs = len(self.job_list)
 
-				for job_id in range(len(self.job_list)):
-					if len(p) < n_workers:
-						PrConn[job_id], ChConn = mp.Pipe()
-						p[job_id] = mp.Process(target=ParDat.worker, 
-							args=(ChConn, q, self.job_list, func, kwargs))
-						p[job_id].daemon = True
-						p[job_id].start()
-						PrConn[job_id].send(job_id)
+			if n_workers > 1:
+				for job_id in range(n_jobs):
+					if len(self.p) < n_workers:
+						self.spawn(job_id, func, kwargs)
 					else:
-						worker_id, result = q.get()
-						PrConn[worker_id].send(job_id)
-						yield result
-				for _ in p:
-					worker_id, result = q.get()
-					PrConn[worker_id].send(None)
-					p[worker_id].join()
+						yield self.next(job_id)
+				for result in self.terminate():
 					yield result
 			else:
 				for job in self.job_list:
@@ -79,5 +71,21 @@ class ParDat:
 		checkers.checkTypeErrNone('verbose', bool, val)
 		self._verbose = val
 
+	def spawn(self, job_id, func, kwargs):
+		self.PrConn[job_id], ChConn = mp.Pipe()
+		self.p[job_id] = mp.Process(target=ParDat.worker, 
+			args=(ChConn, self.q, self.job_list, func, kwargs))
+		self.p[job_id].daemon = True
+		self.p[job_id].start()
+		self.PrConn[job_id].send(job_id)
 
+	def next(self, job_id):
+		worker_id, result = self.q.get()
+		self.PrConn[worker_id].send(job_id)
+		return result
 
+	def terminate(self):
+		for _ in self.p:
+			worker_id, result = self.q.get()
+			self.PrConn[worker_id].send(None)
+			yield result
