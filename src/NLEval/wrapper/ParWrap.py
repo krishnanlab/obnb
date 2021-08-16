@@ -1,4 +1,6 @@
 import multiprocessing as mp
+mp.set_start_method("fork")
+
 from NLEval.util import checkers
 
 class ParDat:
