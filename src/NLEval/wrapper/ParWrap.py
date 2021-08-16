@@ -4,17 +4,18 @@ mp.set_start_method("fork")
 from NLEval.util import checkers
 
 class ParDat:
-	def __init__(self, job_list, n_workers=5, verbose=False):
+	def __init__(self, job_list, n_workers=5, verbose=False, verb_kws={}):
 		self.job_list = job_list
 		self.n_workers = n_workers
 		self.verbose = verbose
+		self.verb_kws = verb_kws
 
 		self._q = mp.Queue()
 		self._p = []
 		self._PrConn = []
 
 	def __call__(self, func):
-		def wrapper(**kwargs):
+		def wrapper(**func_kws):
 			#n_workers = checkers.checkWorkers(self.n_workers, len(self.job_list))
 			n_workers = self.n_workers
 			n_jobs = self._n_jobs = len(self.job_list)
@@ -23,23 +24,23 @@ class ParDat:
 			if n_workers > 1:
 				for job_id in range(n_jobs):
 					if len(self._p) < n_workers:
-						self.spawn(func, kwargs)
+						self.spawn(func, func_kws)
 					else:
 						yield self.next(job_id)
 				for result in self.terminate():
 					yield result
 			else:
 				for job in self.job_list:
-					self.log()
-					yield func(job, **kwargs)
+					self.log(**self.verb_kws)
+					yield func(job, **func_kws)
 
 		return wrapper
 
 	@staticmethod
-	def worker(conn, q, job_list, func, kwargs):
+	def worker(conn, q, job_list, func, func_kws):
 		job_id = worker_id = conn.recv()
 		while job_id != None:
-			result = func(job_list[job_id], **kwargs)
+			result = func(job_list[job_id], **func_kws)
 			q.put((worker_id, result))
 			job_id = conn.recv()
 		conn.close()
@@ -75,11 +76,11 @@ class ParDat:
 		checkers.checkTypeErrNone('verbose', bool, val)
 		self._verbose = val
 
-	def spawn(self, func, kwargs):
+	def spawn(self, func, func_kws):
 		# configure new child process and setup communication
 		PrConn, ChConn = mp.Pipe()
 		new_process = mp.Process(target=ParDat.worker, 
-			args=(ChConn, self._q, self.job_list, func, kwargs))
+			args=(ChConn, self._q, self.job_list, func, func_kws))
 		new_process.daemon = True
 
 		# launch process and send job id
@@ -94,20 +95,22 @@ class ParDat:
 	def next(self, job_id):
 		worker_id, result = self._q.get()
 		self._PrConn[worker_id].send(job_id)
-		self.log()
+		self.log(**self.verb_kws)
 		return result
 
 	def terminate(self):
 		for _ in self._p:
 			worker_id, result = self._q.get()
 			self._PrConn[worker_id].send(None)
-			self.log()
+			self.log(**self.verb_kws)
 			yield result
 
-	def log(self):
+	def log(self, bar_length=80, log_steps=1):
 		self._n_finished += 1
-		if self.verbose:
-			bar_length = 80
+		if not self.verbose:
+			return
+		if (self._n_finished % log_steps == 0) | \
+			(self._n_finished == self._n_jobs):
 			filled_length = self._n_finished * bar_length // self._n_jobs
 			empty_length = bar_length - filled_length
 			bar_str = '|' + '#' * filled_length + ' ' * empty_length + '|'
