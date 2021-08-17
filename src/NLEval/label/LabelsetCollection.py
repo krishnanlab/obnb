@@ -339,8 +339,11 @@ class SplitLSC(BaseLSC):
             raise AttributeError("'valsplit' not configured, " + \
                                  "assign validation split generator first. " + \
                                  "See `NLEval.valsplit` for more info.")
-        self.valsplit.train_test_setup(self.entity, graph.IDmap, prop_name)
-        if min_pos is not None:
+
+        num_labelsets = None
+        while num_labelsets != len(self.labelIDlst):
+            num_labelsets = len(self.labelIDlst)
+            self.valsplit.train_test_setup(self.entity, graph.IDmap, prop_name)
             self.apply(Filter.LabelsetRangeFilterTrainTestPos(min_pos), inplace=True)
 
     def splitLabelset(self, labelID, entityIDlst=None):
