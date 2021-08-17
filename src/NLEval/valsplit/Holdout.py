@@ -154,11 +154,13 @@ class ThreshHold(BaseHoldout):
             self._train_ID_ary, self._test_ID_ary = bot_list, top_list
 
 class CustomHold(BaseHoldout):
-    def __init__(self, custom_train_ID_ary, custom_test_ID_ary, shuffle=False):
+    def __init__(self, custom_train_ID_ary, custom_test_ID_ary, 
+                 custom_valid_ID_ary=None, shuffle=False):
         """User defined training and testing samples"""
         super(CustomHold, self).__init__(shuffle=shuffle)
         self.custom_train_ID_ary = custom_train_ID_ary
         self.custom_test_ID_ary = custom_test_ID_ary
+        self.custom_valid_ID_ary = custom_valid_ID_ary
 
     def __repr__(self):
         return 'CustomHold(min_pos=%s)'%repr(self.min_pos)
@@ -181,10 +183,24 @@ class CustomHold(BaseHoldout):
         checkers.checkTypesInNumpyArray('Testing data ID list', str, ID_ary)
         self._custom_test_ID_ary = ID_ary
 
+    @property
+    def custom_valid_ID_ary(self):
+        return self._custom_valid_ID_ary
+
+    @custom_valid_ID_ary.setter
+    def custom_valid_ID_ary(self, ID_ary):
+        if ID_ary is None:
+            self._custom_valid_ID_ary = None
+        else:
+            checkers.checkTypesInNumpyArray('Validation data ID list', str, ID_ary)
+            self._custom_valid_ID_ary = ID_ary
+
     def train_test_setup(self, lscIDs, nodeIDs, **kwargs):
         common_ID_list = self.get_common_ID_list(lscIDs, nodeIDs)
         self._train_ID_ary = np.intersect1d(self.custom_train_ID_ary, common_ID_list)
         self._test_ID_ary = np.intersect1d(self.custom_test_ID_ary, common_ID_list)
+        self._valid_ID_ary = None if self.custom_test_ID_ary is None else \
+                            np.intersect1d(self.custom_valid_ID_ary, common_ID_list)
 
 class TrainTestAll(BaseHoldout):
     def __init__(self, shuffle=False):

@@ -186,14 +186,31 @@ class LabelsetRangeFilterJaccard(RangeFilter):
         return lsc.popLabelset
 
 class LabelsetRangeFilterTrainTestPos(RangeFilter):
-    """Pop labelsets based on number of positives in train/test sets"""
+    """Pop labelsets based on number of positives in train/test sets
+
+    Note:
+        Only intended to be work with Holdout split type for now. Would not 
+            raise error for other split types, but only will check the first 
+            split. If validation set is available, will also check the 
+            validation split.
+
+    """
     def __init__(self, min_val):
         super(LabelsetRangeFilterTrainTestPos, self).__init__(min_val=min_val)
 
     @staticmethod
     def get_val_getter(lsc):
-        return lambda labelID: min([min(tr.sum(), ts.sum()) for \
-                                    _,tr,_,ts in lsc.splitLabelset(labelID)])
+        return lambda labelID: \
+                min(
+                    [
+                    idx_ary.size for idx_ary in next(
+                        lsc.valsplit.get_split_idx_ary(
+                            np.array(list(lsc.getLabelset(labelID))), 
+                            valid=lsc.valsplit.valid_ID_ary is not None
+                            )
+                        )
+                    ]
+                )
 
     @staticmethod
     def get_IDs(lsc):

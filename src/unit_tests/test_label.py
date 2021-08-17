@@ -395,6 +395,20 @@ class TestFilter(unittest.TestCase):
             self.assertEqual(lsc.prop['Labelset'], [{'a', 'b', 'c'}, {'e', 'f', 'g'}, {'a', 'f', 'c'}])
             self.assertEqual(lsc.entity.map, {'a':0, 'b':1, 'c':2, 'e':3, 'f':4, 'g':5})
 
+        train_ID_ary = np.array(['a','d'])
+        valid_ID_ary = np.array(['b', 'e'])
+        test_ID_ary = np.array(['c','f'])
+        with self.subTest(train=train_ID_ary, test=test_ID_ary, valid=valid_ID_ary):
+            splitter = valsplit.Holdout.CustomHold(train_ID_ary, test_ID_ary, valid_ID_ary)
+            splitter._train_ID_ary = splitter.custom_train_ID_ary
+            splitter._test_ID_ary = splitter.custom_test_ID_ary
+            splitter._valid_ID_ary = splitter.custom_valid_ID_ary
+            self.lsc.valsplit = splitter
+            lsc = self.lsc.apply(Filter.LabelsetRangeFilterTrainTestPos(min_val=1), inplace=False)
+            self.assertEqual(lsc.labelIDlst, ['Group1'])
+            self.assertEqual(lsc.prop['Labelset'], [{'a', 'b', 'c'}])
+            self.assertEqual(lsc.entity.map, {'a':0, 'b':1, 'c':2})
+
     def test_NegativeFilterHypergeom(self):
         # p-val threshold set to 0.5 since most large, group1-group4 smallest with pval = 0.286
         self.lsc.apply(Filter.NegativeFilterHypergeom(p_thresh=0.5), inplace=True)
