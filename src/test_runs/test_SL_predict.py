@@ -20,7 +20,7 @@ mdl = model.SupervisedLearning.LogReg(g, penalty='l2', solver='lbfgs')
 # diplay choice of labelsets
 for l,m in enumerate(lsc.labelIDlst):
     # index, labelset size, labelset ID
-    print(l, len(lsc.getLabelset(m)), m)
+    print(f"{l:>4d} {len(lsc.getLabelset(m)):>4d} {m}")
 print('')
 
 # get labelID
@@ -37,5 +37,6 @@ score_dict = mdl.predict(pos, neg)
 # print top ranked genes and its intersection with known ones
 top_list = sorted(score_dict, key=score_dict.get, reverse=True)[:k]
 intersection = list(set(top_list) & pos)
-print("Top %d genes: %s" % (k, repr(top_list)))
-print("Known genes in top %d: %s" % (k, repr(intersection)))
+
+print(f"Top {k} genes: {repr(top_list)}")
+print(f"Known genes in top {k}: {repr(intersection)}")

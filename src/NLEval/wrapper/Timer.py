@@ -5,17 +5,17 @@ class TimeIt:
     def __init__(self, verbose=True):
         self.verbose = verbose
 
-    def __call__(self, fun):
+    def __call__(self, func):
         def wrapper(*args):
             start = time.time()
-            fun(*args)
+            func(*args)
             end = time.time()
             time_interval = end - start
-            print("Took %.2f seconds to run function '%s'"%(time_interval, repr(fun)))
+            print(f"Took {time_interval:.2f} seconds to run function {repr(func)}")
         if self.verbose:
             return wrapper
         else:
-            return fun
+            return func
 
     @property
     def verbose(self):

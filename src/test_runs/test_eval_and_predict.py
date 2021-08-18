@@ -27,7 +27,7 @@ mdl = model.SupervisedLearning.LogRegCV(g, penalty='l2', solver='liblinear', max
                                         cv=3, Cs=np.logspace(-8, 4, 20), class_weight='balanced', 
                                         n_jobs=1, scoring=scoring_obj)
 
-@wrapper.ParWrap.ParDat(lsc.labelIDlst, n_jobs=workers)
+@wrapper.ParWrap.ParDat(lsc.labelIDlst, n_workers=1)
 def predict_all_labelsets(labelID):
     np.random.seed()  # initialize random states for parallel processes
 
@@ -55,8 +55,8 @@ def predict_all_labelsets(labelID):
     else:
         status_str = '(Discarded)'
 
-    print(f"{labelID:<60} num_pos={len(pos_ID_set):>4}, " \
-          + f"num_neg={len(neg_ID_set):>4}, score={score:>3.2f} {status_str}")
+    print(f"{labelID:<60} num_pos={len(pos_ID_set):>4}, "
+          f"num_neg={len(neg_ID_set):>4}, score={score:>3.2f} {status_str}")
 
 # depoly processes
 for i in predict_all_labelsets(): pass

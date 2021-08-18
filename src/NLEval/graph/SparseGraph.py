@@ -78,11 +78,10 @@ class SparseGraph(BaseGraph):
                 self.addID(ID)
         try:
             old_weight = self._edge_data[self.IDmap[ID1]][self.IDmap[ID2]]
-            if old_weight != weight:
-                # check if edge exists
-                print("Warning: edge between '%s' and '%s' exists with weight \
-                      '%.2f', overwriting with '%.2f'"%\
-                      (self.IDmap[ID1], self.IDmap[ID2], old_weight, weight))
+            if old_weight != weight:  # check if edge exists
+                print(f"WARNING: edge between {self.IDmap[ID1]} and "
+                      f"{self.IDmap[ID2]} exists with weight {old_weight:.2f}"
+                      f", overwriting with {weight:.2f}")
         except KeyError:
             self._edge_data[self.IDmap[ID1]][self.IDmap[ID2]] = weight
             if not self.directed:
@@ -92,7 +91,7 @@ class SparseGraph(BaseGraph):
         try:
             return self.edge_data[self.IDmap[ID1]][self.IDmap[ID2]]
         except KeyError:
-                return 0
+            return 0
 
     @staticmethod
     def edglst_reader(edg_fp, weighted, directed, cut_threshold):

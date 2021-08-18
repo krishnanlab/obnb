@@ -15,10 +15,9 @@ f = Filter.NegativeFilterHypergeom(p_thresh)
 # apply negative selection filter
 lsc.apply(f, inplace=True)
 
-print("p-val threshold = %.2f" % p_thresh)
+print(f"p-val threshold = {p_thresh:.2f}")
 # compare size of negative before and after filter. Size should shrink after
-print("{:<62} {:<8} {:<8}".format("Term", "Original", "Filtered"))
+print(f"{'Term':<62} {'Original':<8} {'Filtered':<8}")
 for ID in lsc.labelIDlst:
-    print("{:<62} {:>8d} {:>8d}".format(ID, len(lsc_orig.getNegative(ID)), 
-                                        len(lsc.getNegative(ID))))
- 
+    print(f"{ID:<62} {len(lsc_orig.getNegative(ID)):>8d} "
+          f"{len(lsc.getNegative(ID)):>8d}")
