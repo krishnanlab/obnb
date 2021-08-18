@@ -343,8 +343,12 @@ class SplitLSC(BaseLSC):
         num_labelsets = None
         while num_labelsets != len(self.labelIDlst):
             num_labelsets = len(self.labelIDlst)
+            # print(num_labelsets)
+            # labelIDset = set(self.labelIDlst)
             self.valsplit.train_test_setup(self.entity, graph.IDmap, prop_name)
             self.apply(Filter.LabelsetRangeFilterTrainTestPos(min_pos), inplace=True)
+            # for i in labelIDset - set(self.labelIDlst):
+            #     print(f"Pop {i}")
 
     def splitLabelset(self, labelID, entityIDlst=None):
         """Split up a labelset by training and testing sets

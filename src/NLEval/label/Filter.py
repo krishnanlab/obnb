@@ -205,8 +205,9 @@ class LabelsetRangeFilterTrainTestPos(RangeFilter):
                     [
                     idx_ary.size for idx_ary in next(
                         lsc.valsplit.get_split_idx_ary(
-                            np.array(list(lsc.getLabelset(labelID))), 
-                            valid=lsc.valsplit.valid_ID_ary is not None
+                            np.array(
+                                list(lsc.getLabelset(labelID))), 
+                                valid=lsc.valsplit.valid_ID_ary is not None
                             )
                         )
                     ]
