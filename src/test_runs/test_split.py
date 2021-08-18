@@ -37,3 +37,11 @@ print(f"Number of labelsets after filtering "
       f"Number of training = {lsc.valsplit.train_ID_ary.size}, " 
       f"validation = {lsc.valsplit.valid_ID_ary.size}, " 
       f"testing = {lsc.valsplit.test_ID_ary.size}")
+
+"""
+Run test using network = 'STRING' and dataset = 'KEGGBP'
+Number of labelsets in original file: 139
+Number of labelsets before filtering: 58
+Number of labelsets after filtering (train_ratio=0.6, test_ratio=0.2, min_pos=10): 27
+Number of training = 1273, validation = 426, testing = 424
+"""
