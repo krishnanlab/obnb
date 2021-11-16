@@ -16,7 +16,7 @@ class ParDat:
         self._PrConn = []
 
     def __call__(self, func):
-        def wrapper(**func_kws):
+        def wrapper(*func_args, **func_kwargs):
             n_workers = self.n_workers
             n_jobs = self._n_jobs = len(self.job_list)
             self._n_finished = 0
@@ -24,7 +24,7 @@ class ParDat:
             if n_workers > 1:
                 for job_id in range(n_jobs):
                     if len(self._p) < n_workers:
-                        self.spawn(func, func_kws)
+                        self.spawn(func, func_args, func_kwargs)
                     else:
                         yield self.next(job_id)
                 for result in self.terminate():
@@ -32,15 +32,15 @@ class ParDat:
             else:
                 for job in self.job_list:
                     self.log(**self.verb_kws)
-                    yield func(job, **func_kws)
+                    yield func(job, *func_args, **func_kwargs)
 
         return wrapper
 
     @staticmethod
-    def worker(conn, q, job_list, func, func_kws):
+    def worker(conn, q, job_list, func, func_args, func_kwargs):
         job_id = worker_id = conn.recv()
         while job_id != None:
-            result = func(job_list[job_id], **func_kws)
+            result = func(job_list[job_id], *func_args, **func_kwargs)
             q.put((worker_id, result))
             job_id = conn.recv()
         conn.close()
@@ -76,11 +76,11 @@ class ParDat:
         checkers.checkTypeErrNone('verbose', bool, val)
         self._verbose = val
 
-    def spawn(self, func, func_kws):
+    def spawn(self, func, func_args, func_kwargs):
         # configure new child process and setup communication
         PrConn, ChConn = mp.Pipe()
         new_process = mp.Process(target=ParDat.worker, 
-            args=(ChConn, self._q, self.job_list, func, func_kws))
+            args=(ChConn, self._q, self.job_list, func, func_args, func_kwargs))
         new_process.daemon = True
 
         # launch process and send job id
