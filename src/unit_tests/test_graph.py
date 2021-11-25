@@ -1,8 +1,11 @@
 from common import *
+
 from copy import deepcopy
 from scipy.spatial import distance
+
 from NLEval.graph import BaseGraph, SparseGraph, DenseGraph
 from NLEval.util import IDHandler
+from NLEval.util.Exceptions import IDNotExistError, IDExistsError
 
 
 def shuffle_sparse(graph):
@@ -38,9 +41,9 @@ def shuffle_dense(graph):
 
 class test_case1:
     def __init__(self):
-        self.tw_fp = SAMPLE_DATA_PATH + "toy1_weighted.edg"
-        self.tu_fp = SAMPLE_DATA_PATH + "toy1_unweighted.edg"
-        self.temd_fp = SAMPLE_DATA_PATH + "toy1.emd"
+        self.tw_fp = os.path.join(SAMPLE_DATA_DIR, "toy1_weighted.edg")
+        self.tu_fp = os.path.join(SAMPLE_DATA_DIR, "toy1_unweighted.edg")
+        self.temd_fp = os.path.join(SAMPLE_DATA_DIR, "toy1.emd")
         self.IDlst = ["1", "3", "4", "2", "5"]
         self.data_unweighted = [
             {1: 1, 2: 1},
@@ -298,7 +301,9 @@ class TestFeatureVec(unittest.TestCase):
     def test_get_edge(self):
         graph = DenseGraph.FeatureVec.from_emd(self.case.temd_fp)
         temd_data = np.loadtxt(
-            SAMPLE_DATA_PATH + "toy1.emd", delimiter=" ", skiprows=1
+            os.path.join(SAMPLE_DATA_DIR, "toy1.emd"),
+            delimiter=" ",
+            skiprows=1,
         )[:, 1:]
         for i, ID1 in enumerate(graph.IDmap):
             for j, ID2 in enumerate(graph.IDmap):
@@ -333,7 +338,9 @@ class TestFeatureVec(unittest.TestCase):
     def test_from_emd(self):
         graph = DenseGraph.FeatureVec.from_emd(self.case.temd_fp)
         temd_data = np.loadtxt(
-            SAMPLE_DATA_PATH + "toy1.emd", delimiter=" ", skiprows=1
+            os.path.join(SAMPLE_DATA_DIR, "toy1.emd"),
+            delimiter=" ",
+            skiprows=1,
         )[:, 1:]
         self.assertTrue(np.all(graph.mat == temd_data))
 

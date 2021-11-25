@@ -1,14 +1,16 @@
 from common import *
+
+from NLEval import valsplit
 from NLEval.label import LabelsetCollection, Filter
 from NLEval.util import IDHandler
-from NLEval import valsplit
+from NLEval.util.Exceptions import IDNotExistError, IDExistsError
 
 
 class TestBaseLSC(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        self.toy1_gmt_fp = SAMPLE_DATA_PATH + "toy1.gmt"
-        self.toy1_prop_fp = SAMPLE_DATA_PATH + "toy1_property.tsv"
+        self.toy1_gmt_fp = os.path.join(SAMPLE_DATA_DIR, "toy1.gmt")
+        self.toy1_prop_fp = os.path.join(SAMPLE_DATA_DIR, "toy1_property.tsv")
         self.toy1_labelIDlst = ["Group1", "Group2", "Group3", "Group4"]
         self.toy1_InfoLst = [
             "Description1",
