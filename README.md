@@ -2,6 +2,19 @@
 
 # NetworkLearningEval
 
+## Installation
+
+Clone the repository first and then install via ``pip``
+
+```bash
+git clone https://github.com/krishnanlab/NetworkLearningEval
+cd NetworkLearningEval
+pip install -e .
+```
+
+The ``-e`` option means 'editable', i.e. no need to reinstall the library if you make changes to the source code.
+Feel free to not use the ``-e`` option and simply do ``pip install .`` if you do not plan on modifying the source code.
+
 ## Quick Demonstration
 ```python
 from NLEval import graph, valsplit, label, model
@@ -24,3 +37,15 @@ negative_set = lsc.getNegative(some_labelID)
 SLA_score_dict = SL_A.predict(positive_set, negative_set)
 LPA_score_dict = LP_A.predict(positive_set, negative_set)
 ```
+
+## Contributing
+
+### Coding style
+
+Use [``black``](https://github.com/psf/black) to format code, also enforce max 80 line length.
+
+```bash
+$ black src/ -l 80
+```
+
+The ``-l`` option specifies the maixmum line-length, which is set to be 88 originally.
