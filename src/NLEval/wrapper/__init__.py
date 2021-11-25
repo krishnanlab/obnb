@@ -1,2 +1,2 @@
-__all__ = ['ParWrap', 'Timer']
+__all__ = ["ParWrap", "Timer"]
 from . import *

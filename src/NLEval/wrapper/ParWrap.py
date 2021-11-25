@@ -1,7 +1,9 @@
 import multiprocessing as mp
+
 mp.set_start_method("fork")
 
 from NLEval.util import checkers
+
 
 class ParDat:
     # TODO: create doc string, with example(s)
@@ -48,10 +50,10 @@ class ParDat:
     @property
     def n_workers(self):
         return self._n_workers
-    
+
     @n_workers.setter
     def n_workers(self, n):
-        checkers.checkTypeErrNone('n_workers', int, n)
+        checkers.checkTypeErrNone("n_workers", int, n)
         if n == 0:
             n = mp.cpu_count()
         elif n < 0:
@@ -70,17 +72,19 @@ class ParDat:
     @property
     def verbose(self):
         return self._verbose
-    
+
     @verbose.setter
     def verbose(self, val):
-        checkers.checkTypeErrNone('verbose', bool, val)
+        checkers.checkTypeErrNone("verbose", bool, val)
         self._verbose = val
 
     def spawn(self, func, func_args, func_kwargs):
         # configure new child process and setup communication
         PrConn, ChConn = mp.Pipe()
-        new_process = mp.Process(target=ParDat.worker, 
-            args=(ChConn, self._q, self.job_list, func, func_args, func_kwargs))
+        new_process = mp.Process(
+            target=ParDat.worker,
+            args=(ChConn, self._q, self.job_list, func, func_args, func_kwargs),
+        )
         new_process.daemon = True
 
         # launch process and send job id
@@ -109,10 +113,13 @@ class ParDat:
         self._n_finished += 1
         if not self.verbose:
             return
-        if (self._n_finished % log_steps == 0) | \
-           (self._n_finished == self._n_jobs):
+        if (self._n_finished % log_steps == 0) | (
+            self._n_finished == self._n_jobs
+        ):
             filled_length = self._n_finished * bar_length // self._n_jobs
             empty_length = bar_length - filled_length
-            bar_str = '|' + '#' * filled_length + ' ' * empty_length + '|'
-            progress_str = f"{bar_str} {self._n_finished} / {self._n_jobs} finished"
-            print(progress_str, end='\r', flush=True)
+            bar_str = "|" + "#" * filled_length + " " * empty_length + "|"
+            progress_str = (
+                f"{bar_str} {self._n_finished} / {self._n_jobs} finished"
+            )
+            print(progress_str, end="\r", flush=True)

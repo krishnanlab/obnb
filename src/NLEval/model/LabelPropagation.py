@@ -1,7 +1,8 @@
 from NLEval.model.BaseModel import BaseModel
 import numpy as np
 
-__all__ = ['LP']
+__all__ = ["LP"]
+
 
 class LP(BaseModel):
     def __init__(self, G):

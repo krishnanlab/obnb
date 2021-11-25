@@ -1,14 +1,15 @@
 from sys import path
-path.append('../')
+
+path.append("../")
 from NLEval import graph, valsplit, label, model
 from sklearn.metrics import roc_auc_score as auroc
 import numpy as np
 
-data_path = '../../data/'
-network = 'STRING'
-dataset = 'KEGGBP'
-network_fp = data_path + f'networks/{network}.edg'
-label_fp = data_path + f'labels/{dataset}.gmt'
+data_path = "../../data/"
+network = "STRING"
+dataset = "KEGGBP"
+network_fp = data_path + f"networks/{network}.edg"
+label_fp = data_path + f"labels/{dataset}.gmt"
 
 train_ratio = 0.6
 test_ratio = 0.2
@@ -23,20 +24,24 @@ print(f"Number of labelsets in original file: {len(lsc.labelIDlst)}")
 
 lsc.apply(label.Filter.EntityExistanceFilter(g.IDmap.lst), inplace=True)
 lsc.apply(label.Filter.LabelsetRangeFilterSize(min_val=50), inplace=True)
-lsc.load_entity_properties(data_path + '/properties/pubcnt.txt', 
-                           'Pubmed Count', 0, int)
-lsc.valsplit = valsplit.Holdout.TrainValTest(train_ratio=train_ratio, 
-                                             test_ratio=test_ratio)
+lsc.load_entity_properties(
+    data_path + "/properties/pubcnt.txt", "Pubmed Count", 0, int
+)
+lsc.valsplit = valsplit.Holdout.TrainValTest(
+    train_ratio=train_ratio, test_ratio=test_ratio
+)
 
 print(f"Number of labelsets before filtering: {len(lsc.labelIDlst)}")
-lsc.train_test_setup(g, prop_name='Pubmed Count', min_pos=min_pos)
+lsc.train_test_setup(g, prop_name="Pubmed Count", min_pos=min_pos)
 
-print(f"Number of labelsets after filtering "
-      f"(train_ratio={train_ratio}, test_ratio={test_ratio}, "
-      f"min_pos={min_pos}): {len(lsc.labelIDlst)}\n"
-      f"Number of training = {lsc.valsplit.train_ID_ary.size}, " 
-      f"validation = {lsc.valsplit.valid_ID_ary.size}, " 
-      f"testing = {lsc.valsplit.test_ID_ary.size}")
+print(
+    f"Number of labelsets after filtering "
+    f"(train_ratio={train_ratio}, test_ratio={test_ratio}, "
+    f"min_pos={min_pos}): {len(lsc.labelIDlst)}\n"
+    f"Number of training = {lsc.valsplit.train_ID_ary.size}, "
+    f"validation = {lsc.valsplit.valid_ID_ary.size}, "
+    f"testing = {lsc.valsplit.test_ID_ary.size}"
+)
 
 """
 Run test using network = 'STRING' and dataset = 'KEGGBP'

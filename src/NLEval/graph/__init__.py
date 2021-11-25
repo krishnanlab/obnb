@@ -1,2 +1,2 @@
-__all__ = ['DenseGraph', 'SparseGraph']
+__all__ = ["DenseGraph", "SparseGraph"]
 from . import *
