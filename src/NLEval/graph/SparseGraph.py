@@ -184,9 +184,9 @@ class SparseGraph(BaseGraph):
             for srcID, dstID, weight in edge_gen():
                 if weighted:
                     if weight > cut_threshold:
-                        f.write("%s\t%s\t%.12f\n" % (srcID, dstID, weight))
+                        f.write(f"{srcID}\t{dstID}\t{weight:.12f}\n")
                 else:
-                    f.write("%s\t%s\n" % (srcID, dstID))
+                    f.write(f"{srcID}\t{dstID}\n")
 
     @staticmethod
     def npy_writer():
@@ -220,9 +220,7 @@ class SparseGraph(BaseGraph):
             elif writer == "npy":
                 writer = self.npy_writer
             else:
-                raise ValueError(
-                    "Unknown writer function name %s" % repr(writer)
-                )
+                raise ValueError(f"Unknown writer function name {writer!r}")
         writer(
             outpth, self.edge_gen, self.weighted, self.directed, cut_threshold
         )

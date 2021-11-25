@@ -213,7 +213,7 @@ class TestDenseGraph(unittest.TestCase):
         graph = DenseGraph.DenseGraph.construct_graph(idmap.lst, mat1)
         # test inconsistent size input --> error
         self.assertRaises(
-            AssertionError, DenseGraph.DenseGraph.construct_graph, idmap, mat2
+            ValueError, DenseGraph.DenseGraph.construct_graph, idmap, mat2
         )
 
     def test_from_edglst(self):
@@ -333,7 +333,7 @@ class TestFeatureVec(unittest.TestCase):
         self.assertEqual(graph.dim, 3)
         # test if captures inconsistency between number of IDs and number matrix entires
         graph.IDmap.addID("d")
-        self.assertRaises(AssertionError, graph.addVec, "e", self.vec_a)
+        self.assertRaises(ValueError, graph.addVec, "e", self.vec_a)
 
     def test_from_emd(self):
         graph = DenseGraph.FeatureVec.from_emd(self.case.temd_fp)

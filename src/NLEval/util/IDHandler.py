@@ -75,8 +75,8 @@ class IDlst(object):
             return self._getitem_multiple(ID)
         else:
             raise TypeError(
-                "ID key(s) must be stirng or iterables of "
-                + "string, not %s" % repr(type(ID))
+                f"ID key(s) must be stirng or iterables of "
+                f"string, not {type(ID)!r}"
             )
 
     def _getitem_sinlge(self, ID):
@@ -94,9 +94,9 @@ class IDlst(object):
         """Check existence of ID and raise exceptions depending on
         desired existence of ID"""
         if (not existence) & (ID in self):
-            raise IDExistsError("Existing ID %s" % repr(ID))
+            raise IDExistsError(f"Existing ID {ID!r}")
         elif existence & (ID not in self):
-            raise IDNotExistError("Unknown ID %s" % repr(ID))
+            raise IDNotExistError(f"Unknown ID ID!r")
 
     @property
     def lst(self):
@@ -255,9 +255,9 @@ class IDprop(IDmap):
         """
         checkers.checkType("Property name", str, prop_name)
         if (not existence) & (prop_name in self._prop):
-            raise IDExistsError("Existing property name %s" % repr(prop_name))
+            raise IDExistsError(f"Existing property name {prop_name!r}")
         elif existence & (prop_name not in self._prop):
-            raise IDNotExistError("Unknown property name %s" % repr(prop_name))
+            raise IDNotExistError(f"Unknown property name {prop_name!r}")
 
     @property
     def prop_default_val(self):
@@ -303,9 +303,8 @@ class IDprop(IDmap):
             checkers.checkType("Default type", type, default_type)
             if not isinstance(default_val, default_type):
                 raise TypeError(
-                    "Inconsistent type between default values "
-                    + "%s and default type %s"
-                    % (type(default_val), default_type)
+                    f"Inconsistent type between default values "
+                    f"{type(default_val)!r} and default type {default_type!r}"
                 )
         if not self.isempty():
             prop_lst = [deepcopy(default_val) for i in range(self.size)]
@@ -320,7 +319,7 @@ class IDprop(IDmap):
         self.getProp(ID, prop_name)  # check ID and prop_name validity
         if self.prop_default_type[prop_name] is not None:
             checkers.checkType(
-                "Property value for %s" % repr(prop_name),
+                f"Property value for {prop_name!r}",
                 self.prop_default_type[prop_name],
                 prop_val,
             )

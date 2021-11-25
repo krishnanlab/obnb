@@ -54,8 +54,7 @@ def checkType(name, targetType, val):
     """
     if not isinstance(val, targetType):
         raise TypeError(
-            "%s should be %s, not %s: %s"
-            % (repr(name), repr(targetType), repr(type(val)), repr(val))
+            f"{name!r} should be {targetType!r}, not {type(val)!r}: {val!r}"
         )
 
 
@@ -69,7 +68,7 @@ def checkTypeErrNone(name, targetType, val):
     if val is not None:
         checkType(name, targetType, val)
     else:
-        raise ValueError("Value for %s has not yet been provided" % repr(name))
+        raise ValueError(f"Value for {name!r} has not yet been provided")
 
 
 def checkTypeAllowNone(name, targetType, val):
@@ -83,10 +82,8 @@ def checkTypesInIterable(name, targetType, val):
     for idx, i in enumerate(val):
         if not isinstance(i, targetType):
             raise TypeError(
-                "All instances in %s must be type %s, "
-                % (repr(name), repr(targetType))
-                + "invalid type %s found at position (%d): %s"
-                % (repr(type(i)), idx, repr(i))
+                f"All instances in {name!r} must be type {targetType!r}, "
+                f"invalid type {type(i)!r} found at position ({idx}): {i!r}"
             )
 
 
@@ -112,9 +109,7 @@ def checkNumpyArrayIsNumeric(name, ary):
     """Check if numpy array is numeric type"""
     checkType(name, np.ndarray, ary)
     if not any([ary.dtype == i for i in NUMERIC_TYPE]):
-        raise TypeError(
-            "%s should be numeric, not type %s" % (repr(name), repr(ary.dtype))
-        )
+        raise TypeError(f"{name!r} should be numeric, not type {ary.dtype!r}")
 
 
 def checkNumpyArrayNDim(name, targetNDim, ary):
@@ -135,8 +130,8 @@ def checkNumpyArrayNDim(name, targetNDim, ary):
     NDim = len(ary.shape)
     if NDim != targetNDim:
         raise ValueError(
-            "%s should be %d dimensional array, not %d dimensional"
-            % (repr(name), targetNDim, NDim)
+            f"{name!r} should be {targetNDim} dimensional array, "
+            f"not {NDim} dimensional"
         )
 
 
@@ -163,6 +158,5 @@ def checkNumpyArrayShape(name, targetShape, ary):
     shape = ary.shape
     if shape != targetShape:
         raise ValueError(
-            "%s should be in shape %s, not %s"
-            % (repr(name), repr(targetShape), repr(shape))
+            f"{name!r} should be in shape {targetShape!r}, not {shape!r}"
         )

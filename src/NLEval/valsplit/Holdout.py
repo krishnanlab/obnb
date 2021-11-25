@@ -20,10 +20,10 @@ class TrainValTest(BaseHoldout):
 
     def __repr__(self):
         # TODO: make repr a super magic fun, automatically generate for children.
-        return "TrainValTest(train_ratio=%s, test_ratio=%s, train_on=%s)" % (
-            repr(self.train_ratio),
-            repr(self.test_ratio),
-            repr(self.train_on),
+        return (
+            f"TrainValTest(train_ratio={self.train_ratio!r}], "
+            f"test_ratio={self.test_ratio!r}, "
+            f"train_on={self.train_on!r})"
         )
 
     @property
@@ -39,8 +39,7 @@ class TrainValTest(BaseHoldout):
         checkers.checkTypeErrNone("Training ratio", checkers.FLOAT_TYPE, val)
         if (val <= 0) | (val > 1):
             raise ValueError(
-                "Training ratio must be between 0 and 1, received value %f"
-                % val
+                f"Training ratio must be between 0 and 1, received {val}"
             )
         self._train_ratio = val
 
@@ -49,13 +48,13 @@ class TrainValTest(BaseHoldout):
         checkers.checkTypeErrNone("Testing ratio", checkers.FLOAT_TYPE, val)
         if (val <= 0) | (val > 1):
             raise ValueError(
-                "Testing ratio must be between 0 and 1, received value %f" % val
+                f"Testing ratio must be between 0 and 1, received {val}"
             )
         if self.train_ratio + val >= 1:
             raise ValueError(
-                "Sum of training and testing ratio must be "
-                + "less than 1, received train_raio = "
-                + "%f, and test_ratio = %f" % (self.train_ratio, val)
+                f"Sum of training and testing ratio must be "
+                f"less than 1, received train_raio = "
+                f"{self.train_ratio}, and test_ratio = {val}"
             )
         self._test_ratio = val
 
@@ -89,10 +88,7 @@ class BinHold(BaseHoldout):
         self.bin_num = bin_num
 
     def __repr__(self):
-        return "BinHold(bin_num=%s, train_on=%s)" % (
-            repr(self.bin_num),
-            repr(self.train_on),
-        )
+        return f"BinHold(bin_num={self.bin_num!r}, train_on={self.train_on!r})"
 
     @property
     def bin_num(self):
@@ -103,7 +99,7 @@ class BinHold(BaseHoldout):
         checkers.checkTypeErrNone("Number of bins", checkers.INT_TYPE, val)
         if val < 1:
             raise ValueError(
-                "Number of bins must be greater than 1, not '%d'" % val
+                f"Number of bins must be greater than 1, received {val}"
             )
         self._bin_num = val
 
@@ -140,10 +136,9 @@ class ThreshHold(BaseHoldout):
         self.cut_off = cut_off
 
     def __repr__(self):
-        return "ThreshHold(cut_off=%s, prop_name=%s, train_on=%s)" % (
-            repr(self.cut_off),
-            repr(self.prop_name),
-            repr(self.train_on),
+        return (
+            f"ThreshHold(cut_off={self.cut_off!r}, prop_name="
+            f"{self.prop_name!r}, train_on={self.train_on!r})"
         )
 
     @property
@@ -196,7 +191,7 @@ class CustomHold(BaseHoldout):
         self.custom_valid_ID_ary = custom_valid_ID_ary
 
     def __repr__(self):
-        return "CustomHold(min_pos=%s)" % repr(self.min_pos)
+        return f"CustomHold(min_pos={self.min_pos!r})"
 
     @property
     def custom_train_ID_ary(self):
@@ -264,7 +259,10 @@ class HoldoutChildTemplate(BaseHoldout):
         super().__init__(min_pos=min_pos)
     
     def __repr__(self):
-        return 'HoldoutChildTemplate(min_pos=%s, train_on=%s)'%repr(self.min_pse)
+        return (
+            f'HoldoutChildTemplate(min_pos={self.min_pose!r}, '
+            f'train_on={self.train_on!r})'
+        )
 
     @property
     def foo(self):

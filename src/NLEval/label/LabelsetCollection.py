@@ -186,9 +186,8 @@ class BaseLSC(IDHandler.IDprop):
             if ID in lbset:
                 # raise Exception(repr(ID), repr(labelID))
                 raise IDExistsError(
-                    "Entity %s is positive in labelset %s, "
-                    % (repr(ID), repr(labelID))
-                    + "cannot be set to negative"
+                    f"Entity {ID!r} is positive in labelset {labelID!r}, "
+                    f"cannot be set to negative"
                 )
         self.setProp(labelID, "Negative", set(lst))
 
@@ -253,13 +252,15 @@ class BaseLSC(IDHandler.IDprop):
         fp += "" if fp.endswith(".lsc") else ".lsc"
         with open(fp, "w") as f:
             # headers
-            f.write("Label ID\t%s\n" % "\t".join(labelIDlst))
-            f.write("Label Info\t%s\n" % "\t".join(labelInfolst))
+            labelIDlst_str = "\t".join(labelIDlst)
+            labelInfolst_str = "\t".join(labelInfolst)
+            f.write(f"Label ID\t{labelIDlst_str}\n")
+            f.write(f"Label Info\t{labelInfolst_str}\n")
 
             # annotations
             for i, entityID in enumerate(entityIDlst):
                 indicator_string = "\t".join(map(str, mat[i]))
-                f.write("%s\t%s\n" % (entityID, indicator_string))
+                f.write("{entityID}\t{indicator_string}\n")
 
     def export_gmt(self, fp):
         """Export as '.gmt' (Gene Matrix Transpose) file
@@ -271,10 +272,8 @@ class BaseLSC(IDHandler.IDprop):
         with open(fp, "w") as f:
             for labelID in self.labelIDlst:
                 labelInfo = self.getInfo(labelID)
-                labelset = self.getLabelset(labelID)
-                f.write(
-                    "%s\t%s\t%s\n" % (labelID, labelInfo, "\t".join(labelset))
-                )
+                labelset_str = "\t".join(self.getLabelset(labelID))
+                f.write("{labelID}\t{labelInfo}\t{labelset_str}\n")
 
     def load_entity_properties(
         self,

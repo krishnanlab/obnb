@@ -106,9 +106,7 @@ class BaseHoldout(BaseValSplit):
     def train_on(self, val):
         checkers.checkTypeErrNone("train_on", str, val)
         if val not in ["top", "bot"]:
-            raise ValueError(
-                "Train on must be 'top' or 'bot', not '%s'" % repr(val)
-            )
+            raise ValueError(f"Train on must be 'top' or 'bot', not {val!r}")
         self._train_on = val
 
     def get_common_ID_list(self, lscIDs, nodeIDs):
@@ -141,8 +139,8 @@ class BaseHoldout(BaseValSplit):
         ), "Training or testing sets not available, run `train_test_setup` first"
         if valid:
             assert self._valid_ID_ary is not None, (
-                "Validation set is only available for TrainValTest split "
-                + "type, current split type is %s" % repr(type(self))
+                f"Validation set is only available for TrainValTest split "
+                f"type, current split type is {type(self)!r}"
             )
 
     def get_split_idx_ary(self, ID_ary, label_ary=None, valid=False):

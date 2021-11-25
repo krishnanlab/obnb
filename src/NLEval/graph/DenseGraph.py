@@ -46,8 +46,7 @@ class DenseGraph(BaseGraph):
             checkers.checkNumpyArrayNDim("val", 2, val)
             if self.IDmap.size != val.shape[0]:
                 raise ValueError(
-                    "Expecting %d entries, not %d"
-                    % (self.IDmap.size, val.shape[0])
+                    f"Expecting {self.IDmap.size} entries, not {val.shape[0]}"
                 )
         self._mat = val.copy()
 
@@ -75,7 +74,11 @@ class DenseGraph(BaseGraph):
             if isinstance(ids, IDHandler.IDmap)
             else IDHandler.IDmap.from_list(ids)
         )
-        assert idmap.size == mat.shape[0]
+        if idmap.size != mat.shape[0]:
+            raise ValueError(
+                f"Inconsistent dimension between IDs ({idmap.size}) and the "
+                f"matrix ({mat.shape[0]})"
+            )
         graph = cls()
         graph.IDmap = idmap
         graph.mat = mat
@@ -129,8 +132,7 @@ class FeatureVec(DenseGraph):
         if d is not None:
             if d < 1:
                 raise ValueError(
-                    "Feature dimension must be "
-                    + "greater than 1, input: %d" % d
+                    f"Feature dimension must be greater than 1, got {d}"
                 )
         if not self.isempty():
             if d != self.mat.shape[1]:
@@ -138,9 +140,8 @@ class FeatureVec(DenseGraph):
                     # self.dim should always in sync with actual dim of feature vec
                     print("CRITICAL: This should never happen!")
                 raise ValueError(
-                    "Inconsistent dimension "
-                    + "between input (%d) and data (%d)"
-                    % (d, self.mat.shape[1])
+                    f"Inconsistent dimension between input ({d}) and data "
+                    f"({self.mat.shape[1]})"
                 )
         self._dim = d
 
@@ -157,9 +158,8 @@ class FeatureVec(DenseGraph):
             elif self.mat.shape[1] != self.dim:  # check dim of input
                 self._mat = mat_bkp
                 raise ValueError(
-                    "Inconsistent dimension between "
-                    + "input (%d) and specified dimension (%d)"
-                    % (val.shape[1], self.dim)
+                    f"Inconsistent dimension between input ({val.shape[1]}) "
+                    f"and specified dimension ({self.dim})"
                 )
 
     def get_edge(self, ID1, ID2, dist_fun=distance.cosine):
@@ -179,12 +179,11 @@ class FeatureVec(DenseGraph):
         checkers.checkNumpyArrayIsNumeric("vec", vec)
 
         # check size consistency between IDmap and mat
-        assert (
-            self.size == self.mat.shape[0]
-        ), "Inconsistent number of IDs (%d) and matrix entries (%d)" % (
-            self.IDmap.size,
-            self.mat.shape[0],
-        )
+        if self.size != self.mat.shape[0]:
+            raise ValueError(
+                f"Inconsistent number of IDs ({self.IDmap.size}) and matrix "
+                f"entries ({self.mat.shape[0]})"
+            )
 
         if self.isempty():
             if self.dim is not None:
