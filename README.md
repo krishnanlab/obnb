@@ -40,6 +40,12 @@ LPA_score_dict = LP_A.predict(positive_set, negative_set)
 
 ## Contributing
 
+### Additional packages used for dev
+
+* [black](https://github.com/psf/black)
+* [pytest](https://docs.pytest.org/en/6.2.x/)
+* [pytest-cov](https://pypi.org/project/pytest-cov/) (not used yet)
+
 ### Coding style
 
 Use [``black``](https://github.com/psf/black) to format code, also enforce max 80 line length.
@@ -49,3 +55,9 @@ $ black src/ -l 80
 ```
 
 The ``-l`` option specifies the maixmum line-length, which is set to be 88 originally.
+
+### Testing
+
+```bash
+$ pytest src/unit_tests  # TODO: move unit_tests to tests/ instead of src/
+```
