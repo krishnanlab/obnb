@@ -25,7 +25,7 @@ class sklSSS(sklInterface):
 
     def __init__(self, skl_kws={}, shuffle=False):
         super(sklSSS, self).__init__(
-            ms.StratifiedShuffleSplit, skl_kws, shuffle
+            ms.StratifiedShuffleSplit, skl_kws, shuffle,
         )
 
 

@@ -122,7 +122,7 @@ class BaseHoldout(BaseValSplit):
 
         """
         checkers.checkType(
-            "ID for labelset collection entities", IDHandler.IDprop, lscIDs
+            "ID for labelset collection entities", IDHandler.IDprop, lscIDs,
         )
         checkers.checkType("ID for graph entities", IDHandler.IDmap, nodeIDs)
         common_ID_list = []
@@ -162,5 +162,5 @@ class BaseInterface(BaseValSplit):
 
     def setup_split_func(self, split_func):
         self.get_split_idx_ary = lambda ID_ary, label_ary: split_func(
-            ID_ary, label_ary
+            ID_ary, label_ary,
         )

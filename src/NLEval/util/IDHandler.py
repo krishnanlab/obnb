@@ -76,7 +76,7 @@ class IDlst(object):
         else:
             raise TypeError(
                 f"ID key(s) must be stirng or iterables of "
-                f"string, not {type(ID)!r}"
+                f"string, not {type(ID)!r}",
             )
 
     def _getitem_sinlge(self, ID):
@@ -304,7 +304,7 @@ class IDprop(IDmap):
             if not isinstance(default_val, default_type):
                 raise TypeError(
                     f"Inconsistent type between default values "
-                    f"{type(default_val)!r} and default type {default_type!r}"
+                    f"{type(default_val)!r} and default type {default_type!r}",
                 )
         if not self.isempty():
             prop_lst = [deepcopy(default_val) for i in range(self.size)]
@@ -382,7 +382,7 @@ class IDprop(IDmap):
                 if prop_name in prop:
                     if default_type is not None:
                         checkers.checkType(
-                            "Properties Values", default_type, prop[prop_name]
+                            "Properties Values", default_type, prop[prop_name],
                         )
                 else:
                     prop[prop_name] = deepcopy(self.prop_default_val[prop_name])

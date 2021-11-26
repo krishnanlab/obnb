@@ -13,7 +13,7 @@ class TimeIt:
             end = time.time()
             time_interval = end - start
             print(
-                f"Took {time_interval:.2f} seconds to run function {repr(func)}"
+                f"Took {time_interval:.2f} seconds to run function {repr(func)}",
             )
 
         if self.verbose:

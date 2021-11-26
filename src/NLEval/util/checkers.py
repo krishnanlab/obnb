@@ -54,7 +54,7 @@ def checkType(name, targetType, val):
     """
     if not isinstance(val, targetType):
         raise TypeError(
-            f"{name!r} should be {targetType!r}, not {type(val)!r}: {val!r}"
+            f"{name!r} should be {targetType!r}, not {type(val)!r}: {val!r}",
         )
 
 
@@ -83,7 +83,7 @@ def checkTypesInIterable(name, targetType, val):
         if not isinstance(i, targetType):
             raise TypeError(
                 f"All instances in {name!r} must be type {targetType!r}, "
-                f"invalid type {type(i)!r} found at position ({idx}): {i!r}"
+                f"invalid type {type(i)!r} found at position ({idx}): {i!r}",
             )
 
 
@@ -131,7 +131,7 @@ def checkNumpyArrayNDim(name, targetNDim, ary):
     if NDim != targetNDim:
         raise ValueError(
             f"{name!r} should be {targetNDim} dimensional array, "
-            f"not {NDim} dimensional"
+            f"not {NDim} dimensional",
         )
 
 
@@ -158,5 +158,5 @@ def checkNumpyArrayShape(name, targetShape, ary):
     shape = ary.shape
     if shape != targetShape:
         raise ValueError(
-            f"{name!r} should be in shape {targetShape!r}, not {shape!r}"
+            f"{name!r} should be in shape {targetShape!r}, not {shape!r}",
         )

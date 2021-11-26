@@ -68,7 +68,7 @@ class CombLogRegCVPredComb(CombSLBase):
             raise ValueError(
                 "PredComb only takes two input features sets, "
                 + +f"but the input has {len(G.mat_list)} "
-                + "number of feature sets"
+                + "number of feature sets",
             )
         self.mixing_ratio = mixing_ratio
         self.base_mdl = LogisticRegressionCV
@@ -106,7 +106,7 @@ class CombLogRegCVAdaBoost(CombSLBase):
             if n_mdl is not None:
                 print(
                     f"Warning: n_mdl set to be {repr(n_mdl)} "
-                    + "with exclude=False, set to None implicitly."
+                    + "with exclude=False, set to None implicitly.",
                 )
                 n_mdl = None
         self.n_mdl = n_mdl
@@ -118,17 +118,17 @@ class CombLogRegCVAdaBoost(CombSLBase):
         w = np.ones(len(ID_ary)) / len(ID_ary)  # data point weights
         coef = np.zeros(n_mdl)  # model boosting coefficients
         y_pred_mat = np.zeros(
-            (len(ID_ary), n_mdl), dtype=bool
+            (len(ID_ary), n_mdl), dtype=bool,
         )  # predictions from all models
         idx_ary = self.G.IDmap[ID_ary]
 
         if self.exclude:
             selected_ind = np.zeros(
-                n_mdl, dtype=bool
+                n_mdl, dtype=bool,
             )  # inidvator for selected model
         else:
             mdl_idx_ary = np.zeros(
-                n_mdl, dtype=int
+                n_mdl, dtype=int,
             )  # index of features of corresponding boosting coefficients
             mdl_list = self.mdl_list
             self.mdl_list = (
@@ -164,7 +164,7 @@ class CombLogRegCVAdaBoost(CombSLBase):
             a = 0.5 * np.log((1 - opt_err) / opt_err)  # model coefficient
             if a < 0:
                 print(
-                    f"Warning: encountered worse than random prediction, a = {a}, set to 0"
+                    f"Warning: encountered worse than random prediction, a = {a}, set to 0",
                 )
                 a = 0
             y_pred_opt = (
@@ -199,7 +199,7 @@ class CombLogRegCVAdaBoost(CombSLBase):
     def decision(self, ID_ary):
         if self.coef_ is None:
             raise ValueError(
-                "Master model untrained, train first using fit_master_mdl"
+                "Master model untrained, train first using fit_master_mdl",
             )
 
         idx_ary = self.G.IDmap[ID_ary]
@@ -210,7 +210,7 @@ class CombLogRegCVAdaBoost(CombSLBase):
         for i, j in enumerate(iter_list):
             x = self.G.mat_list[j][idx_ary]
             decision_ary += self.coef_[i] * self.mdl_list[i].decision_function(
-                x
+                x,
             )
 
         return decision_ary
@@ -243,7 +243,7 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
             if n_mdl is not None:
                 print(
                     f"Warning: n_mdl set to be {repr(n_mdl)} "
-                    + "with exclude=False, set to None implicitly."
+                    + "with exclude=False, set to None implicitly.",
                 )
                 n_mdl = None
         self.n_mdl = n_mdl
@@ -259,17 +259,17 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
         w = np.ones(len(ID_ary)) / n_pos  # data point weights
         coef = np.zeros(n_mdl)  # model boosting coefficients
         y_pred_mat = np.zeros(
-            (len(ID_ary), len(self.G.mat_list)), dtype=bool
+            (len(ID_ary), len(self.G.mat_list)), dtype=bool,
         )  # predictions from all features
         idx_ary = self.G.IDmap[ID_ary]
 
         if self.exclude:
             selected_ind = np.zeros(
-                n_mdl, dtype=bool
+                n_mdl, dtype=bool,
             )  # inidvator for selected model
         else:
             mdl_idx_ary = np.zeros(
-                n_mdl, dtype=int
+                n_mdl, dtype=int,
             )  # index of features of corresponding boosting coefficients
             mdl_list = self.mdl_list
             self.mdl_list = (
@@ -296,14 +296,14 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
                     y_pred_mat[:, j] = mdl.predict(x)
 
                 r = average_precision_score(
-                    y, y_pred_mat[:, j], sample_weight=w / w.sum()
+                    y, y_pred_mat[:, j], sample_weight=w / w.sum(),
                 )
                 if r > opt_r:
                     opt_r = r
                     opt_idx = j
 
             opt_r = min(
-                opt_r, 0.99
+                opt_r, 0.99,
             )  # prevent auprc of 1, causes divide by zero for a
             a = 0.5 * np.log((1 + opt_r) / (1 - opt_r))  # model coefficient
             y_pred_opt = y_pred_mat[
@@ -312,7 +312,7 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
 
             w[y] *= w[y] * np.exp(-a * y_pred_opt[y])  # down weight positives
             w[~y] *= w[~y] * np.exp(
-                a * y_pred_opt[~y]
+                a * y_pred_opt[~y],
             )  # up weight negatives, weighted by skew
             w[w < 0.01] = 0.01  # prevent zero sample weight
             w[y] /= w[y].sum()
@@ -345,7 +345,7 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
     def decision(self, ID_ary):
         if self.coef_ is None:
             raise ValueError(
-                "Master model untrained, train first using fit_master_mdl"
+                "Master model untrained, train first using fit_master_mdl",
             )
 
         idx_ary = self.G.IDmap[ID_ary]
@@ -356,7 +356,7 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
         for i, j in enumerate(iter_list):
             x = self.G.mat_list[j][idx_ary]
             decision_ary += self.coef_[i] * self.mdl_list[i].decision_function(
-                x
+                x,
             )
 
         return decision_ary

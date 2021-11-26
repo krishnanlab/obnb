@@ -172,7 +172,7 @@ class BaseLSC(IDHandler.IDprop):
 
         if neg == {None}:
             all_positives = set(
-                [i for i in self.entity.map if self.getNoccur(i) > 0]
+                [i for i in self.entity.map if self.getNoccur(i) > 0],
             )
             return all_positives - self.getLabelset(labelID)
 
@@ -187,7 +187,7 @@ class BaseLSC(IDHandler.IDprop):
                 # raise Exception(repr(ID), repr(labelID))
                 raise IDExistsError(
                     f"Entity {ID!r} is positive in labelset {labelID!r}, "
-                    f"cannot be set to negative"
+                    f"cannot be set to negative",
                 )
         self.setProp(labelID, "Negative", set(lst))
 
@@ -243,7 +243,7 @@ class BaseLSC(IDHandler.IDprop):
             negative_set = self.getNegative(labelID)
 
             for sign, labelset in zip(
-                ["1", "-1"], [positive_set, negative_set]
+                ["1", "-1"], [positive_set, negative_set],
             ):
                 for entityID in labelset:
                     i = entityIDmap[entityID]
@@ -360,7 +360,7 @@ class SplitLSC(BaseLSC):
             raise AttributeError(
                 "'valsplit' not configured, "
                 + "assign validation split generator first. "
-                + "See `NLEval.valsplit` for more info."
+                + "See `NLEval.valsplit` for more info.",
             )
 
         num_labelsets = None
@@ -370,7 +370,7 @@ class SplitLSC(BaseLSC):
             # labelIDset = set(self.labelIDlst)
             self.valsplit.train_test_setup(self.entity, graph.IDmap, prop_name)
             self.apply(
-                Filter.LabelsetRangeFilterTrainTestPos(min_pos), inplace=True
+                Filter.LabelsetRangeFilterTrainTestPos(min_pos), inplace=True,
             )
             # for i in labelIDset - set(self.labelIDlst):
             #     print(f"Pop {i}")

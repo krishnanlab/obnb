@@ -11,7 +11,7 @@ def auPRC(y_true, y_predict):
         return np.nan
     return np.log2(
         sklearn.metrics.average_precision_score(y_true, y_predict)
-        / prior(y_true)
+        / prior(y_true),
     )
 
 

@@ -334,13 +334,13 @@ class TestIDprop(unittest.TestCase):
         self.assertEqual(self.IDprop1._prop["y"], [[1], []])
         # test if default values and types set correctly
         with self.subTest(
-            mst="Check if default properties values set correctly"
+            mst="Check if default properties values set correctly",
         ):
             self.assertEqual(
-                self.IDprop1.prop_default_val, {"10": None, "x": 10, "y": []}
+                self.IDprop1.prop_default_val, {"10": None, "x": 10, "y": []},
             )
         with self.subTest(
-            mst="Check if default properties types set correctly"
+            mst="Check if default properties types set correctly",
         ):
             self.assertEqual(
                 self.IDprop1.prop_default_type,
@@ -389,10 +389,10 @@ class TestIDprop(unittest.TestCase):
         self.IDprop1.newProp("y", "1", str)
         self.IDprop1.newProp("z", [1], list)
         self.assertEqual(
-            self.IDprop1.prop_default_val, {"x": 1, "y": "1", "z": [1]}
+            self.IDprop1.prop_default_val, {"x": 1, "y": "1", "z": [1]},
         )
         self.assertEqual(
-            self.IDprop1.prop_default_type, {"x": int, "y": str, "z": list}
+            self.IDprop1.prop_default_type, {"x": int, "y": str, "z": list},
         )
         self.assertEqual(self.IDprop1.prop, {"x": [], "y": [], "z": []})
         # test if property deleted properly on empty ID list
@@ -411,7 +411,7 @@ class TestIDprop(unittest.TestCase):
         self.IDprop1.addID("b")
         self.IDprop1.addID("c")
         self.assertEqual(
-            self.IDprop1.prop, {"x": [1, 1, 1], "z": [[1], [1], [1]]}
+            self.IDprop1.prop, {"x": [1, 1, 1], "z": [[1], [1], [1]]},
         )
         self.IDprop1.delProp("z")
         self.assertEqual(self.IDprop1.prop, {"x": [1, 1, 1]})
@@ -467,15 +467,15 @@ class TestIDprop(unittest.TestCase):
         self.assertRaises(TypeError, self.IDprop1.addID, "c", ("x", "y"))
         # test wrong prop keys --> IDNotExistError
         self.assertRaises(
-            IDNotExistError, self.IDprop1.addID, "c", {"x": 3, "z": "3"}
+            IDNotExistError, self.IDprop1.addID, "c", {"x": 3, "z": "3"},
         )
         # test wrong prop val type --> TypeError
         self.assertRaises(
-            TypeError, self.IDprop1.addID, "c", {"x": 3, "y": 3.0}
+            TypeError, self.IDprop1.addID, "c", {"x": 3, "y": 3.0},
         )
         # test partial specification, use default values for unspecified properties
         self.IDprop1.addID(
-            "c", {"x": 3}
+            "c", {"x": 3},
         )  # only 'x' specified, 'y' will be default
         self.assertEqual(self.IDprop1.getProp("c", "x"), 3)
         self.assertEqual(self.IDprop1.getProp("c", "y"), "1")
@@ -546,23 +546,23 @@ class TestCheckers(unittest.TestCase):
     def test_checkType(self):
         checkers.checkType("n_int", int, self.n_int)
         self.assertRaises(
-            TypeError, checkers.checkType, "n_int", int, self.n_float
+            TypeError, checkers.checkType, "n_int", int, self.n_float,
         )
         checkers.checkType("n_float", float, self.n_float)
         self.assertRaises(
-            TypeError, checkers.checkType, "n_float", float, self.n_int
+            TypeError, checkers.checkType, "n_float", float, self.n_int,
         )
         checkers.checkType("n_str", str, self.n_str)
 
     def test_checkTypeInIterable(self):
         checkers.checkTypesInIterable(
-            "n_int_tuple", checkers.INT_TYPE, self.n_int_tuple
+            "n_int_tuple", checkers.INT_TYPE, self.n_int_tuple,
         )
         checkers.checkTypesInIterable(
-            "n_int_lst", checkers.INT_TYPE, self.n_int_lst
+            "n_int_lst", checkers.INT_TYPE, self.n_int_lst,
         )
         checkers.checkTypesInIterable(
-            "n_int_npary", checkers.INT_TYPE, self.n_int_npary
+            "n_int_npary", checkers.INT_TYPE, self.n_int_npary,
         )
         self.assertRaises(
             TypeError,
@@ -586,13 +586,13 @@ class TestCheckers(unittest.TestCase):
             self.n_int_npary,
         )
         checkers.checkTypesInIterable(
-            "n_float_tuple", checkers.FLOAT_TYPE, self.n_float_tuple
+            "n_float_tuple", checkers.FLOAT_TYPE, self.n_float_tuple,
         )
         checkers.checkTypesInIterable(
-            "n_float_lst", checkers.FLOAT_TYPE, self.n_float_lst
+            "n_float_lst", checkers.FLOAT_TYPE, self.n_float_lst,
         )
         checkers.checkTypesInIterable(
-            "n_float_npary", checkers.FLOAT_TYPE, self.n_float_npary
+            "n_float_npary", checkers.FLOAT_TYPE, self.n_float_npary,
         )
         self.assertRaises(
             TypeError,
@@ -619,7 +619,7 @@ class TestCheckers(unittest.TestCase):
     def test_checkTypeErrNone(self):
         self.assertRaises(ValueError, checkers.checkTypeErrNone, "n", int, None)
         self.assertRaises(
-            ValueError, checkers.checkTypeErrNone, "n", float, None
+            ValueError, checkers.checkTypeErrNone, "n", float, None,
         )
         self.assertRaises(ValueError, checkers.checkTypeErrNone, "n", str, None)
 
@@ -636,13 +636,13 @@ class TestCheckers(unittest.TestCase):
         checkers.checkNumpyArrayNDim("ary2", 2, ary2)
         checkers.checkNumpyArrayNDim("ary3", 3, ary3)
         self.assertRaises(
-            ValueError, checkers.checkNumpyArrayNDim, "ary1", 4, ary1
+            ValueError, checkers.checkNumpyArrayNDim, "ary1", 4, ary1,
         )
         self.assertRaises(
-            ValueError, checkers.checkNumpyArrayNDim, "ary2", 4, ary2
+            ValueError, checkers.checkNumpyArrayNDim, "ary2", 4, ary2,
         )
         self.assertRaises(
-            ValueError, checkers.checkNumpyArrayNDim, "ary3", 4, ary3
+            ValueError, checkers.checkNumpyArrayNDim, "ary3", 4, ary3,
         )
 
     def test_checkNumpyArrayShape(self):
@@ -654,7 +654,7 @@ class TestCheckers(unittest.TestCase):
         checkers.checkNumpyArrayShape("ary2", (2, 2), ary2)
         checkers.checkNumpyArrayShape("ary3", (2, 2, 2), ary3)
         self.assertRaises(
-            ValueError, checkers.checkNumpyArrayShape, "ary1", 1, ary1
+            ValueError, checkers.checkNumpyArrayShape, "ary1", 1, ary1,
         )
         self.assertRaises(
             ValueError,
@@ -667,10 +667,10 @@ class TestCheckers(unittest.TestCase):
             ary1,
         )
         self.assertRaises(
-            ValueError, checkers.checkNumpyArrayShape, "ary2", (2, 1), ary2
+            ValueError, checkers.checkNumpyArrayShape, "ary2", (2, 1), ary2,
         )
         self.assertRaises(
-            ValueError, checkers.checkNumpyArrayShape, "ary3", 1, ary3
+            ValueError, checkers.checkNumpyArrayShape, "ary3", 1, ary3,
         )
 
     def test_checkNumpyArrayIsNumeric(self):
@@ -686,22 +686,22 @@ class TestCheckers(unittest.TestCase):
         ary1 = np.ones(3, dtype=str)
         ary2 = np.ones((3, 3), dtype=str)
         self.assertRaises(
-            TypeError, checkers.checkNumpyArrayIsNumeric, "ar1", ary1
+            TypeError, checkers.checkNumpyArrayIsNumeric, "ar1", ary1,
         )
         self.assertRaises(
-            TypeError, checkers.checkNumpyArrayIsNumeric, "ar2", ary2
+            TypeError, checkers.checkNumpyArrayIsNumeric, "ar2", ary2,
         )
 
         # test list --> error
         lst = [1, 2, 3]
         self.assertRaises(
-            TypeError, checkers.checkNumpyArrayIsNumeric, "lst", lst
+            TypeError, checkers.checkNumpyArrayIsNumeric, "lst", lst,
         )
 
         # test string --> error
         string = "asdfgasdglafknklasd"
         self.assertRaises(
-            TypeError, checkers.checkNumpyArrayIsNumeric, "string", string
+            TypeError, checkers.checkNumpyArrayIsNumeric, "string", string,
         )
 
 

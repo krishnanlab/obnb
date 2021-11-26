@@ -46,7 +46,7 @@ class DenseGraph(BaseGraph):
             checkers.checkNumpyArrayNDim("val", 2, val)
             if self.IDmap.size != val.shape[0]:
                 raise ValueError(
-                    f"Expecting {self.IDmap.size} entries, not {val.shape[0]}"
+                    f"Expecting {self.IDmap.size} entries, not {val.shape[0]}",
                 )
         self._mat = val.copy()
 
@@ -77,7 +77,7 @@ class DenseGraph(BaseGraph):
         if idmap.size != mat.shape[0]:
             raise ValueError(
                 f"Inconsistent dimension between IDs ({idmap.size}) and the "
-                f"matrix ({mat.shape[0]})"
+                f"matrix ({mat.shape[0]})",
             )
         graph = cls()
         graph.IDmap = idmap
@@ -132,7 +132,7 @@ class FeatureVec(DenseGraph):
         if d is not None:
             if d < 1:
                 raise ValueError(
-                    f"Feature dimension must be greater than 1, got {d}"
+                    f"Feature dimension must be greater than 1, got {d}",
                 )
         if not self.isempty():
             if d != self.mat.shape[1]:
@@ -141,7 +141,7 @@ class FeatureVec(DenseGraph):
                     print("CRITICAL: This should never happen!")
                 raise ValueError(
                     f"Inconsistent dimension between input ({d}) and data "
-                    f"({self.mat.shape[1]})"
+                    f"({self.mat.shape[1]})",
                 )
         self._dim = d
 
@@ -159,7 +159,7 @@ class FeatureVec(DenseGraph):
                 self._mat = mat_bkp
                 raise ValueError(
                     f"Inconsistent dimension between input ({val.shape[1]}) "
-                    f"and specified dimension ({self.dim})"
+                    f"and specified dimension ({self.dim})",
                 )
 
     def get_edge(self, ID1, ID2, dist_fun=distance.cosine):
@@ -182,7 +182,7 @@ class FeatureVec(DenseGraph):
         if self.size != self.mat.shape[0]:
             raise ValueError(
                 f"Inconsistent number of IDs ({self.IDmap.size}) and matrix "
-                f"entries ({self.mat.shape[0]})"
+                f"entries ({self.mat.shape[0]})",
             )
 
         if self.isempty():

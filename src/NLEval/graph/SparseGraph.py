@@ -84,7 +84,7 @@ class SparseGraph(BaseGraph):
                 print(
                     f"WARNING: edge between {self.IDmap[ID1]} and "
                     f"{self.IDmap[ID2]} exists with weight {old_weight:.2f}"
-                    f", overwriting with {weight:.2f}"
+                    f", overwriting with {weight:.2f}",
                 )
         except KeyError:
             self._edge_data[self.IDmap[ID1]][self.IDmap[ID2]] = weight
@@ -157,7 +157,7 @@ class SparseGraph(BaseGraph):
 
         """
         for ID1, ID2, weight in reader(
-            file, self.weighted, self.directed, cut_threshold
+            file, self.weighted, self.directed, cut_threshold,
         ):
             self.addEdge(ID1, ID2, weight)
 
@@ -222,7 +222,7 @@ class SparseGraph(BaseGraph):
             else:
                 raise ValueError(f"Unknown writer function name {writer!r}")
         writer(
-            outpth, self.edge_gen, self.weighted, self.directed, cut_threshold
+            outpth, self.edge_gen, self.weighted, self.directed, cut_threshold,
         )
 
     def to_adjmat(self, default_val=0):

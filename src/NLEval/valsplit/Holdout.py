@@ -39,7 +39,7 @@ class TrainValTest(BaseHoldout):
         checkers.checkTypeErrNone("Training ratio", checkers.FLOAT_TYPE, val)
         if (val <= 0) | (val > 1):
             raise ValueError(
-                f"Training ratio must be between 0 and 1, received {val}"
+                f"Training ratio must be between 0 and 1, received {val}",
             )
         self._train_ratio = val
 
@@ -48,13 +48,13 @@ class TrainValTest(BaseHoldout):
         checkers.checkTypeErrNone("Testing ratio", checkers.FLOAT_TYPE, val)
         if (val <= 0) | (val > 1):
             raise ValueError(
-                f"Testing ratio must be between 0 and 1, received {val}"
+                f"Testing ratio must be between 0 and 1, received {val}",
             )
         if self.train_ratio + val >= 1:
             raise ValueError(
                 f"Sum of training and testing ratio must be "
                 f"less than 1, received train_raio = "
-                f"{self.train_ratio}, and test_ratio = {val}"
+                f"{self.train_ratio}, and test_ratio = {val}",
             )
         self._test_ratio = val
 
@@ -99,7 +99,7 @@ class BinHold(BaseHoldout):
         checkers.checkTypeErrNone("Number of bins", checkers.INT_TYPE, val)
         if val < 1:
             raise ValueError(
-                f"Number of bins must be greater than 1, received {val}"
+                f"Number of bins must be greater than 1, received {val}",
             )
         self._bin_num = val
 
@@ -221,17 +221,17 @@ class CustomHold(BaseHoldout):
             self._custom_valid_ID_ary = None
         else:
             checkers.checkTypesInNumpyArray(
-                "Validation data ID list", str, ID_ary
+                "Validation data ID list", str, ID_ary,
             )
             self._custom_valid_ID_ary = ID_ary
 
     def train_test_setup(self, lscIDs, nodeIDs, **kwargs):
         common_ID_list = self.get_common_ID_list(lscIDs, nodeIDs)
         self._train_ID_ary = np.intersect1d(
-            self.custom_train_ID_ary, common_ID_list
+            self.custom_train_ID_ary, common_ID_list,
         )
         self._test_ID_ary = np.intersect1d(
-            self.custom_test_ID_ary, common_ID_list
+            self.custom_test_ID_ary, common_ID_list,
         )
         self._valid_ID_ary = (
             None
