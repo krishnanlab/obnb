@@ -1,11 +1,13 @@
-from common import *
+import os
+import unittest
 
+import numpy as np
 from copy import deepcopy
 from scipy.spatial import distance
 
+from common import SAMPLE_DATA_DIR
 from NLEval.graph import BaseGraph, SparseGraph, DenseGraph
 from NLEval.util import IDHandler
-from NLEval.util.Exceptions import IDNotExistError, IDExistsError
 
 
 def shuffle_sparse(graph):
@@ -208,9 +210,9 @@ class TestDenseGraph(unittest.TestCase):
         mat1 = np.random.random((2, 2))
         mat2 = np.random.random((3, 2))
         # test consistent size input, using idmap --> success
-        graph = DenseGraph.DenseGraph.construct_graph(idmap, mat1)
+        DenseGraph.DenseGraph.construct_graph(idmap, mat1)
         # test consistent size input, using idlst --> success
-        graph = DenseGraph.DenseGraph.construct_graph(idmap.lst, mat1)
+        DenseGraph.DenseGraph.construct_graph(idmap.lst, mat1)
         # test inconsistent size input --> error
         self.assertRaises(
             ValueError, DenseGraph.DenseGraph.construct_graph, idmap, mat2

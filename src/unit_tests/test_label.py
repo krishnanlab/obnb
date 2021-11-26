@@ -1,8 +1,11 @@
-from common import *
+import os
+import unittest
 
+import numpy as np
+
+from common import SAMPLE_DATA_DIR
 from NLEval import valsplit
 from NLEval.label import LabelsetCollection, Filter
-from NLEval.util import IDHandler
 from NLEval.util.Exceptions import IDNotExistError, IDExistsError
 
 

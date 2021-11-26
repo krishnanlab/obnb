@@ -1,4 +1,6 @@
-from common import *
+import unittest
+
+import numpy as np
 
 from NLEval.util import IDHandler, checkers
 from NLEval.util.Exceptions import IDNotExistError, IDExistsError
@@ -86,7 +88,6 @@ class TestIDlst(unittest.TestCase):
         self.assertEqual(self.IDlst3.size, 2)
         self.assertEqual(IDHandler.IDlst().size, 0)
 
-    def test_size(self):
         idlst = IDHandler.IDlst()
         self.assertTrue(idlst.isempty())
         idlst.addID("a")
