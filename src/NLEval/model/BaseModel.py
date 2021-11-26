@@ -2,10 +2,12 @@ from NLEval.graph import BaseGraph
 from NLEval.util import checkers
 import numpy as np
 
-__all__ = ['BaseModel']
+__all__ = ["BaseModel"]
+
 
 class BaseModel:
     """Base model object"""
+
     def __init__(self, g):
         super(BaseModel, self).__init__()
         self.G = g
@@ -14,10 +16,10 @@ class BaseModel:
     def G(self):
         """:obj:`NLEval.Graph.BaseGraph`: graph object"""
         return self._G
-    
+
     @G.setter
     def G(self, g):
-        checkers.checkType('Graph', BaseGraph.BaseGraph, g)
+        checkers.checkType("Graph", BaseGraph.BaseGraph, g)
         self._G = g
 
     def get_idx_ary(self, IDs):
@@ -81,14 +83,14 @@ class BaseModel:
             decision_ary = self.decision(test_id_ary)
             y_true.append(test_label_ary)
             y_predict.append(decision_ary)
-            #print(self.C_)
+            # print(self.C_)
         return y_true, y_predict
 
     def predict(self, pos_ID_set, neg_ID_set):
         """Network wise prediction
 
-        Given positive and negative examples, train the model and then generate 
-        predictions for all nodes in the network and return as prediction score 
+        Given positive and negative examples, train the model and then generate
+        predictions for all nodes in the network and return as prediction score
         dictionary.
 
         Input:
@@ -96,7 +98,7 @@ class BaseModel:
             neg_ID_set (:obj:`set` of :obj:`str`): set of IDs of negative examples.
 
         Output:
-            score_dict (:obj:`dict` of :obj:`str` -> :obj:`float`): dictionary 
+            score_dict (:obj:`dict` of :obj:`str` -> :obj:`float`): dictionary
                 mapping node IDs to prediction scores
 
         """
@@ -108,10 +110,10 @@ class BaseModel:
 
         ID_ary = np.array(list(pos_ID_set | neg_ID_set))
         label_ary = np.zeros(len(ID_ary), dtype=bool)
-        label_ary[:len(pos_ID_set)] = True
+        label_ary[: len(pos_ID_set)] = True
 
         self.train(ID_ary, label_ary)
         scores = self.decision(ID_list)
-        score_dict =  {ID:score for ID, score in zip(ID_list, scores)}
-        
+        score_dict = {ID: score for ID, score in zip(ID_list, scores)}
+
         return score_dict

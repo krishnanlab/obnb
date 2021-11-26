@@ -1,27 +1,31 @@
 from sys import path
-path.append('../')
+
+path.append("../")
 from NLEval import graph, valsplit, label, model
 from sklearn.metrics import roc_auc_score as auroc
 import numpy as np
 
 # define connstatns
-data_path = '../../data/' # path to data
-i = 54 # index of labelset
-k = 50 # numbers of top genes to display
+data_path = "../../data/"  # path to data
+i = 54  # index of labelset
+k = 50  # numbers of top genes to display
 
 # load graph and labelset collection
-g = graph.DenseGraph.DenseGraph.from_edglst(data_path \
-    + 'networks/STRING-EXP.edg', weighted=True, directed=False)
-lsc = label.LabelsetCollection.SplitLSC.from_gmt(data_path + 'labels/KEGGBP.gmt')
+g = graph.DenseGraph.DenseGraph.from_edglst(
+    data_path + "networks/STRING-EXP.edg", weighted=True, directed=False
+)
+lsc = label.LabelsetCollection.SplitLSC.from_gmt(
+    data_path + "labels/KEGGBP.gmt"
+)
 
 # initialize model
-mdl = model.SupervisedLearning.LogReg(g, penalty='l2', solver='lbfgs')
+mdl = model.SupervisedLearning.LogReg(g, penalty="l2", solver="lbfgs")
 
 # diplay choice of labelsets
-for l,m in enumerate(lsc.labelIDlst):
+for l, m in enumerate(lsc.labelIDlst):
     # index, labelset size, labelset ID
     print(f"{l:>4d} {len(lsc.getLabelset(m)):>4d} {m}")
-print('')
+print("")
 
 # get labelID
 labelID = lsc.labelIDlst[i]

@@ -3,10 +3,12 @@ from NLEval.util.Exceptions import IDNotExistError, IDExistsError
 from NLEval.util import checkers
 from copy import deepcopy
 
-__all__ = ['IDlst', 'IDmap', 'IDprop']
+__all__ = ["IDlst", "IDmap", "IDprop"]
+
 
 class IDlst(object):
     """ID list object that stores a list of IDs"""
+
     def __init__(self):
         super(IDlst, self).__init__()
         self._lst = []
@@ -17,12 +19,12 @@ class IDlst(object):
 
     def __eq__(self, other):
         """Return true if two IDlst have same set of IDs"""
-        checkers.checkType('other', self.__class__, other)
+        checkers.checkType("other", self.__class__, other)
         return set(self._lst) == set(other._lst)
 
     def __add__(self, other):
         """Combine two ID list and return a copy"""
-        checkers.checkType('other', self.__class__, other)
+        checkers.checkType("other", self.__class__, other)
         new = self.copy()
         for ID in other:
             if ID not in new:
@@ -32,7 +34,7 @@ class IDlst(object):
     def __sub__(self, other):
         """Return a copy of ID list that does not contain any
         IDs from the `other` ID list"""
-        checkers.checkType('other', self.__class__, other)
+        checkers.checkType("other", self.__class__, other)
         new = self.__class__()
         for ID in self:
             if ID not in other:
@@ -41,7 +43,7 @@ class IDlst(object):
 
     def __and__(self, other):
         """Return a copy of ID list with IDs that exist in both lists"""
-        checkers.checkType('other', self.__class__, other)
+        checkers.checkType("other", self.__class__, other)
         new = self.__class__()
         for ID in set(self._lst) & set(other._lst):
             new.addID(ID)
@@ -53,7 +55,7 @@ class IDlst(object):
 
     def __xor__(self, other):
         """Return a copy of ID list with IDs that are unique"""
-        checkers.checkType('other', self.__class__, other)
+        checkers.checkType("other", self.__class__, other)
         new = self.__class__()
         for ID in set(self._lst) ^ set(other._lst):
             new.addID(ID)
@@ -61,7 +63,7 @@ class IDlst(object):
 
     def __contains__(self, ID):
         """Return true if ID exist in current list"""
-        checkers.checkType('ID', str, ID)
+        checkers.checkType("ID", str, ID)
         return ID in self._lst
 
     def __getitem__(self, ID):
@@ -72,27 +74,29 @@ class IDlst(object):
         elif isinstance(ID, checkers.ITERABLE_TYPE):
             return self._getitem_multiple(ID)
         else:
-            raise TypeError("ID key(s) must be stirng or iterables of " + \
-                            "string, not %s"%repr(type(ID)))
+            raise TypeError(
+                f"ID key(s) must be stirng or iterables of "
+                f"string, not {type(ID)!r}",
+            )
 
     def _getitem_sinlge(self, ID):
         self._check_ID_existence(ID, True)
         return self._lst.index(ID)
 
     def _getitem_multiple(self, IDs):
-        checkers.checkTypesInIterable('IDs', str, IDs)
+        checkers.checkTypesInIterable("IDs", str, IDs)
         idx_lst = []
         for ID in IDs:
             idx_lst.append(self._getitem_sinlge(ID))
         return np.array(idx_lst)
 
     def _check_ID_existence(self, ID, existence):
-        """Check existence of ID and raise exceptions depending on 
+        """Check existence of ID and raise exceptions depending on
         desired existence of ID"""
         if (not existence) & (ID in self):
-            raise IDExistsError("Existing ID %s"%repr(ID))
+            raise IDExistsError(f"Existing ID {ID!r}")
         elif existence & (ID not in self):
-            raise IDNotExistError("Unknown ID %s"%repr(ID))
+            raise IDNotExistError(f"Unknown ID ID!r")
 
     @property
     def lst(self):
@@ -103,7 +107,7 @@ class IDlst(object):
 
         """
         return self._lst.copy()
-    
+
     @property
     def size(self):
         """int: number of IDs in list"""
@@ -138,7 +142,7 @@ class IDlst(object):
         Loop over all IDs and add to list if not yet existed
 
         Args:
-            IDs(:obj:`list` of :obj:`str`): list of ID to be added, 
+            IDs(:obj:`list` of :obj:`str`): list of ID to be added,
             can be redundant
 
         Returns:
@@ -165,15 +169,17 @@ class IDlst(object):
             obj.addID(ID)
         return obj
 
+
 class IDmap(IDlst):
     """IDmap object that implements dictionary for more efficient mapping
     from ID to index"""
+
     def __init__(self):
         super(IDmap, self).__init__()
         self._map = {}
 
     def __contains__(self, ID):
-        checkers.checkType('ID', str, ID)
+        checkers.checkType("ID", str, ID)
         return ID in self._map
 
     def _getitem_sinlge(self, ID):
@@ -183,7 +189,7 @@ class IDmap(IDlst):
     @property
     def map(self):
         """(dict of str:int): map from ID to index
-        
+
         Note: the returned dict is a copy of self._map to prevent userside
         maniputation on data, use `.addID()` or `.popID()` to modify data
 
@@ -197,14 +203,16 @@ class IDmap(IDlst):
         for i, ID in enumerate(self.lst[idx:]):
             self._map[ID] = idx + i
         return idx
-    
+
     def addID(self, ID):
         new_idx = self.size
         super(IDmap, self).addID(ID)
         self._map[self._lst[-1]] = new_idx
 
+
 class IDprop(IDmap):
     """ID properties object that stores property information of IDs"""
+
     def __init__(self):
         super(IDprop, self).__init__()
         self._prop_default_val = {}
@@ -235,35 +243,35 @@ class IDprop(IDmap):
         raise NotImplementedError
 
     def _check_prop_existence(self, prop_name, existence):
-        """Check existence of property name and raise exceptions depending 
+        """Check existence of property name and raise exceptions depending
         on desired existence of property name
 
         Raises:
             IDExistsError: if desired existence of `prop_name` int `self._prop`
                 is `False` and `prop_name` exists
             IDNotExitError: if desired existence of `prop_name` in `self._prop`
-                is `True` and `prop_name` not yet existed 
+                is `True` and `prop_name` not yet existed
 
         """
         checkers.checkType("Property name", str, prop_name)
         if (not existence) & (prop_name in self._prop):
-            raise IDExistsError("Existing property name %s"%repr(prop_name))
+            raise IDExistsError(f"Existing property name {prop_name!r}")
         elif existence & (prop_name not in self._prop):
-            raise IDNotExistError("Unknown property name %s"%repr(prop_name))
+            raise IDNotExistError(f"Unknown property name {prop_name!r}")
 
     @property
     def prop_default_val(self):
-        """(dict of str:obj): dictionary mapping from property name to 
+        """(dict of str:obj): dictionary mapping from property name to
         default property value"""
         return self._prop_default_val.copy()
-    
+
     @property
     def prop_default_type(self):
         return self._prop_default_type.copy()
 
     @property
     def prop(self):
-        """(dict of str: :obj:`list` of :obj:): dictionary mapping from 
+        """(dict of str: :obj:`list` of :obj:): dictionary mapping from
         property name to list of property values in the order of ID list
 
         Note: the returned dict is a copy of self._prop to prevent userside
@@ -279,7 +287,7 @@ class IDprop(IDmap):
 
     def newProp(self, prop_name, default_val=None, default_type=None):
         """Create a new property
-        
+
         Args:
             prop_name(str): name of property
             default_val: default value to set if property not specified
@@ -294,9 +302,10 @@ class IDprop(IDmap):
         if default_type is not None:
             checkers.checkType("Default type", type, default_type)
             if not isinstance(default_val, default_type):
-                raise TypeError("Inconsistent type between default values " + \
-                                "%s and default type %s"%\
-                                (type(default_val), default_type))
+                raise TypeError(
+                    f"Inconsistent type between default values "
+                    f"{type(default_val)!r} and default type {default_type!r}",
+                )
         if not self.isempty():
             prop_lst = [deepcopy(default_val) for i in range(self.size)]
         else:
@@ -307,10 +316,13 @@ class IDprop(IDmap):
 
     def setProp(self, ID, prop_name, prop_val):
         """Set a pericif property value of an ID, must match default type if available"""
-        self.getProp(ID, prop_name) # check ID and prop_name validity
+        self.getProp(ID, prop_name)  # check ID and prop_name validity
         if self.prop_default_type[prop_name] is not None:
-            checkers.checkType("Property value for %s"%repr(prop_name), \
-                self.prop_default_type[prop_name], prop_val)
+            checkers.checkType(
+                f"Property value for {prop_name!r}",
+                self.prop_default_type[prop_name],
+                prop_val,
+            )
         self._prop[prop_name][self[ID]] = prop_val
 
     def getProp(self, ID, prop_name):
@@ -334,7 +346,7 @@ class IDprop(IDmap):
 
     def getAllProp(self, ID):
         """Return all properties associated with an ID"""
-        return {prop:self.getProp(ID, prop) for prop in self.propLst}
+        return {prop: self.getProp(ID, prop) for prop in self.propLst}
 
     def popID(self, ID):
         """Pop ID from ID list, and all properties lists."""
@@ -354,7 +366,7 @@ class IDprop(IDmap):
             ID(str): ID to be added
             prop(:obj:`dict` of str:obj): dictionary specifying property(s)
                 of the input ID. Corresponding properties must follow default
-                type as specified in `.prop_default_type` if any. If `None` 
+                type as specified in `.prop_default_type` if any. If `None`
                 specified for `prop` (or `prop` doesn't contain all properties
                 needed), default input from `.prop_default_val` is used to set
                 (or fill in missing properties of) new ID properties.
@@ -369,8 +381,9 @@ class IDprop(IDmap):
             for prop_name, default_type in self.prop_default_type.items():
                 if prop_name in prop:
                     if default_type is not None:
-                        checkers.checkType("Properties Values", default_type, 
-                                           prop[prop_name])
+                        checkers.checkType(
+                            "Properties Values", default_type, prop[prop_name],
+                        )
                 else:
                     prop[prop_name] = deepcopy(self.prop_default_val[prop_name])
         else:

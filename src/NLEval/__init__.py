@@ -1,2 +1,2 @@
-__all__ = ['graph', 'model', 'label', 'valsplit']
+__all__ = ["graph", "model", "label", "valsplit"]
 from . import *

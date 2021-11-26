@@ -1,2 +1,2 @@
-__all__ = ['LabelsetCollection', 'Filter']
+__all__ = ["LabelsetCollection", "Filter"]
 from . import *

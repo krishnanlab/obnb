@@ -1,10 +1,13 @@
 import numpy as np
 from scipy.stats import hypergeom
 
-__all__ = ['EntityRangeFilterNoccur', 
-            'LabelsetRangeFilterSize', 
-            'LabelsetRangeFilterTrainTestPos', 
-            'NegativeFilterHypergeom']
+__all__ = [
+    "EntityRangeFilterNoccur",
+    "LabelsetRangeFilterSize",
+    "LabelsetRangeFilterTrainTestPos",
+    "NegativeFilterHypergeom",
+]
+
 
 class BaseFilter:
     """Base Filter object containing basic filter operations
@@ -18,13 +21,14 @@ class BaseFilter:
         criterion: retrun true if the corresponding value of an instance passes
             the criterion
         get_IDs: return list of IDs to scan through
-        get_val_getter: return a function that map ID of an instance to some 
+        get_val_getter: return a function that map ID of an instance to some
             corresponding values
         get_mod_fun: return a function that modifies an instance
 
     All three 'get' methods above take a `LabelsetCollection` object as input
 
     """
+
     def __init__(self):
         super(BaseFilter, self).__init__()
 
@@ -37,17 +41,19 @@ class BaseFilter:
             if self.criterion(val_getter(ID)):
                 mod_fun(ID)
 
+
 class ExistanceFilter(BaseFilter):
     """Filter by existance in some given list of targets
 
     Attributes:
         target_lst: list (or set) of targets of interest to be preserved
-        remove_existance: boolean value indicating whether or not to remove 
-            tarets in `target_lst`. If True, remove any target present in the 
-            `target_lst` from the labelset collection; if False, preserve only 
+        remove_existance: boolean value indicating whether or not to remove
+            tarets in `target_lst`. If True, remove any target present in the
+            `target_lst` from the labelset collection; if False, preserve only
             those target present in the `target_lst`
 
     """
+
     def __init__(self, target_lst, remove_existance=False):
         super(ExistanceFilter, self).__init__()
         self.target_lst = target_lst
@@ -59,14 +65,18 @@ class ExistanceFilter(BaseFilter):
         else:
             return val not in self.target_lst
 
+
 class EntityExistanceFilter(ExistanceFilter):
     """Filter entities by list of entiteis of interest"""
+
     def __init__(self, target_lst, remove_existance=False):
-        super(EntityExistanceFilter, self).__init__(target_lst, remove_existance)
+        super(EntityExistanceFilter, self).__init__(
+            target_lst, remove_existance,
+        )
 
     @staticmethod
     def get_val_getter(lsc):
-        return lambda x: x # return entity ID itself
+        return lambda x: x  # return entity ID itself
 
     @staticmethod
     def get_IDs(lsc):
@@ -76,14 +86,18 @@ class EntityExistanceFilter(ExistanceFilter):
     def get_mod_fun(lsc):
         return lsc.popEntity
 
+
 class LabelsetExistanceFilter(ExistanceFilter):
     """Filter labelset by list of labelsets of interest"""
+
     def __init__(self, target_lst, remove_existance=False):
-        super(LabelsetExistanceFilter, self).__init__(target_lst, remove_existance)
+        super(LabelsetExistanceFilter, self).__init__(
+            target_lst, remove_existance,
+        )
 
     @staticmethod
     def get_val_getter(lsc):
-        return lambda x: x # return labelset ID itself
+        return lambda x: x  # return labelset ID itself
 
     @staticmethod
     def get_IDs(lsc):
@@ -92,6 +106,7 @@ class LabelsetExistanceFilter(ExistanceFilter):
     @staticmethod
     def get_mod_fun(lsc):
         return lsc.popLabelset
+
 
 class RangeFilter(BaseFilter):
     """Filter entities in labelset collection by range of values
@@ -119,9 +134,11 @@ class RangeFilter(BaseFilter):
             if val > self.max_val:
                 return True
         return False
-    
+
+
 class EntityRangeFilterNoccur(RangeFilter):
     """Pop entities based on number of occurance"""
+
     def __init__(self, min_val=None, max_val=None):
         super(EntityRangeFilterNoccur, self).__init__(min_val, max_val)
 
@@ -137,8 +154,10 @@ class EntityRangeFilterNoccur(RangeFilter):
     def get_mod_fun(lsc):
         return lsc.popEntity
 
+
 class LabelsetRangeFilterSize(RangeFilter):
     """Pop labelsets based on size"""
+
     def __init__(self, min_val=None, max_val=None):
         super(LabelsetRangeFilterSize, self).__init__(min_val, max_val)
 
@@ -154,14 +173,16 @@ class LabelsetRangeFilterSize(RangeFilter):
     def get_mod_fun(lsc):
         return lsc.popLabelset
 
+
 class LabelsetRangeFilterJaccard(RangeFilter):
     """Pop labelsets based on Jaccard indx"""
+
     def __init__(self, max_val=None):
         super(LabelsetRangeFilterJaccard, self).__init__(None, max_val)
 
     @staticmethod
     def get_val_getter(lsc):
-        # if jjaccard index greater than threshold, determin whether or not to 
+        # if jjaccard index greater than threshold, determin whether or not to
         # discard depending on the size, only discard the larger one
         def val_getter(labelID):
             val = 0
@@ -185,33 +206,34 @@ class LabelsetRangeFilterJaccard(RangeFilter):
     def get_mod_fun(lsc):
         return lsc.popLabelset
 
+
 class LabelsetRangeFilterTrainTestPos(RangeFilter):
     """Pop labelsets based on number of positives in train/test sets
 
     Note:
-        Only intended to be work with Holdout split type for now. Would not 
-            raise error for other split types, but only will check the first 
-            split. If validation set is available, will also check the 
+        Only intended to be work with Holdout split type for now. Would not
+            raise error for other split types, but only will check the first
+            split. If validation set is available, will also check the
             validation split.
 
     """
+
     def __init__(self, min_val):
         super(LabelsetRangeFilterTrainTestPos, self).__init__(min_val=min_val)
 
     @staticmethod
     def get_val_getter(lsc):
-        return lambda labelID: \
-                min(
-                    [
-                    idx_ary.size for idx_ary in next(
-                        lsc.valsplit.get_split_idx_ary(
-                            np.array(
-                                list(lsc.getLabelset(labelID))), 
-                                valid=lsc.valsplit.valid_ID_ary is not None
-                            )
-                        )
-                    ]
+        return lambda labelID: min(
+            [
+                idx_ary.size
+                for idx_ary in next(
+                    lsc.valsplit.get_split_idx_ary(
+                        np.array(list(lsc.getLabelset(labelID))),
+                        valid=lsc.valsplit.valid_ID_ary is not None,
+                    ),
                 )
+            ],
+        )
 
     @staticmethod
     def get_IDs(lsc):
@@ -219,7 +241,8 @@ class LabelsetRangeFilterTrainTestPos(RangeFilter):
 
     @staticmethod
     def get_mod_fun(lsc):
-        return lsc.popLabelset #replace with soft filter
+        return lsc.popLabelset  # replace with soft filter
+
 
 class ValueFilter(BaseFilter):
     """Filter based on certain values
@@ -230,6 +253,7 @@ class ValueFilter(BaseFilter):
             else remove any ID with mismatched value
 
     """
+
     def __init__(self, val, remove=True):
         super(RangeFilter, self).__init__()
         self.val = val
@@ -238,9 +262,10 @@ class ValueFilter(BaseFilter):
     def criterion(self, val):
         return True if (val == self.val) is self.remove else False
 
+
 class NegativeFilterHypergeom(BaseFilter):
     """Filter based on enrichment (hypergeometric test)
-    
+
     Notes:
         Given a labelset, compare it with all other labelsets and if p-val
         from hypergemetric test less than some threshold, exclude genes
@@ -251,9 +276,9 @@ class NegativeFilterHypergeom(BaseFilter):
         p_thresh: p-val threshold used for filtering
 
     """
+
     def __init__(self, p_thresh):
         self.p_thresh = p_thresh
-
 
     def __call__(self, lsc):
         IDs = lsc.labelIDlst
@@ -268,22 +293,23 @@ class NegativeFilterHypergeom(BaseFilter):
             for i in range(num_labelsets):
                 ID1 = IDs[i]
                 labelset1 = lsc.getLabelset(ID1)
-                N = len(labelset1) # size of first labelset
+                N = len(labelset1)  # size of first labelset
 
                 for j in range(i + 1, num_labelsets):
                     ID2 = IDs[j]
                     labelset2 = lsc.getLabelset(ID2)
 
-                    k = len(labelset1 & labelset2) # size of intersection
-                    n = len(labelset2) # size of second labelset
+                    k = len(labelset1 & labelset2)  # size of intersection
+                    n = len(labelset2)  # size of second labelset
 
-                    pval_mat[i, j] = pval_mat[j, i] = hypergeom.sf(k - 1, M, n, N)
+                    pval_mat[i, j] = pval_mat[j, i] = hypergeom.sf(
+                        k - 1, M, n, N,
+                    )
 
-                    #if k >= 1: # for debugging
+                    # if k >= 1: # for debugging
                     #   print("k = {:>3d}, M = {:>5d}, n = {:>5d}, N = {:>5d}, pval = {:>.4f}".format(k, M, n, N, pval_mat[i,j]))
 
             return pval_mat
-
 
         pval_mat = get_pval_mat()
 

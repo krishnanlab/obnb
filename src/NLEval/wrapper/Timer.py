@@ -1,6 +1,7 @@
 import time
 from NLEval.util import checkers
 
+
 class TimeIt:
     def __init__(self, verbose=True):
         self.verbose = verbose
@@ -11,7 +12,10 @@ class TimeIt:
             func(*args)
             end = time.time()
             time_interval = end - start
-            print(f"Took {time_interval:.2f} seconds to run function {repr(func)}")
+            print(
+                f"Took {time_interval:.2f} seconds to run function {repr(func)}",
+            )
+
         if self.verbose:
             return wrapper
         else:
@@ -20,9 +24,8 @@ class TimeIt:
     @property
     def verbose(self):
         return self._verbose
-    
+
     @verbose.setter
     def verbose(self, val):
-        checkers.checkTypeErrNone('verbose', bool, val)
+        checkers.checkTypeErrNone("verbose", bool, val)
         self._verbose = val
-    
