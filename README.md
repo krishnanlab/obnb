@@ -43,6 +43,7 @@ LPA_score_dict = LP_A.predict(positive_set, negative_set)
 ### Additional packages used for dev
 
 * [black](https://github.com/psf/black)
+* [tox](https://tox.wiki/en/latest/index.html)
 * [pytest](https://docs.pytest.org/en/6.2.x/)
 * [pytest-cov](https://pypi.org/project/pytest-cov/) (not used yet)
 
