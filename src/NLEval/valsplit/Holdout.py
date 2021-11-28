@@ -60,9 +60,9 @@ class TrainValTest(BaseHoldout):
 
     def train_test_setup(self, lsc_ids, node_ids, prop_name, **kwargs):
         lsc_ids._check_prop_existence(prop_name, True)
-        common_ID_list = self.get_common_ids(lsc_ids, node_ids)
+        common_ids = self.get_common_ids(lsc_ids, node_ids)
         sorted_ID_list = sorted(
-            common_ID_list,
+            common_ids,
             reverse=self.train_on == "bot",
             key=lambda node_ID: lsc_ids.getProp(node_ID, prop_name),
         )
@@ -113,9 +113,9 @@ class BinHold(BaseHoldout):
 
         """
         lsc_ids._check_prop_existence(prop_name, True)
-        common_ID_list = self.get_common_ids(lsc_ids, node_ids)
+        common_ids = self.get_common_ids(lsc_ids, node_ids)
         sorted_ID_list = sorted(
-            common_ID_list,
+            common_ids,
             reverse=self.train_on == "bot",
             key=lambda node_ID: lsc_ids.getProp(node_ID, prop_name),
         )
@@ -229,19 +229,19 @@ class CustomHold(BaseHoldout):
             self._custom_valid_index = id_ary
 
     def train_test_setup(self, lsc_ids, node_ids, **kwargs):
-        common_ID_list = self.get_common_ids(lsc_ids, node_ids)
+        common_ids = self.get_common_ids(lsc_ids, node_ids)
         self._train_index = np.intersect1d(
             self.custom_train_index,
-            common_ID_list,
+            common_ids,
         )
         self._test_index = np.intersect1d(
             self.custom_test_index,
-            common_ID_list,
+            common_ids,
         )
         self._valid_index = (
             None
             if self.custom_test_index is None
-            else np.intersect1d(self.custom_valid_index, common_ID_list)
+            else np.intersect1d(self.custom_valid_index, common_ids)
         )
 
 
@@ -251,8 +251,8 @@ class TrainTestAll(BaseHoldout):
         super(TrainTestAll, self).__init__(shuffle=shuffle)
 
     def train_test_setup(self, lsc_ids, node_ids, **kwargs):
-        common_ID_list = self.get_common_ids(lsc_ids, node_ids)
-        self._train_index = self._test_index = np.array(common_ID_list)
+        common_ids = self.get_common_ids(lsc_ids, node_ids)
+        self._train_index = self._test_index = np.array(common_ids)
 
 
 '''

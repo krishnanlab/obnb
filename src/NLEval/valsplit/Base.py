@@ -124,13 +124,13 @@ class BaseHoldout(BaseValSplit):
             lsc_ids,
         )
         checkers.checkType("ID for graph entities", IDHandler.IDmap, node_ids)
-        common_ID_list = []
+        common_ids = []
         for node_id in node_ids.lst:
             if node_id in lsc_ids:
                 # make sure entity is part of at least one labelset
                 if lsc_ids.getProp(node_id, "Noccur") > 0:
-                    common_ID_list.append(node_id)
-        return common_ID_list
+                    common_ids.append(node_id)
+        return common_ids
 
     def check_split_setup(self, valid):
         if self._test_index is None or self._train_index is None:
