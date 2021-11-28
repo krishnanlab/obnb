@@ -28,7 +28,7 @@ class ParDat:
                     if len(self._p) < n_workers:
                         self.spawn(func, func_args, func_kwargs)
                     else:
-                        yield self.next(job_id)
+                        yield self.next_job(job_id)
                 for result in self.terminate():
                     yield result
             else:
@@ -96,7 +96,7 @@ class ParDat:
         self._PrConn.append(PrConn)
         self._p.append(new_process)
 
-    def next(self, job_id):
+    def next_job(self, job_id):
         worker_id, result = self._q.get()
         self._PrConn[worker_id].send(job_id)
         self.log(**self.verb_kws)
