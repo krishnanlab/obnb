@@ -73,7 +73,7 @@ class TestBaseLSC(unittest.TestCase):
         self.assertEqual(self.lsc.getNegative("Labelset1"), {"d"})
         self.assertEqual(self.lsc.getNegative("Labelset2"), {"a", "c"})
         # test if unrelated entities included
-        self.lsc.entity.addID("h")
+        self.lsc.entity.add_id("h")
         self.assertEqual(self.lsc.getNegative("Labelset2"), {"a", "c"})
         # test specified negative
         self.lsc.setNegative(["a"], "Labelset2")

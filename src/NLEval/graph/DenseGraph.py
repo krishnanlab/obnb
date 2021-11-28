@@ -101,7 +101,7 @@ class DenseGraph(BaseGraph):
         for ID in mat[:, 0]:
             if int(ID) != ID:
                 raise ValueError("ID must be int type")
-            idmap.addID(str(int(ID)))
+            idmap.add_id(str(int(ID)))
         return cls.construct_graph(idmap, mat[:, 1:].astype(float))
 
     @classmethod
@@ -184,7 +184,7 @@ class FeatureVec(DenseGraph):
         """
         return dist_fun(self[ID1], self[ID2])
 
-    def addVec(self, ID, vec):
+    def add_vec(self, ID, vec):
         """Add a new feature vector."""
         checkers.checkNumpyArrayNDim("vec", 1, vec)
         checkers.checkNumpyArrayIsNumeric("vec", vec)
@@ -204,7 +204,7 @@ class FeatureVec(DenseGraph):
             new_mat = vec.copy().reshape((1, vec.size))
         else:
             new_mat = np.vstack([self.mat, vec])
-        self.idmap.addID(ID)
+        self.idmap.add_id(ID)
         self.mat = new_mat
 
     @classmethod
@@ -216,7 +216,7 @@ class FeatureVec(DenseGraph):
             for line in f:
                 terms = line.split(" ")
                 ID = terms[0].strip()
-                idmap.addID(ID)
+                idmap.add_id(ID)
                 fvec_lst.append(np.array(terms[1:], dtype=float))
         mat = np.asarray(fvec_lst)
         return cls.construct_graph(idmap, mat)

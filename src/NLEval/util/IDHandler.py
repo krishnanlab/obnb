@@ -28,7 +28,7 @@ class IDlst(object):
         new = self.copy()
         for ID in other:
             if ID not in new:
-                new.addID(ID)
+                new.add_id(ID)
         return new
 
     def __sub__(self, other):
@@ -38,7 +38,7 @@ class IDlst(object):
         new = self.__class__()
         for ID in self:
             if ID not in other:
-                new.addID(ID)
+                new.add_id(ID)
         return new
 
     def __and__(self, other):
@@ -46,7 +46,7 @@ class IDlst(object):
         checkers.checkType("other", self.__class__, other)
         new = self.__class__()
         for ID in set(self._lst) & set(other._lst):
-            new.addID(ID)
+            new.add_id(ID)
         return new
 
     def __or__(self, other):
@@ -58,7 +58,7 @@ class IDlst(object):
         checkers.checkType("other", self.__class__, other)
         new = self.__class__()
         for ID in set(self._lst) ^ set(other._lst):
-            new.addID(ID)
+            new.add_id(ID)
         return new
 
     def __contains__(self, ID):
@@ -103,7 +103,7 @@ class IDlst(object):
         """:obj:`list` of :obj:`str`: list of IDs.
 
         Note: the returned list is a copy of self._lst to prevent userside
-        maniputation on data, use `.addID()` or `.popID()` to modify data
+        maniputation on data, use `.add_id()` or `.popID()` to modify data
 
         """
         return self._lst.copy()
@@ -128,7 +128,7 @@ class IDlst(object):
         self._lst.pop(idx)
         return idx
 
-    def addID(self, ID):
+    def add_id(self, ID):
         """Add new ID to end of list
 
         Note: raises IDExistsError if ID exists
@@ -153,7 +153,7 @@ class IDlst(object):
         n = 0
         for ID in IDs:
             if ID not in self:
-                self.addID(ID)
+                self.add_id(ID)
                 n += 1
         return n
 
@@ -166,7 +166,7 @@ class IDlst(object):
         checkers.checkType("ID list", list, lst)
         obj = cls()
         for ID in lst:
-            obj.addID(ID)
+            obj.add_id(ID)
         return obj
 
 
@@ -191,7 +191,7 @@ class IDmap(IDlst):
         """(dict of str:int): map from ID to index
 
         Note: the returned dict is a copy of self._map to prevent userside
-        maniputation on data, use `.addID()` or `.popID()` to modify data
+        maniputation on data, use `.add_id()` or `.popID()` to modify data
 
         """
         return self._map.copy()
@@ -204,9 +204,9 @@ class IDmap(IDlst):
             self._map[ID] = idx + i
         return idx
 
-    def addID(self, ID):
+    def add_id(self, ID):
         new_idx = self.size
-        super(IDmap, self).addID(ID)
+        super(IDmap, self).add_id(ID)
         self._map[self._lst[-1]] = new_idx
 
 
@@ -355,7 +355,7 @@ class IDprop(IDmap):
             self._prop[prop].pop(idx)
         return idx
 
-    def addID(self, ID, prop=None):
+    def add_id(self, ID, prop=None):
         """Add a new ID to list, optional input of properties
 
         Note: input properties must be one of the existing properties,
@@ -390,6 +390,6 @@ class IDprop(IDmap):
                     prop[prop_name] = deepcopy(self.prop_default_val[prop_name])
         else:
             prop = deepcopy(self.prop_default_val)
-        super(IDprop, self).addID(ID)
+        super(IDprop, self).add_id(ID)
         for prop_name, prop_val in prop.items():
             self._prop[prop_name].append(prop_val)

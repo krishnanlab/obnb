@@ -69,15 +69,15 @@ class SparseGraph(BaseGraph):
             fvec[nbr_idx] = weight
         return fvec
 
-    def addID(self, ID):
-        self.idmap.addID(ID)
+    def add_id(self, ID):
+        self.idmap.add_id(ID)
         self._edge_data.append({})
 
-    def addEdge(self, ID1, ID2, weight):
+    def add_edge(self, ID1, ID2, weight):
         for ID in [ID1, ID2]:
             # check if ID exists, add new if not
             if ID not in self.idmap:
-                self.addID(ID)
+                self.add_id(ID)
         try:
             old_weight = self._edge_data[self.idmap[ID1]][self.idmap[ID2]]
             if old_weight != weight:  # check if edge exists
@@ -168,7 +168,7 @@ class SparseGraph(BaseGraph):
             self.directed,
             cut_threshold,
         ):
-            self.addEdge(ID1, ID2, weight)
+            self.add_edge(ID1, ID2, weight)
 
     @classmethod
     def from_edglst(cls, path_to_edglst, weighted, directed, cut_threshold=0):

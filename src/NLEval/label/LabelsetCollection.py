@@ -77,7 +77,7 @@ class BaseLSC(IDHandler.IDprop):
             labelInfo(str): description of label
 
         """
-        self.addID(labelID, {} if labelInfo is None else {"Info": labelInfo})
+        self.add_id(labelID, {} if labelInfo is None else {"Info": labelInfo})
         try:
             self.entity.update(lst)
         except Exception as e:
@@ -120,7 +120,7 @@ class BaseLSC(IDHandler.IDprop):
         lbset = self.getLabelset(labelID)
         for ID in lst:
             if ID not in self.entity:
-                self.entity.addID(ID)
+                self.entity.add_id(ID)
             if ID not in lbset:
                 lbset.update([ID])
                 self.entity.setProp(ID, "Noccur", self.getNoccur(ID) + 1)
@@ -307,7 +307,7 @@ class BaseLSC(IDHandler.IDprop):
                     continue
                 ID, val = line.strip().split()
                 if ID not in self.entity:
-                    self.entity.addID(ID)
+                    self.entity.add_id(ID)
                 self.entity.setProp(ID, prop_name, interpreter(val))
 
     @classmethod
