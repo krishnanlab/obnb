@@ -2,7 +2,7 @@ from NLEval.valsplit.Base import *
 from sklearn.model_selection import LeaveOneOut, LeavePOut, StratifiedKFold, \
     StratifiedShuffleSplit
 
-__all__ = ["sklSKF", "sklSSS", "sklLOO", "sklLPO"]
+__all__ = ["SklSKF", "SklSSS", "SklLOO", "SklLPO"]
 
 
 def pass_kwargs(func, kwargs):
@@ -13,40 +13,40 @@ def pass_kwargs(func, kwargs):
         return func(**kwargs)
 
 
-class sklInterface(BaseInterface):
+class SklInterface(BaseInterface):
     """Dedicated interface for Scikit Learn splitter."""
 
-    def __init__(self, sklSplitter, skl_kws=None, shuffle=False):
-        super(sklInterface, self).__init__(shuffle=shuffle)
-        splitter = pass_kwargs(sklSplitter, skl_kws)
+    def __init__(self, SklSplitter, skl_kws=None, shuffle=False):
+        super(SklInterface, self).__init__(shuffle=shuffle)
+        splitter = pass_kwargs(SklSplitter, skl_kws)
         self.setup_split_func(splitter.split)
 
 
-class sklSKF(sklInterface):
+class SklSKF(SklInterface):
     """Dedicated interface for Stratified K-Fold in SKLearn."""
 
     def __init__(self, skl_kws=None, shuffle=False):
-        super(sklSKF, self).__init__(StratifiedKFold, skl_kws, shuffle)
+        super(SklSKF, self).__init__(StratifiedKFold, skl_kws, shuffle)
 
 
-class sklSSS(sklInterface):
+class SklSSS(SklInterface):
     """Dedicated interface for Stratified Shuffle Split in SKLearn."""
 
     def __init__(self, skl_kws=None, shuffle=False):
-        super(sklSSS, self).__init__(
+        super(SklSSS, self).__init__(
             StratifiedShuffleSplit, skl_kws, shuffle,
         )
 
 
-class sklLOO(sklInterface):
+class SklLOO(SklInterface):
     """Dedicated interface for Leave One Out in SKLearn."""
 
     def __init__(self, skl_kws=None, shuffle=False):
-        super(sklLOO, self).__init__(LeavePOut, skl_kws, shuffle)
+        super(SklLOO, self).__init__(LeavePOut, skl_kws, shuffle)
 
 
-class sklLPO(sklInterface):
+class SklLPO(SklInterface):
     """Dedicated interface for Leave P Out in SKLearn."""
 
     def __init__(self, skl_kws=None, shuffle=False):
-        super(sklLPO, self).__init__(LeaveOneOut, skl_kws, shuffle)
+        super(SklLPO, self).__init__(LeaveOneOut, skl_kws, shuffle)
