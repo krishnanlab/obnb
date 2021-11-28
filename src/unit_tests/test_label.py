@@ -130,7 +130,7 @@ class TestBaseLSC(unittest.TestCase):
         lsc3 = lsc2.copy()
         lsc3.setProp("Group1", "Info", "Some other description")
         self.assertNotEqual(lsc1, lsc3)
-        # test if different labelset with same labelID
+        # test if different labelset with same label_id
         lsc3 = lsc2.copy()
         lsc3.update_labelset(["a"], "Group1")
         self.assertNotEqual(lsc1, lsc3)
@@ -214,10 +214,10 @@ class TestBaseLSC(unittest.TestCase):
 
     def test_pop_labelset(self):
         with self.subTest(msg="Input checks"):
-            # test wrong labelID type --> TypeError
+            # test wrong label_id type --> TypeError
             self.assertRaises(TypeError, self.lsc.pop_labelset, 1)
             self.assertRaises(TypeError, self.lsc.pop_labelset, ["Labelset1"])
-            # test not exist labelID --> IDNotExistError
+            # test not exist label_id --> IDNotExistError
             self.assertRaises(
                 IDNotExistError,
                 self.lsc.pop_labelset,
@@ -254,7 +254,7 @@ class TestBaseLSC(unittest.TestCase):
                 "123",
                 "Labelset1",
             )
-            # test labelID input type
+            # test label_id input type
             self.assertRaises(TypeError, self.lsc.update_labelset, ["a"], 123)
             self.assertRaises(
                 TypeError, self.lsc.update_labelset, ["a"], [1, 2]
@@ -265,7 +265,7 @@ class TestBaseLSC(unittest.TestCase):
                 ["a"],
                 ["Labelset1"],
             )
-            # test reset not exist labelID --> IDNotExistError
+            # test reset not exist label_id --> IDNotExistError
             self.assertRaises(
                 IDNotExistError,
                 self.lsc.update_labelset,

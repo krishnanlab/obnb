@@ -27,13 +27,13 @@ for l, m in enumerate(lsc.label_ids):
     print(f"{l:>4d} {len(lsc.get_labelset(m)):>4d} {m}")
 print("")
 
-# get labelID
-labelID = lsc.label_ids[i]
-print(labelID)
+# get label_id
+label_id = lsc.label_ids[i]
+print(label_id)
 
 # get positive and negative samples
-pos = lsc.get_labelset(labelID)
-neg = lsc.get_negative(labelID)
+pos = lsc.get_labelset(label_id)
+neg = lsc.get_negative(label_id)
 
 # train and get genome wide prediction
 score_dict = mdl.predict(pos, neg)

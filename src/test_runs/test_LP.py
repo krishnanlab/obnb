@@ -30,10 +30,10 @@ print(f"Number of labelsets after filtering: {len(lsc.label_ids)}")
 mdl = model.LabelPropagation.LP(g)
 
 score_lst = []
-for labelID in lsc.label_ids:
-    score = auroc(*(mdl.test(lsc.split_labelset(labelID))))
+for label_id in lsc.label_ids:
+    score = auroc(*(mdl.test(lsc.split_labelset(label_id))))
     score_lst.append(score)
-    print(f"{score:.4f}\t{labelID}")
+    print(f"{score:.4f}\t{label_id}")
 
 print(
     f"Average score = {np.mean(score_lst):.4f}, std = {np.std(score_lst):.4f}"

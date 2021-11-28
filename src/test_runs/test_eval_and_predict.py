@@ -54,13 +54,13 @@ mdl = model.SupervisedLearning.LogRegCV(
 
 
 @wrapper.ParWrap.ParDat(lsc.label_ids, n_workers=1)
-def predict_all_labelsets(labelID):
+def predict_all_labelsets(label_id):
     np.random.seed()  # initialize random states for parallel processes
 
-    pos_ID_set = lsc.get_labelset(labelID)
-    neg_ID_set = lsc.get_negative(labelID)
+    pos_ID_set = lsc.get_labelset(label_id)
+    neg_ID_set = lsc.get_negative(label_id)
 
-    y_true, y_predict = mdl.test2(lsc.split_labelset(labelID))
+    y_true, y_predict = mdl.test2(lsc.split_labelset(label_id))
     score = np.mean(
         [metrics.log2_auprc_prior(i, j) for i, j in zip(y_true, y_predict)]
     )
@@ -69,7 +69,7 @@ def predict_all_labelsets(labelID):
         status_str = "(Prediction saved)"
     #        score_dict = mdl.predict(pos_ID_set, neg_ID_set)
     #
-    #        with open(f"predictions/{labelID}_score={score:3.2f}.tsv", 'w') as f:
+    #        with open(f"predictions/{label_id}_score={score:3.2f}.tsv", 'w') as f:
     #            f.write("gene_id\tprediction_score\tannotation\n")
     #            for geneID, prediction_score in score_dict.items():
     #                if geneID in pos_ID_set:
@@ -84,7 +84,7 @@ def predict_all_labelsets(labelID):
         status_str = "(Discarded)"
 
     print(
-        f"{labelID:<60} num_pos={len(pos_ID_set):>4}, "
+        f"{label_id:<60} num_pos={len(pos_ID_set):>4}, "
         f"num_neg={len(neg_ID_set):>4}, score={score:>3.2f} {status_str}"
     )
 
