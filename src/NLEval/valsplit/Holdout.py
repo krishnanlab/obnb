@@ -61,19 +61,19 @@ class TrainValTest(BaseHoldout):
     def train_test_setup(self, lsc_ids, node_ids, prop_name, **kwargs):
         lsc_ids._check_prop_existence(prop_name, True)
         common_ids = self.get_common_ids(lsc_ids, node_ids)
-        sorted_ID_list = sorted(
+        sorted_node_ids = sorted(
             common_ids,
             reverse=self.train_on == "bot",
             key=lambda node_ID: lsc_ids.getProp(node_ID, prop_name),
         )
 
-        n = len(sorted_ID_list)
+        n = len(sorted_node_ids)
         train_size = np.floor(n * self.train_ratio).astype(int)
         test_size = np.floor(n * self.test_ratio).astype(int)
 
-        self._test_index = np.array(sorted_ID_list[:test_size])
-        self._valid_index = np.array(sorted_ID_list[test_size:-train_size])
-        self._train_index = np.array(sorted_ID_list[-train_size:])
+        self._test_index = np.array(sorted_node_ids[:test_size])
+        self._valid_index = np.array(sorted_node_ids[test_size:-train_size])
+        self._train_index = np.array(sorted_node_ids[-train_size:])
 
 
 class BinHold(BaseHoldout):
@@ -114,14 +114,14 @@ class BinHold(BaseHoldout):
         """
         lsc_ids._check_prop_existence(prop_name, True)
         common_ids = self.get_common_ids(lsc_ids, node_ids)
-        sorted_ID_list = sorted(
+        sorted_node_ids = sorted(
             common_ids,
             reverse=self.train_on == "bot",
             key=lambda node_ID: lsc_ids.getProp(node_ID, prop_name),
         )
-        bin_size = np.floor(len(sorted_ID_list) / self.bin_num).astype(int)
-        self._test_index = np.array(sorted_ID_list[:bin_size])
-        self._train_index = np.array(sorted_ID_list[-bin_size:])
+        bin_size = np.floor(len(sorted_node_ids) / self.bin_num).astype(int)
+        self._test_index = np.array(sorted_node_ids[:bin_size])
+        self._train_index = np.array(sorted_node_ids[-bin_size:])
 
 
 class ThreshHold(BaseHoldout):

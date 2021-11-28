@@ -106,17 +106,17 @@ class BaseModel:
 
         """
         graph = self.graph
-        ID_list = graph.idmap.lst
+        node_ids = graph.idmap.lst
 
-        pos_ids_set = pos_ids_set & set(ID_list)
-        neg_ids_set = neg_ids_set & set(ID_list)
+        pos_ids_set = pos_ids_set & set(node_ids)
+        neg_ids_set = neg_ids_set & set(node_ids)
 
         id_ary = np.array(list(pos_ids_set | neg_ids_set))
         label_ary = np.zeros(len(id_ary), dtype=bool)
         label_ary[: len(pos_ids_set)] = True
 
         self.train(id_ary, label_ary)
-        scores = self.decision(ID_list)
-        score_dict = {node_id: score for node_id, score in zip(ID_list, scores)}
+        scores = self.decision(node_ids)
+        score_dict = {node_id: score for node_id, score in zip(node_ids, scores)}
 
         return score_dict
