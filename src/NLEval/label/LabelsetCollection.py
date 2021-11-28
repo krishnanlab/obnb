@@ -272,7 +272,7 @@ class BaseLSC(IDHandler.IDprop):
             for labelID in self.labelIDlst:
                 labelInfo = self.getInfo(labelID)
                 labelset_str = "\t".join(self.getLabelset(labelID))
-                f.write("{labelID}\t{labelInfo}\t{labelset_str}\n")
+                f.write(f"{labelID}\t{labelInfo}\t{labelset_str}\n")
 
     def load_entity_properties(
         self,
@@ -357,9 +357,8 @@ class SplitLSC(BaseLSC):
         """
         if self.valsplit is None:
             raise AttributeError(
-                "'valsplit' not configured, "
-                + "assign validation split generator first. "
-                + "See `NLEval.valsplit` for more info.",
+                "'valsplit' not configured, please assign validation split "
+                "generator first. See `NLEval.valsplit` for more info.",
             )
 
         num_labelsets = None
@@ -414,8 +413,7 @@ class SplitLSC(BaseLSC):
 
         """
         checkers.checkType(
-            "Labelset collection splitter "
-            + "(only support Holdout split now)",
+            "Labelset collection splitter (only support Holdout split now)",
             Base.BaseHoldout,
             self.valsplit,
         )
