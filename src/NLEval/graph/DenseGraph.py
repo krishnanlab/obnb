@@ -114,7 +114,10 @@ class DenseGraph(BaseGraph):
     def from_edglst(cls, path_to_edglst, weighted, directed, **kwargs):
         """Read from edgelist and construct BaseGraph."""
         graph = SparseGraph.from_edglst(
-            path_to_edglst, weighted, directed, **kwargs,
+            path_to_edglst,
+            weighted,
+            directed,
+            **kwargs,
         )
         return cls.construct_graph(graph.IDmap, graph.to_adjmat())
 

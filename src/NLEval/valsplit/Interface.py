@@ -1,6 +1,10 @@
 from NLEval.valsplit.Base import *
-from sklearn.model_selection import LeaveOneOut, LeavePOut, StratifiedKFold, \
-    StratifiedShuffleSplit
+from sklearn.model_selection import (
+    LeaveOneOut,
+    LeavePOut,
+    StratifiedKFold,
+    StratifiedShuffleSplit,
+)
 
 __all__ = ["SklSKF", "SklSSS", "SklLOO", "SklLPO"]
 
@@ -34,7 +38,9 @@ class SklSSS(SklInterface):
 
     def __init__(self, skl_kws=None, shuffle=False):
         super(SklSSS, self).__init__(
-            StratifiedShuffleSplit, skl_kws, shuffle,
+            StratifiedShuffleSplit,
+            skl_kws,
+            shuffle,
         )
 
 

@@ -222,17 +222,21 @@ class CustomHold(BaseHoldout):
             self._custom_valid_ID_ary = None
         else:
             checkers.checkTypesInNumpyArray(
-                "Validation data ID list", str, ID_ary,
+                "Validation data ID list",
+                str,
+                ID_ary,
             )
             self._custom_valid_ID_ary = ID_ary
 
     def train_test_setup(self, lscIDs, nodeIDs, **kwargs):
         common_ID_list = self.get_common_ID_list(lscIDs, nodeIDs)
         self._train_ID_ary = np.intersect1d(
-            self.custom_train_ID_ary, common_ID_list,
+            self.custom_train_ID_ary,
+            common_ID_list,
         )
         self._test_ID_ary = np.intersect1d(
-            self.custom_test_ID_ary, common_ID_list,
+            self.custom_test_ID_ary,
+            common_ID_list,
         )
         self._valid_ID_ary = (
             None

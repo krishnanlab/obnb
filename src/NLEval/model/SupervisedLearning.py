@@ -119,17 +119,20 @@ class CombLogRegCVAdaBoost(CombSLBase):
         w = np.ones(len(ID_ary)) / len(ID_ary)  # data point weights
         coef = np.zeros(n_mdl)  # model boosting coefficients
         y_pred_mat = np.zeros(
-            (len(ID_ary), n_mdl), dtype=bool,
+            (len(ID_ary), n_mdl),
+            dtype=bool,
         )  # predictions from all models
         idx_ary = self.G.IDmap[ID_ary]
 
         if self.exclude:
             selected_ind = np.zeros(
-                n_mdl, dtype=bool,
+                n_mdl,
+                dtype=bool,
             )  # inidvator for selected model
         else:
             mdl_idx_ary = np.zeros(
-                n_mdl, dtype=int,
+                n_mdl,
+                dtype=int,
             )  # index of features of corresponding boosting coefficients
             mdl_list = self.mdl_list
             self.mdl_list = (
@@ -264,17 +267,20 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
         w = np.ones(len(ID_ary)) / n_pos  # data point weights
         coef = np.zeros(n_mdl)  # model boosting coefficients
         y_pred_mat = np.zeros(
-            (len(ID_ary), len(self.G.mat_list)), dtype=bool,
+            (len(ID_ary), len(self.G.mat_list)),
+            dtype=bool,
         )  # predictions from all features
         idx_ary = self.G.IDmap[ID_ary]
 
         if self.exclude:
             selected_ind = np.zeros(
-                n_mdl, dtype=bool,
+                n_mdl,
+                dtype=bool,
             )  # inidvator for selected model
         else:
             mdl_idx_ary = np.zeros(
-                n_mdl, dtype=int,
+                n_mdl,
+                dtype=int,
             )  # index of features of corresponding boosting coefficients
             mdl_list = self.mdl_list
             self.mdl_list = (
@@ -301,14 +307,17 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
                     y_pred_mat[:, j] = mdl.predict(x)
 
                 r = average_precision_score(
-                    y, y_pred_mat[:, j], sample_weight=w / w.sum(),
+                    y,
+                    y_pred_mat[:, j],
+                    sample_weight=w / w.sum(),
                 )
                 if r > opt_r:
                     opt_r = r
                     opt_idx = j
 
             opt_r = min(
-                opt_r, 0.99,
+                opt_r,
+                0.99,
             )  # prevent auprc of 1, causes divide by zero for a
             a = 0.5 * np.log((1 + opt_r) / (1 - opt_r))  # model coefficient
             y_pred_opt = y_pred_mat[:, opt_idx]  # decision scores of optim mdl

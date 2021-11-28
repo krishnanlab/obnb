@@ -382,7 +382,9 @@ class IDprop(IDmap):
                 if prop_name in prop:
                     if default_type is not None:
                         checkers.checkType(
-                            "Properties Values", default_type, prop[prop_name],
+                            "Properties Values",
+                            default_type,
+                            prop[prop_name],
                         )
                 else:
                     prop[prop_name] = deepcopy(self.prop_default_val[prop_name])

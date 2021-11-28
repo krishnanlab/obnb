@@ -71,7 +71,8 @@ class EntityExistanceFilter(ExistanceFilter):
 
     def __init__(self, target_lst, remove_existance=False):
         super(EntityExistanceFilter, self).__init__(
-            target_lst, remove_existance,
+            target_lst,
+            remove_existance,
         )
 
     @staticmethod
@@ -92,7 +93,8 @@ class LabelsetExistanceFilter(ExistanceFilter):
 
     def __init__(self, target_lst, remove_existance=False):
         super(LabelsetExistanceFilter, self).__init__(
-            target_lst, remove_existance,
+            target_lst,
+            remove_existance,
         )
 
     @staticmethod
@@ -303,7 +305,10 @@ class NegativeFilterHypergeom(BaseFilter):
                     n = len(labelset2)  # size of second labelset
 
                     pval_mat[i, j] = pval_mat[j, i] = hypergeom.sf(
-                        k - 1, M, n, N,
+                        k - 1,
+                        M,
+                        n,
+                        N,
                     )
 
                     # if k >= 1: # for debugging

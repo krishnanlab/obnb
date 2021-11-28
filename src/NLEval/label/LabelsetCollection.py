@@ -242,7 +242,8 @@ class BaseLSC(IDHandler.IDprop):
             negative_set = self.getNegative(labelID)
 
             for sign, labelset in zip(
-                ["1", "-1"], [positive_set, negative_set],
+                ["1", "-1"],
+                [positive_set, negative_set],
             ):
                 for entityID in labelset:
                     i = entityIDmap[entityID]
@@ -368,7 +369,8 @@ class SplitLSC(BaseLSC):
             # labelIDset = set(self.labelIDlst)
             self.valsplit.train_test_setup(self.entity, graph.IDmap, prop_name)
             self.apply(
-                Filter.LabelsetRangeFilterTrainTestPos(min_pos), inplace=True,
+                Filter.LabelsetRangeFilterTrainTestPos(min_pos),
+                inplace=True,
             )
             # for i in labelIDset - set(self.labelIDlst):
             #     print(f"Pop {i}")

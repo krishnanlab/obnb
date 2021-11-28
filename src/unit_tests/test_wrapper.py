@@ -8,7 +8,6 @@ from NLEval.wrapper.ParWrap import ParDat
 
 
 class TestParDat(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.n_samples = 1000

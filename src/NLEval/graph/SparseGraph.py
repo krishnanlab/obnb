@@ -163,7 +163,10 @@ class SparseGraph(BaseGraph):
 
         """
         for ID1, ID2, weight in reader(
-            file, self.weighted, self.directed, cut_threshold,
+            file,
+            self.weighted,
+            self.directed,
+            cut_threshold,
         ):
             self.addEdge(ID1, ID2, weight)
 
@@ -231,7 +234,11 @@ class SparseGraph(BaseGraph):
             else:
                 raise ValueError(f"Unknown writer function name {writer!r}")
         writer(
-            outpth, self.edge_gen, self.weighted, self.directed, cut_threshold,
+            outpth,
+            self.edge_gen,
+            self.weighted,
+            self.directed,
+            cut_threshold,
         )
 
     def to_adjmat(self, default_val=0):
