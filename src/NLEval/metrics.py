@@ -6,7 +6,7 @@ def prior(y_true):
     return (y_true > 0).sum() / len(y_true)
 
 
-def auPRC(y_true, y_predict):
+def log2_auprc_prior(y_true, y_predict):
     if skip(y_true, y_predict):
         return np.nan
     return np.log2(
@@ -15,7 +15,7 @@ def auPRC(y_true, y_predict):
     )
 
 
-def PTopK(y_true, y_predict):
+def precision_at_topk(y_true, y_predict):
     if skip(y_true, y_predict):
         return np.nan
     k = (y_true > 0).sum()
@@ -24,7 +24,7 @@ def PTopK(y_true, y_predict):
     return -np.inf if nhits == 0 else np.log2(nhits * len(y_true) / k ** 2)
 
 
-def auROC(y_true, y_predict):
+def auroc(y_true, y_predict):
     if skip(y_true, y_predict):
         return np.nan
     return sklearn.metrics.roc_auc_score(y_true, y_predict)

@@ -37,7 +37,7 @@ print(
     f"After filtering, there are {len(lsc.labelIDlst)} number of effective labelsets"
 )
 
-scoring_obj = lambda estimator, X, y: metrics.auPRC(
+scoring_obj = lambda estimator, X, y: metrics.log2_auprc_prior(
     y, estimator.decision_function(X)
 )
 mdl = model.SupervisedLearning.LogRegCV(
@@ -61,7 +61,9 @@ def predict_all_labelsets(labelID):
     neg_ID_set = lsc.getNegative(labelID)
 
     y_true, y_predict = mdl.test2(lsc.splitLabelset(labelID))
-    score = np.mean([metrics.auPRC(i, j) for i, j in zip(y_true, y_predict)])
+    score = np.mean(
+        [metrics.log2_auprc_prior(i, j) for i, j in zip(y_true, y_predict)]
+    )
 
     if score > score_cutoff:
         status_str = "(Prediction saved)"
