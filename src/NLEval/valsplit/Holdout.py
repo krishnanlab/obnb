@@ -58,13 +58,13 @@ class TrainValTest(BaseHoldout):
             )
         self._test_ratio = val
 
-    def train_test_setup(self, lscIDs, nodeIDs, prop_name, **kwargs):
-        lscIDs._check_prop_existence(prop_name, True)
-        common_ID_list = self.get_common_ids(lscIDs, nodeIDs)
+    def train_test_setup(self, lsc_ids, nodeIDs, prop_name, **kwargs):
+        lsc_ids._check_prop_existence(prop_name, True)
+        common_ID_list = self.get_common_ids(lsc_ids, nodeIDs)
         sorted_ID_list = sorted(
             common_ID_list,
             reverse=self.train_on == "bot",
-            key=lambda node_ID: lscIDs.getProp(node_ID, prop_name),
+            key=lambda node_ID: lsc_ids.getProp(node_ID, prop_name),
         )
 
         n = len(sorted_ID_list)
@@ -103,21 +103,21 @@ class BinHold(BaseHoldout):
             )
         self._bin_num = val
 
-    def train_test_setup(self, lscIDs, nodeIDs, prop_name, **kwargs):
+    def train_test_setup(self, lsc_ids, nodeIDs, prop_name, **kwargs):
         """Set up training and testing.
 
         Args:
-            lscIDs(:obj:`NLEval.util.IDHandler.IDprop`)
+            lsc_ids(:obj:`NLEval.util.IDHandler.IDprop`)
             nodeIDs(:obj:`NLEval.util.IDHandler.IDmap`)
             prop_name(str): name of property to be used for splitting
 
         """
-        lscIDs._check_prop_existence(prop_name, True)
-        common_ID_list = self.get_common_ids(lscIDs, nodeIDs)
+        lsc_ids._check_prop_existence(prop_name, True)
+        common_ID_list = self.get_common_ids(lsc_ids, nodeIDs)
         sorted_ID_list = sorted(
             common_ID_list,
             reverse=self.train_on == "bot",
-            key=lambda node_ID: lscIDs.getProp(node_ID, prop_name),
+            key=lambda node_ID: lsc_ids.getProp(node_ID, prop_name),
         )
         bin_size = np.floor(len(sorted_ID_list) / self.bin_num).astype(int)
         self._test_index = np.array(sorted_ID_list[:bin_size])
@@ -151,22 +151,22 @@ class ThreshHold(BaseHoldout):
         checkers.checkTypeErrNone("Cut off", checkers.NUMERIC_TYPE, val)
         self._cut_off = val
 
-    def train_test_setup(self, lscIDs, nodeIDs, prop_name, **kwargs):
+    def train_test_setup(self, lsc_ids, nodeIDs, prop_name, **kwargs):
         """Set up training and testing.
 
         Args:
-            lscIDs(:obj:`NLEval.util.IDHandler.IDprop`)
+            lsc_ids(:obj:`NLEval.util.IDHandler.IDprop`)
             nodeIDs(:obj:`NLEval.util.IDHandler.IDmap`)
             prop_name(str): name of property to be used for splitting
 
         """
-        lscIDs._check_prop_existence(prop_name, True)
+        lsc_ids._check_prop_existence(prop_name, True)
         top_list = []
         bot_list = []
         for node_ID in nodeIDs.lst:
-            if node_ID in lscIDs:
-                if lscIDs.getProp(node_ID, "Noccur") > 0:
-                    if lscIDs.getProp(node_ID, prop_name) >= self.cut_off:
+            if node_ID in lsc_ids:
+                if lsc_ids.getProp(node_ID, "Noccur") > 0:
+                    if lsc_ids.getProp(node_ID, prop_name) >= self.cut_off:
                         top_list.append(node_ID)
                     else:
                         bot_list.append(node_ID)
@@ -228,8 +228,8 @@ class CustomHold(BaseHoldout):
             )
             self._custom_valid_index = id_ary
 
-    def train_test_setup(self, lscIDs, nodeIDs, **kwargs):
-        common_ID_list = self.get_common_ids(lscIDs, nodeIDs)
+    def train_test_setup(self, lsc_ids, nodeIDs, **kwargs):
+        common_ID_list = self.get_common_ids(lsc_ids, nodeIDs)
         self._train_index = np.intersect1d(
             self.custom_train_index,
             common_ID_list,
@@ -250,8 +250,8 @@ class TrainTestAll(BaseHoldout):
         """Train and test on all data."""
         super(TrainTestAll, self).__init__(shuffle=shuffle)
 
-    def train_test_setup(self, lscIDs, nodeIDs, **kwargs):
-        common_ID_list = self.get_common_ids(lscIDs, nodeIDs)
+    def train_test_setup(self, lsc_ids, nodeIDs, **kwargs):
+        common_ID_list = self.get_common_ids(lsc_ids, nodeIDs)
         self._train_index = self._test_index = np.array(common_ID_list)
 
 
@@ -277,6 +277,6 @@ class HoldoutChildTemplate(BaseHoldout):
     def foo(self, val):
         self._foo = val
 
-    def train_test_setup(self, lscIDs, nodeIDs, prop_name, **kwargs):
+    def train_test_setup(self, lsc_ids, nodeIDs, prop_name, **kwargs):
         #setup train_index and test_index
 '''

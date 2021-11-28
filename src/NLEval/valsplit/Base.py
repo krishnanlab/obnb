@@ -106,14 +106,14 @@ class BaseHoldout(BaseValSplit):
             raise ValueError(f"Train on must be 'top' or 'bot', not {val!r}")
         self._train_on = val
 
-    def get_common_ids(self, lscIDs, nodeIDs):
+    def get_common_ids(self, lsc_ids, nodeIDs):
         """Get list of common IDs between labelset collection and graph.
 
         Note:
             Only included IDs that are part of at least one labelset
 
         Args:
-            lscIDs(:obj:`NLEval.util.IDHandler.IDprop`): ID list of labelset
+            lsc_ids(:obj:`NLEval.util.IDHandler.IDprop`): ID list of labelset
                 collection
             nodeIDs(:obj:`NLEval.util.IDHandler.IDmap`): ID list of graph
 
@@ -121,14 +121,14 @@ class BaseHoldout(BaseValSplit):
         checkers.checkType(
             "ID for labelset collection entities",
             IDHandler.IDprop,
-            lscIDs,
+            lsc_ids,
         )
         checkers.checkType("ID for graph entities", IDHandler.IDmap, nodeIDs)
         common_ID_list = []
         for node_id in nodeIDs.lst:
-            if node_id in lscIDs:
+            if node_id in lsc_ids:
                 # make sure entity is part of at least one labelset
-                if lscIDs.getProp(node_id, "Noccur") > 0:
+                if lsc_ids.getProp(node_id, "Noccur") > 0:
                     common_ID_list.append(node_id)
         return common_ID_list
 
