@@ -106,7 +106,7 @@ class BaseHoldout(BaseValSplit):
             raise ValueError(f"Train on must be 'top' or 'bot', not {val!r}")
         self._train_on = val
 
-    def get_common_ID_list(self, lscIDs, nodeIDs):
+    def get_common_ids(self, lscIDs, nodeIDs):
         """Get list of common IDs between labelset collection and graph.
 
         Note:

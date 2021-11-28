@@ -60,7 +60,7 @@ class TrainValTest(BaseHoldout):
 
     def train_test_setup(self, lscIDs, nodeIDs, prop_name, **kwargs):
         lscIDs._check_prop_existence(prop_name, True)
-        common_ID_list = self.get_common_ID_list(lscIDs, nodeIDs)
+        common_ID_list = self.get_common_ids(lscIDs, nodeIDs)
         sorted_ID_list = sorted(
             common_ID_list,
             reverse=self.train_on == "bot",
@@ -113,7 +113,7 @@ class BinHold(BaseHoldout):
 
         """
         lscIDs._check_prop_existence(prop_name, True)
-        common_ID_list = self.get_common_ID_list(lscIDs, nodeIDs)
+        common_ID_list = self.get_common_ids(lscIDs, nodeIDs)
         sorted_ID_list = sorted(
             common_ID_list,
             reverse=self.train_on == "bot",
@@ -229,7 +229,7 @@ class CustomHold(BaseHoldout):
             self._custom_valid_index = ID_ary
 
     def train_test_setup(self, lscIDs, nodeIDs, **kwargs):
-        common_ID_list = self.get_common_ID_list(lscIDs, nodeIDs)
+        common_ID_list = self.get_common_ids(lscIDs, nodeIDs)
         self._train_index = np.intersect1d(
             self.custom_train_index,
             common_ID_list,
@@ -251,7 +251,7 @@ class TrainTestAll(BaseHoldout):
         super(TrainTestAll, self).__init__(shuffle=shuffle)
 
     def train_test_setup(self, lscIDs, nodeIDs, **kwargs):
-        common_ID_list = self.get_common_ID_list(lscIDs, nodeIDs)
+        common_ID_list = self.get_common_ids(lscIDs, nodeIDs)
         self._train_index = self._test_index = np.array(common_ID_list)
 
 
