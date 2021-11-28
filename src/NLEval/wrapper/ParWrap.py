@@ -7,11 +7,19 @@ from NLEval.util import checkers
 
 class ParDat:
     # TODO: create doc string, with example(s)
-    def __init__(self, job_list, n_workers=5, verbose=False, verb_kws={}):
+    def __init__(
+        self,
+        job_list,
+        n_workers=5,
+        verbose=False,
+        bar_length=80,
+        log_steps=1
+    ):
         self.job_list = job_list
         self.n_workers = n_workers
         self.verbose = verbose
-        self.verb_kws = verb_kws
+        self.bar_length = bar_length
+        self.log_steps = log_steps
 
         self._q = mp.Queue()
         self._p = []
@@ -33,7 +41,7 @@ class ParDat:
                     yield result
             else:
                 for job in self.job_list:
-                    self.log(**self.verb_kws)
+                    self.log()
                     yield func(job, *func_args, **func_kwargs)
 
         return wrapper
@@ -99,25 +107,25 @@ class ParDat:
     def next_job(self, job_id):
         worker_id, result = self._q.get()
         self._PrConn[worker_id].send(job_id)
-        self.log(**self.verb_kws)
+        self.log()
         return result
 
     def terminate(self):
         for _ in self._p:
             worker_id, result = self._q.get()
             self._PrConn[worker_id].send(None)
-            self.log(**self.verb_kws)
+            self.log()
             yield result
 
-    def log(self, bar_length=80, log_steps=1):
+    def log(self):
         self._n_finished += 1
         if not self.verbose:
             return
-        if (self._n_finished % log_steps == 0) | (
+        if (self._n_finished % self.log_steps == 0) | (
             self._n_finished == self._n_jobs
         ):
-            filled_length = self._n_finished * bar_length // self._n_jobs
-            empty_length = bar_length - filled_length
+            filled_length = self._n_finished * self.bar_length // self._n_jobs
+            empty_length = self.bar_length - filled_length
             bar_str = "|" + "#" * filled_length + " " * empty_length + "|"
             progress_str = (
                 f"{bar_str} {self._n_finished} / {self._n_jobs} finished"
