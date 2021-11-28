@@ -419,12 +419,12 @@ class SplitLSC(BaseLSC):
             Base.BaseHoldout,
             self.valsplit,
         )
-        valid = False if self.valsplit.valid_ID_ary is None else True
+        valid = False if self.valsplit.valid_index is None else True
         self.valsplit.check_split_setup(valid)
 
-        train_idx = graph.idmap[self.valsplit.train_ID_ary]
-        test_idx = graph.idmap[self.valsplit.test_ID_ary]
-        valid_idx = graph.idmap[self.valsplit.valid_ID_ary] if valid else np.NaN
+        train_idx = graph.idmap[self.valsplit.train_index]
+        test_idx = graph.idmap[self.valsplit.test_index]
+        valid_idx = graph.idmap[self.valsplit.valid_index] if valid else np.NaN
 
         y = np.zeros((graph.size, len(self.label_ids)), dtype=bool)
         for i, labelID in enumerate(self.label_ids):

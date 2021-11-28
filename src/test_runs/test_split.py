@@ -38,9 +38,9 @@ print(
     f"Number of labelsets after filtering "
     f"(train_ratio={train_ratio}, test_ratio={test_ratio}, "
     f"min_pos={min_pos}): {len(lsc.label_ids)}\n"
-    f"Number of training = {lsc.valsplit.train_ID_ary.size}, "
-    f"validation = {lsc.valsplit.valid_ID_ary.size}, "
-    f"testing = {lsc.valsplit.test_ID_ary.size}"
+    f"Number of training = {lsc.valsplit.train_index.size}, "
+    f"validation = {lsc.valsplit.valid_index.size}, "
+    f"testing = {lsc.valsplit.test_index.size}"
 )
 
 """

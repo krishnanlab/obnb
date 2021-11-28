@@ -39,15 +39,15 @@ class BaseValSplit:
                 is False
 
         Yields:
-            train_ID_ary(:obj:`numpy.ndarray` of :obj:`str`):
+            train_index(:obj:`numpy.ndarray` of :obj:`str`):
                 numpy array of training IDs
             train_label_ary(:obj:`numpy.ndarray` of :obj:`bool`):
                 numpy array of training labels
-            test_ID_ary(:obj:`numpy.ndarray` of :obj:`str`):
+            test_index(:obj:`numpy.ndarray` of :obj:`str`):
                 numpy array of testing IDs
             test_label_ary(:obj:`numpy.ndarray` of :obj:`bool`):
                 numpy array of testing labels
-            valid_ID_ary(:obj:`numpy.ndarray` of :obj:`str`):
+            valid_index(:obj:`numpy.ndarray` of :obj:`str`):
                 for `valid=True`, numpy array of validation IDs
             valid_label_ary(:obj:`numpy.ndarray` of :obj:`bool`):
                 for `valid=True`, numpy array of validation labels
@@ -72,27 +72,27 @@ class BaseHoldout(BaseValSplit):
         user specification of `train_on`. If 'top' specified, those samples
         with properties of larger values are used for training, and those
         with smaller values are used for testing, and vice versa. The
-        ``train_ID_ary`` and ``test_ID_ary`` will be constructed by more
+        ``train_index`` and ``test_index`` will be constructed by more
         specific hold-out class.
 
         """
         super(BaseHoldout, self).__init__(shuffle=shuffle)
         self.train_on = train_on
-        self._test_ID_ary = None
-        self._valid_ID_ary = None
-        self._train_ID_ary = None
+        self._test_index = None
+        self._valid_index = None
+        self._train_index = None
 
     @property
-    def train_ID_ary(self):
-        return None if self._train_ID_ary is None else self._train_ID_ary.copy()
+    def train_index(self):
+        return None if self._train_index is None else self._train_index.copy()
 
     @property
-    def valid_ID_ary(self):
-        return None if self._valid_ID_ary is None else self._valid_ID_ary.copy()
+    def valid_index(self):
+        return None if self._valid_index is None else self._valid_index.copy()
 
     @property
-    def test_ID_ary(self):
-        return None if self._test_ID_ary is None else self._test_ID_ary.copy()
+    def test_index(self):
+        return None if self._test_index is None else self._test_index.copy()
 
     @property
     def train_on(self):
@@ -133,14 +133,14 @@ class BaseHoldout(BaseValSplit):
         return common_ID_list
 
     def check_split_setup(self, valid):
-        if self._test_ID_ary is None or self._train_ID_ary is None:
+        if self._test_index is None or self._train_index is None:
             raise ValueError(
                 "Training or testing sets not available, "
                 "run `train_test_setup` first",
             )
 
         if valid:
-            if self.valid_ID_ary is None:
+            if self.valid_index is None:
                 raise ValueError(
                     f"Validation set is only available for TrainValTest "
                     f"split type, current split type is {type(self)!r}",
@@ -148,10 +148,10 @@ class BaseHoldout(BaseValSplit):
 
     def get_split_idx_ary(self, ID_ary, label_ary=None, valid=False):
         self.check_split_setup(valid)
-        train_idx_ary = np.where(np.in1d(ID_ary, self.train_ID_ary))[0]
-        test_idx_ary = np.where(np.in1d(ID_ary, self.test_ID_ary))[0]
+        train_idx_ary = np.where(np.in1d(ID_ary, self.train_index))[0]
+        test_idx_ary = np.where(np.in1d(ID_ary, self.test_index))[0]
         if valid:
-            valid_idx_ary = np.where(np.in1d(ID_ary, self.valid_ID_ary))[0]
+            valid_idx_ary = np.where(np.in1d(ID_ary, self.valid_index))[0]
             yield train_idx_ary, valid_idx_ary, test_idx_ary
         else:
             yield train_idx_ary, test_idx_ary

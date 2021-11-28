@@ -628,12 +628,12 @@ class TestFilter(unittest.TestCase):
             self.assertEqual(lsc.entity.map, {})
 
     def test_LabelsetRangeFilterTrainTestPos(self):
-        train_ID_ary = np.array(["a", "b", "c", "d"])
-        test_ID_ary = np.array(["e", "f", "g", "h"])
-        with self.subTest(train=train_ID_ary, test=test_ID_ary):
-            splitter = valsplit.Holdout.CustomHold(train_ID_ary, test_ID_ary)
-            splitter._train_ID_ary = splitter.custom_train_ID_ary
-            splitter._test_ID_ary = splitter.custom_test_ID_ary
+        train_index = np.array(["a", "b", "c", "d"])
+        test_index = np.array(["e", "f", "g", "h"])
+        with self.subTest(train=train_index, test=test_index):
+            splitter = valsplit.Holdout.CustomHold(train_index, test_index)
+            splitter._train_index = splitter.custom_train_index
+            splitter._test_index = splitter.custom_test_index
             self.lsc.valsplit = splitter
             lsc = self.lsc.apply(
                 Filter.LabelsetRangeFilterTrainTestPos(min_val=1),
@@ -646,12 +646,12 @@ class TestFilter(unittest.TestCase):
             )
             self.assertEqual(lsc.entity.map, {"a": 0, "c": 1, "f": 2, "h": 3})
 
-        train_ID_ary = np.array(["a", "c", "e"])
-        test_ID_ary = np.array(["b", "d", "f"])
-        with self.subTest(train=train_ID_ary, test=test_ID_ary):
-            splitter = valsplit.Holdout.CustomHold(train_ID_ary, test_ID_ary)
-            splitter._train_ID_ary = splitter.custom_train_ID_ary
-            splitter._test_ID_ary = splitter.custom_test_ID_ary
+        train_index = np.array(["a", "c", "e"])
+        test_index = np.array(["b", "d", "f"])
+        with self.subTest(train=train_index, test=test_index):
+            splitter = valsplit.Holdout.CustomHold(train_index, test_index)
+            splitter._train_index = splitter.custom_train_index
+            splitter._test_index = splitter.custom_test_index
             self.lsc.valsplit = splitter
             lsc = self.lsc.apply(
                 Filter.LabelsetRangeFilterTrainTestPos(min_val=1),
@@ -667,22 +667,22 @@ class TestFilter(unittest.TestCase):
                 {"a": 0, "b": 1, "c": 2, "e": 3, "f": 4, "g": 5},
             )
 
-        train_ID_ary = np.array(["a", "d"])
-        valid_ID_ary = np.array(["b", "e"])
-        test_ID_ary = np.array(["c", "f"])
+        train_index = np.array(["a", "d"])
+        valid_index = np.array(["b", "e"])
+        test_index = np.array(["c", "f"])
         with self.subTest(
-            train=train_ID_ary,
-            test=test_ID_ary,
-            valid=valid_ID_ary,
+            train=train_index,
+            test=test_index,
+            valid=valid_index,
         ):
             splitter = valsplit.Holdout.CustomHold(
-                train_ID_ary,
-                test_ID_ary,
-                valid_ID_ary,
+                train_index,
+                test_index,
+                valid_index,
             )
-            splitter._train_ID_ary = splitter.custom_train_ID_ary
-            splitter._test_ID_ary = splitter.custom_test_ID_ary
-            splitter._valid_ID_ary = splitter.custom_valid_ID_ary
+            splitter._train_index = splitter.custom_train_index
+            splitter._test_index = splitter.custom_test_index
+            splitter._valid_index = splitter.custom_valid_index
             self.lsc.valsplit = splitter
             lsc = self.lsc.apply(
                 Filter.LabelsetRangeFilterTrainTestPos(min_val=1),
