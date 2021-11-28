@@ -171,9 +171,9 @@ class BaseLSC(IDHandler.IDprop):
         neg = self.getProp(labelID, "Negative")
 
         if neg == {None}:
-            all_positives = set(
-                [i for i in self.entity.map if self.getNoccur(i) > 0],
-            )
+            all_positives = {
+                i for i in self.entity.map if self.getNoccur(i) > 0
+            }
             return all_positives - self.getLabelset(labelID)
 
         return neg
