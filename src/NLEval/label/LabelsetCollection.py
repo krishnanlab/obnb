@@ -139,7 +139,7 @@ class BaseLSC(IDHandler.IDprop):
                 self.entity.popID(ID)
         lbset.clear()
 
-    def popEntity(self, ID):
+    def pop_entity(self, ID):
         """Pop an entity from entity list, and also remove it from all labelsets.
 
         Note: Unlike `pop_labelset`, if after removal, a labelset beomes empty, the

@@ -60,9 +60,9 @@ class TestBaseLSC(unittest.TestCase):
         self.assertEqual(self.lsc.getNoccur("c"), 1)
         self.assertEqual(self.lsc.getNoccur("d"), 1)
 
-    def test_popEntity(self):
-        self.template_test_input_for_getters(self.lsc.popEntity)
-        self.lsc.popEntity("b")
+    def test_pop_entity(self):
+        self.template_test_input_for_getters(self.lsc.pop_entity)
+        self.lsc.pop_entity("b")
         self.assertEqual(self.lsc.entity.map, {"a": 0, "c": 1, "d": 2})
         self.assertEqual(self.lsc.getLabelset("Labelset1"), {"a", "c"})
         self.assertEqual(self.lsc.getLabelset("Labelset2"), {"d"})

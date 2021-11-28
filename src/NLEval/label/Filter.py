@@ -85,7 +85,7 @@ class EntityExistanceFilter(ExistanceFilter):
 
     @staticmethod
     def get_mod_fun(lsc):
-        return lsc.popEntity
+        return lsc.pop_entity
 
 
 class LabelsetExistanceFilter(ExistanceFilter):
@@ -154,7 +154,7 @@ class EntityRangeFilterNoccur(RangeFilter):
 
     @staticmethod
     def get_mod_fun(lsc):
-        return lsc.popEntity
+        return lsc.pop_entity
 
 
 class LabelsetRangeFilterSize(RangeFilter):
