@@ -76,38 +76,38 @@ class TestBaseLSC(unittest.TestCase):
         self.lsc.entity.add_id("h")
         self.assertEqual(self.lsc.get_negative("Labelset2"), {"a", "c"})
         # test specified negative
-        self.lsc.setNegative(["a"], "Labelset2")
+        self.lsc.set_negative(["a"], "Labelset2")
         self.assertEqual(self.lsc.get_negative("Labelset2"), {"a"})
 
-    def test_setNegative(self):
+    def test_set_negative(self):
         # test with known entity ID
-        self.lsc.setNegative(["a"], "Labelset2")
+        self.lsc.set_negative(["a"], "Labelset2")
         self.assertEqual(self.lsc.get_negative("Labelset2"), {"a"})
-        self.lsc.setNegative(["c"], "Labelset2")
+        self.lsc.set_negative(["c"], "Labelset2")
         self.assertEqual(self.lsc.get_negative("Labelset2"), {"c"})
         # test with knwon positive ID --> IDExistsError
         self.assertRaises(
             IDExistsError,
-            self.lsc.setNegative,
+            self.lsc.set_negative,
             ["b"],
             "Labelset2",
         )
         self.assertRaises(
             IDExistsError,
-            self.lsc.setNegative,
+            self.lsc.set_negative,
             ["a", "d"],
             "Labelset2",
         )
         # test with unknown entity ID --> IDNotExistError
         self.assertRaises(
             IDNotExistError,
-            self.lsc.setNegative,
+            self.lsc.set_negative,
             ["e"],
             "Labelset2",
         )
         self.assertRaises(
             IDNotExistError,
-            self.lsc.setNegative,
+            self.lsc.set_negative,
             ["a", "e"],
             "Labelset2",
         )

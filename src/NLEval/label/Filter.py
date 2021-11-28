@@ -329,4 +329,4 @@ class NegativeFilterHypergeom(BaseFilter):
                     exclude_set.update(lsc.get_labelset(ID2))
 
             negative = list(all_entities - exclude_set)
-            lsc.setNegative(list(negative), ID1)
+            lsc.set_negative(list(negative), ID1)

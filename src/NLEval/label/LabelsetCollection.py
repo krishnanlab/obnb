@@ -176,7 +176,7 @@ class BaseLSC(IDHandler.IDprop):
 
         return neg
 
-    def setNegative(self, lst, labelID):
+    def set_negative(self, lst, labelID):
         checkers.checkTypesInList("Negative entity list", str, lst)
         lbset = self.get_labelset(labelID)
         for ID in lst:
