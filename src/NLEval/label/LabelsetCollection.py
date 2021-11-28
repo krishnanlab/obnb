@@ -67,44 +67,44 @@ class BaseLSC(IDHandler.IDprop):
         """:obj:`list` of :obj:`str`: list of all labelset names."""
         return self.lst
 
-    def add_labelset(self, lst, labelID, labelInfo=None):
+    def add_labelset(self, lst, label_id, labelInfo=None):
         """Add a new labelset.
 
         Args:
             lst(:obj:`list` of :obj:`str`): list of IDs of entiteis belong
                 to the input label
-            labelID(str): name of label
+            label_id(str): name of label
             labelInfo(str): description of label
 
         """
-        self.add_id(labelID, {} if labelInfo is None else {"Info": labelInfo})
+        self.add_id(label_id, {} if labelInfo is None else {"Info": labelInfo})
         try:
             self.entity.update(lst)
         except Exception as e:
             # if entity list not updated successfully, pop the new labelset
-            self.popID(labelID)
+            self.popID(label_id)
             raise e
-        self.update_labelset(lst, labelID)
+        self.update_labelset(lst, label_id)
 
-    def pop_labelset(self, labelID):
+    def pop_labelset(self, label_id):
         """Pop a labelset.
 
         Note:
             This also removes any entity that longer belongs to any labelset.
 
         """
-        self.reset_labelset(labelID)
-        self.popID(labelID)
+        self.reset_labelset(label_id)
+        self.popID(label_id)
 
-    def update_labelset(self, lst, labelID):
+    def update_labelset(self, lst, label_id):
         """Update an existing labelset.
 
         Take list of entities IDs and update current labelset with a label
-        name matching `labelID`. Any ID in the input list `lst` that does
+        name matching `label_id`. Any ID in the input list `lst` that does
         not exist in the entity list will be added to the entity list. Increment
         the `Noccur` property of any newly added entites to the labelset by 1.
 
-        Note: labelID must already existed, use `.add_labelset()` for adding
+        Note: label_id must already existed, use `.add_labelset()` for adding
         new labelset
 
         Args:
@@ -117,7 +117,7 @@ class BaseLSC(IDHandler.IDprop):
 
         """
         checkers.checkTypesInList("Entity list", str, lst)
-        lbset = self.get_labelset(labelID)
+        lbset = self.get_labelset(label_id)
         for entity_id in lst:
             if entity_id not in self.entity:
                 self.entity.add_id(entity_id)
@@ -129,14 +129,14 @@ class BaseLSC(IDHandler.IDprop):
                     self.get_noccur(entity_id) + 1,
                 )
 
-    def reset_labelset(self, labelID):
+    def reset_labelset(self, label_id):
         """Reset an existing labelset to an empty set.
 
         Setting the labelset back to empty and deecrement `Noccur` of all
         entites belonging to the labelset by 1.
 
         """
-        lbset = self.get_labelset(labelID)
+        lbset = self.get_labelset(label_id)
         for entity_id in lbset:
             self.entity.setProp(
                 entity_id,
@@ -159,46 +159,46 @@ class BaseLSC(IDHandler.IDprop):
 
         """
         self.entity.popID(entity_id)
-        for labelID in self.label_ids:
-            self.get_labelset(labelID).difference_update([entity_id])
+        for label_id in self.label_ids:
+            self.get_labelset(label_id).difference_update([entity_id])
 
-    def get_info(self, labelID):
+    def get_info(self, label_id):
         """Return description of a labelset."""
-        return self.getProp(labelID, "Info")
+        return self.getProp(label_id, "Info")
 
-    def get_labelset(self, labelID):
+    def get_labelset(self, label_id):
         """Return set of entities associated with a label."""
-        return self.getProp(labelID, "Labelset")
+        return self.getProp(label_id, "Labelset")
 
-    def get_negative(self, labelID):
+    def get_negative(self, label_id):
         """Return set of negative samples of a labelset.
 
         Note:
             If negative samples not available, use complement of labelset
 
         """
-        neg = self.getProp(labelID, "Negative")
+        neg = self.getProp(label_id, "Negative")
 
         if neg == {None}:
             all_positives = {
                 i for i in self.entity.map if self.get_noccur(i) > 0
             }
-            return all_positives - self.get_labelset(labelID)
+            return all_positives - self.get_labelset(label_id)
 
         return neg
 
-    def set_negative(self, lst, labelID):
+    def set_negative(self, lst, label_id):
         checkers.checkTypesInList("Negative entity list", str, lst)
-        lbset = self.get_labelset(labelID)
+        lbset = self.get_labelset(label_id)
         for entity_id in lst:
             self.entity._check_ID_existence(entity_id, True)
             if entity_id in lbset:
-                # raise Exception(repr(entity_id), repr(labelID))
+                # raise Exception(repr(entity_id), repr(label_id))
                 raise IDExistsError(
                     f"Entity {entity_id!r} is positive in labelset, "
-                    f"{labelID!r}, cannot be set to negative",
+                    f"{label_id!r}, cannot be set to negative",
                 )
-        self.setProp(labelID, "Negative", set(lst))
+        self.setProp(label_id, "Negative", set(lst))
 
     def get_noccur(self, entity_id):
         """Return the number of labelsets in which an entity participates."""
@@ -247,12 +247,12 @@ class BaseLSC(IDHandler.IDprop):
             entity_id: idx for idx, entity_id in enumerate(entity_ids)
         }
         label_ids = self.label_ids
-        labelInfolst = [self.get_info(labelID) for labelID in label_ids]
+        labelInfolst = [self.get_info(label_id) for label_id in label_ids]
         mat = np.zeros((len(entity_ids), len(label_ids)), dtype=int)
 
-        for j, labelID in enumerate(label_ids):
-            positive_set = self.get_labelset(labelID)
-            negative_set = self.get_negative(labelID)
+        for j, label_id in enumerate(label_ids):
+            positive_set = self.get_labelset(label_id)
+            negative_set = self.get_negative(label_id)
 
             for sign, labelset in zip(
                 ["1", "-1"],
@@ -283,10 +283,10 @@ class BaseLSC(IDHandler.IDprop):
         """
         fp += "" if fp.endswith(".gmt") else ".gmt"
         with open(fp, "w") as f:
-            for labelID in self.label_ids:
-                labelInfo = self.get_info(labelID)
-                labelset_str = "\t".join(self.get_labelset(labelID))
-                f.write(f"{labelID}\t{labelInfo}\t{labelset_str}\n")
+            for label_id in self.label_ids:
+                labelInfo = self.get_info(label_id)
+                labelset_str = "\t".join(self.get_labelset(label_id))
+                f.write(f"{label_id}\t{labelInfo}\t{labelset_str}\n")
 
     def load_entity_properties(
         self,
@@ -334,8 +334,8 @@ class BaseLSC(IDHandler.IDprop):
         lsc = cls()
         with open(fp, "r") as f:
             for line in f:
-                labelID, labelInfo, *lst = line.strip().split("\t")
-                lsc.add_labelset(lst, labelID, labelInfo)
+                label_id, labelInfo, *lst = line.strip().split("\t")
+                lsc.add_labelset(lst, label_id, labelInfo)
         return lsc
 
 
@@ -379,16 +379,16 @@ class SplitLSC(BaseLSC):
         while num_labelsets != len(self.label_ids):
             num_labelsets = len(self.label_ids)
             # print(num_labelsets)
-            # labelIDset = set(self.label_ids)
+            # label_id_set = set(self.label_ids)
             self.valsplit.train_test_setup(self.entity, graph.idmap, prop_name)
             self.apply(
                 Filter.LabelsetRangeFilterTrainTestPos(min_pos),
                 inplace=True,
             )
-            # for i in labelIDset - set(self.label_ids):
+            # for i in label_id_set - set(self.label_ids):
             #     print(f"Pop {i}")
 
-    def split_labelset(self, labelID, entity_ids=None):
+    def split_labelset(self, label_id, entity_ids=None):
         """Split up a labelset by training and testing sets.
 
         Returns:
@@ -399,8 +399,8 @@ class SplitLSC(BaseLSC):
         if entity_ids is None:
             entity_ids = self.entity_ids.copy()
 
-        pos_ID_set = set(self.get_labelset(labelID)) & set(entity_ids)
-        neg_ID_set = set(self.get_negative(labelID)) & set(entity_ids)
+        pos_ID_set = set(self.get_labelset(label_id)) & set(entity_ids)
+        neg_ID_set = set(self.get_negative(label_id)) & set(entity_ids)
 
         ID_ary = np.array(list(pos_ID_set) + list(neg_ID_set))
         label_ary = np.zeros(len(ID_ary), dtype=bool)
@@ -440,8 +440,8 @@ class SplitLSC(BaseLSC):
         valid_idx = graph.idmap[self.valsplit.valid_index] if valid else np.NaN
 
         y = np.zeros((graph.size, len(self.label_ids)), dtype=bool)
-        for i, labelID in enumerate(self.label_ids):
-            pos_ID_ary = np.array(list(self.get_labelset(labelID)))
+        for i, label_id in enumerate(self.label_ids):
+            pos_ID_ary = np.array(list(self.get_labelset(label_id)))
             pos_idx_ary = graph.idmap[pos_ID_ary]
             y[pos_idx_ary, i] = True
 
@@ -452,5 +452,5 @@ class SplitLSC(BaseLSC):
             valid_idx=valid_idx,
             test_idx=test_idx,
             IDs=graph.idmap.lst,
-            labelIDs=self.label_ids,
+            label_ids=self.label_ids,
         )

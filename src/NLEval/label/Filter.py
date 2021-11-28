@@ -186,13 +186,13 @@ class LabelsetRangeFilterJaccard(RangeFilter):
     def get_val_getter(lsc):
         # if jjaccard index greater than threshold, determin whether or not to
         # discard depending on the size, only discard the larger one
-        def val_getter(labelID):
+        def val_getter(label_id):
             val = 0
-            labelset = lsc.get_labelset(labelID)
-            for labelID2 in lsc.label_ids:
-                if labelID2 == labelID:  # skip self
+            labelset = lsc.get_labelset(label_id)
+            for label_id2 in lsc.label_ids:
+                if label_id2 == label_id:  # skip self
                     continue
-                labelset2 = lsc.get_labelset(labelID2)
+                labelset2 = lsc.get_labelset(label_id2)
                 jidx = len(labelset & labelset2) / len(labelset | labelset2)
                 if (jidx > val) & (len(labelset) <= len(labelset2)):
                     val = jidx
@@ -225,12 +225,12 @@ class LabelsetRangeFilterTrainTestPos(RangeFilter):
 
     @staticmethod
     def get_val_getter(lsc):
-        return lambda labelID: min(
+        return lambda label_id: min(
             [
                 idx_ary.size
                 for idx_ary in next(
                     lsc.valsplit.get_split_idx_ary(
-                        np.array(list(lsc.get_labelset(labelID))),
+                        np.array(list(lsc.get_labelset(label_id))),
                         valid=lsc.valsplit.valid_index is not None,
                     ),
                 )
