@@ -1,10 +1,11 @@
-import numpy as np
-from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
-from sklearn.svm import LinearSVC
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import average_precision_score
-from NLEval.model.BaseModel import BaseModel
 from copy import deepcopy
+
+import numpy as np
+from NLEval.model.BaseModel import BaseModel
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
+from sklearn.metrics import average_precision_score
+from sklearn.svm import LinearSVC
 
 __all__ = ["SLBase", "LogReg", "SVM", "RF"]
 

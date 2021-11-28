@@ -1,5 +1,5 @@
-from NLEval.util import checkers, IDHandler
 import numpy as np
+from NLEval.util import IDHandler, checkers
 
 __all__ = ["BaseValSplit", "BaseHoldout", "BaseInterface"]
 

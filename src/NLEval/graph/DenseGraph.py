@@ -1,8 +1,8 @@
+import numpy as np
 from NLEval.graph.BaseGraph import BaseGraph
 from NLEval.graph.SparseGraph import SparseGraph
-from NLEval.util import checkers, IDHandler
+from NLEval.util import IDHandler, checkers
 from scipy.spatial import distance
-import numpy as np
 
 __all__ = ["DenseGraph", "FeatureVec"]
 

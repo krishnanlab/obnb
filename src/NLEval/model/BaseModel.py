@@ -1,6 +1,6 @@
+import numpy as np
 from NLEval.graph import BaseGraph
 from NLEval.util import checkers
-import numpy as np
 
 __all__ = ["BaseModel"]
 

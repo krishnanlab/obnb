@@ -1,5 +1,6 @@
-from sklearn import model_selection as ms
 from NLEval.valsplit.Base import *
+from sklearn.model_selection import LeaveOneOut, LeavePOut, StratifiedKFold, \
+    StratifiedShuffleSplit
 
 __all__ = ["sklSKF", "sklSSS", "sklLOO", "sklLPO"]
 
@@ -25,7 +26,7 @@ class sklSKF(sklInterface):
     """Dedicated interface for Stratified K-Fold in SKLearn."""
 
     def __init__(self, skl_kws=None, shuffle=False):
-        super(sklSKF, self).__init__(ms.StratifiedKFold, skl_kws, shuffle)
+        super(sklSKF, self).__init__(StratifiedKFold, skl_kws, shuffle)
 
 
 class sklSSS(sklInterface):
@@ -33,7 +34,7 @@ class sklSSS(sklInterface):
 
     def __init__(self, skl_kws=None, shuffle=False):
         super(sklSSS, self).__init__(
-            ms.StratifiedShuffleSplit, skl_kws, shuffle,
+            StratifiedShuffleSplit, skl_kws, shuffle,
         )
 
 
@@ -41,11 +42,11 @@ class sklLOO(sklInterface):
     """Dedicated interface for Leave One Out in SKLearn."""
 
     def __init__(self, skl_kws=None, shuffle=False):
-        super(sklLOO, self).__init__(ms.LeavePOut, skl_kws, shuffle)
+        super(sklLOO, self).__init__(LeavePOut, skl_kws, shuffle)
 
 
 class sklLPO(sklInterface):
     """Dedicated interface for Leave P Out in SKLearn."""
 
     def __init__(self, skl_kws=None, shuffle=False):
-        super(sklLPO, self).__init__(ms.LeaveOneOu, skl_kws, shuffle)
+        super(sklLPO, self).__init__(LeaveOneOut, skl_kws, shuffle)

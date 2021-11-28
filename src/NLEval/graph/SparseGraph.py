@@ -1,6 +1,6 @@
+import numpy as np
 from NLEval.graph.BaseGraph import BaseGraph
 from NLEval.util import checkers
-import numpy as np
 
 __all__ = ["SparseGraph"]
 

@@ -1,6 +1,6 @@
+import numpy as np
 from NLEval.util import checkers
 from NLEval.valsplit.Base import *
-import numpy as np
 
 __all__ = ["BinHold", "ThreshHold", "CustomHold", "TrainTestAll"]
 
