@@ -31,8 +31,10 @@ class BaseGraph:
         return True
 
     def __eq__(self, graph):
-        """Return true if input graph is identical to self
-        i.e. same set of IDs with same connections
+        """Return true if input graph is identical to self.
+
+        For example, same set of IDs with same connections.
+
         """
         if self.IDmap == graph.IDmap:
             return graph in self

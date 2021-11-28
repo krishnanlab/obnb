@@ -96,10 +96,7 @@ class BaseHoldout(BaseValSplit):
 
     @property
     def train_on(self):
-        """str: train on top or bottom sample sets
-        - 'top': train on top, test on bottom
-        - 'bot': train on bottom, test on top
-        """
+        """Train on top ('top') or bottom ('bot') sample sets."""
         return self._train_on
 
     @train_on.setter

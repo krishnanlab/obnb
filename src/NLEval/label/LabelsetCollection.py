@@ -59,8 +59,7 @@ class BaseLSC(IDHandler.IDprop):
 
     @property
     def entityIDlst(self):
-        """:obj:`list` of :obj:`str`: list of all entity IDs that
-        are part of at least one labelset"""
+        """List of all entity IDs that are part of at least one labelset."""
         return [i for i in self.entity if self.getNoccur(i) > 0]
 
     @property
@@ -88,7 +87,12 @@ class BaseLSC(IDHandler.IDprop):
         self.updateLabelset(lst, labelID)
 
     def popLabelset(self, labelID):
-        """Pop a labelset and remove entities that no longer belong to any labelset"""
+        """Pop a labelset.
+
+        Note:
+            This also removes any entity that longer belongs to any labelset.
+
+        """
         self.resetLabelset(labelID)
         self.popID(labelID)
 
@@ -122,16 +126,10 @@ class BaseLSC(IDHandler.IDprop):
                 self.entity.setProp(ID, "Noccur", self.getNoccur(ID) + 1)
 
     def resetLabelset(self, labelID):
-        """Reset an existing labelset to an empty set, and deecrement `Noccur` of
-        all entites belonging to the labelset.
+        """Reset an existing labelset to an empty set.
 
-        Note: Any entity specific to the popped labelset is popped, which is
-        indicated by the equality of properties of entity with default property
-        values. The most important property is `Noccur`, the number of labelset
-        an entity is presented in, with default value of 0 (see init), which implies
-        that the entity is no longer present in any labelsets. The use of all
-        default properfies for comparison to determine popping of entity is just
-        for generalization purpose.
+        Setting the labelset back to empty and deecrement `Noccur` of all
+        entites belonging to the labelset by 1.
 
         """
         lbset = self.getLabelset(labelID)
@@ -287,6 +285,7 @@ class BaseLSC(IDHandler.IDprop):
         skiprows=0,
     ):
         """Load entity properties from file.
+
         The file is tab seprated with two columns, first column
         contains entities IDs, second column contains corresponding
         properties of entities.
@@ -312,8 +311,7 @@ class BaseLSC(IDHandler.IDprop):
 
     @classmethod
     def from_gmt(cls, fp):
-        """Load data from Gene Matrix Transpose `.gmt` file
-        https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats
+        """Load data from Gene Matrix Transpose `.gmt` file.
 
         Args:
             fg(str): path to the `.gmt` file
@@ -328,8 +326,7 @@ class BaseLSC(IDHandler.IDprop):
 
 
 class SplitLSC(BaseLSC):
-    """Labelset collection with more functionality including negative selection and
-    splitting utility to generate train/test split for each labelset"""
+    """Labelset collection equipped with split generator."""
 
     def __init__(self):
         super(SplitLSC, self).__init__()
@@ -338,8 +335,7 @@ class SplitLSC(BaseLSC):
 
     @property
     def valsplit(self):
-        """:obj:`NLEval.valsplit.Base.BaseValSplit`: validation split
-        generator used to generat train/test split for labelsets"""
+        """Ssplit generator for generating train/(val)/test splits."""
         return self._valsplit
 
     @valsplit.setter

@@ -20,6 +20,7 @@ class DenseGraph(BaseGraph):
         Args:
             key(str): key of ID
             key(:obj:`list` of :obj:`str`): list of keys of IDs
+
         """
         if isinstance(key, slice):
             raise NotImplementedError
@@ -34,12 +35,15 @@ class DenseGraph(BaseGraph):
     @mat.setter
     def mat(self, val):
         """Setter for DenseGraph.mat
-        Note: need to construct IDmap (self.IDmap) first before
-        loading matrix (self.mat), which should have same number of
-        entires (rows) as size of IDmap, riases exption other wise
+
+        Note:
+            need to construct IDmap (self.IDmap) first before loading matrix
+            (self.mat), which should have same number of entires (rows) as size
+            of IDmap, riases exption other wise>
 
         Args:
             val(:obj:`numpy.ndarray`): 2D numpy array
+
         """
         checkers.checkNumpyArrayIsNumeric("val", val)
         if val.size > 0:
@@ -56,6 +60,7 @@ class DenseGraph(BaseGraph):
         Args:
             ID1(str): ID of first node
             ID2(str): ID of second node
+
         """
         return self.mat[self.IDmap[ID1], self.IDmap[ID2]]
 
@@ -147,8 +152,11 @@ class FeatureVec(DenseGraph):
 
     @DenseGraph.mat.setter
     def mat(self, val):
-        """Setter for FeatureVec.mat
-        Note: matrix must match dimension of both self.IDmap and self.dim
+        """Setter for FeatureVec.mat>
+
+        Note:
+            Matrix must match the dim of both ``self.IDmap`` and ``self.dim``.
+
         """
         mat_bkp = self.mat  # create backup copy
         DenseGraph.mat.fset(self, val)

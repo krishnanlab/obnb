@@ -70,9 +70,12 @@ class BaseModel:
         return y_true, y_predict
 
     def test2(self, labelset_splitgen):
-        """Same as test() above, but return y_true and y_pred as list of
-        lists, grouping based on fold/split instead of merging into a
-        single list"""
+        """Model testing through validation split and separate by splits.
+
+        Same as test() above, but return y_true and y_pred as list of lists,
+        grouping based on fold/split instead of merging into a single list
+
+        """
         y_true = []
         y_predict = []
         for arys in labelset_splitgen:

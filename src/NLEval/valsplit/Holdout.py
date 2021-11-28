@@ -78,7 +78,7 @@ class TrainValTest(BaseHoldout):
 
 class BinHold(BaseHoldout):
     def __init__(self, bin_num, train_on="top", shuffle=False):
-        """
+        """Initialize bining holdout object.
 
         Args:
             bin_num(int): num of bins for bin_num mode (see mode)
@@ -104,7 +104,7 @@ class BinHold(BaseHoldout):
         self._bin_num = val
 
     def train_test_setup(self, lscIDs, nodeIDs, prop_name, **kwargs):
-        """
+        """Set up training and testing.
 
         Args:
             lscIDs(:obj:`NLEval.util.IDHandler.IDprop`)
@@ -126,10 +126,11 @@ class BinHold(BaseHoldout):
 
 class ThreshHold(BaseHoldout):
     def __init__(self, cut_off, train_on="top", shuffle=False):
-        """
+        """Initialize threshold holdout split object.
 
         Args:
-            cut_off:        cut-off point for cut mode, num of bins for bin mode (see mode)
+            cut_off: cut-off point for the 'cut' mode, or number of bins for
+                the 'bin' mode (see mode).
 
         """
         super(ThreshHold, self).__init__(train_on=train_on, shuffle=shuffle)
@@ -151,7 +152,7 @@ class ThreshHold(BaseHoldout):
         self._cut_off = val
 
     def train_test_setup(self, lscIDs, nodeIDs, prop_name, **kwargs):
-        """
+        """Set up training and testing.
 
         Args:
             lscIDs(:obj:`NLEval.util.IDHandler.IDprop`)

@@ -6,8 +6,7 @@ __all__ = ["SparseGraph"]
 
 
 class SparseGraph(BaseGraph):
-    """Sparse Graph object with data stored as adjacency list
-    for efficient data retrieving and processing"""
+    """Sparse Graph object with data stored as adjacency list."""
 
     def __init__(self, weighted=True, directed=False):
         super().__init__()
@@ -46,6 +45,7 @@ class SparseGraph(BaseGraph):
         Args:
             key(str): key of ID
             key(:obj:`list` of :obj:`str`): list of keys of IDs
+
         """
         idx = self.IDmap[key]
         if isinstance(idx, int):
@@ -57,11 +57,11 @@ class SparseGraph(BaseGraph):
         return fvec
 
     def construct_adj_vec(self, src_idx):
-        """Construct and return a specific row vector of
-        adjacency matrix using correspondingadjacency list
+        """Construct and return a specific row vector of the adjacency matrix.
 
         Args:
             src_idx(int): index of row
+
         """
         checkers.checkType("src_idx", int, src_idx)
         fvec = np.zeros(self.size)
@@ -99,8 +99,10 @@ class SparseGraph(BaseGraph):
 
     @staticmethod
     def edglst_reader(edg_fp, weighted, directed, cut_threshold):
-        """Edge list file reader
+        """Edge list file reader.
+
         Read line by line from a edge list file and yield ID1, ID2, weight
+
         """
         with open(edg_fp, "r") as f:
             for line in f:
@@ -120,11 +122,15 @@ class SparseGraph(BaseGraph):
 
     @staticmethod
     def npy_reader(mat, weighted, directed, cut_threshold):
-        """Numpy reader
+        """Numpy reader.
+
         Load an numpy matrix (either from file path or numpy matrix directly)
-        and yield ID1, ID2, weight
-        Matrix should be in shape (N, N+1), where N is number of nodes
-        First column of the matrix encodes IDs
+        and yield ID1, ID2, weight.
+
+        Note:
+            The matrix should be in shape (N, N+1), where N is number of nodes.
+            The first column of the matrix encodes the node IDs
+
         """
         if isinstance(mat, str):
             # load numpy matrix from file if provided path instead of numpy matrix
@@ -177,8 +183,10 @@ class SparseGraph(BaseGraph):
 
     @staticmethod
     def edglst_writer(outpth, edge_gen, weighted, directed, cut_threshold):
-        """Edge list file writer
-        Write line by line to edge list
+        """Edge list file writer.
+
+        Write line by line to edge list.
+
         """
         with open(outpth, "w") as f:
             for srcID, dstID, weight in edge_gen():
@@ -208,11 +216,12 @@ class SparseGraph(BaseGraph):
         """Save graph to file
 
         Args:
-            outpth(str): path to output file
-            writer: writer function (or name of default writer) to generate file
-                        - 'edglst': edge list writer
-                        - 'npy': numpy writer
-            cut_threshold(float): threshold below which edges are not considered
+            outpth (str): path to output file
+            writer (str): writer function (or name of default writer) to
+                generate file ('edglst', 'npy').
+            cut_threshold (float): threshold of edge weights below which the
+                edges are not considered.
+
         """
         if isinstance(writer, str):
             if writer == "edglst":
@@ -230,6 +239,7 @@ class SparseGraph(BaseGraph):
 
         Args:
             default_val(float): default value for missing edges
+
         """
         Nnodes = self.IDmap.size
         mat = np.ones((Nnodes, Nnodes)) * default_val
