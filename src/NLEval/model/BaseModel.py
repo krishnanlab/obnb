@@ -8,19 +8,19 @@ __all__ = ["BaseModel"]
 class BaseModel:
     """Base model object."""
 
-    def __init__(self, g):
+    def __init__(self, graph):
         super(BaseModel, self).__init__()
-        self.G = g
+        self.graph = graph
 
     @property
-    def G(self):
+    def graph(self):
         """:obj:`NLEval.Graph.BaseGraph`: graph object."""
         return self._G
 
-    @G.setter
-    def G(self, g):
-        checkers.checkType("Graph", BaseGraph.BaseGraph, g)
-        self._G = g
+    @graph.setter
+    def graph(self, graph):
+        checkers.checkType("Graph", BaseGraph.BaseGraph, graph)
+        self._G = graph
 
     def get_idx_ary(self, IDs):
         """Return indices of corresponding input IDs.
@@ -35,12 +35,12 @@ class BaseModel:
             (:obj:`numpy.ndarray`): numpy array of indices of input IDs
 
         """
-        return self.G.idmap[IDs]
+        return self.graph.idmap[IDs]
 
     def get_x(self, IDs):
         """Return features of input IDs as corresponding rows in graph."""
         idx_ary = self.get_idx_ary(IDs)
-        return self.G.mat[idx_ary]
+        return self.graph.mat[idx_ary]
 
     def test(self, labelset_splitgen):
         """Model testing through validation split.
@@ -105,8 +105,8 @@ class BaseModel:
                 mapping node IDs to prediction scores
 
         """
-        G = self.G
-        ID_list = G.idmap.lst
+        graph = self.graph
+        ID_list = graph.idmap.lst
 
         pos_ID_set = pos_ID_set & set(ID_list)
         neg_ID_set = neg_ID_set & set(ID_list)
