@@ -1,4 +1,4 @@
-from NLEval.util.Exceptions import IDExistsError, IDNotExistError
+from NLEval.util.Exceptions import IDExistsError
 from NLEval.util import checkers, IDHandler
 from NLEval.label import Filter
 from NLEval.valsplit import Base

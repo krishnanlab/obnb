@@ -1,4 +1,4 @@
-from NLEval.util import checkers, IDHandler
+from NLEval.util import checkers
 from NLEval.valsplit.Base import *
 import numpy as np
 
