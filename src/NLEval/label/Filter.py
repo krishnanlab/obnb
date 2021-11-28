@@ -289,13 +289,13 @@ class NegativeFilterHypergeom(BaseFilter):
         all_entities = set(lsc.entity_ids)
 
         def get_pval_mat():
-            M = len(all_entities)
+            tot_num_entities = len(all_entities)
             pval_mat = np.zeros((num_labelsets, num_labelsets))
 
             for i in range(num_labelsets):
                 label_id1 = label_ids[i]
                 labelset1 = lsc.get_labelset(label_id1)
-                N = len(labelset1)  # size of first labelset
+                num_entities = len(labelset1)  # size of first labelset
 
                 for j in range(i + 1, num_labelsets):
                     label_id2 = label_ids[j]
@@ -306,15 +306,15 @@ class NegativeFilterHypergeom(BaseFilter):
 
                     pval_mat[i, j] = pval_mat[j, i] = hypergeom.sf(
                         k - 1,
-                        M,
+                        tot_num_entities,
                         n,
-                        N,
+                        num_entities,
                     )
 
                     # if k >= 1: # for debugging
                     #     print(
-                    #         f"{k=:>3d}, {M=:>5d}, {n=:>5d}, {N=:>5d}, "
-                    #         f"{pval=:>.4f}"
+                    #         f"{k=:>3d}, {tot_num_entities=:>5d}, {n=:>5d}, "
+                    #         f"{num_entities=:>5d}, {pval=:>.4f}"
                     #     )
 
             return pval_mat
