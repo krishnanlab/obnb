@@ -1,2 +1,3 @@
-__all__ = ["LabelsetCollection", "Filter"]
-from . import *
+from NLEval.label import Filter, LabelsetCollection
+
+__all__ = ["Filter", "LabelsetCollection"]

@@ -1,6 +1,6 @@
 import numpy as np
 from NLEval.util import checkers
-from NLEval.valsplit.Base import *
+from NLEval.valsplit.Base import BaseHoldout
 
 __all__ = ["BinHold", "ThreshHold", "CustomHold", "TrainTestAll"]
 
