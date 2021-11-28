@@ -131,14 +131,18 @@ class BaseHoldout(BaseValSplit):
         return common_ID_list
 
     def check_split_setup(self, valid):
-        assert (self._test_ID_ary is not None) & (
-            self._train_ID_ary is not None
-        ), "Training or testing sets not available, run `train_test_setup` first"
-        if valid:
-            assert self._valid_ID_ary is not None, (
-                f"Validation set is only available for TrainValTest split "
-                f"type, current split type is {type(self)!r}"
+        if self._test_ID_ary is None or self._train_ID_ary is None:
+            raise ValueError(
+                "Training or testing sets not available, "
+                "run `train_test_setup` first",
             )
+
+        if valid:
+            if self.valid_ID_ary is None:
+                raise ValueError(
+                    f"Validation set is only available for TrainValTest "
+                    f"split type, current split type is {type(self)!r}",
+                )
 
     def get_split_idx_ary(self, ID_ary, label_ary=None, valid=False):
         self.check_split_setup(valid)
