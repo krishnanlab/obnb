@@ -60,7 +60,7 @@ class BaseLSC(IDHandler.IDprop):
     @property
     def entity_ids(self):
         """List of all entity IDs that are part of at least one labelset."""
-        return [i for i in self.entity if self.getNoccur(i) > 0]
+        return [i for i in self.entity if self.get_noccur(i) > 0]
 
     @property
     def label_ids(self):
@@ -123,7 +123,7 @@ class BaseLSC(IDHandler.IDprop):
                 self.entity.add_id(ID)
             if ID not in lbset:
                 lbset.update([ID])
-                self.entity.setProp(ID, "Noccur", self.getNoccur(ID) + 1)
+                self.entity.setProp(ID, "Noccur", self.get_noccur(ID) + 1)
 
     def reset_labelset(self, labelID):
         """Reset an existing labelset to an empty set.
@@ -134,7 +134,7 @@ class BaseLSC(IDHandler.IDprop):
         """
         lbset = self.get_labelset(labelID)
         for ID in lbset:
-            self.entity.setProp(ID, "Noccur", self.getNoccur(ID) - 1)
+            self.entity.setProp(ID, "Noccur", self.get_noccur(ID) - 1)
             if self.entity.getAllProp(ID) == self.entity.prop_default_val:
                 self.entity.popID(ID)
         lbset.clear()
@@ -170,7 +170,7 @@ class BaseLSC(IDHandler.IDprop):
 
         if neg == {None}:
             all_positives = {
-                i for i in self.entity.map if self.getNoccur(i) > 0
+                i for i in self.entity.map if self.get_noccur(i) > 0
             }
             return all_positives - self.get_labelset(labelID)
 
@@ -189,7 +189,7 @@ class BaseLSC(IDHandler.IDprop):
                 )
         self.setProp(labelID, "Negative", set(lst))
 
-    def getNoccur(self, ID):
+    def get_noccur(self, ID):
         """Return the number of labelsets in which an entity participates."""
         return self.entity.getProp(ID, "Noccur")
 

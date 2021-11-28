@@ -36,7 +36,7 @@ class TestBaseLSC(unittest.TestCase):
 
     def template_test_input_for_getters(self, fun):
         """Template for testing inputs for methods with only one positional
-        argument as ID, i.e. `.get_info`, `get_labelset`, and `getNoccur`."""
+        argument as ID, i.e. `.get_info`, `get_labelset`, and `get_noccur`."""
         # input type other than str --> TypeError
         self.assertRaises(TypeError, fun, 1)
         self.assertRaises(TypeError, fun, ["1"])
@@ -53,12 +53,12 @@ class TestBaseLSC(unittest.TestCase):
         self.assertEqual(self.lsc.get_labelset("Labelset1"), {"a", "b", "c"})
         self.assertEqual(self.lsc.get_labelset("Labelset2"), {"b", "d"})
 
-    def test_getNoccur(self):
-        self.template_test_input_for_getters(self.lsc.getNoccur)
-        self.assertEqual(self.lsc.getNoccur("a"), 1)
-        self.assertEqual(self.lsc.getNoccur("b"), 2)
-        self.assertEqual(self.lsc.getNoccur("c"), 1)
-        self.assertEqual(self.lsc.getNoccur("d"), 1)
+    def test_get_noccur(self):
+        self.template_test_input_for_getters(self.lsc.get_noccur)
+        self.assertEqual(self.lsc.get_noccur("a"), 1)
+        self.assertEqual(self.lsc.get_noccur("b"), 2)
+        self.assertEqual(self.lsc.get_noccur("c"), 1)
+        self.assertEqual(self.lsc.get_noccur("d"), 1)
 
     def test_pop_entity(self):
         self.template_test_input_for_getters(self.lsc.pop_entity)

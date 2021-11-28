@@ -146,7 +146,7 @@ class EntityRangeFilterNoccur(RangeFilter):
 
     @staticmethod
     def get_val_getter(lsc):
-        return lsc.getNoccur
+        return lsc.get_noccur
 
     @staticmethod
     def get_ids(lsc):
