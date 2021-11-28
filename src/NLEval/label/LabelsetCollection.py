@@ -118,12 +118,16 @@ class BaseLSC(IDHandler.IDprop):
         """
         checkers.checkTypesInList("Entity list", str, lst)
         lbset = self.get_labelset(labelID)
-        for ID in lst:
-            if ID not in self.entity:
-                self.entity.add_id(ID)
-            if ID not in lbset:
-                lbset.update([ID])
-                self.entity.setProp(ID, "Noccur", self.get_noccur(ID) + 1)
+        for entity_id in lst:
+            if entity_id not in self.entity:
+                self.entity.add_id(entity_id)
+            if entity_id not in lbset:
+                lbset.update([entity_id])
+                self.entity.setProp(
+                    entity_id, 
+                    "Noccur", 
+                    self.get_noccur(entity_id)+1,
+                )
 
     def reset_labelset(self, labelID):
         """Reset an existing labelset to an empty set.
@@ -133,13 +137,13 @@ class BaseLSC(IDHandler.IDprop):
 
         """
         lbset = self.get_labelset(labelID)
-        for ID in lbset:
-            self.entity.setProp(ID, "Noccur", self.get_noccur(ID) - 1)
-            if self.entity.getAllProp(ID) == self.entity.prop_default_val:
-                self.entity.popID(ID)
+        for entity_id in lbset:
+            self.entity.setProp(entity_id, "Noccur", self.get_noccur(entity_id) - 1)
+            if self.entity.getAllProp(entity_id) == self.entity.prop_default_val:
+                self.entity.popID(entity_id)
         lbset.clear()
 
-    def pop_entity(self, ID):
+    def pop_entity(self, entity_id):
         """Pop an entity from entity list, and also remove it from all labelsets.
 
         Note: Unlike `pop_labelset`, if after removal, a labelset beomes empty, the
@@ -147,9 +151,9 @@ class BaseLSC(IDHandler.IDprop):
         labelset sizes before and after filtering.
 
         """
-        self.entity.popID(ID)
+        self.entity.popID(entity_id)
         for labelID in self.label_ids:
-            self.get_labelset(labelID).difference_update([ID])
+            self.get_labelset(labelID).difference_update([entity_id])
 
     def get_info(self, labelID):
         """Return description of a labelset."""
@@ -179,19 +183,19 @@ class BaseLSC(IDHandler.IDprop):
     def set_negative(self, lst, labelID):
         checkers.checkTypesInList("Negative entity list", str, lst)
         lbset = self.get_labelset(labelID)
-        for ID in lst:
-            self.entity._check_ID_existence(ID, True)
-            if ID in lbset:
-                # raise Exception(repr(ID), repr(labelID))
+        for entity_id in lst:
+            self.entity._check_ID_existence(entity_id, True)
+            if entity_id in lbset:
+                # raise Exception(repr(entity_id), repr(labelID))
                 raise IDExistsError(
-                    f"Entity {ID!r} is positive in labelset {labelID!r}, "
-                    f"cannot be set to negative",
+                    f"Entity {entity_id!r} is positive in labelset, "
+                    f"{labelID!r}, cannot be set to negative",
                 )
         self.setProp(labelID, "Negative", set(lst))
 
-    def get_noccur(self, ID):
+    def get_noccur(self, entity_id):
         """Return the number of labelsets in which an entity participates."""
-        return self.entity.getProp(ID, "Noccur")
+        return self.entity.getProp(entity_id, "Noccur")
 
     def apply(self, filter_func, inplace=False):
         """Apply filter to labelsets, see `NLEval.label.Filter` for more info.
@@ -232,7 +236,9 @@ class BaseLSC(IDHandler.IDprop):
 
         """
         entity_ids = self.entity_ids
-        entityIDmap = {ID: idx for idx, ID in enumerate(entity_ids)}
+        entityIDmap = {
+            entity_id: idx for idx, entity_id in enumerate(entity_ids)
+        }
         label_ids = self.label_ids
         labelInfolst = [self.get_info(labelID) for labelID in label_ids]
         mat = np.zeros((len(entity_ids), len(label_ids)), dtype=int)
@@ -305,10 +311,10 @@ class BaseLSC(IDHandler.IDprop):
             for i, line in enumerate(f):
                 if (i < skiprows) | line.startswith(comment):
                     continue
-                ID, val = line.strip().split()
-                if ID not in self.entity:
-                    self.entity.add_id(ID)
-                self.entity.setProp(ID, prop_name, interpreter(val))
+                entity_id, val = line.strip().split()
+                if entity_id not in self.entity:
+                    self.entity.add_id(entity_id)
+                self.entity.setProp(entity_id, prop_name, interpreter(val))
 
     @classmethod
     def from_gmt(cls, fp):

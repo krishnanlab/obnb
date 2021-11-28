@@ -22,24 +22,24 @@ class BaseModel:
         checkers.checkType("Graph", BaseGraph.BaseGraph, graph)
         self._G = graph
 
-    def get_idx_ary(self, IDs):
+    def get_idx_ary(self, node_ids):
         """Return indices of corresponding input IDs.
 
         Note:
             All ID in the input ID list must be in idmap of graph
 
         Args:
-            IDs(:obj:`list` of str): list of ID in idmap
+            node_ids(:obj:`list` of str): list of ID in idmap
 
         Returns:
             (:obj:`numpy.ndarray`): numpy array of indices of input IDs
 
         """
-        return self.graph.idmap[IDs]
+        return self.graph.idmap[node_ids]
 
-    def get_x(self, IDs):
+    def get_x(self, node_ids):
         """Return features of input IDs as corresponding rows in graph."""
-        idx_ary = self.get_idx_ary(IDs)
+        idx_ary = self.get_idx_ary(node_ids)
         return self.graph.mat[idx_ary]
 
     def test(self, labelset_splitgen):
@@ -117,6 +117,6 @@ class BaseModel:
 
         self.train(ID_ary, label_ary)
         scores = self.decision(ID_list)
-        score_dict = {ID: score for ID, score in zip(ID_list, scores)}
+        score_dict = {node_id: score for node_id, score in zip(ID_list, scores)}
 
         return score_dict

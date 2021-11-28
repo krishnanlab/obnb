@@ -54,15 +54,15 @@ class DenseGraph(BaseGraph):
                 )
         self._mat = val.copy()
 
-    def get_edge(self, ID1, ID2):
-        """Return edge weight between ID1 and ID2.
+    def get_edge(self, node_id1, node_id2):
+        """Return edge weight between node_id1 and node_id2.
 
         Args:
-            ID1(str): ID of first node
-            ID2(str): ID of second node
+            node_id1(str): ID of first node
+            node_id2(str): ID of second node
 
         """
-        return self.mat[self.idmap[ID1], self.idmap[ID2]]
+        return self.mat[self.idmap[node_id1], self.idmap[node_id2]]
 
     @classmethod
     def construct_graph(cls, ids, mat):
@@ -94,14 +94,14 @@ class DenseGraph(BaseGraph):
         """Construct DenseGraph object from numpy array.
 
         Note:
-            First column of mat encodes ID, must be integers
+            First column of mat encodes ID, must be integers.
 
         """
         idmap = IDHandler.IDmap()
-        for ID in mat[:, 0]:
-            if int(ID) != ID:
+        for node_id in mat[:, 0]:
+            if int(node_id) != node_id:
                 raise ValueError("ID must be int type")
-            idmap.add_id(str(int(ID)))
+            idmap.add_id(str(int(node_id)))
         return cls.construct_graph(idmap, mat[:, 1:].astype(float))
 
     @classmethod
@@ -173,18 +173,19 @@ class FeatureVec(DenseGraph):
                     f"and specified dimension ({self.dim})",
                 )
 
-    def get_edge(self, ID1, ID2, dist_fun=distance.cosine):
+    def get_edge(self, node_id1, node_id2, dist_fun=distance.cosine):
         """Return pairwise similarity of two features as 'edge'.
 
         Args:
-            ID1(str): ID of first node
-            ID2(str): ID of second node
+            node_id1(str): ID of the first node.
+            node_id2(str): ID of the second node.
             dist_fun: function to calculate distance between two vectors
-                        default as cosine similarity
-        """
-        return dist_fun(self[ID1], self[ID2])
+                default as cosine similarity.
 
-    def add_vec(self, ID, vec):
+        """
+        return dist_fun(self[node_id1], self[node_id2])
+
+    def add_vec(self, node_id, vec):
         """Add a new feature vector."""
         checkers.checkNumpyArrayNDim("vec", 1, vec)
         checkers.checkNumpyArrayIsNumeric("vec", vec)
@@ -204,7 +205,7 @@ class FeatureVec(DenseGraph):
             new_mat = vec.copy().reshape((1, vec.size))
         else:
             new_mat = np.vstack([self.mat, vec])
-        self.idmap.add_id(ID)
+        self.idmap.add_id(node_id)
         self.mat = new_mat
 
     @classmethod
@@ -215,8 +216,8 @@ class FeatureVec(DenseGraph):
             f.readline()  # skip header
             for line in f:
                 terms = line.split(" ")
-                ID = terms[0].strip()
-                idmap.add_id(ID)
+                node_id = terms[0].strip()
+                idmap.add_id(node_id)
                 fvec_lst.append(np.array(terms[1:], dtype=float))
         mat = np.asarray(fvec_lst)
         return cls.construct_graph(idmap, mat)
@@ -225,7 +226,7 @@ class FeatureVec(DenseGraph):
 class MultiFeatureVec(BaseGraph):
     """Multi feature vectors with ID maps.
 
-    Note: experimenting feature
+    Note: experimenting feature.
 
     """
 

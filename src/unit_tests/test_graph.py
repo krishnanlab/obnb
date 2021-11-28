@@ -18,12 +18,12 @@ def shuffle_sparse(graph):
         directed=graph.directed,
     )
     for i in shuffle_idx:
-        ID = graph.idmap.lst[i]
-        new_graph.add_id(ID)
-    for idx1, ID1 in enumerate(graph.idmap):
-        for idx2, weight in graph.edge_data[graph.idmap[ID1]].items():
-            ID2 = graph.idmap.lst[idx2]
-            new_graph.add_edge(ID1, ID2, weight)
+        node_id = graph.idmap.lst[i]
+        new_graph.add_id(node_id)
+    for idx1, node_id1 in enumerate(graph.idmap):
+        for idx2, weight in graph.edge_data[graph.idmap[node_id1]].items():
+            node_id2 = graph.idmap.lst[idx2]
+            new_graph.add_edge(node_id1, node_id2, weight)
     return new_graph
 
 
@@ -33,8 +33,8 @@ def shuffle_dense(graph):
     new_graph = DenseGraph.DenseGraph()
 
     for i in shuffle_idx:
-        ID = graph.idmap.lst[i]
-        new_graph.idmap.add_id(ID)
+        node_id = graph.idmap.lst[i]
+        new_graph.idmap.add_id(node_id)
     new_graph.mat = np.zeros(graph.mat.shape)
     for idx1_new, idx1_old in enumerate(shuffle_idx):
         for idx2_new, idx2_old in enumerate(shuffle_idx):
@@ -185,10 +185,10 @@ class TestDenseGraph(unittest.TestCase):
         """compare graph with data, true if identical"""
         mat = self.case.data_mat[:, 1:]
         IDlst = [str(int(i)) for i in self.case.data_mat[:, 0]]
-        for idx1, ID1 in enumerate(IDlst):
-            for idx2, ID2 in enumerate(IDlst):
-                with self.subTest(idx1=idx1, idx2=idx2, ID1=type(ID1), ID2=ID2):
-                    self.assertEqual(mat[idx1, idx2], graph.get_edge(ID1, ID2))
+        for idx1, node_id1 in enumerate(IDlst):
+            for idx2, node_id2 in enumerate(IDlst):
+                with self.subTest(idx1=idx1, idx2=idx2, node_id1=type(node_id1), node_id2=node_id2):
+                    self.assertEqual(mat[idx1, idx2], graph.get_edge(node_id1, node_id2))
 
     def test_mat(self):
         graph = DenseGraph.DenseGraph()
@@ -214,9 +214,9 @@ class TestDenseGraph(unittest.TestCase):
         mat = self.case.data_mat[:, 1:]
         for i in range(mat.shape[0]):
             for j in range(mat.shape[1]):
-                ID1 = graph.idmap.lst[i]
-                ID2 = graph.idmap.lst[j]
-                self.assertEqual(graph.get_edge(ID1, ID2), mat[i, j])
+                node_id1 = graph.idmap.lst[i]
+                node_id2 = graph.idmap.lst[j]
+                self.assertEqual(graph.get_edge(node_id1, node_id2), mat[i, j])
 
     def test_construc_graph(self):
         idmap = IDHandler.IDmap()
@@ -329,10 +329,10 @@ class TestFeatureVec(unittest.TestCase):
             delimiter=" ",
             skiprows=1,
         )[:, 1:]
-        for i, ID1 in enumerate(graph.idmap):
-            for j, ID2 in enumerate(graph.idmap):
+        for i, node_id1 in enumerate(graph.idmap):
+            for j, node_id2 in enumerate(graph.idmap):
                 calculated = distance.cosine(temd_data[i], temd_data[j])
-                self.assertEqual(graph.get_edge(ID1, ID2), calculated)
+                self.assertEqual(graph.get_edge(node_id1, node_id2), calculated)
 
     def test_add_vec(self):
         graph = DenseGraph.FeatureVec(dim=4)

@@ -33,13 +33,13 @@ class BaseFilter:
         super(BaseFilter, self).__init__()
 
     def __call__(self, lsc):
-        IDs = self.get_ids(lsc)
+        entity_ids = self.get_ids(lsc)
         val_getter = self.get_val_getter(lsc)
         mod_fun = self.get_mod_fun(lsc)
 
-        for ID in IDs:
-            if self.criterion(val_getter(ID)):
-                mod_fun(ID)
+        for entity_id in entity_ids:
+            if self.criterion(val_getter(entity_id)):
+                mod_fun(entity_id)
 
 
 class ExistanceFilter(BaseFilter):
@@ -165,7 +165,7 @@ class LabelsetRangeFilterSize(RangeFilter):
 
     @staticmethod
     def get_val_getter(lsc):
-        return lambda ID: len(lsc.get_labelset(ID))
+        return lambda entity_id: len(lsc.get_labelset(entity_id))
 
     @staticmethod
     def get_ids(lsc):
@@ -283,8 +283,8 @@ class NegativeFilterHypergeom(BaseFilter):
         self.p_thresh = p_thresh
 
     def __call__(self, lsc):
-        IDs = lsc.label_ids
-        num_labelsets = len(IDs)
+        label_ids = lsc.label_ids
+        num_labelsets = len(label_ids)
         # set of all entities in the labelset collection
         all_entities = set(lsc.entity_ids)
 
@@ -293,13 +293,13 @@ class NegativeFilterHypergeom(BaseFilter):
             pval_mat = np.zeros((num_labelsets, num_labelsets))
 
             for i in range(num_labelsets):
-                ID1 = IDs[i]
-                labelset1 = lsc.get_labelset(ID1)
+                label_id1 = label_ids[i]
+                labelset1 = lsc.get_labelset(label_id1)
                 N = len(labelset1)  # size of first labelset
 
                 for j in range(i + 1, num_labelsets):
-                    ID2 = IDs[j]
-                    labelset2 = lsc.get_labelset(ID2)
+                    label_id2 = label_ids[j]
+                    labelset2 = lsc.get_labelset(label_id2)
 
                     k = len(labelset1 & labelset2)  # size of intersection
                     n = len(labelset2)  # size of second labelset
@@ -321,12 +321,12 @@ class NegativeFilterHypergeom(BaseFilter):
 
         pval_mat = get_pval_mat()
 
-        for i, ID1 in enumerate(IDs):
-            exclude_set = lsc.get_labelset(ID1).copy()
+        for i, label_id1 in enumerate(label_ids):
+            exclude_set = lsc.get_labelset(label_id1).copy()
 
-            for j, ID2 in enumerate(IDs):
+            for j, label_id2 in enumerate(label_ids):
                 if pval_mat[i, j] < self.p_thresh:
-                    exclude_set.update(lsc.get_labelset(ID2))
+                    exclude_set.update(lsc.get_labelset(label_id2))
 
             negative = list(all_entities - exclude_set)
-            lsc.set_negative(list(negative), ID1)
+            lsc.set_negative(list(negative), label_id1)

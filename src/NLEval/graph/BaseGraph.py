@@ -20,12 +20,15 @@ class BaseGraph:
 
     def __contains__(self, graph):
         """Return true if contains the input graph."""
-        for ID in graph.idmap:  # check if containes all IDs in input graph
-            if ID not in self.idmap:
+        # Check if containes all IDs in input graph
+        for node_id in graph.idmap:
+            if node_id not in self.idmap:
                 return False
-        for ID1 in graph.idmap:  # check if all connections match
-            for ID2 in graph.idmap:
-                if self.get_edge(ID1, ID2) != graph.get_edge(ID1, ID2):
+
+        for node_id1 in graph.idmap:  # check if all connections match
+            for node_id2 in graph.idmap:
+                if self.get_edge(node_id1, node_id2) \
+                   != graph.get_edge(node_id1, node_id2):
                     return False
         return True
 
