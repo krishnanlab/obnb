@@ -36,17 +36,17 @@ class TestBaseLSC(unittest.TestCase):
 
     def template_test_input_for_getters(self, fun):
         """Template for testing inputs for methods with only one positional
-        argument as ID, i.e. `.getInfo`, `getLabelset`, and `getNoccur`."""
+        argument as ID, i.e. `.get_info`, `getLabelset`, and `getNoccur`."""
         # input type other than str --> TypeError
         self.assertRaises(TypeError, fun, 1)
         self.assertRaises(TypeError, fun, ["1"])
         # input unknown ID --> IDNotExistError
         self.assertRaises(IDNotExistError, fun, "1")
 
-    def test_getInfo(self):
-        self.template_test_input_for_getters(self.lsc.getInfo)
-        self.assertEqual(self.lsc.getInfo("Labelset1"), "Description1")
-        self.assertEqual(self.lsc.getInfo("Labelset2"), "Description2")
+    def test_get_info(self):
+        self.template_test_input_for_getters(self.lsc.get_info)
+        self.assertEqual(self.lsc.get_info("Labelset1"), "Description1")
+        self.assertEqual(self.lsc.get_info("Labelset2"), "Description2")
 
     def test_getLabelset(self):
         self.template_test_input_for_getters(self.lsc.getLabelset)

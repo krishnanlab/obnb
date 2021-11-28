@@ -151,7 +151,7 @@ class BaseLSC(IDHandler.IDprop):
         for labelID in self.label_ids:
             self.getLabelset(labelID).difference_update([ID])
 
-    def getInfo(self, labelID):
+    def get_info(self, labelID):
         """Return description of a labelset."""
         return self.getProp(labelID, "Info")
 
@@ -234,7 +234,7 @@ class BaseLSC(IDHandler.IDprop):
         entity_ids = self.entity_ids
         entityIDmap = {ID: idx for idx, ID in enumerate(entity_ids)}
         label_ids = self.label_ids
-        labelInfolst = [self.getInfo(labelID) for labelID in label_ids]
+        labelInfolst = [self.get_info(labelID) for labelID in label_ids]
         mat = np.zeros((len(entity_ids), len(label_ids)), dtype=int)
 
         for j, labelID in enumerate(label_ids):
@@ -271,7 +271,7 @@ class BaseLSC(IDHandler.IDprop):
         fp += "" if fp.endswith(".gmt") else ".gmt"
         with open(fp, "w") as f:
             for labelID in self.label_ids:
-                labelInfo = self.getInfo(labelID)
+                labelInfo = self.get_info(labelID)
                 labelset_str = "\t".join(self.getLabelset(labelID))
                 f.write(f"{labelID}\t{labelInfo}\t{labelset_str}\n")
 
