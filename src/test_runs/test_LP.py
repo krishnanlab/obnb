@@ -31,7 +31,7 @@ mdl = model.LabelPropagation.LP(g)
 
 score_lst = []
 for labelID in lsc.label_ids:
-    score = auroc(*(mdl.test(lsc.splitLabelset(labelID))))
+    score = auroc(*(mdl.test(lsc.split_labelset(labelID))))
     score_lst.append(score)
     print(f"{score:.4f}\t{labelID}")
 

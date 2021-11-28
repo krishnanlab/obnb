@@ -375,7 +375,7 @@ class SplitLSC(BaseLSC):
             # for i in labelIDset - set(self.label_ids):
             #     print(f"Pop {i}")
 
-    def splitLabelset(self, labelID, entity_ids=None):
+    def split_labelset(self, labelID, entity_ids=None):
         """Split up a labelset by training and testing sets.
 
         Returns:

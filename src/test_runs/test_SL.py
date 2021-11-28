@@ -31,7 +31,7 @@ mdl = model.SupervisedLearning.LogReg(g, penalty="l2", solver="lbfgs")
 
 score_lst = []
 for labelID in lsc.label_ids:
-    score = auroc(*(mdl.test(lsc.splitLabelset(labelID))))
+    score = auroc(*(mdl.test(lsc.split_labelset(labelID))))
     score_lst.append(score)
     print(f"{score:.4f}\t{labelID}")
 
@@ -42,7 +42,7 @@ print(
 """
 #for printing average properties in training/testing sets
 for labelID in lsc.label_ids:
-    tr, _, ts, _ = next(lsc.splitLabelset(labelID))
+    tr, _, ts, _ = next(lsc.split_labelset(labelID))
     avg_tr_prop = np.array([lsc.entity.getProp(i, 'Pubmed Count') for i in tr]).mean()
     avg_ts_prop = np.array([lsc.entity.getProp(i, 'Pubmed Count') for i in ts]).mean()
     print('Avg train prop: %.6f\t Avg test prop: %.6f'%\

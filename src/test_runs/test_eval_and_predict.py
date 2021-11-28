@@ -60,7 +60,7 @@ def predict_all_labelsets(labelID):
     pos_ID_set = lsc.get_labelset(labelID)
     neg_ID_set = lsc.get_negative(labelID)
 
-    y_true, y_predict = mdl.test2(lsc.splitLabelset(labelID))
+    y_true, y_predict = mdl.test2(lsc.split_labelset(labelID))
     score = np.mean(
         [metrics.log2_auprc_prior(i, j) for i, j in zip(y_true, y_predict)]
     )
