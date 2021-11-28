@@ -20,7 +20,7 @@ print(f"Run test using network = {repr(network)} and dataset = {repr(dataset)}")
 g = graph.SparseGraph.SparseGraph.from_edglst(network_fp, True, False)
 lsc = label.LabelsetCollection.SplitLSC.from_gmt(label_fp)
 
-print(f"Number of labelsets in original file: {len(lsc.labelIDlst)}")
+print(f"Number of labelsets in original file: {len(lsc.label_ids)}")
 
 lsc.apply(label.Filter.EntityExistanceFilter(g.idmap.lst), inplace=True)
 lsc.apply(label.Filter.LabelsetRangeFilterSize(min_val=50), inplace=True)
@@ -31,13 +31,13 @@ lsc.valsplit = valsplit.Holdout.TrainValTest(
     train_ratio=train_ratio, test_ratio=test_ratio
 )
 
-print(f"Number of labelsets before filtering: {len(lsc.labelIDlst)}")
+print(f"Number of labelsets before filtering: {len(lsc.label_ids)}")
 lsc.train_test_setup(g, prop_name="Pubmed Count", min_pos=min_pos)
 
 print(
     f"Number of labelsets after filtering "
     f"(train_ratio={train_ratio}, test_ratio={test_ratio}, "
-    f"min_pos={min_pos}): {len(lsc.labelIDlst)}\n"
+    f"min_pos={min_pos}): {len(lsc.label_ids)}\n"
     f"Number of training = {lsc.valsplit.train_ID_ary.size}, "
     f"validation = {lsc.valsplit.valid_ID_ary.size}, "
     f"testing = {lsc.valsplit.test_ID_ary.size}"

@@ -23,14 +23,14 @@ lsc.valsplit = valsplit.Holdout.TrainValTest(
     train_ratio=1 / 3, test_ratio=1 / 3, shuffle=True
 )
 
-print(f"Number of labelsets before filtering: {len(lsc.labelIDlst)}")
+print(f"Number of labelsets before filtering: {len(lsc.label_ids)}")
 lsc.train_test_setup(g, prop_name="Pubmed Count", min_pos=10)
-print(f"Number of labelsets after filtering: {len(lsc.labelIDlst)}")
+print(f"Number of labelsets after filtering: {len(lsc.label_ids)}")
 
 mdl = model.SupervisedLearning.LogReg(g, penalty="l2", solver="lbfgs")
 
 score_lst = []
-for labelID in lsc.labelIDlst:
+for labelID in lsc.label_ids:
     score = auroc(*(mdl.test(lsc.splitLabelset(labelID))))
     score_lst.append(score)
     print(f"{score:.4f}\t{labelID}")
@@ -41,7 +41,7 @@ print(
 
 """
 #for printing average properties in training/testing sets
-for labelID in lsc.labelIDlst:
+for labelID in lsc.label_ids:
     tr, _, ts, _ = next(lsc.splitLabelset(labelID))
     avg_tr_prop = np.array([lsc.entity.getProp(i, 'Pubmed Count') for i in tr]).mean()
     avg_ts_prop = np.array([lsc.entity.getProp(i, 'Pubmed Count') for i in ts]).mean()

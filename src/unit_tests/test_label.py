@@ -14,7 +14,7 @@ class TestBaseLSC(unittest.TestCase):
     def setUpClass(self):
         self.toy1_gmt_fp = os.path.join(SAMPLE_DATA_DIR, "toy1.gmt")
         self.toy1_prop_fp = os.path.join(SAMPLE_DATA_DIR, "toy1_property.tsv")
-        self.toy1_labelIDlst = ["Group1", "Group2", "Group3", "Group4"]
+        self.toy1_label_ids = ["Group1", "Group2", "Group3", "Group4"]
         self.toy1_InfoLst = [
             "Description1",
             "Description2",
@@ -122,7 +122,7 @@ class TestBaseLSC(unittest.TestCase):
             for lsc, idx in zip((lsc1, lsc2), (idx1, idx2)):
                 lsc.addLabelset(
                     list(self.toy1_labelsets[idx]),
-                    self.toy1_labelIDlst[idx],
+                    self.toy1_label_ids[idx],
                     self.toy1_InfoLst[idx],
                 )
         self.assertEqual(lsc1, lsc2)
@@ -139,7 +139,7 @@ class TestBaseLSC(unittest.TestCase):
 
     def test_from_gmt(self):
         lsc = LabelsetCollection.BaseLSC.from_gmt(self.toy1_gmt_fp)
-        self.assertEqual(lsc.labelIDlst, self.toy1_labelIDlst)
+        self.assertEqual(lsc.label_ids, self.toy1_label_ids)
         self.assertEqual(lsc.prop["Info"], self.toy1_InfoLst)
         self.assertEqual(lsc.prop["Labelset"], self.toy1_labelsets)
 
@@ -184,7 +184,7 @@ class TestBaseLSC(unittest.TestCase):
                 ["Description"],
             )
             # make sure no new label added with exception
-            self.assertEqual(self.lsc.labelIDlst, ["Labelset1", "Labelset2"])
+            self.assertEqual(self.lsc.label_ids, ["Labelset1", "Labelset2"])
             # test add existing label ID --> IDExistsError
             self.assertRaises(
                 IDExistsError,
@@ -227,10 +227,10 @@ class TestBaseLSC(unittest.TestCase):
             self.assertEqual(self.lsc.lst, ["Labelset1", "Labelset2"])
         # make sure enties that are no longer in any labelset are popped
         self.lsc.popLabelset("Labelset1")
-        self.assertEqual(self.lsc.labelIDlst, ["Labelset2"])
+        self.assertEqual(self.lsc.label_ids, ["Labelset2"])
         self.assertEqual(self.lsc.entity.map, {"b": 0, "d": 1})
         self.lsc.popLabelset("Labelset2")
-        self.assertEqual(self.lsc.labelIDlst, [])
+        self.assertEqual(self.lsc.label_ids, [])
         self.assertEqual(self.lsc.entity.map, {})
 
     def test_updateLabelset(self):
@@ -301,7 +301,7 @@ class TestBaseLSC(unittest.TestCase):
         self.assertEqual(self.lsc.getLabelset("Labelset1"), set())
         self.assertEqual(self.lsc.getLabelset("Labelset2"), {"b", "d"})
         # makesure list of labelsets untouched
-        self.assertEqual(self.lsc.labelIDlst, ["Labelset1", "Labelset2"])
+        self.assertEqual(self.lsc.label_ids, ["Labelset1", "Labelset2"])
         # make sure entities that are nolongler in any labelset are popped
         self.assertEqual(self.lsc.entity.map, {"b": 0, "d": 1})
 
@@ -591,7 +591,7 @@ class TestFilter(unittest.TestCase):
                 Filter.LabelsetRangeFilterSize(min_val=3),
                 inplace=False,
             )
-            self.assertEqual(lsc.labelIDlst, ["Group1", "Group3", "Group4"])
+            self.assertEqual(lsc.label_ids, ["Group1", "Group3", "Group4"])
             self.assertEqual(
                 lsc.prop["Labelset"],
                 [{"a", "b", "c"}, {"e", "f", "g"}, {"a", "f", "c"}],
@@ -605,7 +605,7 @@ class TestFilter(unittest.TestCase):
                 Filter.LabelsetRangeFilterSize(min_val=4),
                 inplace=False,
             )
-            self.assertEqual(lsc.labelIDlst, [])
+            self.assertEqual(lsc.label_ids, [])
             self.assertEqual(lsc.prop["Labelset"], [])
             self.assertEqual(lsc.entity.map, {})
         with self.subTest(max_val=2):
@@ -613,7 +613,7 @@ class TestFilter(unittest.TestCase):
                 Filter.LabelsetRangeFilterSize(max_val=2),
                 inplace=False,
             )
-            self.assertEqual(lsc.labelIDlst, ["Group2", "Group5"])
+            self.assertEqual(lsc.label_ids, ["Group2", "Group5"])
             self.assertEqual(lsc.prop["Labelset"], [{"b", "d"}, {"a", "h"}])
             self.assertEqual(lsc.entity.map, {"a": 0, "b": 1, "d": 2, "h": 3})
         with self.subTest(max_val=1):
@@ -621,7 +621,7 @@ class TestFilter(unittest.TestCase):
                 Filter.LabelsetRangeFilterSize(max_val=1),
                 inplace=False,
             )
-            self.assertEqual(lsc.labelIDlst, [])
+            self.assertEqual(lsc.label_ids, [])
             self.assertEqual(lsc.prop["Labelset"], [])
             self.assertEqual(lsc.entity.map, {})
 
@@ -637,7 +637,7 @@ class TestFilter(unittest.TestCase):
                 Filter.LabelsetRangeFilterTrainTestPos(min_val=1),
                 inplace=False,
             )
-            self.assertEqual(lsc.labelIDlst, ["Group4", "Group5"])
+            self.assertEqual(lsc.label_ids, ["Group4", "Group5"])
             self.assertEqual(
                 lsc.prop["Labelset"],
                 [{"a", "f", "c"}, {"a", "h"}],
@@ -655,7 +655,7 @@ class TestFilter(unittest.TestCase):
                 Filter.LabelsetRangeFilterTrainTestPos(min_val=1),
                 inplace=False,
             )
-            self.assertEqual(lsc.labelIDlst, ["Group1", "Group3", "Group4"])
+            self.assertEqual(lsc.label_ids, ["Group1", "Group3", "Group4"])
             self.assertEqual(
                 lsc.prop["Labelset"],
                 [{"a", "b", "c"}, {"e", "f", "g"}, {"a", "f", "c"}],
@@ -686,7 +686,7 @@ class TestFilter(unittest.TestCase):
                 Filter.LabelsetRangeFilterTrainTestPos(min_val=1),
                 inplace=False,
             )
-            self.assertEqual(lsc.labelIDlst, ["Group1"])
+            self.assertEqual(lsc.label_ids, ["Group1"])
             self.assertEqual(lsc.prop["Labelset"], [{"a", "b", "c"}])
             self.assertEqual(lsc.entity.map, {"a": 0, "b": 1, "c": 2})
 

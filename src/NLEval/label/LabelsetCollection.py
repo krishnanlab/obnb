@@ -22,9 +22,9 @@ class BaseLSC(IDHandler.IDprop):
 
     Example internal data for a label collection with above GMT data:
 
-    self.entityIDlst = ['Gene1', 'Gene2', 'Gene3', 'Gene4', 'Gene5', 'Gene6']
+    self.entity_ids = ['Gene1', 'Gene2', 'Gene3', 'Gene4', 'Gene5', 'Gene6']
     self.entity.prop = {'Noccur': [1, 2, 1, 1, 1, 1]}
-    self.labelIDlst = ['Geneset1', 'Geneset2']
+    self.label_ids = ['Geneset1', 'Geneset2']
     self.prop = {
         'Info':['Description1', 'Description2']
         'Labelset':[
@@ -58,12 +58,12 @@ class BaseLSC(IDHandler.IDprop):
         print(self.entity._prop)
 
     @property
-    def entityIDlst(self):
+    def entity_ids(self):
         """List of all entity IDs that are part of at least one labelset."""
         return [i for i in self.entity if self.getNoccur(i) > 0]
 
     @property
-    def labelIDlst(self):
+    def label_ids(self):
         """:obj:`list` of :obj:`str`: list of all labelset names."""
         return self.lst
 
@@ -148,7 +148,7 @@ class BaseLSC(IDHandler.IDprop):
 
         """
         self.entity.popID(ID)
-        for labelID in self.labelIDlst:
+        for labelID in self.label_ids:
             self.getLabelset(labelID).difference_update([ID])
 
     def getInfo(self, labelID):
@@ -231,13 +231,13 @@ class BaseLSC(IDHandler.IDprop):
                 extension.
 
         """
-        entityIDlst = self.entityIDlst
-        entityIDmap = {ID: idx for idx, ID in enumerate(entityIDlst)}
-        labelIDlst = self.labelIDlst
-        labelInfolst = [self.getInfo(labelID) for labelID in labelIDlst]
-        mat = np.zeros((len(entityIDlst), len(labelIDlst)), dtype=int)
+        entity_ids = self.entity_ids
+        entityIDmap = {ID: idx for idx, ID in enumerate(entity_ids)}
+        label_ids = self.label_ids
+        labelInfolst = [self.getInfo(labelID) for labelID in label_ids]
+        mat = np.zeros((len(entity_ids), len(label_ids)), dtype=int)
 
-        for j, labelID in enumerate(labelIDlst):
+        for j, labelID in enumerate(label_ids):
             positive_set = self.getLabelset(labelID)
             negative_set = self.getNegative(labelID)
 
@@ -252,13 +252,13 @@ class BaseLSC(IDHandler.IDprop):
         fp = fp if fp.endswith(".lsc") else fp + ".lsc"
         with open(fp, "w") as f:
             # headers
-            labelIDlst_str = "\t".join(labelIDlst)
+            label_ids = "\t".join(label_ids)
             labelInfolst_str = "\t".join(labelInfolst)
-            f.write(f"Label ID\t{labelIDlst_str}\n")
+            f.write(f"Label ID\t{label_ids}\n")
             f.write(f"Label Info\t{labelInfolst_str}\n")
 
             # annotations
-            for i, entityID in enumerate(entityIDlst):
+            for i, entityID in enumerate(entity_ids):
                 indicator_string = "\t".join(map(str, mat[i]))
                 f.write(f"{entityID}\t{indicator_string}\n")
 
@@ -270,7 +270,7 @@ class BaseLSC(IDHandler.IDprop):
         """
         fp += "" if fp.endswith(".gmt") else ".gmt"
         with open(fp, "w") as f:
-            for labelID in self.labelIDlst:
+            for labelID in self.label_ids:
                 labelInfo = self.getInfo(labelID)
                 labelset_str = "\t".join(self.getLabelset(labelID))
                 f.write(f"{labelID}\t{labelInfo}\t{labelset_str}\n")
@@ -363,19 +363,19 @@ class SplitLSC(BaseLSC):
             )
 
         num_labelsets = None
-        while num_labelsets != len(self.labelIDlst):
-            num_labelsets = len(self.labelIDlst)
+        while num_labelsets != len(self.label_ids):
+            num_labelsets = len(self.label_ids)
             # print(num_labelsets)
-            # labelIDset = set(self.labelIDlst)
+            # labelIDset = set(self.label_ids)
             self.valsplit.train_test_setup(self.entity, graph.idmap, prop_name)
             self.apply(
                 Filter.LabelsetRangeFilterTrainTestPos(min_pos),
                 inplace=True,
             )
-            # for i in labelIDset - set(self.labelIDlst):
+            # for i in labelIDset - set(self.label_ids):
             #     print(f"Pop {i}")
 
-    def splitLabelset(self, labelID, entityIDlst=None):
+    def splitLabelset(self, labelID, entity_ids=None):
         """Split up a labelset by training and testing sets.
 
         Returns:
@@ -383,11 +383,11 @@ class SplitLSC(BaseLSC):
             `NLEval.valsplit.Base.BaseValSplit.split` for more info.
 
         """
-        if entityIDlst is None:
-            entityIDlst = self.entityIDlst.copy()
+        if entity_ids is None:
+            entity_ids = self.entity_ids.copy()
 
-        pos_ID_set = set(self.getLabelset(labelID)) & set(entityIDlst)
-        neg_ID_set = set(self.getNegative(labelID)) & set(entityIDlst)
+        pos_ID_set = set(self.getLabelset(labelID)) & set(entity_ids)
+        neg_ID_set = set(self.getNegative(labelID)) & set(entity_ids)
 
         ID_ary = np.array(list(pos_ID_set) + list(neg_ID_set))
         label_ary = np.zeros(len(ID_ary), dtype=bool)
@@ -426,8 +426,8 @@ class SplitLSC(BaseLSC):
         test_idx = graph.idmap[self.valsplit.test_ID_ary]
         valid_idx = graph.idmap[self.valsplit.valid_ID_ary] if valid else np.NaN
 
-        y = np.zeros((graph.size, len(self.labelIDlst)), dtype=bool)
-        for i, labelID in enumerate(self.labelIDlst):
+        y = np.zeros((graph.size, len(self.label_ids)), dtype=bool)
+        for i, labelID in enumerate(self.label_ids):
             pos_ID_ary = np.array(list(self.getLabelset(labelID)))
             pos_idx_ary = graph.idmap[pos_ID_ary]
             y[pos_idx_ary, i] = True
@@ -439,5 +439,5 @@ class SplitLSC(BaseLSC):
             valid_idx=valid_idx,
             test_idx=test_idx,
             IDs=graph.idmap.lst,
-            labelIDs=self.labelIDlst,
+            labelIDs=self.label_ids,
         )

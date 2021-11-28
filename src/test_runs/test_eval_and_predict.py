@@ -34,7 +34,7 @@ lsc.apply(
 )
 lsc.apply(label.Filter.NegativeFilterHypergeom(p_thresh=p_thresh), inplace=True)
 print(
-    f"After filtering, there are {len(lsc.labelIDlst)} number of effective labelsets"
+    f"After filtering, there are {len(lsc.label_ids)} number of effective labelsets"
 )
 
 scoring_obj = lambda estimator, X, y: metrics.log2_auprc_prior(
@@ -53,7 +53,7 @@ mdl = model.SupervisedLearning.LogRegCV(
 )
 
 
-@wrapper.ParWrap.ParDat(lsc.labelIDlst, n_workers=1)
+@wrapper.ParWrap.ParDat(lsc.label_ids, n_workers=1)
 def predict_all_labelsets(labelID):
     np.random.seed()  # initialize random states for parallel processes
 

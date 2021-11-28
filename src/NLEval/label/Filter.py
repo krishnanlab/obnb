@@ -103,7 +103,7 @@ class LabelsetExistanceFilter(ExistanceFilter):
 
     @staticmethod
     def get_ids(lsc):
-        return lsc.labelIDlst
+        return lsc.label_ids
 
     @staticmethod
     def get_mod_fun(lsc):
@@ -169,7 +169,7 @@ class LabelsetRangeFilterSize(RangeFilter):
 
     @staticmethod
     def get_ids(lsc):
-        return lsc.labelIDlst
+        return lsc.label_ids
 
     @staticmethod
     def get_mod_fun(lsc):
@@ -189,7 +189,7 @@ class LabelsetRangeFilterJaccard(RangeFilter):
         def val_getter(labelID):
             val = 0
             labelset = lsc.getLabelset(labelID)
-            for labelID2 in lsc.labelIDlst:
+            for labelID2 in lsc.label_ids:
                 if labelID2 == labelID:  # skip self
                     continue
                 labelset2 = lsc.getLabelset(labelID2)
@@ -202,7 +202,7 @@ class LabelsetRangeFilterJaccard(RangeFilter):
 
     @staticmethod
     def get_ids(lsc):
-        return lsc.labelIDlst
+        return lsc.label_ids
 
     @staticmethod
     def get_mod_fun(lsc):
@@ -239,7 +239,7 @@ class LabelsetRangeFilterTrainTestPos(RangeFilter):
 
     @staticmethod
     def get_ids(lsc):
-        return lsc.labelIDlst
+        return lsc.label_ids
 
     @staticmethod
     def get_mod_fun(lsc):
@@ -283,10 +283,10 @@ class NegativeFilterHypergeom(BaseFilter):
         self.p_thresh = p_thresh
 
     def __call__(self, lsc):
-        IDs = lsc.labelIDlst
+        IDs = lsc.label_ids
         num_labelsets = len(IDs)
         # set of all entities in the labelset collection
-        all_entities = set(lsc.entityIDlst)
+        all_entities = set(lsc.entity_ids)
 
         def get_pval_mat():
             M = len(all_entities)

@@ -22,13 +22,13 @@ lsc = label.LabelsetCollection.SplitLSC.from_gmt(
 mdl = model.SupervisedLearning.LogReg(g, penalty="l2", solver="lbfgs")
 
 # diplay choice of labelsets
-for l, m in enumerate(lsc.labelIDlst):
+for l, m in enumerate(lsc.label_ids):
     # index, labelset size, labelset ID
     print(f"{l:>4d} {len(lsc.getLabelset(m)):>4d} {m}")
 print("")
 
 # get labelID
-labelID = lsc.labelIDlst[i]
+labelID = lsc.label_ids[i]
 print(labelID)
 
 # get positive and negative samples
