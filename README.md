@@ -32,7 +32,7 @@ SL_A = model.SupervisedLearning.LogReg(g, penalty='l2', solver='lbfgs')
 LP_A = model.LabelPropagation.LP(g)
 
 # train model and get genomewide prediction scores
-positive_set = lsc.getLabelset(some_labelID)
+positive_set = lsc.get_labelset(some_labelID)
 negative_set = lsc.getNegative(some_labelID)
 SLA_score_dict = SL_A.predict(positive_set, negative_set)
 LPA_score_dict = LP_A.predict(positive_set, negative_set)

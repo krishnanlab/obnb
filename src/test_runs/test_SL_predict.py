@@ -24,7 +24,7 @@ mdl = model.SupervisedLearning.LogReg(g, penalty="l2", solver="lbfgs")
 # diplay choice of labelsets
 for l, m in enumerate(lsc.label_ids):
     # index, labelset size, labelset ID
-    print(f"{l:>4d} {len(lsc.getLabelset(m)):>4d} {m}")
+    print(f"{l:>4d} {len(lsc.get_labelset(m)):>4d} {m}")
 print("")
 
 # get labelID
@@ -32,7 +32,7 @@ labelID = lsc.label_ids[i]
 print(labelID)
 
 # get positive and negative samples
-pos = lsc.getLabelset(labelID)
+pos = lsc.get_labelset(labelID)
 neg = lsc.getNegative(labelID)
 
 # train and get genome wide prediction

@@ -57,7 +57,7 @@ mdl = model.SupervisedLearning.LogRegCV(
 def predict_all_labelsets(labelID):
     np.random.seed()  # initialize random states for parallel processes
 
-    pos_ID_set = lsc.getLabelset(labelID)
+    pos_ID_set = lsc.get_labelset(labelID)
     neg_ID_set = lsc.getNegative(labelID)
 
     y_true, y_predict = mdl.test2(lsc.splitLabelset(labelID))

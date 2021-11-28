@@ -36,7 +36,7 @@ class TestBaseLSC(unittest.TestCase):
 
     def template_test_input_for_getters(self, fun):
         """Template for testing inputs for methods with only one positional
-        argument as ID, i.e. `.get_info`, `getLabelset`, and `getNoccur`."""
+        argument as ID, i.e. `.get_info`, `get_labelset`, and `getNoccur`."""
         # input type other than str --> TypeError
         self.assertRaises(TypeError, fun, 1)
         self.assertRaises(TypeError, fun, ["1"])
@@ -48,10 +48,10 @@ class TestBaseLSC(unittest.TestCase):
         self.assertEqual(self.lsc.get_info("Labelset1"), "Description1")
         self.assertEqual(self.lsc.get_info("Labelset2"), "Description2")
 
-    def test_getLabelset(self):
-        self.template_test_input_for_getters(self.lsc.getLabelset)
-        self.assertEqual(self.lsc.getLabelset("Labelset1"), {"a", "b", "c"})
-        self.assertEqual(self.lsc.getLabelset("Labelset2"), {"b", "d"})
+    def test_get_labelset(self):
+        self.template_test_input_for_getters(self.lsc.get_labelset)
+        self.assertEqual(self.lsc.get_labelset("Labelset1"), {"a", "b", "c"})
+        self.assertEqual(self.lsc.get_labelset("Labelset2"), {"b", "d"})
 
     def test_getNoccur(self):
         self.template_test_input_for_getters(self.lsc.getNoccur)
@@ -64,8 +64,8 @@ class TestBaseLSC(unittest.TestCase):
         self.template_test_input_for_getters(self.lsc.pop_entity)
         self.lsc.pop_entity("b")
         self.assertEqual(self.lsc.entity.map, {"a": 0, "c": 1, "d": 2})
-        self.assertEqual(self.lsc.getLabelset("Labelset1"), {"a", "c"})
-        self.assertEqual(self.lsc.getLabelset("Labelset2"), {"d"})
+        self.assertEqual(self.lsc.get_labelset("Labelset1"), {"a", "c"})
+        self.assertEqual(self.lsc.get_labelset("Labelset2"), {"d"})
 
     def test_getNegative(self):
         self.template_test_input_for_getters(self.lsc.getNegative)
@@ -274,20 +274,20 @@ class TestBaseLSC(unittest.TestCase):
             )
         # test update nothing --> labelset stays the same
         self.lsc.update_labelset([], "Labelset1")
-        self.assertEqual(self.lsc.getLabelset("Labelset1"), {"a", "b", "c"})
+        self.assertEqual(self.lsc.get_labelset("Labelset1"), {"a", "b", "c"})
         # test update existing --> labelset stays the same
         self.lsc.update_labelset(["a", "b", "c"], "Labelset1")
-        self.assertEqual(self.lsc.getLabelset("Labelset1"), {"a", "b", "c"})
+        self.assertEqual(self.lsc.get_labelset("Labelset1"), {"a", "b", "c"})
         # test update partially new
         self.lsc.update_labelset(["a", "d"], "Labelset1")
         self.assertEqual(
-            self.lsc.getLabelset("Labelset1"),
+            self.lsc.get_labelset("Labelset1"),
             {"a", "b", "c", "d"},
         )
         # test update all new
         self.lsc.update_labelset(["e"], "Labelset1")
         self.assertEqual(
-            self.lsc.getLabelset("Labelset1"),
+            self.lsc.get_labelset("Labelset1"),
             {"a", "b", "c", "d", "e"},
         )
         # check if new entity added to list
@@ -300,8 +300,8 @@ class TestBaseLSC(unittest.TestCase):
         self.template_test_input_for_getters(self.lsc.reset_labelset)
         # check if labelset reset to empty set correctly
         self.lsc.reset_labelset("Labelset1")
-        self.assertEqual(self.lsc.getLabelset("Labelset1"), set())
-        self.assertEqual(self.lsc.getLabelset("Labelset2"), {"b", "d"})
+        self.assertEqual(self.lsc.get_labelset("Labelset1"), set())
+        self.assertEqual(self.lsc.get_labelset("Labelset2"), {"b", "d"})
         # makesure list of labelsets untouched
         self.assertEqual(self.lsc.label_ids, ["Labelset1", "Labelset2"])
         # make sure entities that are nolongler in any labelset are popped

@@ -117,7 +117,7 @@ class BaseLSC(IDHandler.IDprop):
 
         """
         checkers.checkTypesInList("Entity list", str, lst)
-        lbset = self.getLabelset(labelID)
+        lbset = self.get_labelset(labelID)
         for ID in lst:
             if ID not in self.entity:
                 self.entity.add_id(ID)
@@ -132,7 +132,7 @@ class BaseLSC(IDHandler.IDprop):
         entites belonging to the labelset by 1.
 
         """
-        lbset = self.getLabelset(labelID)
+        lbset = self.get_labelset(labelID)
         for ID in lbset:
             self.entity.setProp(ID, "Noccur", self.getNoccur(ID) - 1)
             if self.entity.getAllProp(ID) == self.entity.prop_default_val:
@@ -149,13 +149,13 @@ class BaseLSC(IDHandler.IDprop):
         """
         self.entity.popID(ID)
         for labelID in self.label_ids:
-            self.getLabelset(labelID).difference_update([ID])
+            self.get_labelset(labelID).difference_update([ID])
 
     def get_info(self, labelID):
         """Return description of a labelset."""
         return self.getProp(labelID, "Info")
 
-    def getLabelset(self, labelID):
+    def get_labelset(self, labelID):
         """Return set of entities associated with a label."""
         return self.getProp(labelID, "Labelset")
 
@@ -172,13 +172,13 @@ class BaseLSC(IDHandler.IDprop):
             all_positives = {
                 i for i in self.entity.map if self.getNoccur(i) > 0
             }
-            return all_positives - self.getLabelset(labelID)
+            return all_positives - self.get_labelset(labelID)
 
         return neg
 
     def setNegative(self, lst, labelID):
         checkers.checkTypesInList("Negative entity list", str, lst)
-        lbset = self.getLabelset(labelID)
+        lbset = self.get_labelset(labelID)
         for ID in lst:
             self.entity._check_ID_existence(ID, True)
             if ID in lbset:
@@ -238,7 +238,7 @@ class BaseLSC(IDHandler.IDprop):
         mat = np.zeros((len(entity_ids), len(label_ids)), dtype=int)
 
         for j, labelID in enumerate(label_ids):
-            positive_set = self.getLabelset(labelID)
+            positive_set = self.get_labelset(labelID)
             negative_set = self.getNegative(labelID)
 
             for sign, labelset in zip(
@@ -272,7 +272,7 @@ class BaseLSC(IDHandler.IDprop):
         with open(fp, "w") as f:
             for labelID in self.label_ids:
                 labelInfo = self.get_info(labelID)
-                labelset_str = "\t".join(self.getLabelset(labelID))
+                labelset_str = "\t".join(self.get_labelset(labelID))
                 f.write(f"{labelID}\t{labelInfo}\t{labelset_str}\n")
 
     def load_entity_properties(
@@ -386,7 +386,7 @@ class SplitLSC(BaseLSC):
         if entity_ids is None:
             entity_ids = self.entity_ids.copy()
 
-        pos_ID_set = set(self.getLabelset(labelID)) & set(entity_ids)
+        pos_ID_set = set(self.get_labelset(labelID)) & set(entity_ids)
         neg_ID_set = set(self.getNegative(labelID)) & set(entity_ids)
 
         ID_ary = np.array(list(pos_ID_set) + list(neg_ID_set))
@@ -428,7 +428,7 @@ class SplitLSC(BaseLSC):
 
         y = np.zeros((graph.size, len(self.label_ids)), dtype=bool)
         for i, labelID in enumerate(self.label_ids):
-            pos_ID_ary = np.array(list(self.getLabelset(labelID)))
+            pos_ID_ary = np.array(list(self.get_labelset(labelID)))
             pos_idx_ary = graph.idmap[pos_ID_ary]
             y[pos_idx_ary, i] = True
 
