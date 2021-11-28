@@ -1,4 +1,4 @@
-from NLEval.valsplit.Base import *
+from NLEval.valsplit.Base import BaseInterface
 from sklearn.model_selection import (
     LeaveOneOut,
     LeavePOut,
