@@ -67,17 +67,17 @@ class BaseLSC(IDHandler.IDprop):
         """:obj:`list` of :obj:`str`: list of all labelset names."""
         return self.lst
 
-    def add_labelset(self, lst, label_id, labelInfo=None):
+    def add_labelset(self, lst, label_id, label_info=None):
         """Add a new labelset.
 
         Args:
             lst(:obj:`list` of :obj:`str`): list of IDs of entiteis belong
                 to the input label
             label_id(str): name of label
-            labelInfo(str): description of label
+            label_info(str): description of label
 
         """
-        self.add_id(label_id, {} if labelInfo is None else {"Info": labelInfo})
+        self.add_id(label_id, {} if label_info is None else {"Info": label_info})
         try:
             self.entity.update(lst)
         except Exception as e:
@@ -247,7 +247,7 @@ class BaseLSC(IDHandler.IDprop):
             entity_id: idx for idx, entity_id in enumerate(entity_ids)
         }
         label_ids = self.label_ids
-        labelInfolst = [self.get_info(label_id) for label_id in label_ids]
+        label_info_list = [self.get_info(label_id) for label_id in label_ids]
         mat = np.zeros((len(entity_ids), len(label_ids)), dtype=int)
 
         for j, label_id in enumerate(label_ids):
@@ -266,9 +266,9 @@ class BaseLSC(IDHandler.IDprop):
         with open(fp, "w") as f:
             # headers
             label_ids = "\t".join(label_ids)
-            labelInfolst_str = "\t".join(labelInfolst)
+            label_info_str = "\t".join(label_info_list)
             f.write(f"Label ID\t{label_ids}\n")
-            f.write(f"Label Info\t{labelInfolst_str}\n")
+            f.write(f"Label Info\t{label_info_str}\n")
 
             # annotations
             for i, entityID in enumerate(entity_ids):
@@ -284,9 +284,9 @@ class BaseLSC(IDHandler.IDprop):
         fp += "" if fp.endswith(".gmt") else ".gmt"
         with open(fp, "w") as f:
             for label_id in self.label_ids:
-                labelInfo = self.get_info(label_id)
+                label_info = self.get_info(label_id)
                 labelset_str = "\t".join(self.get_labelset(label_id))
-                f.write(f"{label_id}\t{labelInfo}\t{labelset_str}\n")
+                f.write(f"{label_id}\t{label_info}\t{labelset_str}\n")
 
     def load_entity_properties(
         self,
@@ -334,8 +334,8 @@ class BaseLSC(IDHandler.IDprop):
         lsc = cls()
         with open(fp, "r") as f:
             for line in f:
-                label_id, labelInfo, *lst = line.strip().split("\t")
-                lsc.add_labelset(lst, label_id, labelInfo)
+                label_id, label_info, *lst = line.strip().split("\t")
+                lsc.add_labelset(lst, label_id, label_info)
         return lsc
 
 
