@@ -402,10 +402,10 @@ class SplitLSC(BaseLSC):
         pos_ID_set = set(self.get_labelset(label_id)) & set(entity_ids)
         neg_ID_set = set(self.get_negative(label_id)) & set(entity_ids)
 
-        ID_ary = np.array(list(pos_ID_set) + list(neg_ID_set))
-        label_ary = np.zeros(len(ID_ary), dtype=bool)
+        id_ary = np.array(list(pos_ID_set) + list(neg_ID_set))
+        label_ary = np.zeros(len(id_ary), dtype=bool)
         label_ary[: len(pos_ID_set)] = True
-        return self.valsplit.split(ID_ary, label_ary)
+        return self.valsplit.split(id_ary, label_ary)
 
     def export_splits(self, fp, graph):
         """Export (holdout) split information to npz file.
@@ -441,8 +441,8 @@ class SplitLSC(BaseLSC):
 
         y = np.zeros((graph.size, len(self.label_ids)), dtype=bool)
         for i, label_id in enumerate(self.label_ids):
-            pos_ID_ary = np.array(list(self.get_labelset(label_id)))
-            pos_idx_ary = graph.idmap[pos_ID_ary]
+            pos_id_ary = np.array(list(self.get_labelset(label_id)))
+            pos_idx_ary = graph.idmap[pos_id_ary]
             y[pos_idx_ary, i] = True
 
         np.savez(

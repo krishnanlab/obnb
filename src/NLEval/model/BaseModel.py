@@ -111,11 +111,11 @@ class BaseModel:
         pos_ID_set = pos_ID_set & set(ID_list)
         neg_ID_set = neg_ID_set & set(ID_list)
 
-        ID_ary = np.array(list(pos_ID_set | neg_ID_set))
-        label_ary = np.zeros(len(ID_ary), dtype=bool)
+        id_ary = np.array(list(pos_ID_set | neg_ID_set))
+        label_ary = np.zeros(len(id_ary), dtype=bool)
         label_ary[: len(pos_ID_set)] = True
 
-        self.train(ID_ary, label_ary)
+        self.train(id_ary, label_ary)
         scores = self.decision(ID_list)
         score_dict = {node_id: score for node_id, score in zip(ID_list, scores)}
 

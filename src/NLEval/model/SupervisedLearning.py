@@ -11,12 +11,12 @@ __all__ = ["SLBase", "LogReg", "SVM", "RF"]
 
 
 class SLBase(BaseModel):
-    def train(self, ID_ary, y):
-        x = self.graph[ID_ary]
+    def train(self, id_ary, y):
+        x = self.graph[id_ary]
         self.fit(x, y)
 
-    def decision(self, ID_ary):
-        x = self.graph[ID_ary]
+    def decision(self, id_ary):
+        x = self.graph[id_ary]
         decision_ary = self.decision_function(x)
         return decision_ary
 
@@ -39,11 +39,11 @@ class CombSLBase(BaseModel):
         BaseModel.__init__(self, graph)
         self.mdl_list = [self.base_mdl(**kwargs) for i in self.graph.mat_list]
 
-    def train(self, ID_ary, y):
+    def train(self, id_ary, y):
         for i, mat in enumerate(self.graph.mat_list):
-            x = mat[self.graph.idmap[ID_ary]]
+            x = mat[self.graph.idmap[id_ary]]
             self.mdl_list[i].fit(x, y)
-        self.fit_master_mdl(ID_ary, y)
+        self.fit_master_mdl(id_ary, y)
 
 
 class CombLogRegCVBagging(CombSLBase):
@@ -51,13 +51,13 @@ class CombLogRegCVBagging(CombSLBase):
         self.base_mdl = LogisticRegressionCV
         CombSLBase.__init__(self, graph, **kwargs)
 
-    def fit_master_mdl(self, ID_ary, y):
+    def fit_master_mdl(self, id_ary, y):
         pass
 
-    def decision(self, ID_ary):
-        decision_ary = np.zeros((len(ID_ary)))
+    def decision(self, id_ary):
+        decision_ary = np.zeros((len(id_ary)))
         for i, mat in enumerate(self.graph.mat_list):
-            x = mat[self.graph.idmap[ID_ary]]
+            x = mat[self.graph.idmap[id_ary]]
             decision_ary += self.mdl_list[i].decision_function(x)
         decision_ary /= len(self.mdl_list)
         return decision_ary
@@ -75,14 +75,14 @@ class CombLogRegCVPredComb(CombSLBase):
         self.base_mdl = LogisticRegressionCV
         CombSLBase.__init__(self, graph, **kwargs)
 
-    def fit_master_mdl(self, ID_ary, y):
+    def fit_master_mdl(self, id_ary, y):
         pass
 
-    def decision(self, ID_ary):
-        decision_ary = np.zeros((len(ID_ary)))
+    def decision(self, id_ary):
+        decision_ary = np.zeros((len(id_ary)))
         factors = [self.mixing_ratio, 1 - self.mixing_ratio]
         for i, mat in enumerate(self.graph.mat_list):
-            x = mat[self.graph.idmap[ID_ary]]
+            x = mat[self.graph.idmap[id_ary]]
             decision_ary += factors[i] * self.mdl_list[i].decision_function(x)
         return decision_ary
 
@@ -112,17 +112,17 @@ class CombLogRegCVAdaBoost(CombSLBase):
                 n_mdl = None
         self.n_mdl = n_mdl
 
-    def fit_master_mdl(self, ID_ary, y):
+    def fit_master_mdl(self, id_ary, y):
         n_mdl = (
             len(self.mdl_list) if self.n_mdl is None else self.n_mdl
         )  # total number of models
-        w = np.ones(len(ID_ary)) / len(ID_ary)  # data point weights
+        w = np.ones(len(id_ary)) / len(id_ary)  # data point weights
         coef = np.zeros(n_mdl)  # model boosting coefficients
         y_pred_mat = np.zeros(
-            (len(ID_ary), n_mdl),
+            (len(id_ary), n_mdl),
             dtype=bool,
         )  # predictions from all models
-        idx_ary = self.graph.idmap[ID_ary]
+        idx_ary = self.graph.idmap[id_ary]
 
         if self.exclude:
             selected_ind = np.zeros(
@@ -203,14 +203,14 @@ class CombLogRegCVAdaBoost(CombSLBase):
             # print(mdl_idx_ary, '\n', coef, '\n')
             self.mdlidx_ = mdl_idx_ary
 
-    def decision(self, ID_ary):
+    def decision(self, id_ary):
         if self.coef_ is None:
             raise ValueError(
                 "Master model untrained, train first using fit_master_mdl",
             )
 
-        idx_ary = self.graph.idmap[ID_ary]
-        decision_ary = np.zeros((len(ID_ary)))
+        idx_ary = self.graph.idmap[id_ary]
+        decision_ary = np.zeros((len(id_ary)))
         iter_list = (
             list(range(len(self.graph.mat_list)))
             if self.exclude
@@ -258,7 +258,7 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
                 n_mdl = None
         self.n_mdl = n_mdl
 
-    def fit_master_mdl(self, ID_ary, y):
+    def fit_master_mdl(self, id_ary, y):
         n_mdl = (
             len(self.mdl_list) if self.n_mdl is None else self.n_mdl
         )  # total number of models
@@ -266,13 +266,13 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
         n_neg = (~y).sum()
         skew = n_neg / n_pos
 
-        w = np.ones(len(ID_ary)) / n_pos  # data point weights
+        w = np.ones(len(id_ary)) / n_pos  # data point weights
         coef = np.zeros(n_mdl)  # model boosting coefficients
         y_pred_mat = np.zeros(
-            (len(ID_ary), len(self.graph.mat_list)),
+            (len(id_ary), len(self.graph.mat_list)),
             dtype=bool,
         )  # predictions from all features
-        idx_ary = self.graph.idmap[ID_ary]
+        idx_ary = self.graph.idmap[id_ary]
 
         if self.exclude:
             selected_ind = np.zeros(
@@ -356,14 +356,14 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
             # print(mdl_idx_ary, '\n', coef, '\n')
             self.mdlidx_ = mdl_idx_ary
 
-    def decision(self, ID_ary):
+    def decision(self, id_ary):
         if self.coef_ is None:
             raise ValueError(
                 "Master model untrained, train first using fit_master_mdl",
             )
 
-        idx_ary = self.graph.idmap[ID_ary]
-        decision_ary = np.zeros((len(ID_ary)))
+        idx_ary = self.graph.idmap[id_ary]
+        decision_ary = np.zeros((len(id_ary)))
         iter_list = (
             list(range(len(self.graph.mat_list)))
             if self.exclude
@@ -389,7 +389,7 @@ class RF(SLBase, RandomForestClassifier):
         SLBase.__init__(self, graph)
         RandomForestClassifier.__init__(self, **kwargs)
 
-    def decision(self, ID_ary):
-        x = self.get_x(ID_ary)
+    def decision(self, id_ary):
+        x = self.get_x(id_ary)
         decision_ary = self.predict_proba(x)[:, 1]  # take positive class
         return decision_ary

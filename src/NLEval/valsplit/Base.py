@@ -19,7 +19,7 @@ class BaseValSplit:
         checkers.checkType("shuffle", bool, val)
         self._shuffle = val
 
-    def split(self, ID_ary, label_ary, valid=False):
+    def split(self, id_ary, label_ary, valid=False):
         """Split labelset into training, testing (and validation) sets.
 
         Given matching arrays of node IDs and label (currently only support
@@ -27,12 +27,12 @@ class BaseValSplit:
         testing (and validation) splits, by calling ``get_split_idx_ary``.
 
         Note:
-            ID_ary and label_ary are coulpled, such that a particular entry
+            id_ary and label_ary are coulpled, such that a particular entry
             in label_ary corresponds to the label of the ID in the same entry
-            in ID_ary.
+            in id_ary.
 
         Args:
-            ID_ary(:obj:`numpy.ndarray` of :obj:`str`): array of entity IDs
+            id_ary(:obj:`numpy.ndarray` of :obj:`str`): array of entity IDs
             label_ary(:obj:`numpy.ndarray` of :obj:`bool`):
                 boolean/binary array of indicating positive samples
             valid(bool): whether or not to generate validation split, default
@@ -54,12 +54,12 @@ class BaseValSplit:
 
         """
         # train, test (and validation) index arrays
-        for idx_arys in self.get_split_idx_ary(ID_ary, label_ary, valid):
+        for idx_arys in self.get_split_idx_ary(id_ary, label_ary, valid):
             out = ()
             for idx_ary in idx_arys:
                 if self.shuffle:
                     np.random.shuffle(idx_ary)
-                out += (ID_ary[idx_ary], label_ary[idx_ary])
+                out += (id_ary[idx_ary], label_ary[idx_ary])
             yield out
 
 
@@ -146,12 +146,12 @@ class BaseHoldout(BaseValSplit):
                     f"split type, current split type is {type(self)!r}",
                 )
 
-    def get_split_idx_ary(self, ID_ary, label_ary=None, valid=False):
+    def get_split_idx_ary(self, id_ary, label_ary=None, valid=False):
         self.check_split_setup(valid)
-        train_idx_ary = np.where(np.in1d(ID_ary, self.train_index))[0]
-        test_idx_ary = np.where(np.in1d(ID_ary, self.test_index))[0]
+        train_idx_ary = np.where(np.in1d(id_ary, self.train_index))[0]
+        test_idx_ary = np.where(np.in1d(id_ary, self.test_index))[0]
         if valid:
-            valid_idx_ary = np.where(np.in1d(ID_ary, self.valid_index))[0]
+            valid_idx_ary = np.where(np.in1d(id_ary, self.valid_index))[0]
             yield train_idx_ary, valid_idx_ary, test_idx_ary
         else:
             yield train_idx_ary, test_idx_ary
@@ -164,7 +164,7 @@ class BaseInterface(BaseValSplit):
         super(BaseInterface, self).__init__(shuffle=shuffle)
 
     def setup_split_func(self, split_func):
-        self.get_split_idx_ary = lambda ID_ary, label_ary: split_func(
-            ID_ary,
+        self.get_split_idx_ary = lambda id_ary, label_ary: split_func(
+            id_ary,
             label_ary,
         )

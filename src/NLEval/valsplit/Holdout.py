@@ -199,34 +199,34 @@ class CustomHold(BaseHoldout):
         return self._custom_train_index
 
     @custom_train_index.setter
-    def custom_train_index(self, ID_ary):
-        checkers.checkTypesInNumpyArray("Training data ID list", str, ID_ary)
-        self._custom_train_index = ID_ary
+    def custom_train_index(self, id_ary):
+        checkers.checkTypesInNumpyArray("Training data ID list", str, id_ary)
+        self._custom_train_index = id_ary
 
     @property
     def custom_test_index(self):
         return self._custom_test_index
 
     @custom_test_index.setter
-    def custom_test_index(self, ID_ary):
-        checkers.checkTypesInNumpyArray("Testing data ID list", str, ID_ary)
-        self._custom_test_index = ID_ary
+    def custom_test_index(self, id_ary):
+        checkers.checkTypesInNumpyArray("Testing data ID list", str, id_ary)
+        self._custom_test_index = id_ary
 
     @property
     def custom_valid_index(self):
         return self._custom_valid_index
 
     @custom_valid_index.setter
-    def custom_valid_index(self, ID_ary):
-        if ID_ary is None:
+    def custom_valid_index(self, id_ary):
+        if id_ary is None:
             self._custom_valid_index = None
         else:
             checkers.checkTypesInNumpyArray(
                 "Validation data ID list",
                 str,
-                ID_ary,
+                id_ary,
             )
-            self._custom_valid_index = ID_ary
+            self._custom_valid_index = id_ary
 
     def train_test_setup(self, lscIDs, nodeIDs, **kwargs):
         common_ID_list = self.get_common_ids(lscIDs, nodeIDs)
