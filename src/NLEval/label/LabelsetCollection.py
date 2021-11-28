@@ -234,7 +234,7 @@ class BaseLSC(IDHandler.IDprop):
             as '1', else if it is considered a negative for that label, it is
             marked as '-1', otherwise it is '0', standing for neutral.
 
-            entityIDmap is necessary since not all entities are guaranteed to
+            entity_idmap is necessary since not all entities are guaranteed to
             be part of at least one label.
 
         Input:
@@ -243,7 +243,7 @@ class BaseLSC(IDHandler.IDprop):
 
         """
         entity_ids = self.entity_ids
-        entityIDmap = {
+        entity_idmap = {
             entity_id: idx for idx, entity_id in enumerate(entity_ids)
         }
         label_ids = self.label_ids
@@ -258,8 +258,8 @@ class BaseLSC(IDHandler.IDprop):
                 ["1", "-1"],
                 [positive_set, negative_set],
             ):
-                for entityID in labelset:
-                    i = entityIDmap[entityID]
+                for entity_id in labelset:
+                    i = entity_idmap[entity_id]
                     mat[i, j] = sign
 
         fp = fp if fp.endswith(".lsc") else fp + ".lsc"
@@ -271,9 +271,9 @@ class BaseLSC(IDHandler.IDprop):
             f.write(f"Label Info\t{label_info_str}\n")
 
             # annotations
-            for i, entityID in enumerate(entity_ids):
+            for i, entity_id in enumerate(entity_ids):
                 indicator_string = "\t".join(map(str, mat[i]))
-                f.write(f"{entityID}\t{indicator_string}\n")
+                f.write(f"{entity_id}\t{indicator_string}\n")
 
     def export_gmt(self, fp):
         """Export self as a '.gmt' (Gene Matrix Transpose) file.
