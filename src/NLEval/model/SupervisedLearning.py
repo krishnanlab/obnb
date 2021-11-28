@@ -306,9 +306,7 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
                 opt_r, 0.99,
             )  # prevent auprc of 1, causes divide by zero for a
             a = 0.5 * np.log((1 + opt_r) / (1 - opt_r))  # model coefficient
-            y_pred_opt = y_pred_mat[
-                :, opt_idx
-            ]  # decision scores of optimal model
+            y_pred_opt = y_pred_mat[:, opt_idx]  # decision scores of optim mdl
 
             w[y] *= w[y] * np.exp(-a * y_pred_opt[y])  # down weight positives
             w[~y] *= w[~y] * np.exp(

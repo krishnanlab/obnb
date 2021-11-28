@@ -13,7 +13,7 @@ class ParDat:
         n_workers=5,
         verbose=False,
         bar_length=80,
-        log_steps=1
+        log_steps=1,
     ):
         self.job_list = job_list
         self.n_workers = n_workers
