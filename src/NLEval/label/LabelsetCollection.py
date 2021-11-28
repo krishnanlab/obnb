@@ -226,10 +226,11 @@ class BaseLSC(IDHandler.IDprop):
             marked as '-1', otherwise it is '0', standing for neutral.
 
             entityIDmap is necessary since not all entities are guaranteed to
-            be part of at least one labels.
+            be part of at least one label.
 
         Input:
-            fp(str): path to file to save, including file name, with/without extension.
+            fp(str): path to file to save, including file name, with/without
+                extension.
 
         """
         entityIDlst = self.entityIDlst
@@ -249,7 +250,7 @@ class BaseLSC(IDHandler.IDprop):
                     i = entityIDmap[entityID]
                     mat[i, j] = sign
 
-        fp += "" if fp.endswith(".lsc") else ".lsc"
+        fp = fp if fp.endswith(".lsc") else fp + ".lsc"
         with open(fp, "w") as f:
             # headers
             labelIDlst_str = "\t".join(labelIDlst)
@@ -260,7 +261,7 @@ class BaseLSC(IDHandler.IDprop):
             # annotations
             for i, entityID in enumerate(entityIDlst):
                 indicator_string = "\t".join(map(str, mat[i]))
-                f.write("{entityID}\t{indicator_string}\n")
+                f.write(f"{entityID}\t{indicator_string}\n")
 
     def export_gmt(self, fp):
         """Export as '.gmt' (Gene Matrix Transpose) file

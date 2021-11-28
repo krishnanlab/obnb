@@ -76,7 +76,7 @@ class BaseModel:
         y_true = []
         y_predict = []
         for arys in labelset_splitgen:
-            train_id_ary, train_label_ary, test_id_ary, test_label_ary = ary
+            train_id_ary, train_label_ary, test_id_ary, test_label_ary = arys
             if train_id_ary is None:
                 return None, None
             self.train(train_id_ary, train_label_ary)
