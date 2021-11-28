@@ -11,7 +11,7 @@ class BaseValSplit:
 
     @property
     def shuffle(self):
-        """bool: shufle train/test indices when splitting"""
+        """bool: shufle train/test indices when splitting."""
         return self._shuffle
 
     @shuffle.setter
@@ -20,7 +20,7 @@ class BaseValSplit:
         self._shuffle = val
 
     def split(self, ID_ary, label_ary, valid=False):
-        """Split labelset into training, testing (and validation) sets
+        """Split labelset into training, testing (and validation) sets.
 
         Given matching arrays of node IDs and label (currently only support
         binary labels), this function yields the IDs and label for training,
@@ -65,7 +65,7 @@ class BaseValSplit:
 
 class BaseHoldout(BaseValSplit):
     def __init__(self, train_on="top", shuffle=False):
-        """Generic holdout validation object
+        """Generic holdout validation object.
 
         Split based on some numeric properties of the samples, train on
         either top or bottom set and test on the other, depending on
@@ -107,7 +107,7 @@ class BaseHoldout(BaseValSplit):
         self._train_on = val
 
     def get_common_ID_list(self, lscIDs, nodeIDs):
-        """Get list of common IDs between labelset collection and graph
+        """Get list of common IDs between labelset collection and graph.
 
         Note:
             Only included IDs that are part of at least one labelset
@@ -152,7 +152,7 @@ class BaseHoldout(BaseValSplit):
 
 
 class BaseInterface(BaseValSplit):
-    """Base interface with user defined validation split generator"""
+    """Base interface with user defined validation split generator."""
 
     def __init__(self, shuffle=False):
         super(BaseInterface, self).__init__(shuffle=shuffle)

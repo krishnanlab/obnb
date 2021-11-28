@@ -88,7 +88,7 @@ class CombLogRegCVPredComb(CombSLBase):
 
 class CombLogRegCVAdaBoost(CombSLBase):
     def __init__(self, G, exclude=True, n_mdl=None, **kwargs):
-        """Initialize LogisticRegression AdaBoost type ensemble
+        """Initialize LogisticRegression AdaBoost type ensemble.
 
         Args:
             G (NLEval.graph.DenseGraph.MultiFeatureVec): multi-feature objects
@@ -218,7 +218,7 @@ class CombLogRegCVAdaBoost(CombSLBase):
 
 class CombLogRegCVModifiedRankBoost(CombSLBase):
     def __init__(self, G, exclude=True, n_mdl=None, retrain=True, **kwargs):
-        """Initialize LogisticRegression ModifiedRankBoost ensemble
+        """Initialize LogisticRegression ModifiedRankBoost ensemble.
 
         Notes:
             This implementation follows from http://pages.cs.wisc.edu/~shavlik/abstracts/oliphant.ilp09.abstract.html

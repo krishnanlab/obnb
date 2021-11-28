@@ -6,7 +6,7 @@ __all__ = ["BinHold", "ThreshHold", "CustomHold", "TrainTestAll"]
 
 
 class TrainValTest(BaseHoldout):
-    """Split into train-val-test sets by ratios
+    """Split into train-val-test sets by ratios.
 
     Sort the entities based on the desired properties and then prepare the
     splits according to the train-val-test ratio.
@@ -185,7 +185,7 @@ class CustomHold(BaseHoldout):
         custom_valid_ID_ary=None,
         shuffle=False,
     ):
-        """User defined training and testing samples"""
+        """User defined training and testing samples."""
         super(CustomHold, self).__init__(shuffle=shuffle)
         self.custom_train_ID_ary = custom_train_ID_ary
         self.custom_test_ID_ary = custom_test_ID_ary
@@ -243,7 +243,7 @@ class CustomHold(BaseHoldout):
 
 class TrainTestAll(BaseHoldout):
     def __init__(self, shuffle=False):
-        """Train and test on all data"""
+        """Train and test on all data."""
         super(TrainTestAll, self).__init__(shuffle=shuffle)
 
     def train_test_setup(self, lscIDs, nodeIDs, **kwargs):

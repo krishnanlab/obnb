@@ -10,7 +10,7 @@ __all__ = [
 
 
 class BaseFilter:
-    """Base Filter object containing basic filter operations
+    """Base Filter object containing basic filter operations.
 
     Notes:
         Loop through all instances (IDs) retrieved by `self.get_IDs` and decide
@@ -43,7 +43,7 @@ class BaseFilter:
 
 
 class ExistanceFilter(BaseFilter):
-    """Filter by existance in some given list of targets
+    """Filter by existance in some given list of targets.
 
     Attributes:
         target_lst: list (or set) of targets of interest to be preserved
@@ -67,7 +67,7 @@ class ExistanceFilter(BaseFilter):
 
 
 class EntityExistanceFilter(ExistanceFilter):
-    """Filter entities by list of entiteis of interest"""
+    """Filter entities by list of entiteis of interest."""
 
     def __init__(self, target_lst, remove_existance=False):
         super(EntityExistanceFilter, self).__init__(
@@ -88,7 +88,7 @@ class EntityExistanceFilter(ExistanceFilter):
 
 
 class LabelsetExistanceFilter(ExistanceFilter):
-    """Filter labelset by list of labelsets of interest"""
+    """Filter labelset by list of labelsets of interest."""
 
     def __init__(self, target_lst, remove_existance=False):
         super(LabelsetExistanceFilter, self).__init__(
@@ -109,7 +109,7 @@ class LabelsetExistanceFilter(ExistanceFilter):
 
 
 class RangeFilter(BaseFilter):
-    """Filter entities in labelset collection by range of values
+    """Filter entities in labelset collection by range of values.
 
     Notes:
         If `None` specified for `min_val` or `max_val`, no filtering
@@ -137,7 +137,7 @@ class RangeFilter(BaseFilter):
 
 
 class EntityRangeFilterNoccur(RangeFilter):
-    """Pop entities based on number of occurance"""
+    """Pop entities based on number of occurance."""
 
     def __init__(self, min_val=None, max_val=None):
         super(EntityRangeFilterNoccur, self).__init__(min_val, max_val)
@@ -156,7 +156,7 @@ class EntityRangeFilterNoccur(RangeFilter):
 
 
 class LabelsetRangeFilterSize(RangeFilter):
-    """Pop labelsets based on size"""
+    """Pop labelsets based on size."""
 
     def __init__(self, min_val=None, max_val=None):
         super(LabelsetRangeFilterSize, self).__init__(min_val, max_val)
@@ -175,7 +175,7 @@ class LabelsetRangeFilterSize(RangeFilter):
 
 
 class LabelsetRangeFilterJaccard(RangeFilter):
-    """Pop labelsets based on Jaccard indx"""
+    """Pop labelsets based on Jaccard index."""
 
     def __init__(self, max_val=None):
         super(LabelsetRangeFilterJaccard, self).__init__(None, max_val)
@@ -208,7 +208,7 @@ class LabelsetRangeFilterJaccard(RangeFilter):
 
 
 class LabelsetRangeFilterTrainTestPos(RangeFilter):
-    """Pop labelsets based on number of positives in train/test sets
+    """Pop labelsets based on number of positives in train/test sets.
 
     Note:
         Only intended to be work with Holdout split type for now. Would not
@@ -245,7 +245,7 @@ class LabelsetRangeFilterTrainTestPos(RangeFilter):
 
 
 class ValueFilter(BaseFilter):
-    """Filter based on certain values
+    """Filter based on certain values.
 
     Attributes:
         val: target value
@@ -264,7 +264,7 @@ class ValueFilter(BaseFilter):
 
 
 class NegativeFilterHypergeom(BaseFilter):
-    """Filter based on enrichment (hypergeometric test)
+    """Filter based on enrichment (hypergeometric test).
 
     Notes:
         Given a labelset, compare it with all other labelsets and if p-val

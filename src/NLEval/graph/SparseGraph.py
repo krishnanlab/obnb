@@ -16,17 +16,17 @@ class SparseGraph(BaseGraph):
 
     @property
     def edge_data(self):
-        """:obj:`list` of :obj:`dict`: adjacency list data"""
+        """:obj:`list` of :obj:`dict`: adjacency list data."""
         return self._edge_data
 
     @property
     def weighted(self):
-        """bool: Indicate whether weights (3rd column in edgelist) are available"""
+        """bool: Whether weights (3rd column in edgelist) are available."""
         return self._weighted
 
     @property
     def directed(self):
-        """bool: Indicate whether edges are directed or not"""
+        """bool: Indicate whether edges are directed or not."""
         return self._directed
 
     @weighted.setter
@@ -40,7 +40,7 @@ class SparseGraph(BaseGraph):
         self._directed = val
 
     def __getitem__(self, key):
-        """Return slices of constructed adjacency matrix
+        """Return slices of constructed adjacency matrix.
 
         Args:
             key(str): key of ID
@@ -150,7 +150,7 @@ class SparseGraph(BaseGraph):
                         yield str(ID1), str(ID2), weight
 
     def read(self, file, reader="edglst", cut_threshold=0):
-        """Read data and construct sparse graph
+        """Read data and construct sparse graph.
 
         Args:
             file(str): path to input file
@@ -213,7 +213,7 @@ class SparseGraph(BaseGraph):
                 yield srcID, dstID, weight
 
     def save(self, outpth, writer="edglst", cut_threshold=0):
-        """Save graph to file
+        """Save graph to file.
 
         Args:
             outpth (str): path to output file
@@ -235,7 +235,7 @@ class SparseGraph(BaseGraph):
         )
 
     def to_adjmat(self, default_val=0):
-        """Construct adjacency matrix from edgelist data
+        """Construct adjacency matrix from edgelist data.
 
         Args:
             default_val(float): default value for missing edges

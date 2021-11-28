@@ -8,7 +8,7 @@ __all__ = ["BaseLSC", "SplitLSC"]
 
 
 class BaseLSC(IDHandler.IDprop):
-    """Collection of labelsets
+    """Collection of labelsets.
 
     This class is used for managing collection of labelsets.
 
@@ -44,7 +44,7 @@ class BaseLSC(IDHandler.IDprop):
         self.newProp("Negative", {None}, set)
 
     def _show(self):
-        """Debugging prints"""
+        """Debugging prints."""
         print("Labelsets IDs:")
         print(self._lst)
         print("Labelsets Info:")
@@ -64,11 +64,11 @@ class BaseLSC(IDHandler.IDprop):
 
     @property
     def labelIDlst(self):
-        """:obj:`list` of :obj:`str`: list of all labelset names"""
+        """:obj:`list` of :obj:`str`: list of all labelset names."""
         return self.lst
 
     def addLabelset(self, lst, labelID, labelInfo=None):
-        """Add new labelset
+        """Add a new labelset.
 
         Args:
             lst(:obj:`list` of :obj:`str`): list of IDs of entiteis belong
@@ -97,7 +97,7 @@ class BaseLSC(IDHandler.IDprop):
         self.popID(labelID)
 
     def updateLabelset(self, lst, labelID):
-        """Update existing labelset
+        """Update an existing labelset.
 
         Take list of entities IDs and update current labelset with a label
         name matching `labelID`. Any ID in the input list `lst` that does
@@ -152,15 +152,15 @@ class BaseLSC(IDHandler.IDprop):
             self.getLabelset(labelID).difference_update([ID])
 
     def getInfo(self, labelID):
-        """Return description of a labelset"""
+        """Return description of a labelset."""
         return self.getProp(labelID, "Info")
 
     def getLabelset(self, labelID):
-        """Return set of entities associated with a label"""
+        """Return set of entities associated with a label."""
         return self.getProp(labelID, "Labelset")
 
     def getNegative(self, labelID):
-        """Return set of negative samples of a labelset
+        """Return set of negative samples of a labelset.
 
         Note:
             If negative samples not available, use complement of labelset
@@ -190,11 +190,11 @@ class BaseLSC(IDHandler.IDprop):
         self.setProp(labelID, "Negative", set(lst))
 
     def getNoccur(self, ID):
-        """Return the number of labelsets in which an entity participates"""
+        """Return the number of labelsets in which an entity participates."""
         return self.entity.getProp(ID, "Noccur")
 
     def apply(self, filter_func, inplace=False):
-        """Apply filter to labelsets, see `NLEval.label.Filter` for more info
+        """Apply filter to labelsets, see `NLEval.label.Filter` for more info.
 
         Args:
             filter_func
@@ -213,7 +213,7 @@ class BaseLSC(IDHandler.IDprop):
         return obj
 
     def export(self, fp):
-        """Export as '.lsc' file
+        """Export self as a '.lsc' file.
 
         Notes:
             '.lsc' is a csv file storing entity labels in matrix form, where
@@ -262,7 +262,7 @@ class BaseLSC(IDHandler.IDprop):
                 f.write(f"{entityID}\t{indicator_string}\n")
 
     def export_gmt(self, fp):
-        """Export as '.gmt' (Gene Matrix Transpose) file
+        """Export self as a '.gmt' (Gene Matrix Transpose) file.
 
         Input:
             fp(str): path to file to save, including file name, with/without extension.
@@ -344,7 +344,9 @@ class SplitLSC(BaseLSC):
         self._valsplit = obj
 
     def train_test_setup(self, graph, prop_name=None, min_pos=10):
-        """Setup training and testing IDs, filter labelsets based on train/test samples
+        """Setup training and testing IDs.
+
+        Filter labelsets based on train/test samples
 
         Args:
             prop_name(str): name of entity properties used for generating splits
@@ -373,7 +375,7 @@ class SplitLSC(BaseLSC):
             #     print(f"Pop {i}")
 
     def splitLabelset(self, labelID, entityIDlst=None):
-        """Split up a labelset by training and testing sets
+        """Split up a labelset by training and testing sets.
 
         Returns:
             A generator that yeilds train/test IDs and labels, see
@@ -392,7 +394,7 @@ class SplitLSC(BaseLSC):
         return self.valsplit.split(ID_ary, label_ary)
 
     def export_splits(self, fp, graph):
-        """Export (holdout) split information to npz file
+        """Export (holdout) split information to npz file.
 
         Notes:
             * Only allow ``Holdout`` split type for now, since it is not

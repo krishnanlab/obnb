@@ -8,14 +8,14 @@ __all__ = ["DenseGraph", "FeatureVec"]
 
 
 class DenseGraph(BaseGraph):
-    """Base Graph object that stores data using numpy array"""
+    """Base Graph object that stores data using numpy array."""
 
     def __init__(self):
         super().__init__()
         self._mat = np.array([])
 
     def __getitem__(self, key):
-        """Return slice of graph
+        """Return slice of graph.
 
         Args:
             key(str): key of ID
@@ -29,12 +29,12 @@ class DenseGraph(BaseGraph):
 
     @property
     def mat(self):
-        """Node information stored as numpy matrix"""
+        """Node information stored as numpy matrix."""
         return self._mat
 
     @mat.setter
     def mat(self, val):
-        """Setter for DenseGraph.mat
+        """Setter for mat.
 
         Note:
             need to construct IDmap (self.IDmap) first before loading matrix
@@ -55,7 +55,7 @@ class DenseGraph(BaseGraph):
         self._mat = val.copy()
 
     def get_edge(self, ID1, ID2):
-        """Return edge weight between ID1 and ID2
+        """Return edge weight between ID1 and ID2.
 
         Args:
             ID1(str): ID of first node
@@ -66,7 +66,7 @@ class DenseGraph(BaseGraph):
 
     @classmethod
     def construct_graph(cls, ids, mat):
-        """Construct DenseGraph using ids and adjcency matrix
+        """Construct DenseGraph using ids and adjcency matrix.
 
         Args:
             ids(list or :obj:`IDHandler.IDmap`): list of IDs or IDmap of the
@@ -91,7 +91,7 @@ class DenseGraph(BaseGraph):
 
     @classmethod
     def from_mat(cls, mat):
-        """Construct DenseGraph object from numpy array
+        """Construct DenseGraph object from numpy array.
 
         Note:
             First column of mat encodes ID, must be integers
@@ -106,13 +106,13 @@ class DenseGraph(BaseGraph):
 
     @classmethod
     def from_npy(cls, path_to_npy, **kwargs):
-        """Read numpy array from .npy file and construct BaseGraph"""
+        """Read numpy array from .npy file and construct BaseGraph."""
         mat = np.load(path_to_npy, **kwargs)
         return cls.from_mat(mat)
 
     @classmethod
     def from_edglst(cls, path_to_edglst, weighted, directed, **kwargs):
-        """Read from edgelist and construct BaseGraph"""
+        """Read from edgelist and construct BaseGraph."""
         graph = SparseGraph.from_edglst(
             path_to_edglst, weighted, directed, **kwargs,
         )
@@ -120,7 +120,7 @@ class DenseGraph(BaseGraph):
 
 
 class FeatureVec(DenseGraph):
-    """Feature vectors with ID maps"""
+    """Feature vectors with ID maps."""
 
     def __init__(self, dim=None):
         super().__init__()
@@ -128,7 +128,7 @@ class FeatureVec(DenseGraph):
 
     @property
     def dim(self):
-        """int: dimension of feature vectors"""
+        """int: dimension of feature vectors."""
         return self._dim
 
     @dim.setter
@@ -152,7 +152,7 @@ class FeatureVec(DenseGraph):
 
     @DenseGraph.mat.setter
     def mat(self, val):
-        """Setter for FeatureVec.mat>
+        """Setter for mat.
 
         Note:
             Matrix must match the dim of both ``self.IDmap`` and ``self.dim``.
@@ -171,7 +171,7 @@ class FeatureVec(DenseGraph):
                 )
 
     def get_edge(self, ID1, ID2, dist_fun=distance.cosine):
-        """Return pairwise similarity of two features as 'edge'
+        """Return pairwise similarity of two features as 'edge'.
 
         Args:
             ID1(str): ID of first node
@@ -182,7 +182,7 @@ class FeatureVec(DenseGraph):
         return dist_fun(self[ID1], self[ID2])
 
     def addVec(self, ID, vec):
-        """Add a new feature vector"""
+        """Add a new feature vector."""
         checkers.checkNumpyArrayNDim("vec", 1, vec)
         checkers.checkNumpyArrayIsNumeric("vec", vec)
 
@@ -220,7 +220,7 @@ class FeatureVec(DenseGraph):
 
 
 class MultiFeatureVec(BaseGraph):
-    """Multi feature vectors with ID maps
+    """Multi feature vectors with ID maps.
 
     Note: experimenting feature
 
