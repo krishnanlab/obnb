@@ -27,8 +27,10 @@ class BaseGraph:
 
         for node_id1 in graph.idmap:  # check if all connections match
             for node_id2 in graph.idmap:
-                if self.get_edge(node_id1, node_id2) \
-                   != graph.get_edge(node_id1, node_id2):
+                if self.get_edge(node_id1, node_id2) != graph.get_edge(
+                    node_id1,
+                    node_id2,
+                ):
                     return False
         return True
 

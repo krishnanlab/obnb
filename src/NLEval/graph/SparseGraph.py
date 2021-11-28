@@ -79,7 +79,9 @@ class SparseGraph(BaseGraph):
             if node_id not in self.idmap:
                 self.add_id(node_id)
         try:
-            old_weight = self._edge_data[self.idmap[node_id1]][self.idmap[node_id2]]
+            old_weight = self._edge_data[self.idmap[node_id1]][
+                self.idmap[node_id2]
+            ]
             if old_weight != weight:  # check if edge exists
                 print(
                     f"WARNING: edge between {self.idmap[node_id1]} and "
@@ -89,7 +91,9 @@ class SparseGraph(BaseGraph):
         except KeyError:
             self._edge_data[self.idmap[node_id1]][self.idmap[node_id2]] = weight
             if not self.directed:
-                self._edge_data[self.idmap[node_id2]][self.idmap[node_id1]] = weight
+                self._edge_data[self.idmap[node_id2]][
+                    self.idmap[node_id1]
+                ] = weight
 
     def get_edge(self, node_id1, node_id2):
         try:

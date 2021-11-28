@@ -187,8 +187,15 @@ class TestDenseGraph(unittest.TestCase):
         IDlst = [str(int(i)) for i in self.case.data_mat[:, 0]]
         for idx1, node_id1 in enumerate(IDlst):
             for idx2, node_id2 in enumerate(IDlst):
-                with self.subTest(idx1=idx1, idx2=idx2, node_id1=type(node_id1), node_id2=node_id2):
-                    self.assertEqual(mat[idx1, idx2], graph.get_edge(node_id1, node_id2))
+                with self.subTest(
+                    idx1=idx1,
+                    idx2=idx2,
+                    node_id1=type(node_id1),
+                    node_id2=node_id2,
+                ):
+                    self.assertEqual(
+                        mat[idx1, idx2], graph.get_edge(node_id1, node_id2)
+                    )
 
     def test_mat(self):
         graph = DenseGraph.DenseGraph()

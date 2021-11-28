@@ -124,9 +124,9 @@ class BaseLSC(IDHandler.IDprop):
             if entity_id not in lbset:
                 lbset.update([entity_id])
                 self.entity.setProp(
-                    entity_id, 
-                    "Noccur", 
-                    self.get_noccur(entity_id)+1,
+                    entity_id,
+                    "Noccur",
+                    self.get_noccur(entity_id) + 1,
                 )
 
     def reset_labelset(self, labelID):
@@ -138,8 +138,15 @@ class BaseLSC(IDHandler.IDprop):
         """
         lbset = self.get_labelset(labelID)
         for entity_id in lbset:
-            self.entity.setProp(entity_id, "Noccur", self.get_noccur(entity_id) - 1)
-            if self.entity.getAllProp(entity_id) == self.entity.prop_default_val:
+            self.entity.setProp(
+                entity_id,
+                "Noccur",
+                self.get_noccur(entity_id) - 1,
+            )
+            if (
+                self.entity.getAllProp(entity_id)
+                == self.entity.prop_default_val
+            ):
                 self.entity.popID(entity_id)
         lbset.clear()
 

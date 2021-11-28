@@ -230,8 +230,9 @@ class IDprop(IDmap):
         # check if properties have same values
         for prop in self.propLst:
             for identifier in self:
-                if self.getProp(identifier, prop) \
-                   != other.getProp(identifier, prop):
+                if self.getProp(identifier, prop) != other.getProp(
+                    identifier, prop
+                ):
                     return False
         return True
 

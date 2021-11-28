@@ -212,7 +212,9 @@ class CombLogRegCVAdaBoost(CombSLBase):
         idx_ary = self.graph.idmap[ID_ary]
         decision_ary = np.zeros((len(ID_ary)))
         iter_list = (
-            list(range(len(self.graph.mat_list))) if self.exclude else self.mdlidx_
+            list(range(len(self.graph.mat_list)))
+            if self.exclude
+            else self.mdlidx_
         )
         for i, j in enumerate(iter_list):
             x = self.graph.mat_list[j][idx_ary]
@@ -363,7 +365,9 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
         idx_ary = self.graph.idmap[ID_ary]
         decision_ary = np.zeros((len(ID_ary)))
         iter_list = (
-            list(range(len(self.graph.mat_list))) if self.exclude else self.mdlidx_
+            list(range(len(self.graph.mat_list)))
+            if self.exclude
+            else self.mdlidx_
         )
         for i, j in enumerate(iter_list):
             x = self.graph.mat_list[j][idx_ary]
