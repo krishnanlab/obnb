@@ -399,12 +399,12 @@ class SplitLSC(BaseLSC):
         if entity_ids is None:
             entity_ids = self.entity_ids.copy()
 
-        pos_ID_set = set(self.get_labelset(label_id)) & set(entity_ids)
-        neg_ID_set = set(self.get_negative(label_id)) & set(entity_ids)
+        pos_ids_set = set(self.get_labelset(label_id)) & set(entity_ids)
+        neg_ids_set = set(self.get_negative(label_id)) & set(entity_ids)
 
-        id_ary = np.array(list(pos_ID_set) + list(neg_ID_set))
+        id_ary = np.array(list(pos_ids_set) + list(neg_ids_set))
         label_ary = np.zeros(len(id_ary), dtype=bool)
-        label_ary[: len(pos_ID_set)] = True
+        label_ary[: len(pos_ids_set)] = True
         return self.valsplit.split(id_ary, label_ary)
 
     def export_splits(self, fp, graph):

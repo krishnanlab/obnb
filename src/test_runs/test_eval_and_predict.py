@@ -57,8 +57,8 @@ mdl = model.SupervisedLearning.LogRegCV(
 def predict_all_labelsets(label_id):
     np.random.seed()  # initialize random states for parallel processes
 
-    pos_ID_set = lsc.get_labelset(label_id)
-    neg_ID_set = lsc.get_negative(label_id)
+    pos_ids_set = lsc.get_labelset(label_id)
+    neg_ids_set = lsc.get_negative(label_id)
 
     y_true, y_predict = mdl.test2(lsc.split_labelset(label_id))
     score = np.mean(
@@ -67,14 +67,14 @@ def predict_all_labelsets(label_id):
 
     if score > score_cutoff:
         status_str = "(Prediction saved)"
-    #        score_dict = mdl.predict(pos_ID_set, neg_ID_set)
+    #        score_dict = mdl.predict(pos_ids_set, neg_ids_set)
     #
     #        with open(f"predictions/{label_id}_score={score:3.2f}.tsv", 'w') as f:
     #            f.write("gene_id\tprediction_score\tannotation\n")
     #            for geneID, prediction_score in score_dict.items():
-    #                if geneID in pos_ID_set:
+    #                if geneID in pos_ids_set:
     #                    annotation = '+'
-    #                elif geneID in neg_ID_set:
+    #                elif geneID in neg_ids_set:
     #                    annotation = '-'
     #                else:
     #                    annotation = '0'
@@ -84,8 +84,8 @@ def predict_all_labelsets(label_id):
         status_str = "(Discarded)"
 
     print(
-        f"{label_id:<60} num_pos={len(pos_ID_set):>4}, "
-        f"num_neg={len(neg_ID_set):>4}, score={score:>3.2f} {status_str}"
+        f"{label_id:<60} num_pos={len(pos_ids_set):>4}, "
+        f"num_neg={len(neg_ids_set):>4}, score={score:>3.2f} {status_str}"
     )
 
 

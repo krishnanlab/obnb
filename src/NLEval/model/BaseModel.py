@@ -89,7 +89,7 @@ class BaseModel:
             # print(self.C_)
         return y_true, y_predict
 
-    def predict(self, pos_ID_set, neg_ID_set):
+    def predict(self, pos_ids_set, neg_ids_set):
         """Network wise prediction.
 
         Given positive and negative examples, train the model and then generate
@@ -97,8 +97,8 @@ class BaseModel:
         dictionary.
 
         Input:
-            pos_ID_set (:obj:`set` of :obj:`str`): set of IDs of positive examples.
-            neg_ID_set (:obj:`set` of :obj:`str`): set of IDs of negative examples.
+            pos_ids_set (:obj:`set` of :obj:`str`): set of IDs of positive examples.
+            neg_ids_set (:obj:`set` of :obj:`str`): set of IDs of negative examples.
 
         Output:
             score_dict (:obj:`dict` of :obj:`str` -> :obj:`float`): dictionary
@@ -108,12 +108,12 @@ class BaseModel:
         graph = self.graph
         ID_list = graph.idmap.lst
 
-        pos_ID_set = pos_ID_set & set(ID_list)
-        neg_ID_set = neg_ID_set & set(ID_list)
+        pos_ids_set = pos_ids_set & set(ID_list)
+        neg_ids_set = neg_ids_set & set(ID_list)
 
-        id_ary = np.array(list(pos_ID_set | neg_ID_set))
+        id_ary = np.array(list(pos_ids_set | neg_ids_set))
         label_ary = np.zeros(len(id_ary), dtype=bool)
-        label_ary[: len(pos_ID_set)] = True
+        label_ary[: len(pos_ids_set)] = True
 
         self.train(id_ary, label_ary)
         scores = self.decision(ID_list)
