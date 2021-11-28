@@ -139,12 +139,12 @@ class SparseGraph(BaseGraph):
         if isinstance(mat, str):
             # load numpy matrix from file if provided path instead of numpy matrix
             mat = np.load(mat)
-        Nnodes = mat.shape[0]
+        num_nodes = mat.shape[0]
 
-        for i in range(Nnodes):
+        for i in range(num_nodes):
             node_id1 = mat[i, 0]
 
-            for j in range(Nnodes):
+            for j in range(num_nodes):
                 node_id2 = mat[j, 0]
                 weight = mat[i, j + 1]
                 if weight > cut_threshold:
@@ -252,8 +252,8 @@ class SparseGraph(BaseGraph):
             default_val(float): default value for missing edges
 
         """
-        Nnodes = self.idmap.size
-        mat = np.ones((Nnodes, Nnodes)) * default_val
+        num_nodes = self.idmap.size
+        mat = np.ones((num_nodes, num_nodes)) * default_val
         for src_node, src_nbrs in enumerate(self._edge_data):
             for dst_node in src_nbrs:
                 mat[src_node, dst_node] = src_nbrs[dst_node]
