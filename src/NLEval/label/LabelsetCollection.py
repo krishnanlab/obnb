@@ -387,8 +387,8 @@ class SplitLSC(BaseLSC):
         if entityIDlst is None:
             entityIDlst = self.entityIDlst.copy()
 
-        pos_ID_set = set(list(self.getLabelset(labelID))) & set(entityIDlst)
-        neg_ID_set = set(list(self.getNegative(labelID))) & set(entityIDlst)
+        pos_ID_set = set(self.getLabelset(labelID)) & set(entityIDlst)
+        neg_ID_set = set(self.getNegative(labelID)) & set(entityIDlst)
 
         ID_ary = np.array(list(pos_ID_set) + list(neg_ID_set))
         label_ary = np.zeros(len(ID_ary), dtype=bool)
