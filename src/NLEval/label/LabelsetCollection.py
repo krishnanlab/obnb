@@ -344,7 +344,7 @@ class SplitLSC(BaseLSC):
         self._valsplit = obj
 
     def train_test_setup(self, graph, prop_name=None, min_pos=10):
-        """Setup training and testing IDs.
+        """Set up training and testing.
 
         Filter labelsets based on train/test samples
 

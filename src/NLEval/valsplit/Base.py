@@ -65,7 +65,7 @@ class BaseValSplit:
 
 class BaseHoldout(BaseValSplit):
     def __init__(self, train_on="top", shuffle=False):
-        """Generic holdout validation object.
+        """Initialize base holdout.
 
         Split based on some numeric properties of the samples, train on
         either top or bottom set and test on the other, depending on
