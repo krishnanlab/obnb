@@ -258,7 +258,7 @@ class HoldoutChildTemplate(BaseHoldout):
     """
     def __init__(self, **args, min_pos=10, **kwargs):
         super().__init__(min_pos=min_pos)
-    
+
     def __repr__(self):
         return (
             f'HoldoutChildTemplate(min_pos={self.min_pose!r}, '
@@ -268,7 +268,7 @@ class HoldoutChildTemplate(BaseHoldout):
     @property
     def foo(self):
         return self._foo
-    
+
     @foo.setter
     def foo(self, val):
         self._foo = val
