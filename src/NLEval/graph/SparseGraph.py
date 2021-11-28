@@ -199,7 +199,9 @@ class SparseGraph(BaseGraph):
             for src_node_id, dst_node_id, weight in edge_gen():
                 if weighted:
                     if weight > cut_threshold:
-                        f.write(f"{src_node_id}\t{dst_node_id}\t{weight:.12f}\n")
+                        f.write(
+                            f"{src_node_id}\t{dst_node_id}\t{weight:.12f}\n",
+                        )
                 else:
                     f.write(f"{src_node_id}\t{dst_node_id}\n")
 

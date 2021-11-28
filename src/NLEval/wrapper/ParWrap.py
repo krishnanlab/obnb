@@ -91,7 +91,14 @@ class ParDat:
         parent_conn, child_conn = mp.Pipe()
         new_process = mp.Process(
             target=ParDat.worker,
-            args=(child_conn, self._q, self.job_list, func, func_args, func_kwargs),
+            args=(
+                child_conn,
+                self._q,
+                self.job_list,
+                func,
+                func_args,
+                func_kwargs,
+            ),
         )
         new_process.daemon = True
 

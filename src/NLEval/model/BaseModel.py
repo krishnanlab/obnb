@@ -117,6 +117,8 @@ class BaseModel:
 
         self.train(id_ary, label_ary)
         scores = self.decision(node_ids)
-        score_dict = {node_id: score for node_id, score in zip(node_ids, scores)}
+        score_dict = {
+            node_id: score for node_id, score in zip(node_ids, scores)
+        }
 
         return score_dict

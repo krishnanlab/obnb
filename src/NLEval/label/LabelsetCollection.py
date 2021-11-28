@@ -77,7 +77,10 @@ class BaseLSC(IDHandler.IDprop):
             label_info(str): description of label
 
         """
-        self.add_id(label_id, {} if label_info is None else {"Info": label_info})
+        self.add_id(
+            label_id,
+            {} if label_info is None else {"Info": label_info},
+        )
         try:
             self.entity.update(lst)
         except Exception as e:
@@ -193,7 +196,6 @@ class BaseLSC(IDHandler.IDprop):
         for entity_id in lst:
             self.entity._check_ID_existence(entity_id, True)
             if entity_id in lbset:
-                # raise Exception(repr(entity_id), repr(label_id))
                 raise IDExistsError(
                     f"Entity {entity_id!r} is positive in labelset, "
                     f"{label_id!r}, cannot be set to negative",
