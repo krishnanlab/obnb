@@ -67,7 +67,7 @@ class BaseLSC(IDHandler.IDprop):
         """:obj:`list` of :obj:`str`: list of all labelset names."""
         return self.lst
 
-    def addLabelset(self, lst, labelID, labelInfo=None):
+    def add_labelset(self, lst, labelID, labelInfo=None):
         """Add a new labelset.
 
         Args:
@@ -84,19 +84,19 @@ class BaseLSC(IDHandler.IDprop):
             # if entity list not updated successfully, pop the new labelset
             self.popID(labelID)
             raise e
-        self.updateLabelset(lst, labelID)
+        self.update_labelset(lst, labelID)
 
-    def popLabelset(self, labelID):
+    def pop_labelset(self, labelID):
         """Pop a labelset.
 
         Note:
             This also removes any entity that longer belongs to any labelset.
 
         """
-        self.resetLabelset(labelID)
+        self.reset_labelset(labelID)
         self.popID(labelID)
 
-    def updateLabelset(self, lst, labelID):
+    def update_labelset(self, lst, labelID):
         """Update an existing labelset.
 
         Take list of entities IDs and update current labelset with a label
@@ -104,7 +104,7 @@ class BaseLSC(IDHandler.IDprop):
         not exist in the entity list will be added to the entity list. Increment
         the `Noccur` property of any newly added entites to the labelset by 1.
 
-        Note: labelID must already existed, use `.addLabelset()` for adding
+        Note: labelID must already existed, use `.add_labelset()` for adding
         new labelset
 
         Args:
@@ -125,7 +125,7 @@ class BaseLSC(IDHandler.IDprop):
                 lbset.update([ID])
                 self.entity.setProp(ID, "Noccur", self.getNoccur(ID) + 1)
 
-    def resetLabelset(self, labelID):
+    def reset_labelset(self, labelID):
         """Reset an existing labelset to an empty set.
 
         Setting the labelset back to empty and deecrement `Noccur` of all
@@ -142,7 +142,7 @@ class BaseLSC(IDHandler.IDprop):
     def popEntity(self, ID):
         """Pop an entity from entity list, and also remove it from all labelsets.
 
-        Note: Unlike `popLabelset`, if after removal, a labelset beomes empty, the
+        Note: Unlike `pop_labelset`, if after removal, a labelset beomes empty, the
         labelset itself is NOT removed. This is for more convenient comparison of
         labelset sizes before and after filtering.
 
@@ -322,7 +322,7 @@ class BaseLSC(IDHandler.IDprop):
         with open(fp, "r") as f:
             for line in f:
                 labelID, labelInfo, *lst = line.strip().split("\t")
-                lsc.addLabelset(lst, labelID, labelInfo)
+                lsc.add_labelset(lst, labelID, labelInfo)
         return lsc
 
 

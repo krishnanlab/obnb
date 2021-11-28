@@ -107,7 +107,7 @@ class LabelsetExistanceFilter(ExistanceFilter):
 
     @staticmethod
     def get_mod_fun(lsc):
-        return lsc.popLabelset
+        return lsc.pop_labelset
 
 
 class RangeFilter(BaseFilter):
@@ -173,7 +173,7 @@ class LabelsetRangeFilterSize(RangeFilter):
 
     @staticmethod
     def get_mod_fun(lsc):
-        return lsc.popLabelset
+        return lsc.pop_labelset
 
 
 class LabelsetRangeFilterJaccard(RangeFilter):
@@ -206,7 +206,7 @@ class LabelsetRangeFilterJaccard(RangeFilter):
 
     @staticmethod
     def get_mod_fun(lsc):
-        return lsc.popLabelset
+        return lsc.pop_labelset
 
 
 class LabelsetRangeFilterTrainTestPos(RangeFilter):
@@ -243,7 +243,7 @@ class LabelsetRangeFilterTrainTestPos(RangeFilter):
 
     @staticmethod
     def get_mod_fun(lsc):
-        return lsc.popLabelset  # replace with soft filter
+        return lsc.pop_labelset  # replace with soft filter
 
 
 class ValueFilter(BaseFilter):
