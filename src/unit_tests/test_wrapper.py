@@ -13,7 +13,7 @@ class TestParDat(unittest.TestCase):
     def setUpClass(cls):
         cls.n_samples = 1000
         cls.n_features = 20
-        cls.n_classes = 100
+        cls.n_classes = 10
         cls.job_list = list(range(cls.n_classes))
 
     def setUp(self):
