@@ -26,16 +26,16 @@ class BaseModel:
         """Return indices of corresponding input IDs.
 
         Note:
-            All ID in the input ID list must be in IDmap of graph
+            All ID in the input ID list must be in idmap of graph
 
         Args:
-            IDs(:obj:`list` of str): list of ID in IDmap
+            IDs(:obj:`list` of str): list of ID in idmap
 
         Returns:
             (:obj:`numpy.ndarray`): numpy array of indices of input IDs
 
         """
-        return self.G.IDmap[IDs]
+        return self.G.idmap[IDs]
 
     def get_x(self, IDs):
         """Return features of input IDs as corresponding rows in graph."""
@@ -106,7 +106,7 @@ class BaseModel:
 
         """
         G = self.G
-        ID_list = G.IDmap.lst
+        ID_list = G.idmap.lst
 
         pos_ID_set = pos_ID_set & set(ID_list)
         neg_ID_set = neg_ID_set & set(ID_list)

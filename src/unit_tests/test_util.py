@@ -156,113 +156,113 @@ class TestIDlst(unittest.TestCase):
 
 class TestIDmap(unittest.TestCase):
     def setUp(self):
-        self.IDmap = IDHandler.IDmap()
-        self.IDmap.addID("a")
+        self.idmap = IDHandler.IDmap()
+        self.idmap.addID("a")
 
     def tearDown(self):
-        self.IDmap = None
+        self.idmap = None
 
     def test_size(self):
-        self.assertEqual(self.IDmap.size, 1)
-        self.IDmap.addID("b")
-        self.assertEqual(self.IDmap.size, 2)
+        self.assertEqual(self.idmap.size, 1)
+        self.idmap.addID("b")
+        self.assertEqual(self.idmap.size, 2)
 
     def test_map(self):
-        self.assertEqual(self.IDmap.map, {"a": 0})
-        self.IDmap.addID("b")
-        self.assertEqual(self.IDmap.map, {"a": 0, "b": 1})
+        self.assertEqual(self.idmap.map, {"a": 0})
+        self.idmap.addID("b")
+        self.assertEqual(self.idmap.map, {"a": 0, "b": 1})
 
     def test_lst(self):
-        self.assertEqual(self.IDmap.lst, ["a"])
-        self.IDmap.addID("b")
-        self.assertEqual(self.IDmap.lst, ["a", "b"])
+        self.assertEqual(self.idmap.lst, ["a"])
+        self.idmap.addID("b")
+        self.assertEqual(self.idmap.lst, ["a", "b"])
 
     def test_addID(self):
-        self.assertRaises(TypeError, self.IDmap.addID, (1, 2, 3))
-        self.assertRaises(TypeError, self.IDmap.addID, [1, 2, 3])
-        self.assertRaises(TypeError, self.IDmap.addID, 10)
-        self.assertRaises(IDExistsError, self.IDmap.addID, "a")
-        self.IDmap.addID("10")
-        self.IDmap.addID("10.1")
-        self.IDmap.addID("abc")
-        self.assertEqual(self.IDmap.lst, ["a", "10", "10.1", "abc"])
+        self.assertRaises(TypeError, self.idmap.addID, (1, 2, 3))
+        self.assertRaises(TypeError, self.idmap.addID, [1, 2, 3])
+        self.assertRaises(TypeError, self.idmap.addID, 10)
+        self.assertRaises(IDExistsError, self.idmap.addID, "a")
+        self.idmap.addID("10")
+        self.idmap.addID("10.1")
+        self.idmap.addID("abc")
+        self.assertEqual(self.idmap.lst, ["a", "10", "10.1", "abc"])
 
     def test_getitem(self):
-        self.assertEqual(self.IDmap["a"], 0)
+        self.assertEqual(self.idmap["a"], 0)
 
     def test_getID(self):
-        self.assertEqual(self.IDmap.getID(0), "a")
+        self.assertEqual(self.idmap.getID(0), "a")
 
     def test_IDary2idxary(self):
-        self.IDmap.addID("b")
-        self.assertEqual(self.IDmap[["b", "a"]][0], 1)
-        self.assertEqual(self.IDmap[["b", "a"]][1], 0)
-        self.assertEqual(self.IDmap[np.array(["a", "b"])][0], 0)
-        self.assertEqual(self.IDmap[np.array(["a", "b"])][1], 1)
+        self.idmap.addID("b")
+        self.assertEqual(self.idmap[["b", "a"]][0], 1)
+        self.assertEqual(self.idmap[["b", "a"]][1], 0)
+        self.assertEqual(self.idmap[np.array(["a", "b"])][0], 0)
+        self.assertEqual(self.idmap[np.array(["a", "b"])][1], 1)
 
     def test_contains(self):
-        self.assertTrue("a" in self.IDmap)
-        self.assertFalse("b" in self.IDmap)
-        self.IDmap.addID("b")
-        self.assertTrue("b" in self.IDmap)
+        self.assertTrue("a" in self.idmap)
+        self.assertFalse("b" in self.idmap)
+        self.idmap.addID("b")
+        self.assertTrue("b" in self.idmap)
 
     def test_eq(self):
-        self.IDmap.addID("b")
+        self.idmap.addID("b")
         idmap = IDHandler.IDmap()
         idmap.addID("b")
         idmap.addID("a")
-        self.assertTrue(self.IDmap == idmap)
-        self.IDmap.addID("c")
-        self.IDmap.addID("d")
+        self.assertTrue(self.idmap == idmap)
+        self.idmap.addID("c")
+        self.idmap.addID("d")
         idmap.addID("d")
-        self.assertFalse(self.IDmap == idmap)
+        self.assertFalse(self.idmap == idmap)
         idmap.addID("c")
-        self.assertTrue(self.IDmap == idmap)
+        self.assertTrue(self.idmap == idmap)
 
     def test_iter(self):
-        self.IDmap.addID("b")
-        self.IDmap.addID("x")
+        self.idmap.addID("b")
+        self.idmap.addID("x")
         lst = ["a", "b", "x"]
-        for i, j in enumerate(self.IDmap):
+        for i, j in enumerate(self.idmap):
             with self.subTest(i=i):
                 self.assertEqual(j, lst[i])
 
     def test_copy(self):
-        idmap_shallow_copy = self.IDmap
-        idmap_deep_copy = self.IDmap.copy()
+        idmap_shallow_copy = self.idmap
+        idmap_deep_copy = self.idmap.copy()
         # shallow
-        self.IDmap.addID("b")
-        self.assertEqual(idmap_shallow_copy, self.IDmap)
+        self.idmap.addID("b")
+        self.assertEqual(idmap_shallow_copy, self.idmap)
         # deep
-        self.assertNotEqual(idmap_deep_copy, self.IDmap)
+        self.assertNotEqual(idmap_deep_copy, self.idmap)
 
     def test_popID(self):
-        self.IDmap.addID("b")
-        self.IDmap.addID("c")
-        self.assertEqual(self.IDmap.lst, ["a", "b", "c"])
-        self.assertEqual(self.IDmap.map, {"a": 0, "b": 1, "c": 2})
-        self.assertRaises(IDNotExistError, self.IDmap.popID, "d")
-        self.assertEqual(self.IDmap.popID("b"), 1)
+        self.idmap.addID("b")
+        self.idmap.addID("c")
+        self.assertEqual(self.idmap.lst, ["a", "b", "c"])
+        self.assertEqual(self.idmap.map, {"a": 0, "b": 1, "c": 2})
+        self.assertRaises(IDNotExistError, self.idmap.popID, "d")
+        self.assertEqual(self.idmap.popID("b"), 1)
         # make sure both lst and data poped
-        self.assertEqual(self.IDmap.lst, ["a", "c"])
+        self.assertEqual(self.idmap.lst, ["a", "c"])
         # make sure data updated with new mapping
-        self.assertEqual(self.IDmap.map, {"a": 0, "c": 1})
+        self.assertEqual(self.idmap.map, {"a": 0, "c": 1})
 
     def test_add(self):
         idmap = IDHandler.IDmap()
         idmap.addID("b")
-        idmap_combined = self.IDmap + idmap
+        idmap_combined = self.idmap + idmap
         self.assertEqual(idmap_combined.map, {"a": 0, "b": 1})
         self.assertEqual(idmap_combined.lst, ["a", "b"])
 
     def test_sub(self):
-        idmap = self.IDmap.copy()
+        idmap = self.idmap.copy()
         idmap.addID("b")
-        self.IDmap.addID("c")
-        diff = idmap - self.IDmap
+        self.idmap.addID("c")
+        diff = idmap - self.idmap
         self.assertEqual(diff.map, {"b": 0})
         self.assertEqual(diff.lst, ["b"])
-        diff = self.IDmap - idmap
+        diff = self.idmap - idmap
         self.assertEqual(diff.map, {"c": 0})
         self.assertEqual(diff.lst, ["c"])
 

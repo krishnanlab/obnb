@@ -47,7 +47,7 @@ class SparseGraph(BaseGraph):
             key(:obj:`list` of :obj:`str`): list of keys of IDs
 
         """
-        idx = self.IDmap[key]
+        idx = self.idmap[key]
         if isinstance(idx, int):
             fvec = self.construct_adj_vec(idx)
         else:
@@ -70,30 +70,30 @@ class SparseGraph(BaseGraph):
         return fvec
 
     def addID(self, ID):
-        self.IDmap.addID(ID)
+        self.idmap.addID(ID)
         self._edge_data.append({})
 
     def addEdge(self, ID1, ID2, weight):
         for ID in [ID1, ID2]:
             # check if ID exists, add new if not
-            if ID not in self.IDmap:
+            if ID not in self.idmap:
                 self.addID(ID)
         try:
-            old_weight = self._edge_data[self.IDmap[ID1]][self.IDmap[ID2]]
+            old_weight = self._edge_data[self.idmap[ID1]][self.idmap[ID2]]
             if old_weight != weight:  # check if edge exists
                 print(
-                    f"WARNING: edge between {self.IDmap[ID1]} and "
-                    f"{self.IDmap[ID2]} exists with weight {old_weight:.2f}"
+                    f"WARNING: edge between {self.idmap[ID1]} and "
+                    f"{self.idmap[ID2]} exists with weight {old_weight:.2f}"
                     f", overwriting with {weight:.2f}",
                 )
         except KeyError:
-            self._edge_data[self.IDmap[ID1]][self.IDmap[ID2]] = weight
+            self._edge_data[self.idmap[ID1]][self.idmap[ID2]] = weight
             if not self.directed:
-                self._edge_data[self.IDmap[ID2]][self.IDmap[ID1]] = weight
+                self._edge_data[self.idmap[ID2]][self.idmap[ID1]] = weight
 
     def get_edge(self, ID1, ID2):
         try:
-            return self.edge_data[self.IDmap[ID1]][self.IDmap[ID2]]
+            return self.edge_data[self.idmap[ID1]][self.idmap[ID2]]
         except KeyError:
             return 0
 
@@ -207,9 +207,9 @@ class SparseGraph(BaseGraph):
         edge_data_copy = self._edge_data[:]
         for src_idx in range(len(edge_data_copy)):
             src_nbrs = edge_data_copy[src_idx]
-            srcID = self.IDmap.getID(src_idx)
+            srcID = self.idmap.getID(src_idx)
             for dst_idx in src_nbrs:
-                dstID = self.IDmap.getID(dst_idx)
+                dstID = self.idmap.getID(dst_idx)
                 if not self.directed:
                     edge_data_copy[dst_idx].pop(src_idx)
                 weight = edge_data_copy[src_idx][dst_idx]
@@ -248,7 +248,7 @@ class SparseGraph(BaseGraph):
             default_val(float): default value for missing edges
 
         """
-        Nnodes = self.IDmap.size
+        Nnodes = self.idmap.size
         mat = np.ones((Nnodes, Nnodes)) * default_val
         for src_node, src_nbrs in enumerate(self._edge_data):
             for dst_node in src_nbrs:

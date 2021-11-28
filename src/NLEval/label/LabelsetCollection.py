@@ -367,7 +367,7 @@ class SplitLSC(BaseLSC):
             num_labelsets = len(self.labelIDlst)
             # print(num_labelsets)
             # labelIDset = set(self.labelIDlst)
-            self.valsplit.train_test_setup(self.entity, graph.IDmap, prop_name)
+            self.valsplit.train_test_setup(self.entity, graph.idmap, prop_name)
             self.apply(
                 Filter.LabelsetRangeFilterTrainTestPos(min_pos),
                 inplace=True,
@@ -422,14 +422,14 @@ class SplitLSC(BaseLSC):
         valid = False if self.valsplit.valid_ID_ary is None else True
         self.valsplit.check_split_setup(valid)
 
-        train_idx = graph.IDmap[self.valsplit.train_ID_ary]
-        test_idx = graph.IDmap[self.valsplit.test_ID_ary]
-        valid_idx = graph.IDmap[self.valsplit.valid_ID_ary] if valid else np.NaN
+        train_idx = graph.idmap[self.valsplit.train_ID_ary]
+        test_idx = graph.idmap[self.valsplit.test_ID_ary]
+        valid_idx = graph.idmap[self.valsplit.valid_ID_ary] if valid else np.NaN
 
         y = np.zeros((graph.size, len(self.labelIDlst)), dtype=bool)
         for i, labelID in enumerate(self.labelIDlst):
             pos_ID_ary = np.array(list(self.getLabelset(labelID)))
-            pos_idx_ary = graph.IDmap[pos_ID_ary]
+            pos_idx_ary = graph.idmap[pos_ID_ary]
             y[pos_idx_ary, i] = True
 
         np.savez(
@@ -438,6 +438,6 @@ class SplitLSC(BaseLSC):
             train_idx=train_idx,
             valid_idx=valid_idx,
             test_idx=test_idx,
-            IDs=graph.IDmap.lst,
+            IDs=graph.idmap.lst,
             labelIDs=self.labelIDlst,
         )

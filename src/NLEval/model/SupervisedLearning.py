@@ -41,7 +41,7 @@ class CombSLBase(BaseModel):
 
     def train(self, ID_ary, y):
         for i, mat in enumerate(self.G.mat_list):
-            x = mat[self.G.IDmap[ID_ary]]
+            x = mat[self.G.idmap[ID_ary]]
             self.mdl_list[i].fit(x, y)
         self.fit_master_mdl(ID_ary, y)
 
@@ -57,7 +57,7 @@ class CombLogRegCVBagging(CombSLBase):
     def decision(self, ID_ary):
         decision_ary = np.zeros((len(ID_ary)))
         for i, mat in enumerate(self.G.mat_list):
-            x = mat[self.G.IDmap[ID_ary]]
+            x = mat[self.G.idmap[ID_ary]]
             decision_ary += self.mdl_list[i].decision_function(x)
         decision_ary /= len(self.mdl_list)
         return decision_ary
@@ -82,7 +82,7 @@ class CombLogRegCVPredComb(CombSLBase):
         decision_ary = np.zeros((len(ID_ary)))
         factors = [self.mixing_ratio, 1 - self.mixing_ratio]
         for i, mat in enumerate(self.G.mat_list):
-            x = mat[self.G.IDmap[ID_ary]]
+            x = mat[self.G.idmap[ID_ary]]
             decision_ary += factors[i] * self.mdl_list[i].decision_function(x)
         return decision_ary
 
@@ -122,7 +122,7 @@ class CombLogRegCVAdaBoost(CombSLBase):
             (len(ID_ary), n_mdl),
             dtype=bool,
         )  # predictions from all models
-        idx_ary = self.G.IDmap[ID_ary]
+        idx_ary = self.G.idmap[ID_ary]
 
         if self.exclude:
             selected_ind = np.zeros(
@@ -209,7 +209,7 @@ class CombLogRegCVAdaBoost(CombSLBase):
                 "Master model untrained, train first using fit_master_mdl",
             )
 
-        idx_ary = self.G.IDmap[ID_ary]
+        idx_ary = self.G.idmap[ID_ary]
         decision_ary = np.zeros((len(ID_ary)))
         iter_list = (
             list(range(len(self.G.mat_list))) if self.exclude else self.mdlidx_
@@ -270,7 +270,7 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
             (len(ID_ary), len(self.G.mat_list)),
             dtype=bool,
         )  # predictions from all features
-        idx_ary = self.G.IDmap[ID_ary]
+        idx_ary = self.G.idmap[ID_ary]
 
         if self.exclude:
             selected_ind = np.zeros(
@@ -360,7 +360,7 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
                 "Master model untrained, train first using fit_master_mdl",
             )
 
-        idx_ary = self.G.IDmap[ID_ary]
+        idx_ary = self.G.idmap[ID_ary]
         decision_ary = np.zeros((len(ID_ary)))
         iter_list = (
             list(range(len(self.G.mat_list))) if self.exclude else self.mdlidx_

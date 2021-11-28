@@ -22,7 +22,7 @@ lsc = label.LabelsetCollection.SplitLSC.from_gmt(label_fp)
 
 print(f"Number of labelsets in original file: {len(lsc.labelIDlst)}")
 
-lsc.apply(label.Filter.EntityExistanceFilter(g.IDmap.lst), inplace=True)
+lsc.apply(label.Filter.EntityExistanceFilter(g.idmap.lst), inplace=True)
 lsc.apply(label.Filter.LabelsetRangeFilterSize(min_val=50), inplace=True)
 lsc.load_entity_properties(
     data_path + "/properties/pubcnt.txt", "Pubmed Count", 0, int

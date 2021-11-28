@@ -24,7 +24,7 @@ class DenseGraph(BaseGraph):
         """
         if isinstance(key, slice):
             raise NotImplementedError
-        idx = self.IDmap[key]
+        idx = self.idmap[key]
         return self.mat[idx]
 
     @property
@@ -37,9 +37,9 @@ class DenseGraph(BaseGraph):
         """Setter for mat.
 
         Note:
-            need to construct IDmap (self.IDmap) first before loading matrix
+            need to construct idmap (self.idmap) first before loading matrix
             (self.mat), which should have same number of entires (rows) as size
-            of IDmap, riases exption other wise>
+            of idmap, riases exption other wise>
 
         Args:
             val(:obj:`numpy.ndarray`): 2D numpy array
@@ -48,9 +48,9 @@ class DenseGraph(BaseGraph):
         checkers.checkNumpyArrayIsNumeric("val", val)
         if val.size > 0:
             checkers.checkNumpyArrayNDim("val", 2, val)
-            if self.IDmap.size != val.shape[0]:
+            if self.idmap.size != val.shape[0]:
                 raise ValueError(
-                    f"Expecting {self.IDmap.size} entries, not {val.shape[0]}",
+                    f"Expecting {self.idmap.size} entries, not {val.shape[0]}",
                 )
         self._mat = val.copy()
 
@@ -62,14 +62,14 @@ class DenseGraph(BaseGraph):
             ID2(str): ID of second node
 
         """
-        return self.mat[self.IDmap[ID1], self.IDmap[ID2]]
+        return self.mat[self.idmap[ID1], self.idmap[ID2]]
 
     @classmethod
     def construct_graph(cls, ids, mat):
         """Construct DenseGraph using ids and adjcency matrix.
 
         Args:
-            ids(list or :obj:`IDHandler.IDmap`): list of IDs or IDmap of the
+            ids(list or :obj:`IDHandler.idmap`): list of IDs or idmap of the
                 adjacency matrix
             mat(:obj:`numpy.ndarray`): 2D numpy array of adjacency matrix
 
@@ -85,7 +85,7 @@ class DenseGraph(BaseGraph):
                 f"matrix ({mat.shape[0]})",
             )
         graph = cls()
-        graph.IDmap = idmap
+        graph.idmap = idmap
         graph.mat = mat
         return graph
 
@@ -119,7 +119,7 @@ class DenseGraph(BaseGraph):
             directed,
             **kwargs,
         )
-        return cls.construct_graph(graph.IDmap, graph.to_adjmat())
+        return cls.construct_graph(graph.idmap, graph.to_adjmat())
 
 
 class FeatureVec(DenseGraph):
@@ -158,7 +158,7 @@ class FeatureVec(DenseGraph):
         """Setter for mat.
 
         Note:
-            Matrix must match the dim of both ``self.IDmap`` and ``self.dim``.
+            Matrix must match the dim of both ``self.idmap`` and ``self.dim``.
 
         """
         mat_bkp = self.mat  # create backup copy
@@ -189,10 +189,10 @@ class FeatureVec(DenseGraph):
         checkers.checkNumpyArrayNDim("vec", 1, vec)
         checkers.checkNumpyArrayIsNumeric("vec", vec)
 
-        # check size consistency between IDmap and mat
+        # check size consistency between idmap and mat
         if self.size != self.mat.shape[0]:
             raise ValueError(
-                f"Inconsistent number of IDs ({self.IDmap.size}) and matrix "
+                f"Inconsistent number of IDs ({self.idmap.size}) and matrix "
                 f"entries ({self.mat.shape[0]})",
             )
 
@@ -204,7 +204,7 @@ class FeatureVec(DenseGraph):
             new_mat = vec.copy().reshape((1, vec.size))
         else:
             new_mat = np.vstack([self.mat, vec])
-        self.IDmap.addID(ID)
+        self.idmap.addID(ID)
         self.mat = new_mat
 
     @classmethod

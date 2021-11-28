@@ -13,7 +13,7 @@ g = graph.DenseGraph.DenseGraph.from_edglst(
 lsc = label.LabelsetCollection.SplitLSC.from_gmt(
     data_path + "labels/KEGGBP.gmt"
 )
-lsc.apply(label.Filter.EntityExistanceFilter(g.IDmap.lst), inplace=True)
+lsc.apply(label.Filter.EntityExistanceFilter(g.idmap.lst), inplace=True)
 lsc.apply(label.Filter.LabelsetRangeFilterSize(min_val=50), inplace=True)
 lsc.load_entity_properties(
     data_path + "/properties/pubcnt.txt", "Pubmed Count", 0, int

@@ -26,7 +26,7 @@ lsc.valsplit = valsplit.Interface.SklSKF(
 )
 
 lsc.apply(
-    label.Filter.EntityExistanceFilter(target_lst=g.IDmap.lst), inplace=True
+    label.Filter.EntityExistanceFilter(target_lst=g.idmap.lst), inplace=True
 )
 lsc.apply(
     label.Filter.LabelsetRangeFilterSize(min_val=min_labelset_size),
