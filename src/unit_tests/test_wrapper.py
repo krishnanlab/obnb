@@ -28,12 +28,25 @@ class TestParDat(unittest.TestCase):
     def train_mdl(i, X, Y, mdl):
         mdl.fit(X, Y[:, i])
 
-    def test_parallel_logreg_training(self):
-        wrapper = ParDat(self.job_list, n_workers=4, verbose=True)
+    def parallel_logreg_training(self, n_workers, verbose):
+        wrapper = ParDat(self.job_list, n_workers=n_workers, verbose=verbose)
         train_mdl_parallel = wrapper(self.train_mdl)
 
         for _ in train_mdl_parallel(self.X, self.Y, self.mdl):
             pass
+
+    def test_parallel_logreg_training(self):
+        params = [
+            (1, False),
+            (4, True),
+            (1, False),
+            (4, True),
+        ]
+
+        for param in params:
+            n_workers, verbose = param
+            with self.subTest(n_workers=n_workers, verbose=verbose):
+                self.parallel_logreg_training(n_workers, verbose)
 
 
 if __name__ == "__main__":
