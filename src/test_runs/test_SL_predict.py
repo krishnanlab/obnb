@@ -33,7 +33,7 @@ print(labelID)
 
 # get positive and negative samples
 pos = lsc.get_labelset(labelID)
-neg = lsc.getNegative(labelID)
+neg = lsc.get_negative(labelID)
 
 # train and get genome wide prediction
 score_dict = mdl.predict(pos, neg)

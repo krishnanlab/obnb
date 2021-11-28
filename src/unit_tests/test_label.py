@@ -67,24 +67,24 @@ class TestBaseLSC(unittest.TestCase):
         self.assertEqual(self.lsc.get_labelset("Labelset1"), {"a", "c"})
         self.assertEqual(self.lsc.get_labelset("Labelset2"), {"d"})
 
-    def test_getNegative(self):
-        self.template_test_input_for_getters(self.lsc.getNegative)
+    def test_get_negative(self):
+        self.template_test_input_for_getters(self.lsc.get_negative)
         # test unspecified negative
-        self.assertEqual(self.lsc.getNegative("Labelset1"), {"d"})
-        self.assertEqual(self.lsc.getNegative("Labelset2"), {"a", "c"})
+        self.assertEqual(self.lsc.get_negative("Labelset1"), {"d"})
+        self.assertEqual(self.lsc.get_negative("Labelset2"), {"a", "c"})
         # test if unrelated entities included
         self.lsc.entity.add_id("h")
-        self.assertEqual(self.lsc.getNegative("Labelset2"), {"a", "c"})
+        self.assertEqual(self.lsc.get_negative("Labelset2"), {"a", "c"})
         # test specified negative
         self.lsc.setNegative(["a"], "Labelset2")
-        self.assertEqual(self.lsc.getNegative("Labelset2"), {"a"})
+        self.assertEqual(self.lsc.get_negative("Labelset2"), {"a"})
 
     def test_setNegative(self):
         # test with known entity ID
         self.lsc.setNegative(["a"], "Labelset2")
-        self.assertEqual(self.lsc.getNegative("Labelset2"), {"a"})
+        self.assertEqual(self.lsc.get_negative("Labelset2"), {"a"})
         self.lsc.setNegative(["c"], "Labelset2")
-        self.assertEqual(self.lsc.getNegative("Labelset2"), {"c"})
+        self.assertEqual(self.lsc.get_negative("Labelset2"), {"c"})
         # test with knwon positive ID --> IDExistsError
         self.assertRaises(
             IDExistsError,
@@ -699,21 +699,21 @@ class TestFilter(unittest.TestCase):
             inplace=True,
         )
         # test wheter negative selected correctly for group1, 'f' should be excluded due to sim with group2
-        self.assertEqual(self.lsc.getNegative("Group1"), {"d", "e", "g", "h"})
+        self.assertEqual(self.lsc.get_negative("Group1"), {"d", "e", "g", "h"})
 
         # increase p-val thtreshold to 0.7 will also include group2 and group3, where pval = 0.643
         self.lsc.apply(
             Filter.NegativeFilterHypergeom(p_thresh=0.7),
             inplace=True,
         )
-        self.assertEqual(self.lsc.getNegative("Group1"), {"e", "g"})
+        self.assertEqual(self.lsc.get_negative("Group1"), {"e", "g"})
 
         # set p-val threshold to be greater than 1 -> no negatives should be left
         self.lsc.apply(
             Filter.NegativeFilterHypergeom(p_thresh=1.1),
             inplace=True,
         )
-        self.assertEqual(self.lsc.getNegative("Group1"), set())
+        self.assertEqual(self.lsc.get_negative("Group1"), set())
 
 
 if __name__ == "__main__":

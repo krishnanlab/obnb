@@ -159,7 +159,7 @@ class BaseLSC(IDHandler.IDprop):
         """Return set of entities associated with a label."""
         return self.getProp(labelID, "Labelset")
 
-    def getNegative(self, labelID):
+    def get_negative(self, labelID):
         """Return set of negative samples of a labelset.
 
         Note:
@@ -239,7 +239,7 @@ class BaseLSC(IDHandler.IDprop):
 
         for j, labelID in enumerate(label_ids):
             positive_set = self.get_labelset(labelID)
-            negative_set = self.getNegative(labelID)
+            negative_set = self.get_negative(labelID)
 
             for sign, labelset in zip(
                 ["1", "-1"],
@@ -387,7 +387,7 @@ class SplitLSC(BaseLSC):
             entity_ids = self.entity_ids.copy()
 
         pos_ID_set = set(self.get_labelset(labelID)) & set(entity_ids)
-        neg_ID_set = set(self.getNegative(labelID)) & set(entity_ids)
+        neg_ID_set = set(self.get_negative(labelID)) & set(entity_ids)
 
         ID_ary = np.array(list(pos_ID_set) + list(neg_ID_set))
         label_ary = np.zeros(len(ID_ary), dtype=bool)
