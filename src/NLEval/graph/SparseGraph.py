@@ -196,12 +196,12 @@ class SparseGraph(BaseGraph):
 
         """
         with open(outpth, "w") as f:
-            for srcID, dstID, weight in edge_gen():
+            for src_node_id, dst_node_id, weight in edge_gen():
                 if weighted:
                     if weight > cut_threshold:
-                        f.write(f"{srcID}\t{dstID}\t{weight:.12f}\n")
+                        f.write(f"{src_node_id}\t{dst_node_id}\t{weight:.12f}\n")
                 else:
-                    f.write(f"{srcID}\t{dstID}\n")
+                    f.write(f"{src_node_id}\t{dst_node_id}\n")
 
     @staticmethod
     def npy_writer():
@@ -211,13 +211,13 @@ class SparseGraph(BaseGraph):
         edge_data_copy = self._edge_data[:]
         for src_idx in range(len(edge_data_copy)):
             src_nbrs = edge_data_copy[src_idx]
-            srcID = self.idmap.getID(src_idx)
+            src_node_id = self.idmap.getID(src_idx)
             for dst_idx in src_nbrs:
-                dstID = self.idmap.getID(dst_idx)
+                dst_node_id = self.idmap.getID(dst_idx)
                 if not self.directed:
                     edge_data_copy[dst_idx].pop(src_idx)
                 weight = edge_data_copy[src_idx][dst_idx]
-                yield srcID, dstID, weight
+                yield src_node_id, dst_node_id, weight
 
     def save(self, outpth, writer="edglst", cut_threshold=0):
         """Save graph to file.
