@@ -183,7 +183,10 @@ class CombLogRegCVAdaBoost(CombSLBase):
                 mdl_idx_ary[i] = opt_idx
                 self.mdl_list.append(deepcopy(mdl_list[opt_idx]))
                 coef[i] = a
-            # print(f"Iter = {i}, optidx = {opt_idx}, optimal error = {opt_err}, accuracy = {(y_pred_opt==y).sum() / len(y)}")
+            # print(
+            #     f"Iter = {i}, optidx = {opt_idx}, optimal error = {opt_err}, "
+            #     f"accuracy = {(y_pred_opt==y).sum() / len(y)}"
+            # )
 
         if coef.sum() == 0:
             coef = np.ones(n_mdl) / n_mdl
@@ -221,7 +224,8 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
         """Initialize LogisticRegression ModifiedRankBoost ensemble.
 
         Notes:
-            This implementation follows from http://pages.cs.wisc.edu/~shavlik/abstracts/oliphant.ilp09.abstract.html
+            This implementation follows from
+            http://pages.cs.wisc.edu/~shavlik/abstracts/oliphant.ilp09.abstract.html
 
         Args:
             G (NLEval.graph.DenseGraph.MultiFeatureVec): multi-feature objects

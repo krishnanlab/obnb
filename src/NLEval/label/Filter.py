@@ -307,7 +307,10 @@ class NegativeFilterHypergeom(BaseFilter):
                     )
 
                     # if k >= 1: # for debugging
-                    #   print("k = {:>3d}, M = {:>5d}, n = {:>5d}, N = {:>5d}, pval = {:>.4f}".format(k, M, n, N, pval_mat[i,j]))
+                    #     print(
+                    #         f"{k=:>3d}, {M=:>5d}, {n=:>5d}, {N=:>5d}, "
+                    #         f"{pval=:>.4f}"
+                    #     )
 
             return pval_mat
 
