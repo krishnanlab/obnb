@@ -49,7 +49,7 @@ class ParDat:
     @staticmethod
     def worker(conn, q, job_list, func, func_args, func_kwargs):
         job_id = worker_id = conn.recv()
-        while job_id != None:
+        while job_id is not None:
             result = func(job_list[job_id], *func_args, **func_kwargs)
             q.put((worker_id, result))
             job_id = conn.recv()
