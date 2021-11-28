@@ -58,22 +58,22 @@ class TrainValTest(BaseHoldout):
             )
         self._test_ratio = val
 
-    def train_test_setup(self, lscIDs, nodeIDs, prop_name, **kwargs):
-        lscIDs._check_prop_existence(prop_name, True)
-        common_ID_list = self.get_common_ID_list(lscIDs, nodeIDs)
-        sorted_ID_list = sorted(
-            common_ID_list,
+    def train_test_setup(self, lsc_ids, node_ids, prop_name, **kwargs):
+        lsc_ids._check_prop_existence(prop_name, True)
+        common_ids = self.get_common_ids(lsc_ids, node_ids)
+        sorted_node_ids = sorted(
+            common_ids,
             reverse=self.train_on == "bot",
-            key=lambda ID: lscIDs.getProp(ID, prop_name),
+            key=lambda node_id: lsc_ids.getProp(node_id, prop_name),
         )
 
-        n = len(sorted_ID_list)
+        n = len(sorted_node_ids)
         train_size = np.floor(n * self.train_ratio).astype(int)
         test_size = np.floor(n * self.test_ratio).astype(int)
 
-        self._test_ID_ary = np.array(sorted_ID_list[:test_size])
-        self._valid_ID_ary = np.array(sorted_ID_list[test_size:-train_size])
-        self._train_ID_ary = np.array(sorted_ID_list[-train_size:])
+        self._test_index = np.array(sorted_node_ids[:test_size])
+        self._valid_index = np.array(sorted_node_ids[test_size:-train_size])
+        self._train_index = np.array(sorted_node_ids[-train_size:])
 
 
 class BinHold(BaseHoldout):
@@ -103,25 +103,25 @@ class BinHold(BaseHoldout):
             )
         self._bin_num = val
 
-    def train_test_setup(self, lscIDs, nodeIDs, prop_name, **kwargs):
+    def train_test_setup(self, lsc_ids, node_ids, prop_name, **kwargs):
         """Set up training and testing.
 
         Args:
-            lscIDs(:obj:`NLEval.util.IDHandler.IDprop`)
-            nodeIDs(:obj:`NLEval.util.IDHandler.IDmap`)
+            lsc_ids(:obj:`NLEval.util.IDHandler.IDprop`)
+            node_ids(:obj:`NLEval.util.IDHandler.IDmap`)
             prop_name(str): name of property to be used for splitting
 
         """
-        lscIDs._check_prop_existence(prop_name, True)
-        common_ID_list = self.get_common_ID_list(lscIDs, nodeIDs)
-        sorted_ID_list = sorted(
-            common_ID_list,
+        lsc_ids._check_prop_existence(prop_name, True)
+        common_ids = self.get_common_ids(lsc_ids, node_ids)
+        sorted_node_ids = sorted(
+            common_ids,
             reverse=self.train_on == "bot",
-            key=lambda ID: lscIDs.getProp(ID, prop_name),
+            key=lambda node_id: lsc_ids.getProp(node_id, prop_name),
         )
-        bin_size = np.floor(len(sorted_ID_list) / self.bin_num).astype(int)
-        self._test_ID_ary = np.array(sorted_ID_list[:bin_size])
-        self._train_ID_ary = np.array(sorted_ID_list[-bin_size:])
+        bin_size = np.floor(len(sorted_node_ids) / self.bin_num).astype(int)
+        self._test_index = np.array(sorted_node_ids[:bin_size])
+        self._train_index = np.array(sorted_node_ids[-bin_size:])
 
 
 class ThreshHold(BaseHoldout):
@@ -151,97 +151,97 @@ class ThreshHold(BaseHoldout):
         checkers.checkTypeErrNone("Cut off", checkers.NUMERIC_TYPE, val)
         self._cut_off = val
 
-    def train_test_setup(self, lscIDs, nodeIDs, prop_name, **kwargs):
+    def train_test_setup(self, lsc_ids, node_ids, prop_name, **kwargs):
         """Set up training and testing.
 
         Args:
-            lscIDs(:obj:`NLEval.util.IDHandler.IDprop`)
-            nodeIDs(:obj:`NLEval.util.IDHandler.IDmap`)
+            lsc_ids(:obj:`NLEval.util.IDHandler.IDprop`)
+            node_ids(:obj:`NLEval.util.IDHandler.IDmap`)
             prop_name(str): name of property to be used for splitting
 
         """
-        lscIDs._check_prop_existence(prop_name, True)
+        lsc_ids._check_prop_existence(prop_name, True)
         top_list = []
         bot_list = []
-        for ID in nodeIDs.lst:
-            if ID in lscIDs:
-                if lscIDs.getProp(ID, "Noccur") > 0:
-                    if lscIDs.getProp(ID, prop_name) >= self.cut_off:
-                        top_list.append(ID)
+        for node_id in node_ids.lst:
+            if node_id in lsc_ids:
+                if lsc_ids.getProp(node_id, "Noccur") > 0:
+                    if lsc_ids.getProp(node_id, prop_name) >= self.cut_off:
+                        top_list.append(node_id)
                     else:
-                        bot_list.append(ID)
+                        bot_list.append(node_id)
 
         if self.train_on == "top":
-            self._train_ID_ary, self._test_ID_ary = top_list, bot_list
+            self._train_index, self._test_index = top_list, bot_list
         else:
-            self._train_ID_ary, self._test_ID_ary = bot_list, top_list
+            self._train_index, self._test_index = bot_list, top_list
 
 
 class CustomHold(BaseHoldout):
     def __init__(
         self,
-        custom_train_ID_ary,
-        custom_test_ID_ary,
-        custom_valid_ID_ary=None,
+        custom_train_index,
+        custom_test_index,
+        custom_valid_index=None,
         shuffle=False,
     ):
         """User defined training and testing samples."""
         super(CustomHold, self).__init__(shuffle=shuffle)
-        self.custom_train_ID_ary = custom_train_ID_ary
-        self.custom_test_ID_ary = custom_test_ID_ary
-        self.custom_valid_ID_ary = custom_valid_ID_ary
+        self.custom_train_index = custom_train_index
+        self.custom_test_index = custom_test_index
+        self.custom_valid_index = custom_valid_index
 
     def __repr__(self):
         return f"CustomHold(min_pos={self.min_pos!r})"
 
     @property
-    def custom_train_ID_ary(self):
-        return self._custom_train_ID_ary
+    def custom_train_index(self):
+        return self._custom_train_index
 
-    @custom_train_ID_ary.setter
-    def custom_train_ID_ary(self, ID_ary):
-        checkers.checkTypesInNumpyArray("Training data ID list", str, ID_ary)
-        self._custom_train_ID_ary = ID_ary
-
-    @property
-    def custom_test_ID_ary(self):
-        return self._custom_test_ID_ary
-
-    @custom_test_ID_ary.setter
-    def custom_test_ID_ary(self, ID_ary):
-        checkers.checkTypesInNumpyArray("Testing data ID list", str, ID_ary)
-        self._custom_test_ID_ary = ID_ary
+    @custom_train_index.setter
+    def custom_train_index(self, id_ary):
+        checkers.checkTypesInNumpyArray("Training data ID list", str, id_ary)
+        self._custom_train_index = id_ary
 
     @property
-    def custom_valid_ID_ary(self):
-        return self._custom_valid_ID_ary
+    def custom_test_index(self):
+        return self._custom_test_index
 
-    @custom_valid_ID_ary.setter
-    def custom_valid_ID_ary(self, ID_ary):
-        if ID_ary is None:
-            self._custom_valid_ID_ary = None
+    @custom_test_index.setter
+    def custom_test_index(self, id_ary):
+        checkers.checkTypesInNumpyArray("Testing data ID list", str, id_ary)
+        self._custom_test_index = id_ary
+
+    @property
+    def custom_valid_index(self):
+        return self._custom_valid_index
+
+    @custom_valid_index.setter
+    def custom_valid_index(self, id_ary):
+        if id_ary is None:
+            self._custom_valid_index = None
         else:
             checkers.checkTypesInNumpyArray(
                 "Validation data ID list",
                 str,
-                ID_ary,
+                id_ary,
             )
-            self._custom_valid_ID_ary = ID_ary
+            self._custom_valid_index = id_ary
 
-    def train_test_setup(self, lscIDs, nodeIDs, **kwargs):
-        common_ID_list = self.get_common_ID_list(lscIDs, nodeIDs)
-        self._train_ID_ary = np.intersect1d(
-            self.custom_train_ID_ary,
-            common_ID_list,
+    def train_test_setup(self, lsc_ids, node_ids, **kwargs):
+        common_ids = self.get_common_ids(lsc_ids, node_ids)
+        self._train_index = np.intersect1d(
+            self.custom_train_index,
+            common_ids,
         )
-        self._test_ID_ary = np.intersect1d(
-            self.custom_test_ID_ary,
-            common_ID_list,
+        self._test_index = np.intersect1d(
+            self.custom_test_index,
+            common_ids,
         )
-        self._valid_ID_ary = (
+        self._valid_index = (
             None
-            if self.custom_test_ID_ary is None
-            else np.intersect1d(self.custom_valid_ID_ary, common_ID_list)
+            if self.custom_test_index is None
+            else np.intersect1d(self.custom_valid_index, common_ids)
         )
 
 
@@ -250,9 +250,9 @@ class TrainTestAll(BaseHoldout):
         """Train and test on all data."""
         super(TrainTestAll, self).__init__(shuffle=shuffle)
 
-    def train_test_setup(self, lscIDs, nodeIDs, **kwargs):
-        common_ID_list = self.get_common_ID_list(lscIDs, nodeIDs)
-        self._train_ID_ary = self._test_ID_ary = np.array(common_ID_list)
+    def train_test_setup(self, lsc_ids, node_ids, **kwargs):
+        common_ids = self.get_common_ids(lsc_ids, node_ids)
+        self._train_index = self._test_index = np.array(common_ids)
 
 
 '''
@@ -277,6 +277,6 @@ class HoldoutChildTemplate(BaseHoldout):
     def foo(self, val):
         self._foo = val
 
-    def train_test_setup(self, lscIDs, nodeIDs, prop_name, **kwargs):
-        #setup train_ID_ary and test_ID_ary
+    def train_test_setup(self, lsc_ids, node_ids, prop_name, **kwargs):
+        #setup train_index and test_index
 '''

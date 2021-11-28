@@ -13,14 +13,14 @@ class BaseFilter:
     """Base Filter object containing basic filter operations.
 
     Notes:
-        Loop through all instances (IDs) retrieved by `self.get_IDs` and decide
+        Loop through all instances (IDs) retrieved by `self.get_ids` and decide
         whether or not to apply modification using `self.criterion`, and finally
         apply modification if passes criterion using `mod_fun`.
 
     Basic components (methods) needed for children filter classes:
         criterion: retrun true if the corresponding value of an instance passes
             the criterion
-        get_IDs: return list of IDs to scan through
+        get_ids: return list of IDs to scan through
         get_val_getter: return a function that map ID of an instance to some
             corresponding values
         get_mod_fun: return a function that modifies an instance
@@ -33,13 +33,13 @@ class BaseFilter:
         super(BaseFilter, self).__init__()
 
     def __call__(self, lsc):
-        IDs = self.get_IDs(lsc)
+        entity_ids = self.get_ids(lsc)
         val_getter = self.get_val_getter(lsc)
         mod_fun = self.get_mod_fun(lsc)
 
-        for ID in IDs:
-            if self.criterion(val_getter(ID)):
-                mod_fun(ID)
+        for entity_id in entity_ids:
+            if self.criterion(val_getter(entity_id)):
+                mod_fun(entity_id)
 
 
 class ExistanceFilter(BaseFilter):
@@ -80,12 +80,12 @@ class EntityExistanceFilter(ExistanceFilter):
         return lambda x: x  # return entity ID itself
 
     @staticmethod
-    def get_IDs(lsc):
+    def get_ids(lsc):
         return lsc.entity.lst
 
     @staticmethod
     def get_mod_fun(lsc):
-        return lsc.popEntity
+        return lsc.pop_entity
 
 
 class LabelsetExistanceFilter(ExistanceFilter):
@@ -102,12 +102,12 @@ class LabelsetExistanceFilter(ExistanceFilter):
         return lambda x: x  # return labelset ID itself
 
     @staticmethod
-    def get_IDs(lsc):
-        return lsc.labelIDlst
+    def get_ids(lsc):
+        return lsc.label_ids
 
     @staticmethod
     def get_mod_fun(lsc):
-        return lsc.popLabelset
+        return lsc.pop_labelset
 
 
 class RangeFilter(BaseFilter):
@@ -146,15 +146,15 @@ class EntityRangeFilterNoccur(RangeFilter):
 
     @staticmethod
     def get_val_getter(lsc):
-        return lsc.getNoccur
+        return lsc.get_noccur
 
     @staticmethod
-    def get_IDs(lsc):
+    def get_ids(lsc):
         return lsc.entity.lst
 
     @staticmethod
     def get_mod_fun(lsc):
-        return lsc.popEntity
+        return lsc.pop_entity
 
 
 class LabelsetRangeFilterSize(RangeFilter):
@@ -165,15 +165,15 @@ class LabelsetRangeFilterSize(RangeFilter):
 
     @staticmethod
     def get_val_getter(lsc):
-        return lambda ID: len(lsc.getLabelset(ID))
+        return lambda entity_id: len(lsc.get_labelset(entity_id))
 
     @staticmethod
-    def get_IDs(lsc):
-        return lsc.labelIDlst
+    def get_ids(lsc):
+        return lsc.label_ids
 
     @staticmethod
     def get_mod_fun(lsc):
-        return lsc.popLabelset
+        return lsc.pop_labelset
 
 
 class LabelsetRangeFilterJaccard(RangeFilter):
@@ -186,13 +186,13 @@ class LabelsetRangeFilterJaccard(RangeFilter):
     def get_val_getter(lsc):
         # if jjaccard index greater than threshold, determin whether or not to
         # discard depending on the size, only discard the larger one
-        def val_getter(labelID):
+        def val_getter(label_id):
             val = 0
-            labelset = lsc.getLabelset(labelID)
-            for labelID2 in lsc.labelIDlst:
-                if labelID2 == labelID:  # skip self
+            labelset = lsc.get_labelset(label_id)
+            for label_id2 in lsc.label_ids:
+                if label_id2 == label_id:  # skip self
                     continue
-                labelset2 = lsc.getLabelset(labelID2)
+                labelset2 = lsc.get_labelset(label_id2)
                 jidx = len(labelset & labelset2) / len(labelset | labelset2)
                 if (jidx > val) & (len(labelset) <= len(labelset2)):
                     val = jidx
@@ -201,12 +201,12 @@ class LabelsetRangeFilterJaccard(RangeFilter):
         return val_getter
 
     @staticmethod
-    def get_IDs(lsc):
-        return lsc.labelIDlst
+    def get_ids(lsc):
+        return lsc.label_ids
 
     @staticmethod
     def get_mod_fun(lsc):
-        return lsc.popLabelset
+        return lsc.pop_labelset
 
 
 class LabelsetRangeFilterTrainTestPos(RangeFilter):
@@ -225,25 +225,25 @@ class LabelsetRangeFilterTrainTestPos(RangeFilter):
 
     @staticmethod
     def get_val_getter(lsc):
-        return lambda labelID: min(
+        return lambda label_id: min(
             [
                 idx_ary.size
                 for idx_ary in next(
                     lsc.valsplit.get_split_idx_ary(
-                        np.array(list(lsc.getLabelset(labelID))),
-                        valid=lsc.valsplit.valid_ID_ary is not None,
+                        np.array(list(lsc.get_labelset(label_id))),
+                        valid=lsc.valsplit.valid_index is not None,
                     ),
                 )
             ],
         )
 
     @staticmethod
-    def get_IDs(lsc):
-        return lsc.labelIDlst
+    def get_ids(lsc):
+        return lsc.label_ids
 
     @staticmethod
     def get_mod_fun(lsc):
-        return lsc.popLabelset  # replace with soft filter
+        return lsc.pop_labelset  # replace with soft filter
 
 
 class ValueFilter(BaseFilter):
@@ -283,50 +283,50 @@ class NegativeFilterHypergeom(BaseFilter):
         self.p_thresh = p_thresh
 
     def __call__(self, lsc):
-        IDs = lsc.labelIDlst
-        num_labelsets = len(IDs)
+        label_ids = lsc.label_ids
+        num_labelsets = len(label_ids)
         # set of all entities in the labelset collection
-        all_entities = set(lsc.entityIDlst)
+        all_entities = set(lsc.entity_ids)
 
         def get_pval_mat():
-            M = len(all_entities)
+            tot_num_entities = len(all_entities)
             pval_mat = np.zeros((num_labelsets, num_labelsets))
 
             for i in range(num_labelsets):
-                ID1 = IDs[i]
-                labelset1 = lsc.getLabelset(ID1)
-                N = len(labelset1)  # size of first labelset
+                label_id1 = label_ids[i]
+                labelset1 = lsc.get_labelset(label_id1)
+                num_entities = len(labelset1)  # size of first labelset
 
                 for j in range(i + 1, num_labelsets):
-                    ID2 = IDs[j]
-                    labelset2 = lsc.getLabelset(ID2)
+                    label_id2 = label_ids[j]
+                    labelset2 = lsc.get_labelset(label_id2)
 
                     k = len(labelset1 & labelset2)  # size of intersection
                     n = len(labelset2)  # size of second labelset
 
                     pval_mat[i, j] = pval_mat[j, i] = hypergeom.sf(
                         k - 1,
-                        M,
+                        tot_num_entities,
                         n,
-                        N,
+                        num_entities,
                     )
 
                     # if k >= 1: # for debugging
                     #     print(
-                    #         f"{k=:>3d}, {M=:>5d}, {n=:>5d}, {N=:>5d}, "
-                    #         f"{pval=:>.4f}"
+                    #         f"{k=:>3d}, {tot_num_entities=:>5d}, {n=:>5d}, "
+                    #         f"{num_entities=:>5d}, {pval=:>.4f}"
                     #     )
 
             return pval_mat
 
         pval_mat = get_pval_mat()
 
-        for i, ID1 in enumerate(IDs):
-            exclude_set = lsc.getLabelset(ID1).copy()
+        for i, label_id1 in enumerate(label_ids):
+            exclude_set = lsc.get_labelset(label_id1).copy()
 
-            for j, ID2 in enumerate(IDs):
+            for j, label_id2 in enumerate(label_ids):
                 if pval_mat[i, j] < self.p_thresh:
-                    exclude_set.update(lsc.getLabelset(ID2))
+                    exclude_set.update(lsc.get_labelset(label_id2))
 
             negative = list(all_entities - exclude_set)
-            lsc.setNegative(list(negative), ID1)
+            lsc.set_negative(list(negative), label_id1)

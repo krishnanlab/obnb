@@ -22,9 +22,9 @@ class BaseLSC(IDHandler.IDprop):
 
     Example internal data for a label collection with above GMT data:
 
-    self.entityIDlst = ['Gene1', 'Gene2', 'Gene3', 'Gene4', 'Gene5', 'Gene6']
+    self.entity_ids = ['Gene1', 'Gene2', 'Gene3', 'Gene4', 'Gene5', 'Gene6']
     self.entity.prop = {'Noccur': [1, 2, 1, 1, 1, 1]}
-    self.labelIDlst = ['Geneset1', 'Geneset2']
+    self.label_ids = ['Geneset1', 'Geneset2']
     self.prop = {
         'Info':['Description1', 'Description2']
         'Labelset':[
@@ -58,53 +58,53 @@ class BaseLSC(IDHandler.IDprop):
         print(self.entity._prop)
 
     @property
-    def entityIDlst(self):
+    def entity_ids(self):
         """List of all entity IDs that are part of at least one labelset."""
-        return [i for i in self.entity if self.getNoccur(i) > 0]
+        return [i for i in self.entity if self.get_noccur(i) > 0]
 
     @property
-    def labelIDlst(self):
+    def label_ids(self):
         """:obj:`list` of :obj:`str`: list of all labelset names."""
         return self.lst
 
-    def addLabelset(self, lst, labelID, labelInfo=None):
+    def add_labelset(self, lst, label_id, label_info=None):
         """Add a new labelset.
 
         Args:
             lst(:obj:`list` of :obj:`str`): list of IDs of entiteis belong
                 to the input label
-            labelID(str): name of label
-            labelInfo(str): description of label
+            label_id(str): name of label
+            label_info(str): description of label
 
         """
-        self.addID(labelID, {} if labelInfo is None else {"Info": labelInfo})
+        self.add_id(label_id, {} if label_info is None else {"Info": label_info})
         try:
             self.entity.update(lst)
         except Exception as e:
             # if entity list not updated successfully, pop the new labelset
-            self.popID(labelID)
+            self.popID(label_id)
             raise e
-        self.updateLabelset(lst, labelID)
+        self.update_labelset(lst, label_id)
 
-    def popLabelset(self, labelID):
+    def pop_labelset(self, label_id):
         """Pop a labelset.
 
         Note:
             This also removes any entity that longer belongs to any labelset.
 
         """
-        self.resetLabelset(labelID)
-        self.popID(labelID)
+        self.reset_labelset(label_id)
+        self.popID(label_id)
 
-    def updateLabelset(self, lst, labelID):
+    def update_labelset(self, lst, label_id):
         """Update an existing labelset.
 
         Take list of entities IDs and update current labelset with a label
-        name matching `labelID`. Any ID in the input list `lst` that does
+        name matching `label_id`. Any ID in the input list `lst` that does
         not exist in the entity list will be added to the entity list. Increment
         the `Noccur` property of any newly added entites to the labelset by 1.
 
-        Note: labelID must already existed, use `.addLabelset()` for adding
+        Note: label_id must already existed, use `.add_labelset()` for adding
         new labelset
 
         Args:
@@ -117,81 +117,92 @@ class BaseLSC(IDHandler.IDprop):
 
         """
         checkers.checkTypesInList("Entity list", str, lst)
-        lbset = self.getLabelset(labelID)
-        for ID in lst:
-            if ID not in self.entity:
-                self.entity.addID(ID)
-            if ID not in lbset:
-                lbset.update([ID])
-                self.entity.setProp(ID, "Noccur", self.getNoccur(ID) + 1)
+        lbset = self.get_labelset(label_id)
+        for entity_id in lst:
+            if entity_id not in self.entity:
+                self.entity.add_id(entity_id)
+            if entity_id not in lbset:
+                lbset.update([entity_id])
+                self.entity.setProp(
+                    entity_id,
+                    "Noccur",
+                    self.get_noccur(entity_id) + 1,
+                )
 
-    def resetLabelset(self, labelID):
+    def reset_labelset(self, label_id):
         """Reset an existing labelset to an empty set.
 
         Setting the labelset back to empty and deecrement `Noccur` of all
         entites belonging to the labelset by 1.
 
         """
-        lbset = self.getLabelset(labelID)
-        for ID in lbset:
-            self.entity.setProp(ID, "Noccur", self.getNoccur(ID) - 1)
-            if self.entity.getAllProp(ID) == self.entity.prop_default_val:
-                self.entity.popID(ID)
+        lbset = self.get_labelset(label_id)
+        for entity_id in lbset:
+            self.entity.setProp(
+                entity_id,
+                "Noccur",
+                self.get_noccur(entity_id) - 1,
+            )
+            if (
+                self.entity.getAllProp(entity_id)
+                == self.entity.prop_default_val
+            ):
+                self.entity.popID(entity_id)
         lbset.clear()
 
-    def popEntity(self, ID):
+    def pop_entity(self, entity_id):
         """Pop an entity from entity list, and also remove it from all labelsets.
 
-        Note: Unlike `popLabelset`, if after removal, a labelset beomes empty, the
+        Note: Unlike `pop_labelset`, if after removal, a labelset beomes empty, the
         labelset itself is NOT removed. This is for more convenient comparison of
         labelset sizes before and after filtering.
 
         """
-        self.entity.popID(ID)
-        for labelID in self.labelIDlst:
-            self.getLabelset(labelID).difference_update([ID])
+        self.entity.popID(entity_id)
+        for label_id in self.label_ids:
+            self.get_labelset(label_id).difference_update([entity_id])
 
-    def getInfo(self, labelID):
+    def get_info(self, label_id):
         """Return description of a labelset."""
-        return self.getProp(labelID, "Info")
+        return self.getProp(label_id, "Info")
 
-    def getLabelset(self, labelID):
+    def get_labelset(self, label_id):
         """Return set of entities associated with a label."""
-        return self.getProp(labelID, "Labelset")
+        return self.getProp(label_id, "Labelset")
 
-    def getNegative(self, labelID):
+    def get_negative(self, label_id):
         """Return set of negative samples of a labelset.
 
         Note:
             If negative samples not available, use complement of labelset
 
         """
-        neg = self.getProp(labelID, "Negative")
+        neg = self.getProp(label_id, "Negative")
 
         if neg == {None}:
             all_positives = {
-                i for i in self.entity.map if self.getNoccur(i) > 0
+                i for i in self.entity.map if self.get_noccur(i) > 0
             }
-            return all_positives - self.getLabelset(labelID)
+            return all_positives - self.get_labelset(label_id)
 
         return neg
 
-    def setNegative(self, lst, labelID):
+    def set_negative(self, lst, label_id):
         checkers.checkTypesInList("Negative entity list", str, lst)
-        lbset = self.getLabelset(labelID)
-        for ID in lst:
-            self.entity._check_ID_existence(ID, True)
-            if ID in lbset:
-                # raise Exception(repr(ID), repr(labelID))
+        lbset = self.get_labelset(label_id)
+        for entity_id in lst:
+            self.entity._check_ID_existence(entity_id, True)
+            if entity_id in lbset:
+                # raise Exception(repr(entity_id), repr(label_id))
                 raise IDExistsError(
-                    f"Entity {ID!r} is positive in labelset {labelID!r}, "
-                    f"cannot be set to negative",
+                    f"Entity {entity_id!r} is positive in labelset, "
+                    f"{label_id!r}, cannot be set to negative",
                 )
-        self.setProp(labelID, "Negative", set(lst))
+        self.setProp(label_id, "Negative", set(lst))
 
-    def getNoccur(self, ID):
+    def get_noccur(self, entity_id):
         """Return the number of labelsets in which an entity participates."""
-        return self.entity.getProp(ID, "Noccur")
+        return self.entity.getProp(entity_id, "Noccur")
 
     def apply(self, filter_func, inplace=False):
         """Apply filter to labelsets, see `NLEval.label.Filter` for more info.
@@ -223,7 +234,7 @@ class BaseLSC(IDHandler.IDprop):
             as '1', else if it is considered a negative for that label, it is
             marked as '-1', otherwise it is '0', standing for neutral.
 
-            entityIDmap is necessary since not all entities are guaranteed to
+            entity_idmap is necessary since not all entities are guaranteed to
             be part of at least one label.
 
         Input:
@@ -231,36 +242,38 @@ class BaseLSC(IDHandler.IDprop):
                 extension.
 
         """
-        entityIDlst = self.entityIDlst
-        entityIDmap = {ID: idx for idx, ID in enumerate(entityIDlst)}
-        labelIDlst = self.labelIDlst
-        labelInfolst = [self.getInfo(labelID) for labelID in labelIDlst]
-        mat = np.zeros((len(entityIDlst), len(labelIDlst)), dtype=int)
+        entity_ids = self.entity_ids
+        entity_idmap = {
+            entity_id: idx for idx, entity_id in enumerate(entity_ids)
+        }
+        label_ids = self.label_ids
+        label_info_list = [self.get_info(label_id) for label_id in label_ids]
+        mat = np.zeros((len(entity_ids), len(label_ids)), dtype=int)
 
-        for j, labelID in enumerate(labelIDlst):
-            positive_set = self.getLabelset(labelID)
-            negative_set = self.getNegative(labelID)
+        for j, label_id in enumerate(label_ids):
+            positive_set = self.get_labelset(label_id)
+            negative_set = self.get_negative(label_id)
 
             for sign, labelset in zip(
                 ["1", "-1"],
                 [positive_set, negative_set],
             ):
-                for entityID in labelset:
-                    i = entityIDmap[entityID]
+                for entity_id in labelset:
+                    i = entity_idmap[entity_id]
                     mat[i, j] = sign
 
         fp = fp if fp.endswith(".lsc") else fp + ".lsc"
         with open(fp, "w") as f:
             # headers
-            labelIDlst_str = "\t".join(labelIDlst)
-            labelInfolst_str = "\t".join(labelInfolst)
-            f.write(f"Label ID\t{labelIDlst_str}\n")
-            f.write(f"Label Info\t{labelInfolst_str}\n")
+            label_ids = "\t".join(label_ids)
+            label_info_str = "\t".join(label_info_list)
+            f.write(f"Label ID\t{label_ids}\n")
+            f.write(f"Label Info\t{label_info_str}\n")
 
             # annotations
-            for i, entityID in enumerate(entityIDlst):
+            for i, entity_id in enumerate(entity_ids):
                 indicator_string = "\t".join(map(str, mat[i]))
-                f.write(f"{entityID}\t{indicator_string}\n")
+                f.write(f"{entity_id}\t{indicator_string}\n")
 
     def export_gmt(self, fp):
         """Export self as a '.gmt' (Gene Matrix Transpose) file.
@@ -270,10 +283,10 @@ class BaseLSC(IDHandler.IDprop):
         """
         fp += "" if fp.endswith(".gmt") else ".gmt"
         with open(fp, "w") as f:
-            for labelID in self.labelIDlst:
-                labelInfo = self.getInfo(labelID)
-                labelset_str = "\t".join(self.getLabelset(labelID))
-                f.write(f"{labelID}\t{labelInfo}\t{labelset_str}\n")
+            for label_id in self.label_ids:
+                label_info = self.get_info(label_id)
+                labelset_str = "\t".join(self.get_labelset(label_id))
+                f.write(f"{label_id}\t{label_info}\t{labelset_str}\n")
 
     def load_entity_properties(
         self,
@@ -305,10 +318,10 @@ class BaseLSC(IDHandler.IDprop):
             for i, line in enumerate(f):
                 if (i < skiprows) | line.startswith(comment):
                     continue
-                ID, val = line.strip().split()
-                if ID not in self.entity:
-                    self.entity.addID(ID)
-                self.entity.setProp(ID, prop_name, interpreter(val))
+                entity_id, val = line.strip().split()
+                if entity_id not in self.entity:
+                    self.entity.add_id(entity_id)
+                self.entity.setProp(entity_id, prop_name, interpreter(val))
 
     @classmethod
     def from_gmt(cls, fp):
@@ -321,8 +334,8 @@ class BaseLSC(IDHandler.IDprop):
         lsc = cls()
         with open(fp, "r") as f:
             for line in f:
-                labelID, labelInfo, *lst = line.strip().split("\t")
-                lsc.addLabelset(lst, labelID, labelInfo)
+                label_id, label_info, *lst = line.strip().split("\t")
+                lsc.add_labelset(lst, label_id, label_info)
         return lsc
 
 
@@ -363,19 +376,19 @@ class SplitLSC(BaseLSC):
             )
 
         num_labelsets = None
-        while num_labelsets != len(self.labelIDlst):
-            num_labelsets = len(self.labelIDlst)
+        while num_labelsets != len(self.label_ids):
+            num_labelsets = len(self.label_ids)
             # print(num_labelsets)
-            # labelIDset = set(self.labelIDlst)
-            self.valsplit.train_test_setup(self.entity, graph.IDmap, prop_name)
+            # label_id_set = set(self.label_ids)
+            self.valsplit.train_test_setup(self.entity, graph.idmap, prop_name)
             self.apply(
                 Filter.LabelsetRangeFilterTrainTestPos(min_pos),
                 inplace=True,
             )
-            # for i in labelIDset - set(self.labelIDlst):
+            # for i in label_id_set - set(self.label_ids):
             #     print(f"Pop {i}")
 
-    def splitLabelset(self, labelID, entityIDlst=None):
+    def split_labelset(self, label_id, entity_ids=None):
         """Split up a labelset by training and testing sets.
 
         Returns:
@@ -383,16 +396,16 @@ class SplitLSC(BaseLSC):
             `NLEval.valsplit.Base.BaseValSplit.split` for more info.
 
         """
-        if entityIDlst is None:
-            entityIDlst = self.entityIDlst.copy()
+        if entity_ids is None:
+            entity_ids = self.entity_ids.copy()
 
-        pos_ID_set = set(self.getLabelset(labelID)) & set(entityIDlst)
-        neg_ID_set = set(self.getNegative(labelID)) & set(entityIDlst)
+        pos_ids_set = set(self.get_labelset(label_id)) & set(entity_ids)
+        neg_ids_set = set(self.get_negative(label_id)) & set(entity_ids)
 
-        ID_ary = np.array(list(pos_ID_set) + list(neg_ID_set))
-        label_ary = np.zeros(len(ID_ary), dtype=bool)
-        label_ary[: len(pos_ID_set)] = True
-        return self.valsplit.split(ID_ary, label_ary)
+        id_ary = np.array(list(pos_ids_set) + list(neg_ids_set))
+        label_ary = np.zeros(len(id_ary), dtype=bool)
+        label_ary[: len(pos_ids_set)] = True
+        return self.valsplit.split(id_ary, label_ary)
 
     def export_splits(self, fp, graph):
         """Export (holdout) split information to npz file.
@@ -419,17 +432,17 @@ class SplitLSC(BaseLSC):
             Base.BaseHoldout,
             self.valsplit,
         )
-        valid = False if self.valsplit.valid_ID_ary is None else True
+        valid = False if self.valsplit.valid_index is None else True
         self.valsplit.check_split_setup(valid)
 
-        train_idx = graph.IDmap[self.valsplit.train_ID_ary]
-        test_idx = graph.IDmap[self.valsplit.test_ID_ary]
-        valid_idx = graph.IDmap[self.valsplit.valid_ID_ary] if valid else np.NaN
+        train_idx = graph.idmap[self.valsplit.train_index]
+        test_idx = graph.idmap[self.valsplit.test_index]
+        valid_idx = graph.idmap[self.valsplit.valid_index] if valid else np.NaN
 
-        y = np.zeros((graph.size, len(self.labelIDlst)), dtype=bool)
-        for i, labelID in enumerate(self.labelIDlst):
-            pos_ID_ary = np.array(list(self.getLabelset(labelID)))
-            pos_idx_ary = graph.IDmap[pos_ID_ary]
+        y = np.zeros((graph.size, len(self.label_ids)), dtype=bool)
+        for i, label_id in enumerate(self.label_ids):
+            pos_id_ary = np.array(list(self.get_labelset(label_id)))
+            pos_idx_ary = graph.idmap[pos_id_ary]
             y[pos_idx_ary, i] = True
 
         np.savez(
@@ -438,6 +451,6 @@ class SplitLSC(BaseLSC):
             train_idx=train_idx,
             valid_idx=valid_idx,
             test_idx=test_idx,
-            IDs=graph.IDmap.lst,
-            labelIDs=self.labelIDlst,
+            IDs=graph.idmap.lst,
+            label_ids=self.label_ids,
         )

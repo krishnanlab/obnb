@@ -20,9 +20,9 @@ def pass_kwargs(func, kwargs):
 class SklInterface(BaseInterface):
     """Dedicated interface for Scikit Learn splitter."""
 
-    def __init__(self, SklSplitter, skl_kws=None, shuffle=False):
+    def __init__(self, skl_splitter, skl_kws=None, shuffle=False):
         super(SklInterface, self).__init__(shuffle=shuffle)
-        splitter = pass_kwargs(SklSplitter, skl_kws)
+        splitter = pass_kwargs(skl_splitter, skl_kws)
         self.setup_split_func(splitter.split)
 
 

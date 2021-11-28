@@ -47,7 +47,7 @@ class SparseGraph(BaseGraph):
             key(:obj:`list` of :obj:`str`): list of keys of IDs
 
         """
-        idx = self.IDmap[key]
+        idx = self.idmap[key]
         if isinstance(idx, int):
             fvec = self.construct_adj_vec(idx)
         else:
@@ -69,31 +69,35 @@ class SparseGraph(BaseGraph):
             fvec[nbr_idx] = weight
         return fvec
 
-    def addID(self, ID):
-        self.IDmap.addID(ID)
+    def add_id(self, node_id):
+        self.idmap.add_id(node_id)
         self._edge_data.append({})
 
-    def addEdge(self, ID1, ID2, weight):
-        for ID in [ID1, ID2]:
-            # check if ID exists, add new if not
-            if ID not in self.IDmap:
-                self.addID(ID)
+    def add_edge(self, node_id1, node_id2, weight):
+        for node_id in [node_id1, node_id2]:
+            # check if node_id exists, add new if not
+            if node_id not in self.idmap:
+                self.add_id(node_id)
         try:
-            old_weight = self._edge_data[self.IDmap[ID1]][self.IDmap[ID2]]
+            old_weight = self._edge_data[self.idmap[node_id1]][
+                self.idmap[node_id2]
+            ]
             if old_weight != weight:  # check if edge exists
                 print(
-                    f"WARNING: edge between {self.IDmap[ID1]} and "
-                    f"{self.IDmap[ID2]} exists with weight {old_weight:.2f}"
+                    f"WARNING: edge between {self.idmap[node_id1]} and "
+                    f"{self.idmap[node_id2]} exists with weight {old_weight:.2f}"
                     f", overwriting with {weight:.2f}",
                 )
         except KeyError:
-            self._edge_data[self.IDmap[ID1]][self.IDmap[ID2]] = weight
+            self._edge_data[self.idmap[node_id1]][self.idmap[node_id2]] = weight
             if not self.directed:
-                self._edge_data[self.IDmap[ID2]][self.IDmap[ID1]] = weight
+                self._edge_data[self.idmap[node_id2]][
+                    self.idmap[node_id1]
+                ] = weight
 
-    def get_edge(self, ID1, ID2):
+    def get_edge(self, node_id1, node_id2):
         try:
-            return self.edge_data[self.IDmap[ID1]][self.IDmap[ID2]]
+            return self.edge_data[self.idmap[node_id1]][self.idmap[node_id2]]
         except KeyError:
             return 0
 
@@ -101,31 +105,31 @@ class SparseGraph(BaseGraph):
     def edglst_reader(edg_fp, weighted, directed, cut_threshold):
         """Edge list file reader.
 
-        Read line by line from a edge list file and yield ID1, ID2, weight
+        Read line by line from a edge list file and yield node_id1, node_id2, weight
 
         """
         with open(edg_fp, "r") as f:
             for line in f:
                 try:
-                    ID1, ID2, weight = line.split("\t")
+                    node_id1, node_id2, weight = line.split("\t")
                     weight = float(weight)
                     if weight <= cut_threshold:
                         continue
                     if not weighted:
                         weight = float(1)
                 except ValueError:
-                    ID1, ID2 = line.split("\t")
+                    node_id1, node_id2 = line.split("\t")
                     weight = float(1)
-                ID1 = ID1.strip()
-                ID2 = ID2.strip()
-                yield ID1, ID2, weight
+                node_id1 = node_id1.strip()
+                node_id2 = node_id2.strip()
+                yield node_id1, node_id2, weight
 
     @staticmethod
     def npy_reader(mat, weighted, directed, cut_threshold):
         """Numpy reader.
 
         Load an numpy matrix (either from file path or numpy matrix directly)
-        and yield ID1, ID2, weight.
+        and yield node_id1, node_id2, weight.
 
         Note:
             The matrix should be in shape (N, N+1), where N is number of nodes.
@@ -135,19 +139,19 @@ class SparseGraph(BaseGraph):
         if isinstance(mat, str):
             # load numpy matrix from file if provided path instead of numpy matrix
             mat = np.load(mat)
-        Nnodes = mat.shape[0]
+        num_nodes = mat.shape[0]
 
-        for i in range(Nnodes):
-            ID1 = mat[i, 0]
+        for i in range(num_nodes):
+            node_id1 = mat[i, 0]
 
-            for j in range(Nnodes):
-                ID2 = mat[j, 0]
+            for j in range(num_nodes):
+                node_id2 = mat[j, 0]
                 weight = mat[i, j + 1]
                 if weight > cut_threshold:
                     try:
-                        yield str(int(ID1)), str(int(ID2)), weight
+                        yield str(int(node_id1)), str(int(node_id2)), weight
                     except TypeError:
-                        yield str(ID1), str(ID2), weight
+                        yield str(node_id1), str(node_id2), weight
 
     def read(self, file, reader="edglst", cut_threshold=0):
         """Read data and construct sparse graph.
@@ -162,13 +166,13 @@ class SparseGraph(BaseGraph):
         TODO: reader part looks sus, check unit test
 
         """
-        for ID1, ID2, weight in reader(
+        for node_id1, node_id2, weight in reader(
             file,
             self.weighted,
             self.directed,
             cut_threshold,
         ):
-            self.addEdge(ID1, ID2, weight)
+            self.add_edge(node_id1, node_id2, weight)
 
     @classmethod
     def from_edglst(cls, path_to_edglst, weighted, directed, cut_threshold=0):
@@ -192,12 +196,12 @@ class SparseGraph(BaseGraph):
 
         """
         with open(outpth, "w") as f:
-            for srcID, dstID, weight in edge_gen():
+            for src_node_id, dst_node_id, weight in edge_gen():
                 if weighted:
                     if weight > cut_threshold:
-                        f.write(f"{srcID}\t{dstID}\t{weight:.12f}\n")
+                        f.write(f"{src_node_id}\t{dst_node_id}\t{weight:.12f}\n")
                 else:
-                    f.write(f"{srcID}\t{dstID}\n")
+                    f.write(f"{src_node_id}\t{dst_node_id}\n")
 
     @staticmethod
     def npy_writer():
@@ -207,13 +211,13 @@ class SparseGraph(BaseGraph):
         edge_data_copy = self._edge_data[:]
         for src_idx in range(len(edge_data_copy)):
             src_nbrs = edge_data_copy[src_idx]
-            srcID = self.IDmap.getID(src_idx)
+            src_node_id = self.idmap.getID(src_idx)
             for dst_idx in src_nbrs:
-                dstID = self.IDmap.getID(dst_idx)
+                dst_node_id = self.idmap.getID(dst_idx)
                 if not self.directed:
                     edge_data_copy[dst_idx].pop(src_idx)
                 weight = edge_data_copy[src_idx][dst_idx]
-                yield srcID, dstID, weight
+                yield src_node_id, dst_node_id, weight
 
     def save(self, outpth, writer="edglst", cut_threshold=0):
         """Save graph to file.
@@ -248,8 +252,8 @@ class SparseGraph(BaseGraph):
             default_val(float): default value for missing edges
 
         """
-        Nnodes = self.IDmap.size
-        mat = np.ones((Nnodes, Nnodes)) * default_val
+        num_nodes = self.idmap.size
+        mat = np.ones((num_nodes, num_nodes)) * default_val
         for src_node, src_nbrs in enumerate(self._edge_data):
             for dst_node in src_nbrs:
                 mat[src_node, dst_node] = src_nbrs[dst_node]

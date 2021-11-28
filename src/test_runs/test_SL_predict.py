@@ -22,18 +22,18 @@ lsc = label.LabelsetCollection.SplitLSC.from_gmt(
 mdl = model.SupervisedLearning.LogReg(g, penalty="l2", solver="lbfgs")
 
 # diplay choice of labelsets
-for l, m in enumerate(lsc.labelIDlst):
+for l, m in enumerate(lsc.label_ids):
     # index, labelset size, labelset ID
-    print(f"{l:>4d} {len(lsc.getLabelset(m)):>4d} {m}")
+    print(f"{l:>4d} {len(lsc.get_labelset(m)):>4d} {m}")
 print("")
 
-# get labelID
-labelID = lsc.labelIDlst[i]
-print(labelID)
+# get label_id
+label_id = lsc.label_ids[i]
+print(label_id)
 
 # get positive and negative samples
-pos = lsc.getLabelset(labelID)
-neg = lsc.getNegative(labelID)
+pos = lsc.get_labelset(label_id)
+neg = lsc.get_negative(label_id)
 
 # train and get genome wide prediction
 score_dict = mdl.predict(pos, neg)

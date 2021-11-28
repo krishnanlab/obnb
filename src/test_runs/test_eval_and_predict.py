@@ -26,7 +26,7 @@ lsc.valsplit = valsplit.Interface.SklSKF(
 )
 
 lsc.apply(
-    label.Filter.EntityExistanceFilter(target_lst=g.IDmap.lst), inplace=True
+    label.Filter.EntityExistanceFilter(target_lst=g.idmap.lst), inplace=True
 )
 lsc.apply(
     label.Filter.LabelsetRangeFilterSize(min_val=min_labelset_size),
@@ -34,10 +34,10 @@ lsc.apply(
 )
 lsc.apply(label.Filter.NegativeFilterHypergeom(p_thresh=p_thresh), inplace=True)
 print(
-    f"After filtering, there are {len(lsc.labelIDlst)} number of effective labelsets"
+    f"After filtering, there are {len(lsc.label_ids)} number of effective labelsets"
 )
 
-scoring_obj = lambda estimator, X, y: metrics.auPRC(
+scoring_obj = lambda estimator, X, y: metrics.log2_auprc_prior(
     y, estimator.decision_function(X)
 )
 mdl = model.SupervisedLearning.LogRegCV(
@@ -53,26 +53,28 @@ mdl = model.SupervisedLearning.LogRegCV(
 )
 
 
-@wrapper.ParWrap.ParDat(lsc.labelIDlst, n_workers=1)
-def predict_all_labelsets(labelID):
+@wrapper.ParWrap.ParDat(lsc.label_ids, n_workers=1)
+def predict_all_labelsets(label_id):
     np.random.seed()  # initialize random states for parallel processes
 
-    pos_ID_set = lsc.getLabelset(labelID)
-    neg_ID_set = lsc.getNegative(labelID)
+    pos_ids_set = lsc.get_labelset(label_id)
+    neg_ids_set = lsc.get_negative(label_id)
 
-    y_true, y_predict = mdl.test2(lsc.splitLabelset(labelID))
-    score = np.mean([metrics.auPRC(i, j) for i, j in zip(y_true, y_predict)])
+    y_true, y_predict = mdl.test2(lsc.split_labelset(label_id))
+    score = np.mean(
+        [metrics.log2_auprc_prior(i, j) for i, j in zip(y_true, y_predict)]
+    )
 
     if score > score_cutoff:
         status_str = "(Prediction saved)"
-    #        score_dict = mdl.predict(pos_ID_set, neg_ID_set)
+    #        score_dict = mdl.predict(pos_ids_set, neg_ids_set)
     #
-    #        with open(f"predictions/{labelID}_score={score:3.2f}.tsv", 'w') as f:
+    #        with open(f"predictions/{label_id}_score={score:3.2f}.tsv", 'w') as f:
     #            f.write("gene_id\tprediction_score\tannotation\n")
     #            for geneID, prediction_score in score_dict.items():
-    #                if geneID in pos_ID_set:
+    #                if geneID in pos_ids_set:
     #                    annotation = '+'
-    #                elif geneID in neg_ID_set:
+    #                elif geneID in neg_ids_set:
     #                    annotation = '-'
     #                else:
     #                    annotation = '0'
@@ -82,8 +84,8 @@ def predict_all_labelsets(labelID):
         status_str = "(Discarded)"
 
     print(
-        f"{labelID:<60} num_pos={len(pos_ID_set):>4}, "
-        f"num_neg={len(neg_ID_set):>4}, score={score:>3.2f} {status_str}"
+        f"{label_id:<60} num_pos={len(pos_ids_set):>4}, "
+        f"num_neg={len(neg_ids_set):>4}, score={score:>3.2f} {status_str}"
     )
 
 

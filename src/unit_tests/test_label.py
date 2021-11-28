@@ -14,7 +14,7 @@ class TestBaseLSC(unittest.TestCase):
     def setUpClass(self):
         self.toy1_gmt_fp = os.path.join(SAMPLE_DATA_DIR, "toy1.gmt")
         self.toy1_prop_fp = os.path.join(SAMPLE_DATA_DIR, "toy1_property.tsv")
-        self.toy1_labelIDlst = ["Group1", "Group2", "Group3", "Group4"]
+        self.toy1_label_ids = ["Group1", "Group2", "Group3", "Group4"]
         self.toy1_InfoLst = [
             "Description1",
             "Description2",
@@ -31,83 +31,83 @@ class TestBaseLSC(unittest.TestCase):
 
     def setUp(self):
         self.lsc = LabelsetCollection.BaseLSC()
-        self.lsc.addLabelset(["a", "b", "c"], "Labelset1", "Description1")
-        self.lsc.addLabelset(["b", "d"], "Labelset2", "Description2")
+        self.lsc.add_labelset(["a", "b", "c"], "Labelset1", "Description1")
+        self.lsc.add_labelset(["b", "d"], "Labelset2", "Description2")
 
     def template_test_input_for_getters(self, fun):
         """Template for testing inputs for methods with only one positional
-        argument as ID, i.e. `.getInfo`, `getLabelset`, and `getNoccur`."""
+        argument as ID, i.e. `.get_info`, `get_labelset`, and `get_noccur`."""
         # input type other than str --> TypeError
         self.assertRaises(TypeError, fun, 1)
         self.assertRaises(TypeError, fun, ["1"])
         # input unknown ID --> IDNotExistError
         self.assertRaises(IDNotExistError, fun, "1")
 
-    def test_getInfo(self):
-        self.template_test_input_for_getters(self.lsc.getInfo)
-        self.assertEqual(self.lsc.getInfo("Labelset1"), "Description1")
-        self.assertEqual(self.lsc.getInfo("Labelset2"), "Description2")
+    def test_get_info(self):
+        self.template_test_input_for_getters(self.lsc.get_info)
+        self.assertEqual(self.lsc.get_info("Labelset1"), "Description1")
+        self.assertEqual(self.lsc.get_info("Labelset2"), "Description2")
 
-    def test_getLabelset(self):
-        self.template_test_input_for_getters(self.lsc.getLabelset)
-        self.assertEqual(self.lsc.getLabelset("Labelset1"), {"a", "b", "c"})
-        self.assertEqual(self.lsc.getLabelset("Labelset2"), {"b", "d"})
+    def test_get_labelset(self):
+        self.template_test_input_for_getters(self.lsc.get_labelset)
+        self.assertEqual(self.lsc.get_labelset("Labelset1"), {"a", "b", "c"})
+        self.assertEqual(self.lsc.get_labelset("Labelset2"), {"b", "d"})
 
-    def test_getNoccur(self):
-        self.template_test_input_for_getters(self.lsc.getNoccur)
-        self.assertEqual(self.lsc.getNoccur("a"), 1)
-        self.assertEqual(self.lsc.getNoccur("b"), 2)
-        self.assertEqual(self.lsc.getNoccur("c"), 1)
-        self.assertEqual(self.lsc.getNoccur("d"), 1)
+    def test_get_noccur(self):
+        self.template_test_input_for_getters(self.lsc.get_noccur)
+        self.assertEqual(self.lsc.get_noccur("a"), 1)
+        self.assertEqual(self.lsc.get_noccur("b"), 2)
+        self.assertEqual(self.lsc.get_noccur("c"), 1)
+        self.assertEqual(self.lsc.get_noccur("d"), 1)
 
-    def test_popEntity(self):
-        self.template_test_input_for_getters(self.lsc.popEntity)
-        self.lsc.popEntity("b")
+    def test_pop_entity(self):
+        self.template_test_input_for_getters(self.lsc.pop_entity)
+        self.lsc.pop_entity("b")
         self.assertEqual(self.lsc.entity.map, {"a": 0, "c": 1, "d": 2})
-        self.assertEqual(self.lsc.getLabelset("Labelset1"), {"a", "c"})
-        self.assertEqual(self.lsc.getLabelset("Labelset2"), {"d"})
+        self.assertEqual(self.lsc.get_labelset("Labelset1"), {"a", "c"})
+        self.assertEqual(self.lsc.get_labelset("Labelset2"), {"d"})
 
-    def test_getNegative(self):
-        self.template_test_input_for_getters(self.lsc.getNegative)
+    def test_get_negative(self):
+        self.template_test_input_for_getters(self.lsc.get_negative)
         # test unspecified negative
-        self.assertEqual(self.lsc.getNegative("Labelset1"), {"d"})
-        self.assertEqual(self.lsc.getNegative("Labelset2"), {"a", "c"})
+        self.assertEqual(self.lsc.get_negative("Labelset1"), {"d"})
+        self.assertEqual(self.lsc.get_negative("Labelset2"), {"a", "c"})
         # test if unrelated entities included
-        self.lsc.entity.addID("h")
-        self.assertEqual(self.lsc.getNegative("Labelset2"), {"a", "c"})
+        self.lsc.entity.add_id("h")
+        self.assertEqual(self.lsc.get_negative("Labelset2"), {"a", "c"})
         # test specified negative
-        self.lsc.setNegative(["a"], "Labelset2")
-        self.assertEqual(self.lsc.getNegative("Labelset2"), {"a"})
+        self.lsc.set_negative(["a"], "Labelset2")
+        self.assertEqual(self.lsc.get_negative("Labelset2"), {"a"})
 
-    def test_setNegative(self):
+    def test_set_negative(self):
         # test with known entity ID
-        self.lsc.setNegative(["a"], "Labelset2")
-        self.assertEqual(self.lsc.getNegative("Labelset2"), {"a"})
-        self.lsc.setNegative(["c"], "Labelset2")
-        self.assertEqual(self.lsc.getNegative("Labelset2"), {"c"})
+        self.lsc.set_negative(["a"], "Labelset2")
+        self.assertEqual(self.lsc.get_negative("Labelset2"), {"a"})
+        self.lsc.set_negative(["c"], "Labelset2")
+        self.assertEqual(self.lsc.get_negative("Labelset2"), {"c"})
         # test with knwon positive ID --> IDExistsError
         self.assertRaises(
             IDExistsError,
-            self.lsc.setNegative,
+            self.lsc.set_negative,
             ["b"],
             "Labelset2",
         )
         self.assertRaises(
             IDExistsError,
-            self.lsc.setNegative,
+            self.lsc.set_negative,
             ["a", "d"],
             "Labelset2",
         )
         # test with unknown entity ID --> IDNotExistError
         self.assertRaises(
             IDNotExistError,
-            self.lsc.setNegative,
+            self.lsc.set_negative,
             ["e"],
             "Labelset2",
         )
         self.assertRaises(
             IDNotExistError,
-            self.lsc.setNegative,
+            self.lsc.set_negative,
             ["a", "e"],
             "Labelset2",
         )
@@ -120,9 +120,9 @@ class TestBaseLSC(unittest.TestCase):
         for idx1 in range(4):
             idx2 = shuffle_idx[idx1]
             for lsc, idx in zip((lsc1, lsc2), (idx1, idx2)):
-                lsc.addLabelset(
+                lsc.add_labelset(
                     list(self.toy1_labelsets[idx]),
-                    self.toy1_labelIDlst[idx],
+                    self.toy1_label_ids[idx],
                     self.toy1_InfoLst[idx],
                 )
         self.assertEqual(lsc1, lsc2)
@@ -130,77 +130,77 @@ class TestBaseLSC(unittest.TestCase):
         lsc3 = lsc2.copy()
         lsc3.setProp("Group1", "Info", "Some other description")
         self.assertNotEqual(lsc1, lsc3)
-        # test if different labelset with same labelID
+        # test if different labelset with same label_id
         lsc3 = lsc2.copy()
-        lsc3.updateLabelset(["a"], "Group1")
+        lsc3.update_labelset(["a"], "Group1")
         self.assertNotEqual(lsc1, lsc3)
         # make sure lsc2 still the same as lsc1
         self.assertEqual(lsc1, lsc2)
 
     def test_from_gmt(self):
         lsc = LabelsetCollection.BaseLSC.from_gmt(self.toy1_gmt_fp)
-        self.assertEqual(lsc.labelIDlst, self.toy1_labelIDlst)
+        self.assertEqual(lsc.label_ids, self.toy1_label_ids)
         self.assertEqual(lsc.prop["Info"], self.toy1_InfoLst)
         self.assertEqual(lsc.prop["Labelset"], self.toy1_labelsets)
 
-    def test_addLabelset(self):
+    def test_add_labelset(self):
         with self.subTest(msg="Input checks"):
             # test lst input type, only list of string allowed
-            self.assertRaises(TypeError, self.lsc.addLabelset, 1, "Labelset3")
+            self.assertRaises(TypeError, self.lsc.add_labelset, 1, "Labelset3")
             self.assertRaises(
                 TypeError,
-                self.lsc.addLabelset,
+                self.lsc.add_labelset,
                 ["1", 2],
                 "Labelset3",
             )
             self.assertRaises(
                 TypeError,
-                self.lsc.addLabelset,
+                self.lsc.add_labelset,
                 "123",
                 "Labelset3",
             )
             # test label ID input type --> TypeError
-            self.assertRaises(TypeError, self.lsc.addLabelset, ["a"], 123)
-            self.assertRaises(TypeError, self.lsc.addLabelset, ["a"], [1, 2])
+            self.assertRaises(TypeError, self.lsc.add_labelset, ["a"], 123)
+            self.assertRaises(TypeError, self.lsc.add_labelset, ["a"], [1, 2])
             self.assertRaises(
                 TypeError,
-                self.lsc.addLabelset,
+                self.lsc.add_labelset,
                 ["a"],
                 ["Labelset"],
             )
             # test label info input type --> TypeError
             self.assertRaises(
                 TypeError,
-                self.lsc.addLabelset,
+                self.lsc.add_labelset,
                 ["a"],
                 "Labelset3",
                 [1, 2, 3],
             )
             self.assertRaises(
                 TypeError,
-                self.lsc.addLabelset,
+                self.lsc.add_labelset,
                 ["a"],
                 "Labelset3",
                 ["Description"],
             )
             # make sure no new label added with exception
-            self.assertEqual(self.lsc.labelIDlst, ["Labelset1", "Labelset2"])
+            self.assertEqual(self.lsc.label_ids, ["Labelset1", "Labelset2"])
             # test add existing label ID --> IDExistsError
             self.assertRaises(
                 IDExistsError,
-                self.lsc.addLabelset,
+                self.lsc.add_labelset,
                 ["e", "f"],
                 "Labelset1",
             )
             # test label info specification --> Info default to 'NA' if not specified
-            self.lsc.addLabelset(["e"], "Labelset3")
+            self.lsc.add_labelset(["e"], "Labelset3")
             self.assertEqual(
                 self.lsc._prop["Info"],
                 ["Description1", "Description2", "NA"],
             )
         with self.subTest(msg="Labelset loading checks"):
             # test input empty labelset
-            self.lsc.addLabelset([], "Labelset4")
+            self.lsc.add_labelset([], "Labelset4")
             # check if labelset loaded correctly
             self.assertEqual(
                 self.lsc._prop["Labelset"],
@@ -212,80 +212,82 @@ class TestBaseLSC(unittest.TestCase):
                 {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4},
             )
 
-    def test_popLabelset(self):
+    def test_pop_labelset(self):
         with self.subTest(msg="Input checks"):
-            # test wrong labelID type --> TypeError
-            self.assertRaises(TypeError, self.lsc.popLabelset, 1)
-            self.assertRaises(TypeError, self.lsc.popLabelset, ["Labelset1"])
-            # test not exist labelID --> IDNotExistError
+            # test wrong label_id type --> TypeError
+            self.assertRaises(TypeError, self.lsc.pop_labelset, 1)
+            self.assertRaises(TypeError, self.lsc.pop_labelset, ["Labelset1"])
+            # test not exist label_id --> IDNotExistError
             self.assertRaises(
                 IDNotExistError,
-                self.lsc.popLabelset,
+                self.lsc.pop_labelset,
                 "Labelset3",
             )
             # make sure nothing poped
             self.assertEqual(self.lsc.lst, ["Labelset1", "Labelset2"])
         # make sure enties that are no longer in any labelset are popped
-        self.lsc.popLabelset("Labelset1")
-        self.assertEqual(self.lsc.labelIDlst, ["Labelset2"])
+        self.lsc.pop_labelset("Labelset1")
+        self.assertEqual(self.lsc.label_ids, ["Labelset2"])
         self.assertEqual(self.lsc.entity.map, {"b": 0, "d": 1})
-        self.lsc.popLabelset("Labelset2")
-        self.assertEqual(self.lsc.labelIDlst, [])
+        self.lsc.pop_labelset("Labelset2")
+        self.assertEqual(self.lsc.label_ids, [])
         self.assertEqual(self.lsc.entity.map, {})
 
-    def test_updateLabelset(self):
+    def test_update_labelset(self):
         with self.subTest(msg="Input checks"):
             # test lst input, only list of string allowed
             self.assertRaises(
                 TypeError,
-                self.lsc.updateLabelset,
+                self.lsc.update_labelset,
                 1,
                 "Labelset1",
             )
             self.assertRaises(
                 TypeError,
-                self.lsc.updateLabelset,
+                self.lsc.update_labelset,
                 ["1", 2],
                 "Labelset1",
             )
             self.assertRaises(
                 TypeError,
-                self.lsc.updateLabelset,
+                self.lsc.update_labelset,
                 "123",
                 "Labelset1",
             )
-            # test labelID input type
-            self.assertRaises(TypeError, self.lsc.updateLabelset, ["a"], 123)
-            self.assertRaises(TypeError, self.lsc.updateLabelset, ["a"], [1, 2])
+            # test label_id input type
+            self.assertRaises(TypeError, self.lsc.update_labelset, ["a"], 123)
+            self.assertRaises(
+                TypeError, self.lsc.update_labelset, ["a"], [1, 2]
+            )
             self.assertRaises(
                 TypeError,
-                self.lsc.updateLabelset,
+                self.lsc.update_labelset,
                 ["a"],
                 ["Labelset1"],
             )
-            # test reset not exist labelID --> IDNotExistError
+            # test reset not exist label_id --> IDNotExistError
             self.assertRaises(
                 IDNotExistError,
-                self.lsc.updateLabelset,
+                self.lsc.update_labelset,
                 ["a"],
                 "Labelset3",
             )
         # test update nothing --> labelset stays the same
-        self.lsc.updateLabelset([], "Labelset1")
-        self.assertEqual(self.lsc.getLabelset("Labelset1"), {"a", "b", "c"})
+        self.lsc.update_labelset([], "Labelset1")
+        self.assertEqual(self.lsc.get_labelset("Labelset1"), {"a", "b", "c"})
         # test update existing --> labelset stays the same
-        self.lsc.updateLabelset(["a", "b", "c"], "Labelset1")
-        self.assertEqual(self.lsc.getLabelset("Labelset1"), {"a", "b", "c"})
+        self.lsc.update_labelset(["a", "b", "c"], "Labelset1")
+        self.assertEqual(self.lsc.get_labelset("Labelset1"), {"a", "b", "c"})
         # test update partially new
-        self.lsc.updateLabelset(["a", "d"], "Labelset1")
+        self.lsc.update_labelset(["a", "d"], "Labelset1")
         self.assertEqual(
-            self.lsc.getLabelset("Labelset1"),
+            self.lsc.get_labelset("Labelset1"),
             {"a", "b", "c", "d"},
         )
         # test update all new
-        self.lsc.updateLabelset(["e"], "Labelset1")
+        self.lsc.update_labelset(["e"], "Labelset1")
         self.assertEqual(
-            self.lsc.getLabelset("Labelset1"),
+            self.lsc.get_labelset("Labelset1"),
             {"a", "b", "c", "d", "e"},
         )
         # check if new entity added to list
@@ -294,14 +296,14 @@ class TestBaseLSC(unittest.TestCase):
             {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4},
         )
 
-    def test_resetLabelset(self):
-        self.template_test_input_for_getters(self.lsc.resetLabelset)
+    def test_reset_labelset(self):
+        self.template_test_input_for_getters(self.lsc.reset_labelset)
         # check if labelset reset to empty set correctly
-        self.lsc.resetLabelset("Labelset1")
-        self.assertEqual(self.lsc.getLabelset("Labelset1"), set())
-        self.assertEqual(self.lsc.getLabelset("Labelset2"), {"b", "d"})
+        self.lsc.reset_labelset("Labelset1")
+        self.assertEqual(self.lsc.get_labelset("Labelset1"), set())
+        self.assertEqual(self.lsc.get_labelset("Labelset2"), {"b", "d"})
         # makesure list of labelsets untouched
-        self.assertEqual(self.lsc.labelIDlst, ["Labelset1", "Labelset2"])
+        self.assertEqual(self.lsc.label_ids, ["Labelset1", "Labelset2"])
         # make sure entities that are nolongler in any labelset are popped
         self.assertEqual(self.lsc.entity.map, {"b": 0, "d": 1})
 
@@ -318,19 +320,19 @@ class TestBaseLSC(unittest.TestCase):
             int,
         )
         # make sure entity with properties different from default don't get popped
-        self.lsc.popLabelset("Labelset1")
-        self.lsc.popLabelset("Labelset2")
+        self.lsc.pop_labelset("Labelset1")
+        self.lsc.pop_labelset("Labelset2")
         self.assertEqual(self.lsc.entity.map, {"a": 0, "c": 1, "d": 2})
 
 
 class TestFilter(unittest.TestCase):
     def setUp(self):
         self.lsc = LabelsetCollection.SplitLSC()
-        self.lsc.addLabelset(["a", "b", "c"], "Group1")
-        self.lsc.addLabelset(["b", "d"], "Group2")
-        self.lsc.addLabelset(["e", "f", "g"], "Group3")
-        self.lsc.addLabelset(["a", "f", "c"], "Group4")
-        self.lsc.addLabelset(["a", "h"], "Group5")
+        self.lsc.add_labelset(["a", "b", "c"], "Group1")
+        self.lsc.add_labelset(["b", "d"], "Group2")
+        self.lsc.add_labelset(["e", "f", "g"], "Group3")
+        self.lsc.add_labelset(["a", "f", "c"], "Group4")
+        self.lsc.add_labelset(["a", "h"], "Group5")
         # Noccur=[3, 2, 2, 1, 1, 2, 1, 1]
         # Size=[3, 2, 3, 3, 2]
 
@@ -591,7 +593,7 @@ class TestFilter(unittest.TestCase):
                 Filter.LabelsetRangeFilterSize(min_val=3),
                 inplace=False,
             )
-            self.assertEqual(lsc.labelIDlst, ["Group1", "Group3", "Group4"])
+            self.assertEqual(lsc.label_ids, ["Group1", "Group3", "Group4"])
             self.assertEqual(
                 lsc.prop["Labelset"],
                 [{"a", "b", "c"}, {"e", "f", "g"}, {"a", "f", "c"}],
@@ -605,7 +607,7 @@ class TestFilter(unittest.TestCase):
                 Filter.LabelsetRangeFilterSize(min_val=4),
                 inplace=False,
             )
-            self.assertEqual(lsc.labelIDlst, [])
+            self.assertEqual(lsc.label_ids, [])
             self.assertEqual(lsc.prop["Labelset"], [])
             self.assertEqual(lsc.entity.map, {})
         with self.subTest(max_val=2):
@@ -613,7 +615,7 @@ class TestFilter(unittest.TestCase):
                 Filter.LabelsetRangeFilterSize(max_val=2),
                 inplace=False,
             )
-            self.assertEqual(lsc.labelIDlst, ["Group2", "Group5"])
+            self.assertEqual(lsc.label_ids, ["Group2", "Group5"])
             self.assertEqual(lsc.prop["Labelset"], [{"b", "d"}, {"a", "h"}])
             self.assertEqual(lsc.entity.map, {"a": 0, "b": 1, "d": 2, "h": 3})
         with self.subTest(max_val=1):
@@ -621,41 +623,41 @@ class TestFilter(unittest.TestCase):
                 Filter.LabelsetRangeFilterSize(max_val=1),
                 inplace=False,
             )
-            self.assertEqual(lsc.labelIDlst, [])
+            self.assertEqual(lsc.label_ids, [])
             self.assertEqual(lsc.prop["Labelset"], [])
             self.assertEqual(lsc.entity.map, {})
 
     def test_LabelsetRangeFilterTrainTestPos(self):
-        train_ID_ary = np.array(["a", "b", "c", "d"])
-        test_ID_ary = np.array(["e", "f", "g", "h"])
-        with self.subTest(train=train_ID_ary, test=test_ID_ary):
-            splitter = valsplit.Holdout.CustomHold(train_ID_ary, test_ID_ary)
-            splitter._train_ID_ary = splitter.custom_train_ID_ary
-            splitter._test_ID_ary = splitter.custom_test_ID_ary
+        train_index = np.array(["a", "b", "c", "d"])
+        test_index = np.array(["e", "f", "g", "h"])
+        with self.subTest(train=train_index, test=test_index):
+            splitter = valsplit.Holdout.CustomHold(train_index, test_index)
+            splitter._train_index = splitter.custom_train_index
+            splitter._test_index = splitter.custom_test_index
             self.lsc.valsplit = splitter
             lsc = self.lsc.apply(
                 Filter.LabelsetRangeFilterTrainTestPos(min_val=1),
                 inplace=False,
             )
-            self.assertEqual(lsc.labelIDlst, ["Group4", "Group5"])
+            self.assertEqual(lsc.label_ids, ["Group4", "Group5"])
             self.assertEqual(
                 lsc.prop["Labelset"],
                 [{"a", "f", "c"}, {"a", "h"}],
             )
             self.assertEqual(lsc.entity.map, {"a": 0, "c": 1, "f": 2, "h": 3})
 
-        train_ID_ary = np.array(["a", "c", "e"])
-        test_ID_ary = np.array(["b", "d", "f"])
-        with self.subTest(train=train_ID_ary, test=test_ID_ary):
-            splitter = valsplit.Holdout.CustomHold(train_ID_ary, test_ID_ary)
-            splitter._train_ID_ary = splitter.custom_train_ID_ary
-            splitter._test_ID_ary = splitter.custom_test_ID_ary
+        train_index = np.array(["a", "c", "e"])
+        test_index = np.array(["b", "d", "f"])
+        with self.subTest(train=train_index, test=test_index):
+            splitter = valsplit.Holdout.CustomHold(train_index, test_index)
+            splitter._train_index = splitter.custom_train_index
+            splitter._test_index = splitter.custom_test_index
             self.lsc.valsplit = splitter
             lsc = self.lsc.apply(
                 Filter.LabelsetRangeFilterTrainTestPos(min_val=1),
                 inplace=False,
             )
-            self.assertEqual(lsc.labelIDlst, ["Group1", "Group3", "Group4"])
+            self.assertEqual(lsc.label_ids, ["Group1", "Group3", "Group4"])
             self.assertEqual(
                 lsc.prop["Labelset"],
                 [{"a", "b", "c"}, {"e", "f", "g"}, {"a", "f", "c"}],
@@ -665,28 +667,28 @@ class TestFilter(unittest.TestCase):
                 {"a": 0, "b": 1, "c": 2, "e": 3, "f": 4, "g": 5},
             )
 
-        train_ID_ary = np.array(["a", "d"])
-        valid_ID_ary = np.array(["b", "e"])
-        test_ID_ary = np.array(["c", "f"])
+        train_index = np.array(["a", "d"])
+        valid_index = np.array(["b", "e"])
+        test_index = np.array(["c", "f"])
         with self.subTest(
-            train=train_ID_ary,
-            test=test_ID_ary,
-            valid=valid_ID_ary,
+            train=train_index,
+            test=test_index,
+            valid=valid_index,
         ):
             splitter = valsplit.Holdout.CustomHold(
-                train_ID_ary,
-                test_ID_ary,
-                valid_ID_ary,
+                train_index,
+                test_index,
+                valid_index,
             )
-            splitter._train_ID_ary = splitter.custom_train_ID_ary
-            splitter._test_ID_ary = splitter.custom_test_ID_ary
-            splitter._valid_ID_ary = splitter.custom_valid_ID_ary
+            splitter._train_index = splitter.custom_train_index
+            splitter._test_index = splitter.custom_test_index
+            splitter._valid_index = splitter.custom_valid_index
             self.lsc.valsplit = splitter
             lsc = self.lsc.apply(
                 Filter.LabelsetRangeFilterTrainTestPos(min_val=1),
                 inplace=False,
             )
-            self.assertEqual(lsc.labelIDlst, ["Group1"])
+            self.assertEqual(lsc.label_ids, ["Group1"])
             self.assertEqual(lsc.prop["Labelset"], [{"a", "b", "c"}])
             self.assertEqual(lsc.entity.map, {"a": 0, "b": 1, "c": 2})
 
@@ -697,21 +699,21 @@ class TestFilter(unittest.TestCase):
             inplace=True,
         )
         # test wheter negative selected correctly for group1, 'f' should be excluded due to sim with group2
-        self.assertEqual(self.lsc.getNegative("Group1"), {"d", "e", "g", "h"})
+        self.assertEqual(self.lsc.get_negative("Group1"), {"d", "e", "g", "h"})
 
         # increase p-val thtreshold to 0.7 will also include group2 and group3, where pval = 0.643
         self.lsc.apply(
             Filter.NegativeFilterHypergeom(p_thresh=0.7),
             inplace=True,
         )
-        self.assertEqual(self.lsc.getNegative("Group1"), {"e", "g"})
+        self.assertEqual(self.lsc.get_negative("Group1"), {"e", "g"})
 
         # set p-val threshold to be greater than 1 -> no negatives should be left
         self.lsc.apply(
             Filter.NegativeFilterHypergeom(p_thresh=1.1),
             inplace=True,
         )
-        self.assertEqual(self.lsc.getNegative("Group1"), set())
+        self.assertEqual(self.lsc.get_negative("Group1"), set())
 
 
 if __name__ == "__main__":

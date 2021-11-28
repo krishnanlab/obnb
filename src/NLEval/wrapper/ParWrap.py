@@ -23,7 +23,7 @@ class ParDat:
 
         self._q = mp.Queue()
         self._p = []
-        self._PrConn = []
+        self._parent_conn = []
 
     def __call__(self, func):
         def wrapper(*func_args, **func_kwargs):
@@ -88,32 +88,32 @@ class ParDat:
 
     def spawn(self, func, func_args, func_kwargs):
         # configure new child process and setup communication
-        PrConn, ChConn = mp.Pipe()
+        parent_conn, child_conn = mp.Pipe()
         new_process = mp.Process(
             target=ParDat.worker,
-            args=(ChConn, self._q, self.job_list, func, func_args, func_kwargs),
+            args=(child_conn, self._q, self.job_list, func, func_args, func_kwargs),
         )
         new_process.daemon = True
 
         # launch process and send job id
         worker_id = len(self._p)
         new_process.start()
-        PrConn.send(worker_id)
+        parent_conn.send(worker_id)
 
         # put communication and process to master lists
-        self._PrConn.append(PrConn)
+        self._parent_conn.append(parent_conn)
         self._p.append(new_process)
 
     def next_job(self, job_id):
         worker_id, result = self._q.get()
-        self._PrConn[worker_id].send(job_id)
+        self._parent_conn[worker_id].send(job_id)
         self.log()
         return result
 
     def terminate(self):
         for _ in self._p:
             worker_id, result = self._q.get()
-            self._PrConn[worker_id].send(None)
+            self._parent_conn[worker_id].send(None)
             self.log()
             yield result
 

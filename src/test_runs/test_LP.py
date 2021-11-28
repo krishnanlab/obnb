@@ -13,7 +13,7 @@ g = graph.DenseGraph.DenseGraph.from_edglst(
 lsc = label.LabelsetCollection.SplitLSC.from_gmt(
     data_path + "labels/KEGGBP.gmt"
 )
-lsc.apply(label.Filter.EntityExistanceFilter(g.IDmap.lst), inplace=True)
+lsc.apply(label.Filter.EntityExistanceFilter(g.idmap.lst), inplace=True)
 lsc.apply(label.Filter.LabelsetRangeFilterSize(min_val=50), inplace=True)
 lsc.load_entity_properties(
     data_path + "/properties/pubcnt.txt", "Pubmed Count", 0, int
@@ -23,17 +23,17 @@ lsc.valsplit = valsplit.Holdout.TrainValTest(
     train_ratio=1 / 3, test_ratio=1 / 3, shuffle=True
 )
 
-print(f"Number of labelsets before filtering: {len(lsc.labelIDlst)}")
+print(f"Number of labelsets before filtering: {len(lsc.label_ids)}")
 lsc.train_test_setup(g, prop_name="Pubmed Count", min_pos=10)
-print(f"Number of labelsets after filtering: {len(lsc.labelIDlst)}")
+print(f"Number of labelsets after filtering: {len(lsc.label_ids)}")
 
 mdl = model.LabelPropagation.LP(g)
 
 score_lst = []
-for labelID in lsc.labelIDlst:
-    score = auroc(*(mdl.test(lsc.splitLabelset(labelID))))
+for label_id in lsc.label_ids:
+    score = auroc(*(mdl.test(lsc.split_labelset(label_id))))
     score_lst.append(score)
-    print(f"{score:.4f}\t{labelID}")
+    print(f"{score:.4f}\t{label_id}")
 
 print(
     f"Average score = {np.mean(score_lst):.4f}, std = {np.std(score_lst):.4f}"

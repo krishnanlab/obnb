@@ -24,7 +24,7 @@ class DenseGraph(BaseGraph):
         """
         if isinstance(key, slice):
             raise NotImplementedError
-        idx = self.IDmap[key]
+        idx = self.idmap[key]
         return self.mat[idx]
 
     @property
@@ -37,9 +37,9 @@ class DenseGraph(BaseGraph):
         """Setter for mat.
 
         Note:
-            need to construct IDmap (self.IDmap) first before loading matrix
+            need to construct idmap (self.idmap) first before loading matrix
             (self.mat), which should have same number of entires (rows) as size
-            of IDmap, riases exption other wise>
+            of idmap, riases exption other wise>
 
         Args:
             val(:obj:`numpy.ndarray`): 2D numpy array
@@ -48,28 +48,28 @@ class DenseGraph(BaseGraph):
         checkers.checkNumpyArrayIsNumeric("val", val)
         if val.size > 0:
             checkers.checkNumpyArrayNDim("val", 2, val)
-            if self.IDmap.size != val.shape[0]:
+            if self.idmap.size != val.shape[0]:
                 raise ValueError(
-                    f"Expecting {self.IDmap.size} entries, not {val.shape[0]}",
+                    f"Expecting {self.idmap.size} entries, not {val.shape[0]}",
                 )
         self._mat = val.copy()
 
-    def get_edge(self, ID1, ID2):
-        """Return edge weight between ID1 and ID2.
+    def get_edge(self, node_id1, node_id2):
+        """Return edge weight between node_id1 and node_id2.
 
         Args:
-            ID1(str): ID of first node
-            ID2(str): ID of second node
+            node_id1(str): ID of first node
+            node_id2(str): ID of second node
 
         """
-        return self.mat[self.IDmap[ID1], self.IDmap[ID2]]
+        return self.mat[self.idmap[node_id1], self.idmap[node_id2]]
 
     @classmethod
     def construct_graph(cls, ids, mat):
         """Construct DenseGraph using ids and adjcency matrix.
 
         Args:
-            ids(list or :obj:`IDHandler.IDmap`): list of IDs or IDmap of the
+            ids(list or :obj:`IDHandler.idmap`): list of IDs or idmap of the
                 adjacency matrix
             mat(:obj:`numpy.ndarray`): 2D numpy array of adjacency matrix
 
@@ -85,7 +85,7 @@ class DenseGraph(BaseGraph):
                 f"matrix ({mat.shape[0]})",
             )
         graph = cls()
-        graph.IDmap = idmap
+        graph.idmap = idmap
         graph.mat = mat
         return graph
 
@@ -94,14 +94,14 @@ class DenseGraph(BaseGraph):
         """Construct DenseGraph object from numpy array.
 
         Note:
-            First column of mat encodes ID, must be integers
+            First column of mat encodes ID, must be integers.
 
         """
         idmap = IDHandler.IDmap()
-        for ID in mat[:, 0]:
-            if int(ID) != ID:
+        for node_id in mat[:, 0]:
+            if int(node_id) != node_id:
                 raise ValueError("ID must be int type")
-            idmap.addID(str(int(ID)))
+            idmap.add_id(str(int(node_id)))
         return cls.construct_graph(idmap, mat[:, 1:].astype(float))
 
     @classmethod
@@ -119,7 +119,7 @@ class DenseGraph(BaseGraph):
             directed,
             **kwargs,
         )
-        return cls.construct_graph(graph.IDmap, graph.to_adjmat())
+        return cls.construct_graph(graph.idmap, graph.to_adjmat())
 
 
 class FeatureVec(DenseGraph):
@@ -158,7 +158,7 @@ class FeatureVec(DenseGraph):
         """Setter for mat.
 
         Note:
-            Matrix must match the dim of both ``self.IDmap`` and ``self.dim``.
+            Matrix must match the dim of both ``self.idmap`` and ``self.dim``.
 
         """
         mat_bkp = self.mat  # create backup copy
@@ -173,26 +173,27 @@ class FeatureVec(DenseGraph):
                     f"and specified dimension ({self.dim})",
                 )
 
-    def get_edge(self, ID1, ID2, dist_fun=distance.cosine):
+    def get_edge(self, node_id1, node_id2, dist_fun=distance.cosine):
         """Return pairwise similarity of two features as 'edge'.
 
         Args:
-            ID1(str): ID of first node
-            ID2(str): ID of second node
+            node_id1(str): ID of the first node.
+            node_id2(str): ID of the second node.
             dist_fun: function to calculate distance between two vectors
-                        default as cosine similarity
-        """
-        return dist_fun(self[ID1], self[ID2])
+                default as cosine similarity.
 
-    def addVec(self, ID, vec):
+        """
+        return dist_fun(self[node_id1], self[node_id2])
+
+    def add_vec(self, node_id, vec):
         """Add a new feature vector."""
         checkers.checkNumpyArrayNDim("vec", 1, vec)
         checkers.checkNumpyArrayIsNumeric("vec", vec)
 
-        # check size consistency between IDmap and mat
+        # check size consistency between idmap and mat
         if self.size != self.mat.shape[0]:
             raise ValueError(
-                f"Inconsistent number of IDs ({self.IDmap.size}) and matrix "
+                f"Inconsistent number of IDs ({self.idmap.size}) and matrix "
                 f"entries ({self.mat.shape[0]})",
             )
 
@@ -204,7 +205,7 @@ class FeatureVec(DenseGraph):
             new_mat = vec.copy().reshape((1, vec.size))
         else:
             new_mat = np.vstack([self.mat, vec])
-        self.IDmap.addID(ID)
+        self.idmap.add_id(node_id)
         self.mat = new_mat
 
     @classmethod
@@ -215,8 +216,8 @@ class FeatureVec(DenseGraph):
             f.readline()  # skip header
             for line in f:
                 terms = line.split(" ")
-                ID = terms[0].strip()
-                idmap.addID(ID)
+                node_id = terms[0].strip()
+                idmap.add_id(node_id)
                 fvec_lst.append(np.array(terms[1:], dtype=float))
         mat = np.asarray(fvec_lst)
         return cls.construct_graph(idmap, mat)
@@ -225,7 +226,7 @@ class FeatureVec(DenseGraph):
 class MultiFeatureVec(BaseGraph):
     """Multi feature vectors with ID maps.
 
-    Note: experimenting feature
+    Note: experimenting feature.
 
     """
 
