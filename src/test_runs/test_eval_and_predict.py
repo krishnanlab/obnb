@@ -21,7 +21,7 @@ g = graph.SparseGraph.SparseGraph.from_edglst(
     network_fp, weighted=False, directed=False
 )
 lsc = label.LabelsetCollection.SplitLSC.from_gmt(labelset_fp)
-lsc.valsplit = valsplit.Interface.sklSKF(
+lsc.valsplit = valsplit.Interface.SklSKF(
     shuffle=True, skl_kws={"n_splits": n_split}
 )
 

@@ -1,14 +1,14 @@
-from NLEval.util.Exceptions import IDExistsError, IDNotExistError
-from NLEval.util import checkers, IDHandler
-from NLEval.label import Filter
-from NLEval.valsplit import Base
 import numpy as np
+from NLEval.label import Filter
+from NLEval.util import IDHandler, checkers
+from NLEval.util.Exceptions import IDExistsError
+from NLEval.valsplit import Base
 
 __all__ = ["BaseLSC", "SplitLSC"]
 
 
 class BaseLSC(IDHandler.IDprop):
-    """Collection of labelsets
+    """Collection of labelsets.
 
     This class is used for managing collection of labelsets.
 
@@ -44,7 +44,7 @@ class BaseLSC(IDHandler.IDprop):
         self.newProp("Negative", {None}, set)
 
     def _show(self):
-        """Debugging prints"""
+        """Debugging prints."""
         print("Labelsets IDs:")
         print(self._lst)
         print("Labelsets Info:")
@@ -59,17 +59,16 @@ class BaseLSC(IDHandler.IDprop):
 
     @property
     def entityIDlst(self):
-        """:obj:`list` of :obj:`str`: list of all entity IDs that
-        are part of at least one labelset"""
+        """List of all entity IDs that are part of at least one labelset."""
         return [i for i in self.entity if self.getNoccur(i) > 0]
 
     @property
     def labelIDlst(self):
-        """:obj:`list` of :obj:`str`: list of all labelset names"""
+        """:obj:`list` of :obj:`str`: list of all labelset names."""
         return self.lst
 
     def addLabelset(self, lst, labelID, labelInfo=None):
-        """Add new labelset
+        """Add a new labelset.
 
         Args:
             lst(:obj:`list` of :obj:`str`): list of IDs of entiteis belong
@@ -88,12 +87,17 @@ class BaseLSC(IDHandler.IDprop):
         self.updateLabelset(lst, labelID)
 
     def popLabelset(self, labelID):
-        """Pop a labelset and remove entities that no longer belong to any labelset"""
+        """Pop a labelset.
+
+        Note:
+            This also removes any entity that longer belongs to any labelset.
+
+        """
         self.resetLabelset(labelID)
         self.popID(labelID)
 
     def updateLabelset(self, lst, labelID):
-        """Update existing labelset
+        """Update an existing labelset.
 
         Take list of entities IDs and update current labelset with a label
         name matching `labelID`. Any ID in the input list `lst` that does
@@ -122,16 +126,10 @@ class BaseLSC(IDHandler.IDprop):
                 self.entity.setProp(ID, "Noccur", self.getNoccur(ID) + 1)
 
     def resetLabelset(self, labelID):
-        """Reset an existing labelset to an empty set, and deecrement `Noccur` of
-        all entites belonging to the labelset.
+        """Reset an existing labelset to an empty set.
 
-        Note: Any entity specific to the popped labelset is popped, which is
-        indicated by the equality of properties of entity with default property
-        values. The most important property is `Noccur`, the number of labelset
-        an entity is presented in, with default value of 0 (see init), which implies
-        that the entity is no longer present in any labelsets. The use of all
-        default properfies for comparison to determine popping of entity is just
-        for generalization purpose.
+        Setting the labelset back to empty and deecrement `Noccur` of all
+        entites belonging to the labelset by 1.
 
         """
         lbset = self.getLabelset(labelID)
@@ -154,15 +152,15 @@ class BaseLSC(IDHandler.IDprop):
             self.getLabelset(labelID).difference_update([ID])
 
     def getInfo(self, labelID):
-        """Return description of a labelset"""
+        """Return description of a labelset."""
         return self.getProp(labelID, "Info")
 
     def getLabelset(self, labelID):
-        """Return set of entities associated with a label"""
+        """Return set of entities associated with a label."""
         return self.getProp(labelID, "Labelset")
 
     def getNegative(self, labelID):
-        """Return set of negative samples of a labelset
+        """Return set of negative samples of a labelset.
 
         Note:
             If negative samples not available, use complement of labelset
@@ -171,9 +169,9 @@ class BaseLSC(IDHandler.IDprop):
         neg = self.getProp(labelID, "Negative")
 
         if neg == {None}:
-            all_positives = set(
-                [i for i in self.entity.map if self.getNoccur(i) > 0],
-            )
+            all_positives = {
+                i for i in self.entity.map if self.getNoccur(i) > 0
+            }
             return all_positives - self.getLabelset(labelID)
 
         return neg
@@ -192,11 +190,11 @@ class BaseLSC(IDHandler.IDprop):
         self.setProp(labelID, "Negative", set(lst))
 
     def getNoccur(self, ID):
-        """Return the number of labelsets in which an entity participates"""
+        """Return the number of labelsets in which an entity participates."""
         return self.entity.getProp(ID, "Noccur")
 
     def apply(self, filter_func, inplace=False):
-        """Apply filter to labelsets, see `NLEval.label.Filter` for more info
+        """Apply filter to labelsets, see `NLEval.label.Filter` for more info.
 
         Args:
             filter_func
@@ -215,7 +213,7 @@ class BaseLSC(IDHandler.IDprop):
         return obj
 
     def export(self, fp):
-        """Export as '.lsc' file
+        """Export self as a '.lsc' file.
 
         Notes:
             '.lsc' is a csv file storing entity labels in matrix form, where
@@ -226,10 +224,11 @@ class BaseLSC(IDHandler.IDprop):
             marked as '-1', otherwise it is '0', standing for neutral.
 
             entityIDmap is necessary since not all entities are guaranteed to
-            be part of at least one labels.
+            be part of at least one label.
 
         Input:
-            fp(str): path to file to save, including file name, with/without extension.
+            fp(str): path to file to save, including file name, with/without
+                extension.
 
         """
         entityIDlst = self.entityIDlst
@@ -243,13 +242,14 @@ class BaseLSC(IDHandler.IDprop):
             negative_set = self.getNegative(labelID)
 
             for sign, labelset in zip(
-                ["1", "-1"], [positive_set, negative_set],
+                ["1", "-1"],
+                [positive_set, negative_set],
             ):
                 for entityID in labelset:
                     i = entityIDmap[entityID]
                     mat[i, j] = sign
 
-        fp += "" if fp.endswith(".lsc") else ".lsc"
+        fp = fp if fp.endswith(".lsc") else fp + ".lsc"
         with open(fp, "w") as f:
             # headers
             labelIDlst_str = "\t".join(labelIDlst)
@@ -260,10 +260,10 @@ class BaseLSC(IDHandler.IDprop):
             # annotations
             for i, entityID in enumerate(entityIDlst):
                 indicator_string = "\t".join(map(str, mat[i]))
-                f.write("{entityID}\t{indicator_string}\n")
+                f.write(f"{entityID}\t{indicator_string}\n")
 
     def export_gmt(self, fp):
-        """Export as '.gmt' (Gene Matrix Transpose) file
+        """Export self as a '.gmt' (Gene Matrix Transpose) file.
 
         Input:
             fp(str): path to file to save, including file name, with/without extension.
@@ -273,7 +273,7 @@ class BaseLSC(IDHandler.IDprop):
             for labelID in self.labelIDlst:
                 labelInfo = self.getInfo(labelID)
                 labelset_str = "\t".join(self.getLabelset(labelID))
-                f.write("{labelID}\t{labelInfo}\t{labelset_str}\n")
+                f.write(f"{labelID}\t{labelInfo}\t{labelset_str}\n")
 
     def load_entity_properties(
         self,
@@ -286,6 +286,7 @@ class BaseLSC(IDHandler.IDprop):
         skiprows=0,
     ):
         """Load entity properties from file.
+
         The file is tab seprated with two columns, first column
         contains entities IDs, second column contains corresponding
         properties of entities.
@@ -311,8 +312,7 @@ class BaseLSC(IDHandler.IDprop):
 
     @classmethod
     def from_gmt(cls, fp):
-        """Load data from Gene Matrix Transpose `.gmt` file
-        https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats
+        """Load data from Gene Matrix Transpose `.gmt` file.
 
         Args:
             fg(str): path to the `.gmt` file
@@ -327,8 +327,7 @@ class BaseLSC(IDHandler.IDprop):
 
 
 class SplitLSC(BaseLSC):
-    """Labelset collection with more functionality including negative selection and
-    splitting utility to generate train/test split for each labelset"""
+    """Labelset collection equipped with split generator."""
 
     def __init__(self):
         super(SplitLSC, self).__init__()
@@ -337,8 +336,7 @@ class SplitLSC(BaseLSC):
 
     @property
     def valsplit(self):
-        """:obj:`NLEval.valsplit.Base.BaseValSplit`: validation split
-        generator used to generat train/test split for labelsets"""
+        """Ssplit generator for generating train/(val)/test splits."""
         return self._valsplit
 
     @valsplit.setter
@@ -347,7 +345,9 @@ class SplitLSC(BaseLSC):
         self._valsplit = obj
 
     def train_test_setup(self, graph, prop_name=None, min_pos=10):
-        """Setup training and testing IDs, filter labelsets based on train/test samples
+        """Set up training and testing.
+
+        Filter labelsets based on train/test samples
 
         Args:
             prop_name(str): name of entity properties used for generating splits
@@ -358,9 +358,8 @@ class SplitLSC(BaseLSC):
         """
         if self.valsplit is None:
             raise AttributeError(
-                "'valsplit' not configured, "
-                + "assign validation split generator first. "
-                + "See `NLEval.valsplit` for more info.",
+                "'valsplit' not configured, please assign validation split "
+                "generator first. See `NLEval.valsplit` for more info.",
             )
 
         num_labelsets = None
@@ -370,13 +369,14 @@ class SplitLSC(BaseLSC):
             # labelIDset = set(self.labelIDlst)
             self.valsplit.train_test_setup(self.entity, graph.IDmap, prop_name)
             self.apply(
-                Filter.LabelsetRangeFilterTrainTestPos(min_pos), inplace=True,
+                Filter.LabelsetRangeFilterTrainTestPos(min_pos),
+                inplace=True,
             )
             # for i in labelIDset - set(self.labelIDlst):
             #     print(f"Pop {i}")
 
     def splitLabelset(self, labelID, entityIDlst=None):
-        """Split up a labelset by training and testing sets
+        """Split up a labelset by training and testing sets.
 
         Returns:
             A generator that yeilds train/test IDs and labels, see
@@ -386,8 +386,8 @@ class SplitLSC(BaseLSC):
         if entityIDlst is None:
             entityIDlst = self.entityIDlst.copy()
 
-        pos_ID_set = set(list(self.getLabelset(labelID))) & set(entityIDlst)
-        neg_ID_set = set(list(self.getNegative(labelID))) & set(entityIDlst)
+        pos_ID_set = set(self.getLabelset(labelID)) & set(entityIDlst)
+        neg_ID_set = set(self.getNegative(labelID)) & set(entityIDlst)
 
         ID_ary = np.array(list(pos_ID_set) + list(neg_ID_set))
         label_ary = np.zeros(len(ID_ary), dtype=bool)
@@ -395,7 +395,7 @@ class SplitLSC(BaseLSC):
         return self.valsplit.split(ID_ary, label_ary)
 
     def export_splits(self, fp, graph):
-        """Export (holdout) split information to npz file
+        """Export (holdout) split information to npz file.
 
         Notes:
             * Only allow ``Holdout`` split type for now, since it is not
@@ -415,8 +415,7 @@ class SplitLSC(BaseLSC):
 
         """
         checkers.checkType(
-            "Labelset collection splitter "
-            + "(only support Holdout split now)",
+            "Labelset collection splitter (only support Holdout split now)",
             Base.BaseHoldout,
             self.valsplit,
         )

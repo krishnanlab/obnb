@@ -1,12 +1,12 @@
+import numpy as np
 from NLEval.graph import BaseGraph
 from NLEval.util import checkers
-import numpy as np
 
 __all__ = ["BaseModel"]
 
 
 class BaseModel:
-    """Base model object"""
+    """Base model object."""
 
     def __init__(self, g):
         super(BaseModel, self).__init__()
@@ -14,7 +14,7 @@ class BaseModel:
 
     @property
     def G(self):
-        """:obj:`NLEval.Graph.BaseGraph`: graph object"""
+        """:obj:`NLEval.Graph.BaseGraph`: graph object."""
         return self._G
 
     @G.setter
@@ -23,7 +23,7 @@ class BaseModel:
         self._G = g
 
     def get_idx_ary(self, IDs):
-        """Return indices of corresponding input IDs
+        """Return indices of corresponding input IDs.
 
         Note:
             All ID in the input ID list must be in IDmap of graph
@@ -38,12 +38,12 @@ class BaseModel:
         return self.G.IDmap[IDs]
 
     def get_x(self, IDs):
-        """Return features of input IDs as corresponding rows in graph"""
+        """Return features of input IDs as corresponding rows in graph."""
         idx_ary = self.get_idx_ary(IDs)
         return self.G.mat[idx_ary]
 
     def test(self, labelset_splitgen):
-        """Model testing through validation split
+        """Model testing through validation split.
 
         Input:
             labelset_splitgen: validation split helper objects, see example
@@ -70,13 +70,16 @@ class BaseModel:
         return y_true, y_predict
 
     def test2(self, labelset_splitgen):
-        """Same as test() above, but return y_true and y_pred as list of
-        lists, grouping based on fold/split instead of merging into a
-        single list"""
+        """Model testing through validation split and separate by splits.
+
+        Same as test() above, but return y_true and y_pred as list of lists,
+        grouping based on fold/split instead of merging into a single list
+
+        """
         y_true = []
         y_predict = []
         for arys in labelset_splitgen:
-            train_id_ary, train_label_ary, test_id_ary, test_label_ary = ary
+            train_id_ary, train_label_ary, test_id_ary, test_label_ary = arys
             if train_id_ary is None:
                 return None, None
             self.train(train_id_ary, train_label_ary)
@@ -87,7 +90,7 @@ class BaseModel:
         return y_true, y_predict
 
     def predict(self, pos_ID_set, neg_ID_set):
-        """Network wise prediction
+        """Network wise prediction.
 
         Given positive and negative examples, train the model and then generate
         predictions for all nodes in the network and return as prediction score

@@ -15,9 +15,7 @@ class Master:
         pass
 
     def get_label(self, drop_thresh=None, spec_thresh=None):
-        """
-        Import labels and filter on the fly
-        """
+        """Import labels and filter on the fly."""
         pass
 
     def get_node_property(self):

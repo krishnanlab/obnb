@@ -1,5 +1,5 @@
-from NLEval.model.BaseModel import BaseModel
 import numpy as np
+from NLEval.model.BaseModel import BaseModel
 
 __all__ = ["LP"]
 

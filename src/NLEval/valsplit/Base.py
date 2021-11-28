@@ -1,5 +1,5 @@
-from NLEval.util import checkers, IDHandler
 import numpy as np
+from NLEval.util import IDHandler, checkers
 
 __all__ = ["BaseValSplit", "BaseHoldout", "BaseInterface"]
 
@@ -11,7 +11,7 @@ class BaseValSplit:
 
     @property
     def shuffle(self):
-        """bool: shufle train/test indices when splitting"""
+        """bool: shufle train/test indices when splitting."""
         return self._shuffle
 
     @shuffle.setter
@@ -20,7 +20,7 @@ class BaseValSplit:
         self._shuffle = val
 
     def split(self, ID_ary, label_ary, valid=False):
-        """Split labelset into training, testing (and validation) sets
+        """Split labelset into training, testing (and validation) sets.
 
         Given matching arrays of node IDs and label (currently only support
         binary labels), this function yields the IDs and label for training,
@@ -65,7 +65,7 @@ class BaseValSplit:
 
 class BaseHoldout(BaseValSplit):
     def __init__(self, train_on="top", shuffle=False):
-        """Generic holdout validation object
+        """Initialize base holdout.
 
         Split based on some numeric properties of the samples, train on
         either top or bottom set and test on the other, depending on
@@ -96,10 +96,7 @@ class BaseHoldout(BaseValSplit):
 
     @property
     def train_on(self):
-        """str: train on top or bottom sample sets
-        - 'top': train on top, test on bottom
-        - 'bot': train on bottom, test on top
-        """
+        """Train on top ('top') or bottom ('bot') sample sets."""
         return self._train_on
 
     @train_on.setter
@@ -110,7 +107,7 @@ class BaseHoldout(BaseValSplit):
         self._train_on = val
 
     def get_common_ID_list(self, lscIDs, nodeIDs):
-        """Get list of common IDs between labelset collection and graph
+        """Get list of common IDs between labelset collection and graph.
 
         Note:
             Only included IDs that are part of at least one labelset
@@ -122,7 +119,9 @@ class BaseHoldout(BaseValSplit):
 
         """
         checkers.checkType(
-            "ID for labelset collection entities", IDHandler.IDprop, lscIDs,
+            "ID for labelset collection entities",
+            IDHandler.IDprop,
+            lscIDs,
         )
         checkers.checkType("ID for graph entities", IDHandler.IDmap, nodeIDs)
         common_ID_list = []
@@ -134,14 +133,18 @@ class BaseHoldout(BaseValSplit):
         return common_ID_list
 
     def check_split_setup(self, valid):
-        assert (self._test_ID_ary is not None) & (
-            self._train_ID_ary is not None
-        ), "Training or testing sets not available, run `train_test_setup` first"
-        if valid:
-            assert self._valid_ID_ary is not None, (
-                f"Validation set is only available for TrainValTest split "
-                f"type, current split type is {type(self)!r}"
+        if self._test_ID_ary is None or self._train_ID_ary is None:
+            raise ValueError(
+                "Training or testing sets not available, "
+                "run `train_test_setup` first",
             )
+
+        if valid:
+            if self.valid_ID_ary is None:
+                raise ValueError(
+                    f"Validation set is only available for TrainValTest "
+                    f"split type, current split type is {type(self)!r}",
+                )
 
     def get_split_idx_ary(self, ID_ary, label_ary=None, valid=False):
         self.check_split_setup(valid)
@@ -155,12 +158,13 @@ class BaseHoldout(BaseValSplit):
 
 
 class BaseInterface(BaseValSplit):
-    """Base interface with user defined validation split generator"""
+    """Base interface with user defined validation split generator."""
 
     def __init__(self, shuffle=False):
         super(BaseInterface, self).__init__(shuffle=shuffle)
 
     def setup_split_func(self, split_func):
         self.get_split_idx_ary = lambda ID_ary, label_ary: split_func(
-            ID_ary, label_ary,
+            ID_ary,
+            label_ary,
         )

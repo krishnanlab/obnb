@@ -1,10 +1,9 @@
 from NLEval.util import IDHandler
 from NLEval.util import checkers
-import numpy as np
 
 
 class BaseGraph:
-    """Base Graph object that contains basic graph operations"""
+    """Base Graph object that contains basic graph operations."""
 
     def __init__(self):
         super().__init__()
@@ -20,7 +19,7 @@ class BaseGraph:
         self._IDmap = idmap
 
     def __contains__(self, graph):
-        """Return true if contains the input graph"""
+        """Return true if contains the input graph."""
         for ID in graph.IDmap:  # check if containes all IDs in input graph
             if ID not in self.IDmap:
                 return False
@@ -31,8 +30,10 @@ class BaseGraph:
         return True
 
     def __eq__(self, graph):
-        """Return true if input graph is identical to self
-        i.e. same set of IDs with same connections
+        """Return true if input graph is identical to self.
+
+        For example, same set of IDs with same connections.
+
         """
         if self.IDmap == graph.IDmap:
             return graph in self
@@ -40,9 +41,9 @@ class BaseGraph:
 
     @property
     def size(self):
-        """int: number of nodes in graph"""
+        """int: number of nodes in graph."""
         return self.IDmap.size
 
     def isempty(self):
-        """bool: true if graph is empty, indicated by empty IDmap"""
+        """bool: true if graph is empty, indicated by empty IDmap."""
         return not self.size

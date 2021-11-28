@@ -1,5 +1,5 @@
-import sklearn.metrics
 import numpy as np
+import sklearn.metrics
 
 
 def prior(y_true):

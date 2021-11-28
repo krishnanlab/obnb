@@ -14,7 +14,8 @@ def shuffle_sparse(graph):
     n = graph.size
     shuffle_idx = np.random.choice(n, size=n, replace=False)
     new_graph = SparseGraph.SparseGraph(
-        weighted=graph.weighted, directed=graph.directed,
+        weighted=graph.weighted,
+        directed=graph.directed,
     )
     for i in shuffle_idx:
         ID = graph.IDmap.lst[i]
@@ -101,28 +102,36 @@ class TestSparseGraph(unittest.TestCase):
 
     def test_read_edglst_unweighted(self):
         graph = SparseGraph.SparseGraph.from_edglst(
-            self.case.tu_fp, weighted=False, directed=False,
+            self.case.tu_fp,
+            weighted=False,
+            directed=False,
         )
         self.assertEqual(graph.IDmap.lst, self.case.IDlst)
         self.assertEqual(graph.edge_data, self.case.data_unweighted)
 
     def test_read_edglst_weighted(self):
         graph = SparseGraph.SparseGraph.from_edglst(
-            self.case.tw_fp, weighted=True, directed=False,
+            self.case.tw_fp,
+            weighted=True,
+            directed=False,
         )
         self.assertEqual(graph.IDmap.lst, self.case.IDlst)
         self.assertEqual(graph.edge_data, self.case.data_weighted)
 
     def test_read_npymat_weighted(self):
         graph = SparseGraph.SparseGraph.from_npy(
-            self.case.data_mat, weighted=True, directed=False,
+            self.case.data_mat,
+            weighted=True,
+            directed=False,
         )
         self.assertEqual(graph.IDmap.lst, self.case.IDlst)
         self.assertEqual(graph.edge_data, self.case.data_weighted)
 
     def template_test_construct_adj_vec(self, weighted, directed, lst=None):
         graph = SparseGraph.SparseGraph.from_npy(
-            self.case.data_mat, weighted=weighted, directed=directed,
+            self.case.data_mat,
+            weighted=weighted,
+            directed=directed,
         )
         adjmat = graph.to_adjmat()
         if not lst:
@@ -140,17 +149,23 @@ class TestSparseGraph(unittest.TestCase):
 
     def test_construct_adj_vec_weighted_multiple(self):
         self.template_test_construct_adj_vec(
-            weighted=True, directed=False, lst=self.lst,
+            weighted=True,
+            directed=False,
+            lst=self.lst,
         )
 
     def test_construct_adj_vec_unweighted_multiple(self):
         self.template_test_construct_adj_vec(
-            weighted=False, directed=False, lst=self.lst,
+            weighted=False,
+            directed=False,
+            lst=self.lst,
         )
 
     def test_eq(self):
         graph = SparseGraph.SparseGraph.from_npy(
-            self.case.data_mat, weighted=True, directed=False,
+            self.case.data_mat,
+            weighted=True,
+            directed=False,
         )
         for i in range(5):
             # repeat shuffle test
@@ -215,12 +230,17 @@ class TestDenseGraph(unittest.TestCase):
         DenseGraph.DenseGraph.construct_graph(idmap.lst, mat1)
         # test inconsistent size input --> error
         self.assertRaises(
-            ValueError, DenseGraph.DenseGraph.construct_graph, idmap, mat2,
+            ValueError,
+            DenseGraph.DenseGraph.construct_graph,
+            idmap,
+            mat2,
         )
 
     def test_from_edglst(self):
         graph = DenseGraph.DenseGraph.from_edglst(
-            self.case.tw_fp, weighted=True, directed=False,
+            self.case.tw_fp,
+            weighted=True,
+            directed=False,
         )
         self.check_graph(graph)
 
@@ -230,7 +250,9 @@ class TestDenseGraph(unittest.TestCase):
 
     def test_eq(self):
         graph = DenseGraph.DenseGraph.from_edglst(
-            self.case.tw_fp, weighted=True, directed=False,
+            self.case.tw_fp,
+            weighted=True,
+            directed=False,
         )
         for i in range(5):
             # repeat shuffle test

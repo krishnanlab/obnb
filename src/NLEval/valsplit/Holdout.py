@@ -1,12 +1,12 @@
-from NLEval.util import checkers, IDHandler
-from NLEval.valsplit.Base import *
 import numpy as np
+from NLEval.util import checkers
+from NLEval.valsplit.Base import *
 
 __all__ = ["BinHold", "ThreshHold", "CustomHold", "TrainTestAll"]
 
 
 class TrainValTest(BaseHoldout):
-    """Split into train-val-test sets by ratios
+    """Split into train-val-test sets by ratios.
 
     Sort the entities based on the desired properties and then prepare the
     splits according to the train-val-test ratio.
@@ -78,7 +78,7 @@ class TrainValTest(BaseHoldout):
 
 class BinHold(BaseHoldout):
     def __init__(self, bin_num, train_on="top", shuffle=False):
-        """
+        """Initialize bining holdout object.
 
         Args:
             bin_num(int): num of bins for bin_num mode (see mode)
@@ -104,7 +104,7 @@ class BinHold(BaseHoldout):
         self._bin_num = val
 
     def train_test_setup(self, lscIDs, nodeIDs, prop_name, **kwargs):
-        """
+        """Set up training and testing.
 
         Args:
             lscIDs(:obj:`NLEval.util.IDHandler.IDprop`)
@@ -126,10 +126,11 @@ class BinHold(BaseHoldout):
 
 class ThreshHold(BaseHoldout):
     def __init__(self, cut_off, train_on="top", shuffle=False):
-        """
+        """Initialize threshold holdout split object.
 
         Args:
-            cut_off:        cut-off point for cut mode, num of bins for bin mode (see mode)
+            cut_off: cut-off point for the 'cut' mode, or number of bins for
+                the 'bin' mode (see mode).
 
         """
         super(ThreshHold, self).__init__(train_on=train_on, shuffle=shuffle)
@@ -151,7 +152,7 @@ class ThreshHold(BaseHoldout):
         self._cut_off = val
 
     def train_test_setup(self, lscIDs, nodeIDs, prop_name, **kwargs):
-        """
+        """Set up training and testing.
 
         Args:
             lscIDs(:obj:`NLEval.util.IDHandler.IDprop`)
@@ -184,7 +185,7 @@ class CustomHold(BaseHoldout):
         custom_valid_ID_ary=None,
         shuffle=False,
     ):
-        """User defined training and testing samples"""
+        """User defined training and testing samples."""
         super(CustomHold, self).__init__(shuffle=shuffle)
         self.custom_train_ID_ary = custom_train_ID_ary
         self.custom_test_ID_ary = custom_test_ID_ary
@@ -221,17 +222,21 @@ class CustomHold(BaseHoldout):
             self._custom_valid_ID_ary = None
         else:
             checkers.checkTypesInNumpyArray(
-                "Validation data ID list", str, ID_ary,
+                "Validation data ID list",
+                str,
+                ID_ary,
             )
             self._custom_valid_ID_ary = ID_ary
 
     def train_test_setup(self, lscIDs, nodeIDs, **kwargs):
         common_ID_list = self.get_common_ID_list(lscIDs, nodeIDs)
         self._train_ID_ary = np.intersect1d(
-            self.custom_train_ID_ary, common_ID_list,
+            self.custom_train_ID_ary,
+            common_ID_list,
         )
         self._test_ID_ary = np.intersect1d(
-            self.custom_test_ID_ary, common_ID_list,
+            self.custom_test_ID_ary,
+            common_ID_list,
         )
         self._valid_ID_ary = (
             None
@@ -242,7 +247,7 @@ class CustomHold(BaseHoldout):
 
 class TrainTestAll(BaseHoldout):
     def __init__(self, shuffle=False):
-        """Train and test on all data"""
+        """Train and test on all data."""
         super(TrainTestAll, self).__init__(shuffle=shuffle)
 
     def train_test_setup(self, lscIDs, nodeIDs, **kwargs):
@@ -257,7 +262,7 @@ class HoldoutChildTemplate(BaseHoldout):
     """
     def __init__(self, **args, min_pos=10, **kwargs):
         super().__init__(min_pos=min_pos)
-    
+
     def __repr__(self):
         return (
             f'HoldoutChildTemplate(min_pos={self.min_pose!r}, '
@@ -267,7 +272,7 @@ class HoldoutChildTemplate(BaseHoldout):
     @property
     def foo(self):
         return self._foo
-    
+
     @foo.setter
     def foo(self, val):
         self._foo = val
