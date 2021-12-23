@@ -1,5 +1,8 @@
 import multiprocessing as mp
-from typing import Any, Generator, List, no_type_check
+from typing import Any
+from typing import Generator
+from typing import List
+from typing import no_type_check
 
 from NLEval.util import checkers
 
@@ -10,7 +13,7 @@ class ParDat:
     """Run function over a list of args in parallel.
 
     This method is bulit upon ``multiprocessing`` using the parent-children
-    communications. Specifically, it first spqwns ``n_workers`` number of
+    communications. Specifically, it first spawns ``n_workers`` number of
     children (if this number is smaller than the total number of jobs), each
     remains a point communication with the parent process. The parent process
     then distribut jobs among the children processes. When a child process
@@ -105,22 +108,24 @@ class ParDat:
 
     @no_type_check
     @staticmethod
-    def worker(conn, q, job_list, func, func_args, func_kwargs):
+    def worker(worker_id, conn, q, func, func_args, func_kwargs):
         """Worker instance.
 
         Args:
+            worker_id: Index of the worker, used to identify child connection
+                for communicaition from the parent process.
             conn: Connection with the parent process.
             q: Queue on which the results are placed.
-            job_list: List of main arguments for the function to parallelize
             func: function to parallelize
             func_args: remaining positional arguments for the function
             func_kwargs: keyword arguments for the fucntion
         """
-        job_id = worker_id = conn.recv()
-        while job_id is not None:
-            result = func(job_list[job_id], *func_args, **func_kwargs)
+        main_arg = conn.recv()
+        # TODO: create a end process indicator instead of using None.
+        while main_arg is not None:
+            result = func(main_arg, *func_args, **func_kwargs)
             q.put((worker_id, result))
-            job_id = conn.recv()
+            main_arg = conn.recv()
         conn.close()
 
     @property
@@ -173,12 +178,13 @@ class ParDat:
         queue where the parent process can grab the results.
         """
         parent_conn, child_conn = mp.Pipe()
+        worker_id = len(self._p)
         new_process = mp.Process(
             target=ParDat.worker,
             args=(
+                worker_id,
                 child_conn,
                 self._q,
-                self.job_list,
                 func,
                 func_args,
                 func_kwargs,
@@ -186,10 +192,9 @@ class ParDat:
         )
         new_process.daemon = True
 
-        # launch process and send job id
-        worker_id = len(self._p)
+        # launch process and send main arg
         new_process.start()
-        parent_conn.send(worker_id)
+        parent_conn.send(self.job_list[worker_id])
 
         # put communication and process to master lists
         self._parent_conn.append(parent_conn)
@@ -202,7 +207,7 @@ class ParDat:
             job_id: Index for next main argument to use.
         """
         worker_id, result = self._q.get()
-        self._parent_conn[worker_id].send(job_id)
+        self._parent_conn[worker_id].send(self.job_list[job_id])
         self.log()
         return result
 
@@ -226,5 +231,7 @@ class ParDat:
             filled_length = self._n_finished * self.bar_length // self.n_jobs
             empty_length = self.bar_length - filled_length
             bar_str = "|" + "#" * filled_length + " " * empty_length + "|"
-            progress_str = f"{bar_str} {self._n_finished} / {self.n_jobs} finished"
+            progress_str = (
+                f"{bar_str} {self._n_finished} / {self.n_jobs} finished"
+            )
             print(progress_str, end="\r", flush=True)
