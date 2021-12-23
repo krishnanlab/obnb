@@ -1,9 +1,10 @@
 import unittest
 
 import numpy as np
-
-from NLEval.util import IDHandler, checkers
-from NLEval.util.Exceptions import IDNotExistError, IDExistsError
+from NLEval.util import checkers
+from NLEval.util import IDHandler
+from NLEval.util.Exceptions import IDExistsError
+from NLEval.util.Exceptions import IDNotExistError
 
 
 class TestIDlst(unittest.TestCase):

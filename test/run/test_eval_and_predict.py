@@ -18,15 +18,19 @@ min_labelset_size = 50  # minimum number of positive required in a labelset
 score_cutoff = 1.2  # minimum score required for prediction
 
 g = graph.SparseGraph.SparseGraph.from_edglst(
-    network_fp, weighted=False, directed=False
+    network_fp,
+    weighted=False,
+    directed=False,
 )
 lsc = label.LabelsetCollection.SplitLSC.from_gmt(labelset_fp)
 lsc.valsplit = valsplit.Interface.SklSKF(
-    shuffle=True, skl_kws={"n_splits": n_split}
+    shuffle=True,
+    skl_kws={"n_splits": n_split},
 )
 
 lsc.apply(
-    label.Filter.EntityExistanceFilter(target_lst=g.idmap.lst), inplace=True
+    label.Filter.EntityExistanceFilter(target_lst=g.idmap.lst),
+    inplace=True,
 )
 lsc.apply(
     label.Filter.LabelsetRangeFilterSize(min_val=min_labelset_size),
@@ -34,11 +38,12 @@ lsc.apply(
 )
 lsc.apply(label.Filter.NegativeFilterHypergeom(p_thresh=p_thresh), inplace=True)
 print(
-    f"After filtering, there are {len(lsc.label_ids)} number of effective labelsets"
+    f"After filtering, there are {len(lsc.label_ids)} number of effective labelsets",
 )
 
 scoring_obj = lambda estimator, X, y: metrics.log2_auprc_prior(
-    y, estimator.decision_function(X)
+    y,
+    estimator.decision_function(X),
 )
 mdl = model.SupervisedLearning.LogRegCV(
     g,
@@ -62,7 +67,7 @@ def predict_all_labelsets(label_id):
 
     y_true, y_predict = mdl.test2(lsc.split_labelset(label_id))
     score = np.mean(
-        [metrics.log2_auprc_prior(i, j) for i, j in zip(y_true, y_predict)]
+        [metrics.log2_auprc_prior(i, j) for i, j in zip(y_true, y_predict)],
     )
 
     if score > score_cutoff:
@@ -85,7 +90,7 @@ def predict_all_labelsets(label_id):
 
     print(
         f"{label_id:<60} num_pos={len(pos_ids_set):>4}, "
-        f"num_neg={len(neg_ids_set):>4}, score={score:>3.2f} {status_str}"
+        f"num_neg={len(neg_ids_set):>4}, score={score:>3.2f} {status_str}",
     )
 
 

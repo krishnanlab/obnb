@@ -25,10 +25,14 @@ print(f"Number of labelsets in original file: {len(lsc.label_ids)}")
 lsc.apply(label.Filter.EntityExistanceFilter(g.idmap.lst), inplace=True)
 lsc.apply(label.Filter.LabelsetRangeFilterSize(min_val=50), inplace=True)
 lsc.load_entity_properties(
-    data_path + "/properties/pubcnt.txt", "Pubmed Count", 0, int
+    data_path + "/properties/pubcnt.txt",
+    "Pubmed Count",
+    0,
+    int,
 )
 lsc.valsplit = valsplit.Holdout.TrainValTest(
-    train_ratio=train_ratio, test_ratio=test_ratio
+    train_ratio=train_ratio,
+    test_ratio=test_ratio,
 )
 
 print(f"Number of labelsets before filtering: {len(lsc.label_ids)}")
@@ -40,7 +44,7 @@ print(
     f"min_pos={min_pos}): {len(lsc.label_ids)}\n"
     f"Number of training = {lsc.valsplit.train_index.size}, "
     f"validation = {lsc.valsplit.valid_index.size}, "
-    f"testing = {lsc.valsplit.test_index.size}"
+    f"testing = {lsc.valsplit.test_index.size}",
 )
 
 """

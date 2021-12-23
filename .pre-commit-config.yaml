@@ -25,4 +25,4 @@ repos:
     rev: 21.12b0
     hooks:
     -   id: black
-        args: [--safe -l 80]
+        args: ["--safe", "-l80"]

@@ -2,11 +2,12 @@ import os
 import unittest
 
 import numpy as np
-
 from common import SAMPLE_DATA_DIR
 from NLEval import valsplit
-from NLEval.label import LabelsetCollection, Filter
-from NLEval.util.Exceptions import IDNotExistError, IDExistsError
+from NLEval.label import Filter
+from NLEval.label import LabelsetCollection
+from NLEval.util.Exceptions import IDExistsError
+from NLEval.util.Exceptions import IDNotExistError
 
 
 class TestBaseLSC(unittest.TestCase):
@@ -257,7 +258,10 @@ class TestBaseLSC(unittest.TestCase):
             # test label_id input type
             self.assertRaises(TypeError, self.lsc.update_labelset, ["a"], 123)
             self.assertRaises(
-                TypeError, self.lsc.update_labelset, ["a"], [1, 2]
+                TypeError,
+                self.lsc.update_labelset,
+                ["a"],
+                [1, 2],
             )
             self.assertRaises(
                 TypeError,

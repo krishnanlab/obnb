@@ -2,9 +2,8 @@ import os
 import unittest
 
 import numpy as np
-from sklearn.linear_model import LogisticRegression
-
 from NLEval.wrapper.ParWrap import ParDat
+from sklearn.linear_model import LogisticRegression
 
 
 class TestParDatLogReg(unittest.TestCase):
@@ -59,6 +58,7 @@ class TestParDat(unittest.TestCase):
         @ParDat(job_list=self.job_list, n_workers=self.n_workers)
         def func(i):
             return i, np.sqrt(self.num_list[i])
+
         out_list = [None for _ in self.job_list]
         for i, j in func():
             out_list[i] = j
@@ -69,8 +69,13 @@ class TestParDat(unittest.TestCase):
         def func(i):
             return i, np.sqrt(self.num_list[i])
 
+        wrapped_func = ParDat(
+            job_list=self.job_list,
+            n_workers=self.n_workers,
+        )(func)
+
         out_list = [None for _ in self.job_list]
-        for i, j in ParDat(job_list=self.job_list, n_workers=self.n_workers)(func)():
+        for i, j in wrapped_func():
             out_list[i] = j
 
         self.assertEqual(self.sqrt_list, out_list)

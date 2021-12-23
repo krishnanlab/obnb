@@ -12,10 +12,12 @@ k = 50  # numbers of top genes to display
 
 # load graph and labelset collection
 g = graph.DenseGraph.DenseGraph.from_edglst(
-    data_path + "networks/STRING-EXP.edg", weighted=True, directed=False
+    data_path + "networks/STRING-EXP.edg",
+    weighted=True,
+    directed=False,
 )
 lsc = label.LabelsetCollection.SplitLSC.from_gmt(
-    data_path + "labels/KEGGBP.gmt"
+    data_path + "labels/KEGGBP.gmt",
 )
 
 # initialize model
