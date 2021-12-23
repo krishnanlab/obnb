@@ -1,0 +1,4 @@
+tox==3.24.4
+pre-commit==2.16.0
+pytest==6.2.5
+pytest-cov==3.0.0
