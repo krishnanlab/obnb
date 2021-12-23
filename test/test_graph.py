@@ -4,9 +4,7 @@ from copy import deepcopy
 
 import numpy as np
 from commonvar import SAMPLE_DATA_DIR
-from NLEval.graph import BaseGraph
-from NLEval.graph import DenseGraph
-from NLEval.graph import SparseGraph
+from NLEval.graph import BaseGraph, DenseGraph, SparseGraph
 from NLEval.util import IDHandler
 from scipy.spatial import distance
 

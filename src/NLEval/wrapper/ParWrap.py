@@ -1,8 +1,5 @@
 import multiprocessing as mp
-from typing import Any
-from typing import Generator
-from typing import List
-from typing import no_type_check
+from typing import Any, Generator, List, no_type_check
 
 from NLEval.util import checkers
 

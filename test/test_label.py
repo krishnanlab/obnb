@@ -4,10 +4,8 @@ import unittest
 import numpy as np
 from commonvar import SAMPLE_DATA_DIR
 from NLEval import valsplit
-from NLEval.label import Filter
-from NLEval.label import LabelsetCollection
-from NLEval.util.Exceptions import IDExistsError
-from NLEval.util.Exceptions import IDNotExistError
+from NLEval.label import Filter, LabelsetCollection
+from NLEval.util.Exceptions import IDExistsError, IDNotExistError
 
 
 class TestBaseLSC(unittest.TestCase):
