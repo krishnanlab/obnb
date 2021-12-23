@@ -9,6 +9,12 @@ from NLEval.util import checkers
 mp.set_start_method("fork")
 
 
+class EndOfJobIndicator:
+    """Indicate end of job."""
+
+    pass
+
+
 class ParDat:
     """Run function over a list of args in parallel.
 
@@ -121,8 +127,7 @@ class ParDat:
             func_kwargs: keyword arguments for the fucntion
         """
         main_arg = conn.recv()
-        # TODO: create a end process indicator instead of using None.
-        while main_arg is not None:
+        while main_arg is not EndOfJobIndicator:
             result = func(main_arg, *func_args, **func_kwargs)
             q.put((worker_id, result))
             main_arg = conn.recv()
@@ -215,7 +220,7 @@ class ParDat:
         """Kill all children processes after the final round."""
         for _ in self._p:
             worker_id, result = self._q.get()
-            self._parent_conn[worker_id].send(None)
+            self._parent_conn[worker_id].send(EndOfJobIndicator)
             self.log()
             yield result
 
