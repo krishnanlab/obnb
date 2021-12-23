@@ -1,5 +1,5 @@
 import time
-from typing import Callable
+import typing
 
 from NLEval.util import checkers
 
@@ -15,7 +15,8 @@ class TimeIt:
         """
         self.verbose = verbose
 
-    def __call__(self, func: Callable) -> None:
+    @typing.no_type_check
+    def __call__(self, func):
         """Return function wrapped with timer."""
 
         def wrapper(*args):
@@ -27,10 +28,10 @@ class TimeIt:
         return wrapper if self.verbose else func
 
     @property
-    def verbose(self):
+    def verbose(self) -> bool:
         return self._verbose
 
     @verbose.setter
-    def verbose(self, val):
+    def verbose(self, val: bool) -> None:
         checkers.checkTypeErrNone("verbose", bool, val)
         self._verbose = val

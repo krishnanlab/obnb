@@ -134,7 +134,5 @@ class ParDat:
             filled_length = self._n_finished * self.bar_length // self._n_jobs
             empty_length = self.bar_length - filled_length
             bar_str = "|" + "#" * filled_length + " " * empty_length + "|"
-            progress_str = (
-                f"{bar_str} {self._n_finished} / {self._n_jobs} finished"
-            )
+            progress_str = f"{bar_str} {self._n_finished} / {self._n_jobs} finished"
             print(progress_str, end="\r", flush=True)
