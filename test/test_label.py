@@ -2,7 +2,7 @@ import os
 import unittest
 
 import numpy as np
-from common import SAMPLE_DATA_DIR
+from commonvar import SAMPLE_DATA_DIR
 from NLEval import valsplit
 from NLEval.label import Filter
 from NLEval.label import LabelsetCollection

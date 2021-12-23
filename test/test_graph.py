@@ -3,7 +3,7 @@ import unittest
 from copy import deepcopy
 
 import numpy as np
-from common import SAMPLE_DATA_DIR
+from commonvar import SAMPLE_DATA_DIR
 from NLEval.graph import BaseGraph
 from NLEval.graph import DenseGraph
 from NLEval.graph import SparseGraph
