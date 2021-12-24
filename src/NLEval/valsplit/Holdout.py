@@ -20,6 +20,7 @@ class TrainValTest(BaseHoldout):
     """
 
     def __init__(self, train_ratio, test_ratio, train_on="top", shuffle=False):
+        """Initialize TrainValTest object."""
         super().__init__(train_on=train_on, shuffle=shuffle)
         self.train_ratio = train_ratio
         self.test_ratio = test_ratio

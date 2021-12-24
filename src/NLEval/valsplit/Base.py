@@ -11,6 +11,7 @@ class BaseValSplit:
         self.settings = []
 
     def __repr__(self):
+        """Representation of validation split objects."""
         name = self.__class__.__name__
         settings_str = [f"{i}={getattr(self, i)!r}" for i in self.settings]
         return f"{name}({', '.join(settings_str)})"
