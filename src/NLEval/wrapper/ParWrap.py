@@ -7,12 +7,6 @@ from tqdm import tqdm
 mp.set_start_method("fork")
 
 
-class EndOfJobIndicator:
-    """Indicate end of job."""
-
-    pass
-
-
 class ParDat:
     """Run function over a list of args in parallel.
 
@@ -103,10 +97,10 @@ class ParDat:
                             self.spawn(func, func_args, func_kwargs)
                         else:
                             pbar.update(1)
-                            yield self.get_result_and_assign_next(job_id)
+                            yield self.get_result_and_assign_next(job_id)[1]
                     for result in self.terminate():
                         pbar.update(1)
-                        yield result
+                        yield result[1]
                 else:
                     for job in self.job_list:
                         pbar.update(1)
@@ -116,23 +110,24 @@ class ParDat:
 
     @no_type_check
     @staticmethod
-    def worker(worker_id, conn, q, func, func_args, func_kwargs):
+    def worker(worker_id, conn, job_list, q, func, func_args, func_kwargs):
         """Worker instance.
 
         Args:
             worker_id: Index of the worker, used to identify child connection
                 for communicaition from the parent process.
             conn: Connection with the parent process.
+            job_list: List of main arguments for the function.
             q: Queue on which the results are placed.
-            func: function to parallelize
-            func_args: remaining positional arguments for the function
-            func_kwargs: keyword arguments for the fucntion
+            func: Function to parallelize.
+            func_args: Remaining positional arguments for the function.
+            func_kwargs: Keyword arguments for the fucntion.
         """
-        main_arg = conn.recv()
-        while main_arg is not EndOfJobIndicator:
-            result = func(main_arg, *func_args, **func_kwargs)
-            q.put((worker_id, result))
-            main_arg = conn.recv()
+        job_id = worker_id
+        while job_id is not None:
+            result = func(job_list[job_id], *func_args, **func_kwargs)
+            q.put((worker_id, job_id, result))
+            job_id = conn.recv()
         conn.close()
 
     @property
@@ -184,6 +179,7 @@ class ParDat:
         Set up communication with the child process and set up the result
         queue where the parent process can grab the results.
         """
+        # Setup parent child connection and start a child process
         parent_conn, child_conn = mp.Pipe()
         worker_id = len(self._p)
         new_process = mp.Process(
@@ -191,6 +187,7 @@ class ParDat:
             args=(
                 worker_id,
                 child_conn,
+                self.job_list,
                 self._q,
                 func,
                 func_args,
@@ -198,12 +195,9 @@ class ParDat:
             ),
         )
         new_process.daemon = True
-
-        # launch process and send main arg
         new_process.start()
-        parent_conn.send(self.job_list[worker_id])
 
-        # put communication and process to master lists
+        # Put communication and process to master lists
         self._parent_conn.append(parent_conn)
         self._p.append(new_process)
 
@@ -213,13 +207,13 @@ class ParDat:
         Args:
             job_id: Index for next main argument to use.
         """
-        worker_id, result = self._q.get()
-        self._parent_conn[worker_id].send(self.job_list[job_id])
-        return result
+        worker_id, prev_job_id, result = self._q.get()
+        self._parent_conn[worker_id].send(job_id)
+        return prev_job_id, result
 
     def terminate(self) -> Generator[None, Any, None]:
         """Kill all children processes after the final round."""
         for _ in self._p:
-            worker_id, result = self._q.get()
-            self._parent_conn[worker_id].send(EndOfJobIndicator)
-            yield result
+            worker_id, prev_job_id, result = self._q.get()
+            self._parent_conn[worker_id].send(None)
+            yield prev_job_id, result
