@@ -22,5 +22,5 @@ print(f"{'Term':<62} {'Original':<8} {'Filtered':<8}")
 for ID in lsc.label_ids:
     print(
         f"{ID:<62} {len(lsc_orig.get_negative(ID)):>8d} "
-        f"{len(lsc.get_negative(ID)):>8d}"
+        f"{len(lsc.get_negative(ID)):>8d}",
     )

@@ -1,13 +1,12 @@
 import os
 import unittest
+from copy import deepcopy
 
 import numpy as np
-from copy import deepcopy
-from scipy.spatial import distance
-
-from common import SAMPLE_DATA_DIR
-from NLEval.graph import BaseGraph, SparseGraph, DenseGraph
+from commonvar import SAMPLE_DATA_DIR
+from NLEval.graph import BaseGraph, DenseGraph, SparseGraph
 from NLEval.util import IDHandler
+from scipy.spatial import distance
 
 
 def shuffle_sparse(graph):
@@ -194,7 +193,8 @@ class TestDenseGraph(unittest.TestCase):
                     node_id2=node_id2,
                 ):
                     self.assertEqual(
-                        mat[idx1, idx2], graph.get_edge(node_id1, node_id2)
+                        mat[idx1, idx2],
+                        graph.get_edge(node_id1, node_id2),
                     )
 
     def test_mat(self):

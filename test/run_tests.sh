@@ -6,6 +6,6 @@ cd $home_dir
 for i in $(ls test_*.py); do
 	echo $i
 	python $i
-	echo 
+	echo
 	echo
 done

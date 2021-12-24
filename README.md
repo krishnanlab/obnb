@@ -1,4 +1,5 @@
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)
+![Tests](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/tests.yml/badge.svg)
 
 # NetworkLearningEval
 
@@ -47,7 +48,11 @@ LPA_score_dict = LP_A.predict(positive_set, negative_set)
 * [pytest](https://docs.pytest.org/en/6.2.x/)
 * [pytest-cov](https://pypi.org/project/pytest-cov/) (not used yet)
 
+See ``requirements-dev.txt``.
+
 ### Coding style
+
+[Update] now these are taken care by pre-commit hooks.
 
 Use [``black``](https://github.com/psf/black) to format code, also enforce max 80 line length.
 
