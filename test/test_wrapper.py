@@ -2,7 +2,7 @@ import os
 import unittest
 
 import numpy as np
-from NLEval.wrapper.ParWrap import ParDat
+from NLEval.wrapper.ParWrap import ParDat, ParDatMap
 from sklearn.linear_model import LogisticRegression
 
 
@@ -77,6 +77,24 @@ class TestParDat(unittest.TestCase):
         out_list = [None for _ in self.job_list]
         for i, j in wrapped_func():
             out_list[i] = j
+
+        self.assertEqual(self.sqrt_list, out_list)
+
+
+class TestParDatMap(unittest.TestCase):
+    def setUp(self):
+        self.num_list = num_list = list(range(100))
+        self.sqrt_list = np.sqrt(num_list).tolist()
+        self.job_list = list(range(len(num_list)))
+        self.n_workers = 4
+
+    def test_parallel_sqrt(self):
+        wrapped_func = ParDatMap(
+            job_list=self.job_list,
+            n_workers=self.n_workers,
+        )(np.sqrt)
+
+        out_list = wrapped_func()
 
         self.assertEqual(self.sqrt_list, out_list)
 

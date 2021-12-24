@@ -1,5 +1,5 @@
 import multiprocessing as mp
-from typing import Any, Generator, List, no_type_check
+from typing import Any, Iterator, List, Tuple, no_type_check
 
 from NLEval.util import checkers
 from tqdm import tqdm
@@ -43,15 +43,9 @@ class ParDat:
         >>>     print(result)
 
         Notice that in this way, we don't have the guarantee that the result
-        coming back have the same order.
-
-    Todo:
-        * Make a version of ParDat that return a list of results in the order
-            of the input arguments.
-        * Make a version of ParDat that run all the functions in parallel
-            and do not gather reults. This is useful for cases where ``func``
-            do not actually return anything, but just print some statements,
-            for example.
+        coming back have the same order. To enforce the order, use ParDatMap,
+        which return the results in a list with the same order as the input
+        main arguments.
     """
 
     def __init__(
@@ -103,8 +97,8 @@ class ParDat:
                         yield result[1]
                 else:
                     for job in self.job_list:
-                        pbar.update(1)
                         yield func(job, *func_args, **func_kwargs)
+                        pbar.update(1)
 
         return wrapper
 
@@ -211,9 +205,102 @@ class ParDat:
         self._parent_conn[worker_id].send(job_id)
         return prev_job_id, result
 
-    def terminate(self) -> Generator[None, Any, None]:
+    def terminate(self) -> Iterator[Tuple[int, Any]]:
         """Kill all children processes after the final round."""
         for _ in self._p:
             worker_id, prev_job_id, result = self._q.get()
             self._parent_conn[worker_id].send(None)
             yield prev_job_id, result
+
+
+class ParDatMap(ParDat):
+    """Run function over a list of args in parallel and return list of results.
+
+    Examples:
+        >>> @ParDatMap(job_list=mylist, n_workers=4)
+        >>> def func(main_arg, *args, **kwargs):
+        >>>     result = ... # do something
+        >>>     return result
+        >>>
+        >>> # Now can compute and show the results as follow
+        >>> results = func(*args, **kwargs):
+        >>>
+        >>> # Alternatively, wrap the function right before calling
+        >>> results = ParDatMap(job_list=mylist)(func)(*args, **kwargs):
+    """
+
+    @no_type_check
+    def __call__(self, func):
+        """Return the parallelized function over the input arguments."""
+
+        def wrapper(*func_args, **func_kwargs):
+            n_workers = self.n_workers
+            n_jobs = self.n_jobs
+            disable = not self.verbose
+            results = [None] * n_jobs
+
+            with tqdm(total=n_jobs, disable=disable) as pbar:
+                if n_workers > 1:
+                    for job_id in range(self.n_jobs):
+                        if len(self._p) < n_workers:
+                            self.spawn(func, func_args, func_kwargs)
+                        else:
+                            pbar.update(1)
+                            result = self.get_result_and_assign_next(job_id)
+                            results[result[0]] = result[1]
+                    for result in self.terminate():
+                        pbar.update(1)
+                        results[result[0]] = result[1]
+                else:
+                    for i, job in enumerate(self.job_list):
+                        results[i] = func(job, *func_args, **func_kwargs)
+                        pbar.update(1)
+
+            return results
+
+        return wrapper
+
+
+class ParDatExe(ParDat):
+    """Run function over a list of args in parallel and do not capture outputs.
+
+    Examples:
+        >>> @ParDatExe(job_list=mylist, n_workers=4)
+        >>> def func(main_arg, *args, **kwargs):
+        >>>     # do something, but do not output anything
+        >>>
+        >>> # Now can execute the functions in parallel over elements in mylist
+        >>> func(*args, **kwargs):
+        >>>
+        >>> # Alternatively, wrap the function right before calling
+        >>> ParDatExe(job_list=mylist)(func)(*args, **kwargs):
+    """
+
+    @no_type_check
+    def __call__(self, func):
+        """Return the parallelized function over the input arguments."""
+
+        def wrapper(*func_args, **func_kwargs):
+            n_workers = self.n_workers
+            n_jobs = self.n_jobs
+            disable = not self.verbose
+            results = [None] * n_jobs
+
+            with tqdm(total=n_jobs, disable=disable) as pbar:
+                if n_workers > 1:
+                    for job_id in range(self.n_jobs):
+                        if len(self._p) < n_workers:
+                            self.spawn(func, func_args, func_kwargs)
+                        else:
+                            pbar.update(1)
+                            self.get_result_and_assign_next(job_id)
+                    for _ in self.terminate():
+                        pbar.update(1)
+                else:
+                    for job in self.job_list:
+                        func(job, *func_args, **func_kwargs)
+                        pbar.update(1)
+
+            return results
+
+        return wrapper
