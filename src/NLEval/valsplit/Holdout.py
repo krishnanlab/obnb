@@ -20,7 +20,7 @@ class TrainValTest(BaseHoldout):
     """
 
     def __init__(self, train_ratio, test_ratio, train_on="top", shuffle=False):
-        super(TrainValTest, self).__init__(train_on=train_on, shuffle=shuffle)
+        super().__init__(train_on=train_on, shuffle=shuffle)
         self.train_ratio = train_ratio
         self.test_ratio = test_ratio
         self.settings = ["train_ratio", "test_ratio", "train_on", "shuffle"]
@@ -83,7 +83,7 @@ class BinHold(BaseHoldout):
             bin_num(int): num of bins for bin_num mode (see mode)
 
         """
-        super(BinHold, self).__init__(train_on=train_on, shuffle=shuffle)
+        super().__init__(train_on=train_on, shuffle=shuffle)
         self.bin_num = bin_num
         self.settings = ["bin_num", "train_on", "shuffle"]
 
@@ -130,7 +130,7 @@ class ThreshHold(BaseHoldout):
                 the 'bin' mode (see mode).
 
         """
-        super(ThreshHold, self).__init__(train_on=train_on, shuffle=shuffle)
+        super().__init__(train_on=train_on, shuffle=shuffle)
         self.cut_off = cut_off
         self.settings = ["cut_off", "train_on", "shuffle"]
 
@@ -178,7 +178,7 @@ class CustomHold(BaseHoldout):
         shuffle=False,
     ):
         """User defined training and testing samples."""
-        super(CustomHold, self).__init__(shuffle=shuffle)
+        super().__init__(shuffle=shuffle)
         self.custom_train_index = custom_train_index
         self.custom_test_index = custom_test_index
         self.custom_valid_index = custom_valid_index
@@ -237,7 +237,7 @@ class CustomHold(BaseHoldout):
 class TrainTestAll(BaseHoldout):
     def __init__(self, shuffle=False):
         """Train and test on all data."""
-        super(TrainTestAll, self).__init__(shuffle=shuffle)
+        super().__init__(shuffle=shuffle)
 
     def train_test_setup(self, lsc_ids, node_ids, **kwargs):
         common_ids = self.get_common_ids(lsc_ids, node_ids)

@@ -10,7 +10,6 @@ class BaseModel:
 
     def __init__(self, graph):
         """Initialize BaseModel object."""
-        super(BaseModel, self).__init__()
         self.graph = graph
 
     @property

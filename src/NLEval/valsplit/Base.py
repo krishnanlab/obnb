@@ -7,7 +7,6 @@ __all__ = ["BaseValSplit", "BaseHoldout", "BaseInterface"]
 class BaseValSplit:
     def __init__(self, shuffle=False):
         """Initialize BaseValSplit object."""
-        super(BaseValSplit, self).__init__()
         self.shuffle = shuffle
         self.settings = []
 
@@ -83,7 +82,7 @@ class BaseHoldout(BaseValSplit):
         specific hold-out class.
 
         """
-        super(BaseHoldout, self).__init__(shuffle=shuffle)
+        super().__init__(shuffle=shuffle)
         self.train_on = train_on
         self._test_index = None
         self._valid_index = None
@@ -169,7 +168,7 @@ class BaseInterface(BaseValSplit):
 
     def __init__(self, shuffle=False):
         """Initialize BaseInterface object."""
-        super(BaseInterface, self).__init__(shuffle=shuffle)
+        super().__init__(shuffle=shuffle)
 
     def setup_split_func(self, split_func):
         self.get_split_idx_ary = lambda id_ary, label_ary: split_func(

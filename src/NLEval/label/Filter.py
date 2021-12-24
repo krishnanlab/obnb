@@ -29,10 +29,6 @@ class BaseFilter:
 
     """
 
-    def __init__(self):
-        """Initialize BaseFilter object."""
-        super(BaseFilter, self).__init__()
-
     def __call__(self, lsc):
         entity_ids = self.get_ids(lsc)
         val_getter = self.get_val_getter(lsc)
@@ -57,7 +53,7 @@ class ExistanceFilter(BaseFilter):
 
     def __init__(self, target_lst, remove_existance=False):
         """Initialize ExistanceFilter object."""
-        super(ExistanceFilter, self).__init__()
+        super().__init__()
         self.target_lst = target_lst
         self.remove_existance = remove_existance
 
@@ -73,10 +69,7 @@ class EntityExistanceFilter(ExistanceFilter):
 
     def __init__(self, target_lst, remove_existance=False):
         """Initialize EntityExistanceFilter object."""
-        super(EntityExistanceFilter, self).__init__(
-            target_lst,
-            remove_existance,
-        )
+        super().__init__(target_lst, remove_existance)
 
     @staticmethod
     def get_val_getter(lsc):
@@ -96,10 +89,7 @@ class LabelsetExistanceFilter(ExistanceFilter):
 
     def __init__(self, target_lst, remove_existance=False):
         """Initialize LabelsetExistanceFilter object."""
-        super(LabelsetExistanceFilter, self).__init__(
-            target_lst,
-            remove_existance,
-        )
+        super().__init__(target_lst, remove_existance)
 
     @staticmethod
     def get_val_getter(lsc):
@@ -129,7 +119,7 @@ class RangeFilter(BaseFilter):
 
     def __init__(self, min_val=None, max_val=None):
         """Initialize RangeFilter object."""
-        super(RangeFilter, self).__init__()
+        super().__init__()
         self.min_val = min_val
         self.max_val = max_val
 
@@ -148,7 +138,7 @@ class EntityRangeFilterNoccur(RangeFilter):
 
     def __init__(self, min_val=None, max_val=None):
         """Initialize EntityRangeFilterNoccur object."""
-        super(EntityRangeFilterNoccur, self).__init__(min_val, max_val)
+        super().__init__(min_val, max_val)
 
     @staticmethod
     def get_val_getter(lsc):
@@ -168,7 +158,7 @@ class LabelsetRangeFilterSize(RangeFilter):
 
     def __init__(self, min_val=None, max_val=None):
         """Initialize LabelsetRangeFilterSize object."""
-        super(LabelsetRangeFilterSize, self).__init__(min_val, max_val)
+        super().__init__(min_val, max_val)
 
     @staticmethod
     def get_val_getter(lsc):
@@ -188,7 +178,7 @@ class LabelsetRangeFilterJaccard(RangeFilter):
 
     def __init__(self, max_val=None):
         """Initialize LabelsetRangeFilterJaccard object."""
-        super(LabelsetRangeFilterJaccard, self).__init__(None, max_val)
+        super().__init__(None, max_val)
 
     @staticmethod
     def get_val_getter(lsc):
@@ -230,7 +220,7 @@ class LabelsetRangeFilterTrainTestPos(RangeFilter):
 
     def __init__(self, min_val):
         """Initialize LabelsetRangeFilterTrainTestPos object."""
-        super(LabelsetRangeFilterTrainTestPos, self).__init__(min_val=min_val)
+        super().__init__(min_val=min_val)
 
     @staticmethod
     def get_val_getter(lsc):
@@ -265,7 +255,7 @@ class ValueFilter(BaseFilter):
 
     def __init__(self, val, remove=True):
         """Initialize ValueFilter object."""
-        super(RangeFilter, self).__init__()
+        super().__init__()
         self.val = val
         self.remove = remove
 

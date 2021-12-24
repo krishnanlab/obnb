@@ -22,7 +22,7 @@ class SklInterface(BaseInterface):
 
     def __init__(self, skl_splitter, skl_kws=None, shuffle=False):
         """Initialize SklInterface object."""
-        super(SklInterface, self).__init__(shuffle=shuffle)
+        super().__init__(shuffle=shuffle)
         splitter = pass_kwargs(skl_splitter, skl_kws)
         self.setup_split_func(splitter.split)
 
@@ -32,7 +32,7 @@ class SklSKF(SklInterface):
 
     def __init__(self, skl_kws=None, shuffle=False):
         """Initialize SkeSKF object."""
-        super(SklSKF, self).__init__(StratifiedKFold, skl_kws, shuffle)
+        super().__init__(StratifiedKFold, skl_kws, shuffle)
 
 
 class SklSSS(SklInterface):
@@ -40,11 +40,7 @@ class SklSSS(SklInterface):
 
     def __init__(self, skl_kws=None, shuffle=False):
         """Initialize SklSSS object."""
-        super(SklSSS, self).__init__(
-            StratifiedShuffleSplit,
-            skl_kws,
-            shuffle,
-        )
+        super().__init__(StratifiedShuffleSplit, skl_kws, shuffle)
 
 
 class SklLOO(SklInterface):
@@ -52,7 +48,7 @@ class SklLOO(SklInterface):
 
     def __init__(self, skl_kws=None, shuffle=False):
         """Initialize SklLOO object."""
-        super(SklLOO, self).__init__(LeavePOut, skl_kws, shuffle)
+        super().__init__(LeavePOut, skl_kws, shuffle)
 
 
 class SklLPO(SklInterface):
@@ -60,4 +56,4 @@ class SklLPO(SklInterface):
 
     def __init__(self, skl_kws=None, shuffle=False):
         """Initialize SklLPO object."""
-        super(SklLPO, self).__init__(LeaveOneOut, skl_kws, shuffle)
+        super().__init__(LeaveOneOut, skl_kws, shuffle)
