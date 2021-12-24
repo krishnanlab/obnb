@@ -2,7 +2,13 @@ import numpy as np
 from NLEval.util import checkers
 from NLEval.valsplit.Base import BaseHoldout
 
-__all__ = ["BinHold", "ThreshHold", "CustomHold", "TrainTestAll"]
+__all__ = [
+    "TrainValTest",
+    "BinHold",
+    "ThreshHold",
+    "CustomHold",
+    "TrainTestAll",
+]
 
 
 class TrainValTest(BaseHoldout):
@@ -21,7 +27,7 @@ class TrainValTest(BaseHoldout):
     def __repr__(self):
         # TODO: make repr a super magic fun, automatically generate for children.
         return (
-            f"TrainValTest(train_ratio={self.train_ratio!r}], "
+            f"TrainValTest(train_ratio={self.train_ratio!r}, "
             f"test_ratio={self.test_ratio!r}, "
             f"train_on={self.train_on!r})"
         )
@@ -140,8 +146,7 @@ class ThreshHold(BaseHoldout):
     def __repr__(self):
         """Representation of ThreshHold."""
         return (
-            f"ThreshHold(cut_off={self.cut_off!r}, prop_name="
-            f"{self.prop_name!r}, train_on={self.train_on!r})"
+            f"ThreshHold(cut_off={self.cut_off!r}, train_on={self.train_on!r})"
         )
 
     @property
