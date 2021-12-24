@@ -2,6 +2,7 @@ import multiprocessing as mp
 from typing import Any, Generator, List, no_type_check
 
 from NLEval.util import checkers
+from tqdm import tqdm
 
 mp.set_start_method("fork")
 
@@ -85,7 +86,6 @@ class ParDat:
         self._q: mp.Queue = mp.Queue()
         self._p: List = []
         self._parent_conn: List = []
-        self._n_finished: int = 0
 
     @no_type_check
     def __call__(self, func):
@@ -93,19 +93,24 @@ class ParDat:
 
         def wrapper(*func_args, **func_kwargs):
             n_workers = self.n_workers
+            n_jobs = self.n_jobs
+            disable = not self.verbose
 
-            if n_workers > 1:
-                for job_id in range(self.n_jobs):
-                    if len(self._p) < n_workers:
-                        self.spawn(func, func_args, func_kwargs)
-                    else:
-                        yield self.get_result_and_assign_next(job_id)
-                for result in self.terminate():
-                    yield result
-            else:
-                for job in self.job_list:
-                    self.log()
-                    yield func(job, *func_args, **func_kwargs)
+            with tqdm(total=n_jobs, disable=disable) as pbar:
+                if n_workers > 1:
+                    for job_id in range(self.n_jobs):
+                        if len(self._p) < n_workers:
+                            self.spawn(func, func_args, func_kwargs)
+                        else:
+                            pbar.update(1)
+                            yield self.get_result_and_assign_next(job_id)
+                    for result in self.terminate():
+                        pbar.update(1)
+                        yield result
+                else:
+                    for job in self.job_list:
+                        pbar.update(1)
+                        yield func(job, *func_args, **func_kwargs)
 
         return wrapper
 
@@ -210,7 +215,6 @@ class ParDat:
         """
         worker_id, result = self._q.get()
         self._parent_conn[worker_id].send(self.job_list[job_id])
-        self.log()
         return result
 
     def terminate(self) -> Generator[None, Any, None]:
@@ -218,22 +222,4 @@ class ParDat:
         for _ in self._p:
             worker_id, result = self._q.get()
             self._parent_conn[worker_id].send(EndOfJobIndicator)
-            self.log()
             yield result
-
-    def log(self) -> None:
-        """Construct and show progress bar."""
-        self._n_finished += 1
-        # TODO: use tqdm instead
-        if not self.verbose:
-            return
-        if (self._n_finished % self.log_steps == 0) | (
-            self._n_finished == self.n_jobs
-        ):
-            filled_length = self._n_finished * self.bar_length // self.n_jobs
-            empty_length = self.bar_length - filled_length
-            bar_str = "|" + "#" * filled_length + " " * empty_length + "|"
-            progress_str = (
-                f"{bar_str} {self._n_finished} / {self.n_jobs} finished"
-            )
-            print(progress_str, end="\r", flush=True)
