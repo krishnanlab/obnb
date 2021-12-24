@@ -4,9 +4,11 @@ class Master:
         pass
 
     def __repr__(self):
+        """Representation of Master."""
         pass
 
     def __str__(self):
+        """Print Master."""
         pass
 
     def get_all_graphs(self):

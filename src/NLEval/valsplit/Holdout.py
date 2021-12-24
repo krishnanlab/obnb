@@ -88,6 +88,7 @@ class BinHold(BaseHoldout):
         self.bin_num = bin_num
 
     def __repr__(self):
+        """Representation of BinHoldout."""
         return f"BinHold(bin_num={self.bin_num!r}, train_on={self.train_on!r})"
 
     @property
@@ -137,6 +138,7 @@ class ThreshHold(BaseHoldout):
         self.cut_off = cut_off
 
     def __repr__(self):
+        """Representation of ThreshHold."""
         return (
             f"ThreshHold(cut_off={self.cut_off!r}, prop_name="
             f"{self.prop_name!r}, train_on={self.train_on!r})"
@@ -192,6 +194,7 @@ class CustomHold(BaseHoldout):
         self.custom_valid_index = custom_valid_index
 
     def __repr__(self):
+        """Representation of CustomHold."""
         return f"CustomHold(min_pos={self.min_pos!r})"
 
     @property
