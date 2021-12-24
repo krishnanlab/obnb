@@ -23,7 +23,7 @@ class TrainValTest(BaseHoldout):
         super(TrainValTest, self).__init__(train_on=train_on, shuffle=shuffle)
         self.train_ratio = train_ratio
         self.test_ratio = test_ratio
-        self.settings = ["train_ratio", "test_ratio", "train_on"]
+        self.settings = ["train_ratio", "test_ratio", "train_on", "shuffle"]
 
     @property
     def train_ratio(self):
@@ -85,7 +85,7 @@ class BinHold(BaseHoldout):
         """
         super(BinHold, self).__init__(train_on=train_on, shuffle=shuffle)
         self.bin_num = bin_num
-        self.settings = ["bin_num", "train_on"]
+        self.settings = ["bin_num", "train_on", "shuffle"]
 
     @property
     def bin_num(self):
@@ -132,7 +132,7 @@ class ThreshHold(BaseHoldout):
         """
         super(ThreshHold, self).__init__(train_on=train_on, shuffle=shuffle)
         self.cut_off = cut_off
-        self.settings = ["cut_off", "train_on"]
+        self.settings = ["cut_off", "train_on", "shuffle"]
 
     @property
     def cut_off(self):
@@ -182,7 +182,6 @@ class CustomHold(BaseHoldout):
         self.custom_train_index = custom_train_index
         self.custom_test_index = custom_test_index
         self.custom_valid_index = custom_valid_index
-        self.settings = ["min_pos"]
 
     @property
     def custom_train_index(self):
@@ -252,7 +251,7 @@ class HoldoutChildTemplate(BaseHoldout):
     """
     def __init__(self, **args, min_pos=10, **kwargs):
         super().__init__(min_pos=min_pos)
-        self.settings = ['min_pos']
+        self.settings = ["min_pos", "shuffle"]
 
     @property
     def foo(self):

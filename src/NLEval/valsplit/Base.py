@@ -9,6 +9,7 @@ class BaseValSplit:
         """Initialize BaseValSplit object."""
         super(BaseValSplit, self).__init__()
         self.shuffle = shuffle
+        self.settings = []
 
     def __repr__(self):
         name = self.__class__.__name__
