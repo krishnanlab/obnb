@@ -6,9 +6,10 @@ __all__ = ["SparseGraph"]
 
 
 class SparseGraph(BaseGraph):
-    """Sparse Graph object with data stored as adjacency list."""
+    """SparseGraph object sotring data as adjacency list."""
 
     def __init__(self, weighted=True, directed=False):
+        """Initialize SparseGraph object."""
         super().__init__()
         self._edge_data = []
         self.weighted = weighted

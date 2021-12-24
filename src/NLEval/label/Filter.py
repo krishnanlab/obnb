@@ -29,9 +29,6 @@ class BaseFilter:
 
     """
 
-    def __init__(self):
-        super(BaseFilter, self).__init__()
-
     def __call__(self, lsc):
         entity_ids = self.get_ids(lsc)
         val_getter = self.get_val_getter(lsc)
@@ -55,7 +52,8 @@ class ExistanceFilter(BaseFilter):
     """
 
     def __init__(self, target_lst, remove_existance=False):
-        super(ExistanceFilter, self).__init__()
+        """Initialize ExistanceFilter object."""
+        super().__init__()
         self.target_lst = target_lst
         self.remove_existance = remove_existance
 
@@ -70,10 +68,8 @@ class EntityExistanceFilter(ExistanceFilter):
     """Filter entities by list of entiteis of interest."""
 
     def __init__(self, target_lst, remove_existance=False):
-        super(EntityExistanceFilter, self).__init__(
-            target_lst,
-            remove_existance,
-        )
+        """Initialize EntityExistanceFilter object."""
+        super().__init__(target_lst, remove_existance)
 
     @staticmethod
     def get_val_getter(lsc):
@@ -92,10 +88,8 @@ class LabelsetExistanceFilter(ExistanceFilter):
     """Filter labelset by list of labelsets of interest."""
 
     def __init__(self, target_lst, remove_existance=False):
-        super(LabelsetExistanceFilter, self).__init__(
-            target_lst,
-            remove_existance,
-        )
+        """Initialize LabelsetExistanceFilter object."""
+        super().__init__(target_lst, remove_existance)
 
     @staticmethod
     def get_val_getter(lsc):
@@ -124,7 +118,8 @@ class RangeFilter(BaseFilter):
     """
 
     def __init__(self, min_val=None, max_val=None):
-        super(RangeFilter, self).__init__()
+        """Initialize RangeFilter object."""
+        super().__init__()
         self.min_val = min_val
         self.max_val = max_val
 
@@ -142,7 +137,8 @@ class EntityRangeFilterNoccur(RangeFilter):
     """Pop entities based on number of occurance."""
 
     def __init__(self, min_val=None, max_val=None):
-        super(EntityRangeFilterNoccur, self).__init__(min_val, max_val)
+        """Initialize EntityRangeFilterNoccur object."""
+        super().__init__(min_val, max_val)
 
     @staticmethod
     def get_val_getter(lsc):
@@ -161,7 +157,8 @@ class LabelsetRangeFilterSize(RangeFilter):
     """Pop labelsets based on size."""
 
     def __init__(self, min_val=None, max_val=None):
-        super(LabelsetRangeFilterSize, self).__init__(min_val, max_val)
+        """Initialize LabelsetRangeFilterSize object."""
+        super().__init__(min_val, max_val)
 
     @staticmethod
     def get_val_getter(lsc):
@@ -180,7 +177,8 @@ class LabelsetRangeFilterJaccard(RangeFilter):
     """Pop labelsets based on Jaccard index."""
 
     def __init__(self, max_val=None):
-        super(LabelsetRangeFilterJaccard, self).__init__(None, max_val)
+        """Initialize LabelsetRangeFilterJaccard object."""
+        super().__init__(None, max_val)
 
     @staticmethod
     def get_val_getter(lsc):
@@ -221,20 +219,19 @@ class LabelsetRangeFilterTrainTestPos(RangeFilter):
     """
 
     def __init__(self, min_val):
-        super(LabelsetRangeFilterTrainTestPos, self).__init__(min_val=min_val)
+        """Initialize LabelsetRangeFilterTrainTestPos object."""
+        super().__init__(min_val=min_val)
 
     @staticmethod
     def get_val_getter(lsc):
         return lambda label_id: min(
-            [
-                idx_ary.size
-                for idx_ary in next(
-                    lsc.valsplit.get_split_idx_ary(
-                        np.array(list(lsc.get_labelset(label_id))),
-                        valid=lsc.valsplit.valid_index is not None,
-                    ),
-                )
-            ],
+            idx_ary.size
+            for idx_ary in next(
+                lsc.valsplit.get_split_idx_ary(
+                    np.array(list(lsc.get_labelset(label_id))),
+                    valid=lsc.valsplit.valid_index is not None,
+                ),
+            )
         )
 
     @staticmethod
@@ -257,7 +254,8 @@ class ValueFilter(BaseFilter):
     """
 
     def __init__(self, val, remove=True):
-        super(RangeFilter, self).__init__()
+        """Initialize ValueFilter object."""
+        super().__init__()
         self.val = val
         self.remove = remove
 
@@ -280,6 +278,7 @@ class NegativeFilterHypergeom(BaseFilter):
     """
 
     def __init__(self, p_thresh):
+        """Initialize NegativeFilterHypergeom object."""
         self.p_thresh = p_thresh
 
     def __call__(self, lsc):

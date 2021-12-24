@@ -6,11 +6,10 @@ from copy import deepcopy
 __all__ = ["IDlst", "IDmap", "IDprop"]
 
 
-class IDlst(object):
+class IDlst:
     """ID list object that stores a list of IDs"""
 
     def __init__(self):
-        super(IDlst, self).__init__()
         self._lst = []
 
     def __iter__(self):
@@ -175,7 +174,7 @@ class IDmap(IDlst):
     from ID to index"""
 
     def __init__(self):
-        super(IDmap, self).__init__()
+        super().__init__()
         self._map = {}
 
     def __contains__(self, identifier):
@@ -198,7 +197,7 @@ class IDmap(IDlst):
 
     def popID(self, identifier):
         self._check_ID_existence(identifier, True)
-        super(IDmap, self).popID(identifier)
+        super().popID(identifier)
         idx = self._map.pop(identifier)
         for i, identifier in enumerate(self.lst[idx:]):
             self._map[identifier] = idx + i
@@ -206,7 +205,7 @@ class IDmap(IDlst):
 
     def add_id(self, identifier):
         new_idx = self.size
-        super(IDmap, self).add_id(identifier)
+        super().add_id(identifier)
         self._map[self._lst[-1]] = new_idx
 
 
@@ -214,7 +213,7 @@ class IDprop(IDmap):
     """ID properties object that stores property information of IDs"""
 
     def __init__(self):
-        super(IDprop, self).__init__()
+        super().__init__()
         self._prop_default_val = {}
         self._prop_default_type = {}
         self._prop = {}
@@ -222,7 +221,7 @@ class IDprop(IDmap):
     def __eq__(self, other):
         """Return true if two object have same set of IDs with same properties"""
         # check if two objects have same set of IDs
-        if not super(IDprop, self).__eq__(other):
+        if not super().__eq__(other):
             return False
         # check if two objects have same set of properties
         if not set(self.propLst) == set(other.propLst):
@@ -231,7 +230,8 @@ class IDprop(IDmap):
         for prop in self.propLst:
             for identifier in self:
                 if self.getProp(identifier, prop) != other.getProp(
-                    identifier, prop
+                    identifier,
+                    prop,
                 ):
                     return False
         return True
@@ -352,7 +352,7 @@ class IDprop(IDmap):
 
     def popID(self, ideantifier):
         """Pop ID from ID list, and all properties lists."""
-        idx = super(IDprop, self).popID(ideantifier)
+        idx = super().popID(ideantifier)
         for prop in self.propLst:
             self._prop[prop].pop(idx)
         return idx
@@ -392,6 +392,6 @@ class IDprop(IDmap):
                     prop[prop_name] = deepcopy(self.prop_default_val[prop_name])
         else:
             prop = deepcopy(self.prop_default_val)
-        super(IDprop, self).add_id(ideantifier)
+        super().add_id(ideantifier)
         for prop_name, prop_val in prop.items():
             self._prop[prop_name].append(prop_val)

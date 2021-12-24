@@ -1,11 +1,14 @@
 class Master:
     def __init__(self):
+        """Initialize master object."""
         pass
 
     def __repr__(self):
+        """Representation of Master."""
         pass
 
     def __str__(self):
+        """Print Master."""
         pass
 
     def get_all_graphs(self):

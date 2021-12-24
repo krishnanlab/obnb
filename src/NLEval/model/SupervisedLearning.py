@@ -23,18 +23,21 @@ class SLBase(BaseModel):
 
 class LogReg(SLBase, LogisticRegression):
     def __init__(self, graph, **kwargs):
+        """Initialize LogReg object."""
         SLBase.__init__(self, graph)
         LogisticRegression.__init__(self, **kwargs)
 
 
 class LogRegCV(SLBase, LogisticRegressionCV):
     def __init__(self, graph, **kwargs):
+        """Initialize LogRegCV object."""
         SLBase.__init__(self, graph)
         LogisticRegressionCV.__init__(self, **kwargs)
 
 
 class CombSLBase(BaseModel):
     def __init__(self, graph, **kwargs):
+        """Initialize CombSLBase object."""
         # graph here should be multi feature set
         BaseModel.__init__(self, graph)
         self.mdl_list = [self.base_mdl(**kwargs) for i in self.graph.mat_list]
@@ -48,6 +51,7 @@ class CombSLBase(BaseModel):
 
 class CombLogRegCVBagging(CombSLBase):
     def __init__(self, graph, **kwargs):
+        """Initialize CombLogRegCVBagging object."""
         self.base_mdl = LogisticRegressionCV
         CombSLBase.__init__(self, graph, **kwargs)
 
@@ -55,7 +59,7 @@ class CombLogRegCVBagging(CombSLBase):
         pass
 
     def decision(self, id_ary):
-        decision_ary = np.zeros((len(id_ary)))
+        decision_ary = np.zeros(len(id_ary))
         for i, mat in enumerate(self.graph.mat_list):
             x = mat[self.graph.idmap[id_ary]]
             decision_ary += self.mdl_list[i].decision_function(x)
@@ -65,6 +69,7 @@ class CombLogRegCVBagging(CombSLBase):
 
 class CombLogRegCVPredComb(CombSLBase):
     def __init__(self, graph, mixing_ratio=0.5, **kwargs):
+        """Initialize CombLogRegCVPredComb object."""
         if len(graph.mat_list) != 2:
             raise ValueError(
                 "PredComb only takes two input features sets, "
@@ -79,7 +84,7 @@ class CombLogRegCVPredComb(CombSLBase):
         pass
 
     def decision(self, id_ary):
-        decision_ary = np.zeros((len(id_ary)))
+        decision_ary = np.zeros(len(id_ary))
         factors = [self.mixing_ratio, 1 - self.mixing_ratio]
         for i, mat in enumerate(self.graph.mat_list):
             x = mat[self.graph.idmap[id_ary]]
@@ -89,7 +94,9 @@ class CombLogRegCVPredComb(CombSLBase):
 
 class CombLogRegCVAdaBoost(CombSLBase):
     def __init__(self, graph, exclude=True, n_mdl=None, **kwargs):
-        """Initialize LogisticRegression AdaBoost type ensemble.
+        """Initialize ComLogRegCVAdaBoost.
+
+        LogisticRegression AdaBoost type ensemble.
 
         Args:
             graph (NLEval.graph.DenseGraph.MultiFeatureVec): multi-feature objects
@@ -210,7 +217,7 @@ class CombLogRegCVAdaBoost(CombSLBase):
             )
 
         idx_ary = self.graph.idmap[id_ary]
-        decision_ary = np.zeros((len(id_ary)))
+        decision_ary = np.zeros(len(id_ary))
         iter_list = (
             list(range(len(self.graph.mat_list)))
             if self.exclude
@@ -227,7 +234,9 @@ class CombLogRegCVAdaBoost(CombSLBase):
 
 class CombLogRegCVModifiedRankBoost(CombSLBase):
     def __init__(self, graph, exclude=True, n_mdl=None, retrain=True, **kwargs):
-        """Initialize LogisticRegression ModifiedRankBoost ensemble.
+        """Initialize CombLogRegCVModifiedRankBoost.
+
+        LogisticRegression ModifiedRankBoost ensemble.
 
         Notes:
             This implementation follows from
@@ -363,7 +372,7 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
             )
 
         idx_ary = self.graph.idmap[id_ary]
-        decision_ary = np.zeros((len(id_ary)))
+        decision_ary = np.zeros(len(id_ary))
         iter_list = (
             list(range(len(self.graph.mat_list)))
             if self.exclude
@@ -380,12 +389,14 @@ class CombLogRegCVModifiedRankBoost(CombSLBase):
 
 class SVM(SLBase, LinearSVC):
     def __init__(self, graph, **kwargs):
+        """Initialize SVM object."""
         SLBase.__init__(self, graph)
         LinearSVC.__init__(self, **kwargs)
 
 
 class RF(SLBase, RandomForestClassifier):
     def __init__(self, graph, **kwargs):
+        """Initialize RF object."""
         SLBase.__init__(self, graph)
         RandomForestClassifier.__init__(self, **kwargs)
 

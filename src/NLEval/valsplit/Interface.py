@@ -21,7 +21,8 @@ class SklInterface(BaseInterface):
     """Dedicated interface for Scikit Learn splitter."""
 
     def __init__(self, skl_splitter, skl_kws=None, shuffle=False):
-        super(SklInterface, self).__init__(shuffle=shuffle)
+        """Initialize SklInterface object."""
+        super().__init__(shuffle=shuffle)
         splitter = pass_kwargs(skl_splitter, skl_kws)
         self.setup_split_func(splitter.split)
 
@@ -30,29 +31,29 @@ class SklSKF(SklInterface):
     """Dedicated interface for Stratified K-Fold in SKLearn."""
 
     def __init__(self, skl_kws=None, shuffle=False):
-        super(SklSKF, self).__init__(StratifiedKFold, skl_kws, shuffle)
+        """Initialize SkeSKF object."""
+        super().__init__(StratifiedKFold, skl_kws, shuffle)
 
 
 class SklSSS(SklInterface):
     """Dedicated interface for Stratified Shuffle Split in SKLearn."""
 
     def __init__(self, skl_kws=None, shuffle=False):
-        super(SklSSS, self).__init__(
-            StratifiedShuffleSplit,
-            skl_kws,
-            shuffle,
-        )
+        """Initialize SklSSS object."""
+        super().__init__(StratifiedShuffleSplit, skl_kws, shuffle)
 
 
 class SklLOO(SklInterface):
     """Dedicated interface for Leave One Out in SKLearn."""
 
     def __init__(self, skl_kws=None, shuffle=False):
-        super(SklLOO, self).__init__(LeavePOut, skl_kws, shuffle)
+        """Initialize SklLOO object."""
+        super().__init__(LeavePOut, skl_kws, shuffle)
 
 
 class SklLPO(SklInterface):
     """Dedicated interface for Leave P Out in SKLearn."""
 
     def __init__(self, skl_kws=None, shuffle=False):
-        super(SklLPO, self).__init__(LeaveOneOut, skl_kws, shuffle)
+        """Initialize SklLPO object."""
+        super().__init__(LeaveOneOut, skl_kws, shuffle)

@@ -8,9 +8,10 @@ __all__ = ["DenseGraph", "FeatureVec"]
 
 
 class DenseGraph(BaseGraph):
-    """Base Graph object that stores data using numpy array."""
+    """DenseGraph object storing data using numpy array."""
 
     def __init__(self):
+        """Initialize DenseGraph object."""
         super().__init__()
         self._mat = np.array([])
 
@@ -123,9 +124,10 @@ class DenseGraph(BaseGraph):
 
 
 class FeatureVec(DenseGraph):
-    """Feature vectors with ID maps."""
+    """Feature vectors object."""
 
     def __init__(self, dim=None):
+        """Initialize FeatureVec object."""
         super().__init__()
         self.dim = dim
 

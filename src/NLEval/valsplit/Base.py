@@ -6,8 +6,15 @@ __all__ = ["BaseValSplit", "BaseHoldout", "BaseInterface"]
 
 class BaseValSplit:
     def __init__(self, shuffle=False):
-        super(BaseValSplit, self).__init__()
+        """Initialize BaseValSplit object."""
         self.shuffle = shuffle
+        self.settings = []
+
+    def __repr__(self):
+        """Representation of validation split objects."""
+        name = self.__class__.__name__
+        settings_str = [f"{i}={getattr(self, i)!r}" for i in self.settings]
+        return f"{name}({', '.join(settings_str)})"
 
     @property
     def shuffle(self):
@@ -65,7 +72,7 @@ class BaseValSplit:
 
 class BaseHoldout(BaseValSplit):
     def __init__(self, train_on="top", shuffle=False):
-        """Initialize base holdout.
+        """Initialize BaseHoldout object.
 
         Split based on some numeric properties of the samples, train on
         either top or bottom set and test on the other, depending on
@@ -76,7 +83,7 @@ class BaseHoldout(BaseValSplit):
         specific hold-out class.
 
         """
-        super(BaseHoldout, self).__init__(shuffle=shuffle)
+        super().__init__(shuffle=shuffle)
         self.train_on = train_on
         self._test_index = None
         self._valid_index = None
@@ -161,7 +168,8 @@ class BaseInterface(BaseValSplit):
     """Base interface with user defined validation split generator."""
 
     def __init__(self, shuffle=False):
-        super(BaseInterface, self).__init__(shuffle=shuffle)
+        """Initialize BaseInterface object."""
+        super().__init__(shuffle=shuffle)
 
     def setup_split_func(self, split_func):
         self.get_split_idx_ary = lambda id_ary, label_ary: split_func(
