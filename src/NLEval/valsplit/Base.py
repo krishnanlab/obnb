@@ -10,6 +10,11 @@ class BaseValSplit:
         super(BaseValSplit, self).__init__()
         self.shuffle = shuffle
 
+    def __repr__(self):
+        name = self.__class__.__name__
+        settings_str = [f"{i}={getattr(self, i)!r}" for i in self.settings]
+        return f"{name}({', '.join(settings_str)})"
+
     @property
     def shuffle(self):
         """bool: shufle train/test indices when splitting."""

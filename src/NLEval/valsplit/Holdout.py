@@ -23,14 +23,7 @@ class TrainValTest(BaseHoldout):
         super(TrainValTest, self).__init__(train_on=train_on, shuffle=shuffle)
         self.train_ratio = train_ratio
         self.test_ratio = test_ratio
-
-    def __repr__(self):
-        # TODO: make repr a super magic fun, automatically generate for children.
-        return (
-            f"TrainValTest(train_ratio={self.train_ratio!r}, "
-            f"test_ratio={self.test_ratio!r}, "
-            f"train_on={self.train_on!r})"
-        )
+        self.settings = ["train_ratio", "test_ratio", "train_on"]
 
     @property
     def train_ratio(self):
@@ -92,10 +85,7 @@ class BinHold(BaseHoldout):
         """
         super(BinHold, self).__init__(train_on=train_on, shuffle=shuffle)
         self.bin_num = bin_num
-
-    def __repr__(self):
-        """Representation of BinHoldout."""
-        return f"BinHold(bin_num={self.bin_num!r}, train_on={self.train_on!r})"
+        self.settings = ["bin_num", "train_on"]
 
     @property
     def bin_num(self):
@@ -142,12 +132,7 @@ class ThreshHold(BaseHoldout):
         """
         super(ThreshHold, self).__init__(train_on=train_on, shuffle=shuffle)
         self.cut_off = cut_off
-
-    def __repr__(self):
-        """Representation of ThreshHold."""
-        return (
-            f"ThreshHold(cut_off={self.cut_off!r}, train_on={self.train_on!r})"
-        )
+        self.settings = ["cut_off", "train_on"]
 
     @property
     def cut_off(self):
@@ -197,10 +182,7 @@ class CustomHold(BaseHoldout):
         self.custom_train_index = custom_train_index
         self.custom_test_index = custom_test_index
         self.custom_valid_index = custom_valid_index
-
-    def __repr__(self):
-        """Representation of CustomHold."""
-        return f"CustomHold(min_pos={self.min_pos!r})"
+        self.settings = ["min_pos"]
 
     @property
     def custom_train_index(self):
@@ -270,12 +252,7 @@ class HoldoutChildTemplate(BaseHoldout):
     """
     def __init__(self, **args, min_pos=10, **kwargs):
         super().__init__(min_pos=min_pos)
-
-    def __repr__(self):
-        return (
-            f'HoldoutChildTemplate(min_pos={self.min_pose!r}, '
-            f'train_on={self.train_on!r})'
-        )
+        self.settings = ['min_pos']
 
     @property
     def foo(self):
