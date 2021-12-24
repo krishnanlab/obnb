@@ -1,5 +1,6 @@
 class Master:
     def __init__(self):
+        """Initialize master object."""
         pass
 
     def __repr__(self):

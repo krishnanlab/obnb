@@ -6,9 +6,10 @@ __all__ = ["BaseModel"]
 
 
 class BaseModel:
-    """Base model object."""
+    """BaseModel object."""
 
     def __init__(self, graph):
+        """Initialize BaseModel object."""
         super(BaseModel, self).__init__()
         self.graph = graph
 

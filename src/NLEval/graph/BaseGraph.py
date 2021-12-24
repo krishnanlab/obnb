@@ -6,7 +6,7 @@ class BaseGraph:
     """Base Graph object that contains basic graph operations."""
 
     def __init__(self):
-        super().__init__()
+        """Initialize BaseGraph object."""
         self.idmap = IDHandler.IDmap()
 
     @property

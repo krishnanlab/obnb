@@ -36,6 +36,7 @@ class BaseLSC(IDHandler.IDprop):
     """
 
     def __init__(self):
+        """Initialize BaseLSC object."""
         super(BaseLSC, self).__init__()
         self.entity = IDHandler.IDprop()
         self.entity.newProp("Noccur", 0, int)
@@ -345,6 +346,7 @@ class SplitLSC(BaseLSC):
     """Labelset collection equipped with split generator."""
 
     def __init__(self):
+        """Initialize SplitLSC object."""
         super(SplitLSC, self).__init__()
         self._valsplit = None
         self._filter_switch = False

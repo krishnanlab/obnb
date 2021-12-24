@@ -6,6 +6,7 @@ __all__ = ["LP"]
 
 class LP(BaseModel):
     def __init__(self, graph):
+        """Initialize LP objet."""
         super(LP, self).__init__(graph)
 
     def train(self, id_ary, y):
