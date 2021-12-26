@@ -1,3 +1,5 @@
+from typing import List
+
 import numpy as np
 from scipy.stats import hypergeom
 
@@ -39,37 +41,55 @@ class BaseFilter:
                 mod_fun(entity_id)
 
 
-class ExistanceFilter(BaseFilter):
-    """Filter by existance in some given list of targets.
+class BaseExistanceFilter(BaseFilter):
+    """Filter by existance in some given list of targets."""
 
-    Attributes:
-        target_lst: list (or set) of targets of interest to be preserved
-        remove_existance: boolean value indicating whether or not to remove
-            tarets in `target_lst`. If True, remove any target present in the
-            `target_lst` from the labelset collection; if False, preserve only
-            those target present in the `target_lst`
+    def __init__(
+        self,
+        target_lst: List[str],
+        remove_specified: bool = False,
+    ) -> None:
+        """Initialize BaseExistanceFilter object.
 
-    """
+        Args:
+            target_lst: List of targets of interest to be preserved
+            remove_specified: Remove specified tarets if True. Otherwise,
+                preserve the specified targets and remove the unspecified ones.
 
-    def __init__(self, target_lst, remove_existance=False):
-        """Initialize ExistanceFilter object."""
+        """
         super().__init__()
         self.target_lst = target_lst
-        self.remove_existance = remove_existance
+        self.remove_specified = remove_specified
 
     def criterion(self, val):
-        if self.remove_existance:
+        if self.remove_specified:
             return val in self.target_lst
         else:
             return val not in self.target_lst
 
 
-class EntityExistanceFilter(ExistanceFilter):
-    """Filter entities by list of entiteis of interest."""
+class EntityExistanceFilter(BaseExistanceFilter):
+    """Filter entities by list of entiteis of interest.
 
-    def __init__(self, target_lst, remove_existance=False):
+    Example:
+        The following example removes any entities in the labelset_collection
+        that are not present in the specified entity_id_list.
+
+        >>> existance_filter = EntityExistanceFilter(entity_id_list)
+        >>> labelset_collection.apply(existance_filter, inplace=True)
+
+        Alternatively, can preserve (instead of remove) only eneities not
+        present in the entity_id_list by setting ``remove_specified=True``.
+
+    """
+
+    def __init__(
+        self,
+        target_lst: List[str],
+        remove_specified: bool = False,
+    ) -> None:
         """Initialize EntityExistanceFilter object."""
-        super().__init__(target_lst, remove_existance)
+        super().__init__(target_lst, remove_specified)
 
     @staticmethod
     def get_val_getter(lsc):
@@ -84,12 +104,28 @@ class EntityExistanceFilter(ExistanceFilter):
         return lsc.pop_entity
 
 
-class LabelsetExistanceFilter(ExistanceFilter):
-    """Filter labelset by list of labelsets of interest."""
+class LabelsetExistanceFilter(BaseExistanceFilter):
+    """Filter labelset by list of labelsets of interest.
 
-    def __init__(self, target_lst, remove_existance=False):
+    Example:
+        The following example removes any labelset in the labelset_collection
+        that has a label name matching any of the element in label_name_list
+
+        >>> labelset_existance_filter = LabelsetExistanceFilter(label_name_list)
+        >>> labelset_collection.apply(labelset_existance_filter, inplace=True)
+
+        Alternatively, can preserve (intead of remove) only labelsets not
+        present in the label_name_list by setting ``remove_specified=True``.
+
+    """
+
+    def __init__(
+        self,
+        target_lst: List[str],
+        remove_specified: bool = False,
+    ):
         """Initialize LabelsetExistanceFilter object."""
-        super().__init__(target_lst, remove_existance)
+        super().__init__(target_lst, remove_specified)
 
     @staticmethod
     def get_val_getter(lsc):

@@ -342,7 +342,7 @@ class TestFilter(unittest.TestCase):
         # Size=[3, 2, 3, 3, 2]
 
     def test_EntityExistanceFilter(self):
-        # make sure default options of remove_existance=False work
+        # make sure default options of remove_specified=False work
         target_lst = ["a", "b", "c"]
         with self.subTest(target_lst=target_lst):
             lsc = self.lsc.apply(
@@ -356,15 +356,15 @@ class TestFilter(unittest.TestCase):
             self.assertEqual(lsc.entity.map, {"a": 0, "b": 1, "c": 2})
 
         target_lst = ["a", "b", "c"]
-        remove_existance = False
+        remove_specified = False
         with self.subTest(
             target_lst=target_lst,
-            remove_existance=remove_existance,
+            remove_specified=remove_specified,
         ):
             lsc = self.lsc.apply(
                 Filter.EntityExistanceFilter(
                     target_lst=target_lst,
-                    remove_existance=remove_existance,
+                    remove_specified=remove_specified,
                 ),
                 inplace=False,
             )
@@ -375,15 +375,15 @@ class TestFilter(unittest.TestCase):
             self.assertEqual(lsc.entity.map, {"a": 0, "b": 1, "c": 2})
 
         target_lst = ["a", "b", "c"]
-        remove_existance = True
+        remove_specified = True
         with self.subTest(
             target_lst=target_lst,
-            remove_existance=remove_existance,
+            remove_specified=remove_specified,
         ):
             lsc = self.lsc.apply(
                 Filter.EntityExistanceFilter(
                     target_lst=target_lst,
-                    remove_existance=remove_existance,
+                    remove_specified=remove_specified,
                 ),
                 inplace=False,
             )
@@ -397,15 +397,15 @@ class TestFilter(unittest.TestCase):
             )
 
         target_lst = ["b", "e", "h"]
-        remove_existance = False
+        remove_specified = False
         with self.subTest(
             target_lst=target_lst,
-            remove_existance=remove_existance,
+            remove_specified=remove_specified,
         ):
             lsc = self.lsc.apply(
                 Filter.EntityExistanceFilter(
                     target_lst=target_lst,
-                    remove_existance=remove_existance,
+                    remove_specified=remove_specified,
                 ),
                 inplace=False,
             )
@@ -416,15 +416,15 @@ class TestFilter(unittest.TestCase):
             self.assertEqual(lsc.entity.map, {"b": 0, "e": 1, "h": 2})
 
         target_lst = ["b", "e", "h"]
-        remove_existance = True
+        remove_specified = True
         with self.subTest(
             target_lst=target_lst,
-            remove_existance=remove_existance,
+            remove_specified=remove_specified,
         ):
             lsc = self.lsc.apply(
                 Filter.EntityExistanceFilter(
                     target_lst=target_lst,
-                    remove_existance=remove_existance,
+                    remove_specified=remove_specified,
                 ),
                 inplace=False,
             )
@@ -451,12 +451,12 @@ class TestFilter(unittest.TestCase):
             self.assertEqual(lsc.entity.map, {"a": 0, "b": 1, "c": 2, "d": 3})
 
         target_lst = ["Group1", "Group2"]
-        remove_existance = False
+        remove_specified = False
         with self.subTest(target_lst=target_lst):
             lsc = self.lsc.apply(
                 Filter.LabelsetExistanceFilter(
                     target_lst=target_lst,
-                    remove_existance=remove_existance,
+                    remove_specified=remove_specified,
                 ),
                 inplace=False,
             )
@@ -467,12 +467,12 @@ class TestFilter(unittest.TestCase):
             self.assertEqual(lsc.entity.map, {"a": 0, "b": 1, "c": 2, "d": 3})
 
         target_lst = ["Group1", "Group2"]
-        remove_existance = True
+        remove_specified = True
         with self.subTest(target_lst=target_lst):
             lsc = self.lsc.apply(
                 Filter.LabelsetExistanceFilter(
                     target_lst=target_lst,
-                    remove_existance=remove_existance,
+                    remove_specified=remove_specified,
                 ),
                 inplace=False,
             )
@@ -486,12 +486,12 @@ class TestFilter(unittest.TestCase):
             )
 
         target_lst = ["Group2", "Group5"]
-        remove_existance = False
+        remove_specified = False
         with self.subTest(target_lst=target_lst):
             lsc = self.lsc.apply(
                 Filter.LabelsetExistanceFilter(
                     target_lst=target_lst,
-                    remove_existance=remove_existance,
+                    remove_specified=remove_specified,
                 ),
                 inplace=False,
             )
@@ -499,12 +499,12 @@ class TestFilter(unittest.TestCase):
             self.assertEqual(lsc.entity.map, {"a": 0, "b": 1, "d": 2, "h": 3})
 
         target_lst = ["Group2", "Group5"]
-        remove_existance = True
+        remove_specified = True
         with self.subTest(target_lst=target_lst):
             lsc = self.lsc.apply(
                 Filter.LabelsetExistanceFilter(
                     target_lst=target_lst,
-                    remove_existance=remove_existance,
+                    remove_specified=remove_specified,
                 ),
                 inplace=False,
             )
