@@ -1,4 +1,4 @@
-from typing import Any, Iterator, Set, Tuple
+from typing import Any, Iterator, List, Set, Tuple
 
 import numpy as np
 from NLEval.label import Filter
@@ -60,10 +60,27 @@ class BaseLSC(IDHandler.IDprop):
         print("Entities occurances:")
         print(self.entity._prop)
 
+    def stats(self) -> str:
+        """Print basic stats for the labelset collection."""
+        sizes = self.sizes
+        return (
+            f"Number of labelsets: {len(self)}\n"
+            f"max: {max(sizes)}\n"
+            f"min: {min(sizes)}\n"
+            f"med: {np.median(sizes):.2f}\n"
+            f"avg: {np.mean(sizes):.2f}\n"
+            f"std: {np.std(sizes):.2f}\n"
+        )
+
     def items(self) -> Iterator[Tuple[int, Set[str]]]:
         """Yield label name and the corresponding label set."""
         for label in self:
             yield label, self.get_labelset(label)
+
+    @property
+    def sizes(self) -> List[int]:
+        """Sizes of the labelsets."""
+        return [len(labelset) for _, labelset in self.items()]
 
     @property
     def entity_ids(self):

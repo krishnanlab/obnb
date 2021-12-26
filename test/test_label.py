@@ -42,6 +42,9 @@ class TestBaseLSC(unittest.TestCase):
         # input unknown ID --> IDNotExistError
         self.assertRaises(IDNotExistError, fun, "1")
 
+    def test_sizes(self):
+        self.assertEqual(self.lsc.sizes, [3, 2])
+
     def test_get_info(self):
         self.template_test_input_for_getters(self.lsc.get_info)
         self.assertEqual(self.lsc.get_info("Labelset1"), "Description1")
