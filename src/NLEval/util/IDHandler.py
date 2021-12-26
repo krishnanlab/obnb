@@ -224,10 +224,10 @@ class IDprop(IDmap):
         if not super().__eq__(other):
             return False
         # check if two objects have same set of properties
-        if not set(self.propLst) == set(other.propLst):
+        if not set(self.properties) == set(other.properties):
             return False
         # check if properties have same values
-        for prop in self.propLst:
+        for prop in self.properties:
             for identifier in self:
                 if self.getProp(identifier, prop) != other.getProp(
                     identifier,
@@ -283,7 +283,7 @@ class IDprop(IDmap):
         return self._prop.copy()
 
     @property
-    def propLst(self):
+    def properties(self):
         """:obj:`list` of :obj:`str`: list of properties names"""
         return list(self._prop)
 
@@ -348,12 +348,12 @@ class IDprop(IDmap):
 
     def getAllProp(self, ideantifier):
         """Return all properties associated with an ID"""
-        return {prop: self.getProp(ideantifier, prop) for prop in self.propLst}
+        return {i: self.getProp(ideantifier, i) for i in self.properties}
 
     def popID(self, ideantifier):
         """Pop ID from ID list, and all properties lists."""
         idx = super().popID(ideantifier)
-        for prop in self.propLst:
+        for prop in self.properties:
             self._prop[prop].pop(idx)
         return idx
 

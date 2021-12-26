@@ -298,11 +298,11 @@ class TestIDprop(unittest.TestCase):
         self.assertRaises(TypeError, self.IDprop1, IDHandler.IDmap())
         self.assertRaises(TypeError, self.IDprop1, ["a", "b", "c"])
 
-    def test_propLst(self):
+    def test_properties(self):
         self.IDprop1.new_property("x")
         self.IDprop1.new_property("y")
         self.IDprop1.new_property("z")
-        self.assertEqual(self.IDprop1.propLst, ["x", "y", "z"])
+        self.assertEqual(self.IDprop1.properties, ["x", "y", "z"])
 
     def test_new_property(self):
         # test property name type check
@@ -445,7 +445,7 @@ class TestIDprop(unittest.TestCase):
         # test if poped correctly
         self.assertEqual(self.IDprop1.popID("b"), 1)
         self.assertEqual(self.IDprop1.lst, ["a", "c"])
-        self.assertEqual(self.IDprop1.propLst, ["x", "y"])
+        self.assertEqual(self.IDprop1.properties, ["x", "y"])
         self.assertEqual(self.IDprop1._prop, {"x": [1, 3], "y": ["1", "3"]})
         self.IDprop1.popID("a")
         self.IDprop1.popID("c")
