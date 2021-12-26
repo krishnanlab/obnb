@@ -350,7 +350,7 @@ class IDprop(IDmap):
         self._prop_default_val.pop(prop_name)
         self._prop_default_type.pop(prop_name)
 
-    def getAllProp(self, identifier):
+    def get_all_properties(self, identifier):
         """Return all properties associated with an ID"""
         return {i: self.get_property(identifier, i) for i in self.properties}
 

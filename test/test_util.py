@@ -433,16 +433,19 @@ class TestIDprop(unittest.TestCase):
         self.IDprop1.remove_property("x")
         self.assertEqual(self.IDprop1.prop, {})
 
-    def test_getAllProp(self):
+    def test_get_all_properties(self):
         self.IDprop1.add_id("a")
         self.IDprop1.new_property("x", 10, int)
         self.IDprop1.new_property("y", 20.0, float)
         # test wrong ID type --> TypeError
-        self.assertRaises(TypeError, self.IDprop1.getAllProp, 1)
+        self.assertRaises(TypeError, self.IDprop1.get_all_properties, 1)
         # test wrong ID val --> IDNotExistError
-        self.assertRaises(IDNotExistError, self.IDprop1.getAllProp, "b")
+        self.assertRaises(IDNotExistError, self.IDprop1.get_all_properties, "b")
         # test if all prop val retrieved correctly
-        self.assertEqual(self.IDprop1.getAllProp("a"), {"x": 10, "y": 20.0})
+        self.assertEqual(
+            self.IDprop1.get_all_properties("a"),
+            {"x": 10, "y": 20.0},
+        )
 
     def test_pop_id(self):
         self.IDprop1.new_property("x", 1, int)

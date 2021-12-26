@@ -148,7 +148,7 @@ class BaseLSC(IDHandler.IDprop):
                 self.get_noccur(entity_id) - 1,
             )
             if (
-                self.entity.getAllProp(entity_id)
+                self.entity.get_all_properties(entity_id)
                 == self.entity.prop_default_val
             ):
                 self.entity.pop_id(entity_id)
