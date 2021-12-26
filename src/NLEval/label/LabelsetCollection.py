@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import numpy as np
 from NLEval.label import Filter
 from NLEval.util import IDHandler, checkers
@@ -327,17 +329,18 @@ class BaseLSC(IDHandler.IDprop):
                 self.entity.set_property(entity_id, prop_name, interpreter(val))
 
     @classmethod
-    def from_gmt(cls, fp):
+    def from_gmt(cls, fp: str, sep: str = "\t") -> NLEval.label.BaseLSC:
         """Load data from Gene Matrix Transpose `.gmt` file.
 
         Args:
-            fg(str): path to the `.gmt` file
+            fp: path to the `.gmt` file.
+            sep: seperator used in the GMT file.
 
         """
         lsc = cls()
         with open(fp, "r") as f:
             for line in f:
-                label_id, label_info, *lst = line.strip().split("\t")
+                label_id, label_info, *lst = line.strip().split(sep)
                 lsc.add_labelset(lst, label_id, label_info)
         return lsc
 
