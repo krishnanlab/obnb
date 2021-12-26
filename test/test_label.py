@@ -127,7 +127,7 @@ class TestBaseLSC(unittest.TestCase):
         self.assertEqual(lsc1, lsc2)
         # test if different description
         lsc3 = lsc2.copy()
-        lsc3.setProp("Group1", "Info", "Some other description")
+        lsc3.set_property("Group1", "Info", "Some other description")
         self.assertNotEqual(lsc1, lsc3)
         # test if different labelset with same label_id
         lsc3 = lsc2.copy()

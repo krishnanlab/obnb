@@ -127,7 +127,7 @@ class BaseLSC(IDHandler.IDprop):
                 self.entity.add_id(entity_id)
             if entity_id not in lbset:
                 lbset.update([entity_id])
-                self.entity.setProp(
+                self.entity.set_property(
                     entity_id,
                     "Noccur",
                     self.get_noccur(entity_id) + 1,
@@ -142,7 +142,7 @@ class BaseLSC(IDHandler.IDprop):
         """
         lbset = self.get_labelset(label_id)
         for entity_id in lbset:
-            self.entity.setProp(
+            self.entity.set_property(
                 entity_id,
                 "Noccur",
                 self.get_noccur(entity_id) - 1,
@@ -201,7 +201,7 @@ class BaseLSC(IDHandler.IDprop):
                     f"Entity {entity_id!r} is positive in labelset, "
                     f"{label_id!r}, cannot be set to negative",
                 )
-        self.setProp(label_id, "Negative", set(lst))
+        self.set_property(label_id, "Negative", set(lst))
 
     def get_noccur(self, entity_id):
         """Return the number of labelsets in which an entity participates."""
@@ -324,7 +324,7 @@ class BaseLSC(IDHandler.IDprop):
                 entity_id, val = line.strip().split()
                 if entity_id not in self.entity:
                     self.entity.add_id(entity_id)
-                self.entity.setProp(entity_id, prop_name, interpreter(val))
+                self.entity.set_property(entity_id, prop_name, interpreter(val))
 
     @classmethod
     def from_gmt(cls, fp):

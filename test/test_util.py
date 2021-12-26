@@ -347,25 +347,37 @@ class TestIDprop(unittest.TestCase):
                 {"10": None, "x": type(int()), "y": type(list())},
             )
 
-    def test_setProp(self):
+    def test_set_property(self):
         self.IDprop1.add_id("a")
         self.IDprop1.new_property("x", 1, int)
         # test wrong ID type --> TypeError
-        self.assertRaises(TypeError, self.IDprop1.setProp, 1, "x", 10)
+        self.assertRaises(TypeError, self.IDprop1.set_property, 1, "x", 10)
         # test not exist ID --> IDNotExistError
-        self.assertRaises(IDNotExistError, self.IDprop1.setProp, "b", "x", 10)
+        self.assertRaises(
+            IDNotExistError,
+            self.IDprop1.set_property,
+            "b",
+            "x",
+            10,
+        )
         # test wrong prop name type --> TypeError
-        self.assertRaises(TypeError, self.IDprop1.setProp, "a", 1, 10)
+        self.assertRaises(TypeError, self.IDprop1.set_property, "a", 1, 10)
         # test not exist prop name --> IDNotExistError
-        self.assertRaises(IDNotExistError, self.IDprop1.setProp, "a", "y", 10)
+        self.assertRaises(
+            IDNotExistError,
+            self.IDprop1.set_property,
+            "a",
+            "y",
+            10,
+        )
         # test wrong prop val type --> TypeError
-        self.assertRaises(TypeError, self.IDprop1.setProp, "a", "x", "10")
-        self.assertRaises(TypeError, self.IDprop1.setProp, "a", "x", 10.0)
+        self.assertRaises(TypeError, self.IDprop1.set_property, "a", "x", "10")
+        self.assertRaises(TypeError, self.IDprop1.set_property, "a", "x", 10.0)
         # test if correct val set
-        self.IDprop1.setProp("a", "x", 10)
+        self.IDprop1.set_property("a", "x", 10)
         self.assertEqual(self.IDprop1.prop, {"x": [10]})
         self.IDprop1.add_id("b")
-        self.IDprop1.setProp("b", "x", 34)
+        self.IDprop1.set_property("b", "x", 34)
         self.assertEqual(self.IDprop1.prop, {"x": [10, 34]})
 
     def test_get_property(self):
@@ -381,7 +393,7 @@ class TestIDprop(unittest.TestCase):
         self.assertRaises(IDNotExistError, self.IDprop1.get_property, "a", "y")
         # test if correct val retrieved
         self.assertEqual(self.IDprop1.get_property("a", "x"), 10)
-        self.IDprop1.setProp("a", "x", 20)
+        self.IDprop1.set_property("a", "x", 20)
         self.assertEqual(self.IDprop1.get_property("a", "x"), 20)
 
     def test_delProp(self):
