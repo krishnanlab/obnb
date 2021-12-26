@@ -1,4 +1,4 @@
-from __future__ import annotations
+from typing import Any, Iterator, Set, Tuple
 
 import numpy as np
 from NLEval.label import Filter
@@ -59,6 +59,11 @@ class BaseLSC(IDHandler.IDprop):
         print(self.entity._lst)
         print("Entities occurances:")
         print(self.entity._prop)
+
+    def items(self) -> Iterator[Tuple[int, Set[str]]]:
+        """Yield label name and the corresponding label set."""
+        for label in self:
+            yield label, self.get_labelset(label)
 
     @property
     def entity_ids(self):
@@ -329,7 +334,7 @@ class BaseLSC(IDHandler.IDprop):
                 self.entity.set_property(entity_id, prop_name, interpreter(val))
 
     @classmethod
-    def from_gmt(cls, fp: str, sep: str = "\t") -> NLEval.label.BaseLSC:
+    def from_gmt(cls, fp: str, sep: str = "\t") -> Any:
         """Load data from Gene Matrix Transpose `.gmt` file.
 
         Args:

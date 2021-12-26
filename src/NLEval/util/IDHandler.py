@@ -16,6 +16,10 @@ class IDlst:
         """Yield all IDs"""
         return self._lst.__iter__()
 
+    def __len__(self):
+        """Return the size of the id list."""
+        return self.size
+
     def __eq__(self, other):
         """Return true if two IDlst have same set of IDs"""
         checkers.checkType("other", self.__class__, other)
