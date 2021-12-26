@@ -64,7 +64,7 @@ class TestIDlst(unittest.TestCase):
     def test_xor(self):
         self.assertEqual(self.IDlst1, self.IDlst3 ^ self.IDlst4)
         self.IDlst4.add_id("b")
-        self.IDlst1.popID("b")
+        self.IDlst1.pop_id("b")
         self.assertEqual(self.IDlst1, self.IDlst3 ^ self.IDlst4)
 
     def test_contains(self):
@@ -91,7 +91,7 @@ class TestIDlst(unittest.TestCase):
         self.assertTrue(idlst.isempty())
         idlst.add_id("a")
         self.assertFalse(idlst.isempty())
-        idlst.popID("a")
+        idlst.pop_id("a")
         self.assertTrue(idlst.isempty())
 
     def test_copy(self):
@@ -103,11 +103,11 @@ class TestIDlst(unittest.TestCase):
         # deep
         self.assertNotEqual(idlst_deep_copy, self.IDlst1)
 
-    def test_popID(self):
-        self.assertEqual(self.IDlst1.popID("c"), 2)
+    def test_pop_id(self):
+        self.assertEqual(self.IDlst1.pop_id("c"), 2)
         self.assertEqual(self.IDlst1, self.IDlst3)
-        self.assertRaises(IDNotExistError, self.IDlst1.popID, "c")
-        self.assertRaises(TypeError, self.IDlst1.popID, 1)
+        self.assertRaises(IDNotExistError, self.IDlst1.pop_id, "c")
+        self.assertRaises(TypeError, self.IDlst1.pop_id, 1)
 
     def test_add_id(self):
         self.assertEqual(self.IDlst1.lst, ["a", "b", "c"])
@@ -235,13 +235,13 @@ class TestIDmap(unittest.TestCase):
         # deep
         self.assertNotEqual(idmap_deep_copy, self.idmap)
 
-    def test_popID(self):
+    def test_pop_id(self):
         self.idmap.add_id("b")
         self.idmap.add_id("c")
         self.assertEqual(self.idmap.lst, ["a", "b", "c"])
         self.assertEqual(self.idmap.map, {"a": 0, "b": 1, "c": 2})
-        self.assertRaises(IDNotExistError, self.idmap.popID, "d")
-        self.assertEqual(self.idmap.popID("b"), 1)
+        self.assertRaises(IDNotExistError, self.idmap.pop_id, "d")
+        self.assertEqual(self.idmap.pop_id("b"), 1)
         # make sure both lst and data poped
         self.assertEqual(self.idmap.lst, ["a", "c"])
         # make sure data updated with new mapping
@@ -432,23 +432,23 @@ class TestIDprop(unittest.TestCase):
         # test if all prop val retrieved correctly
         self.assertEqual(self.IDprop1.getAllProp("a"), {"x": 10, "y": 20.0})
 
-    def test_popID(self):
+    def test_pop_id(self):
         self.IDprop1.new_property("x", 1, int)
         self.IDprop1.new_property("y", "1", str)
         self.IDprop1.add_id("a")
         self.IDprop1.add_id("b", {"x": 2, "y": "2"})
         self.IDprop1.add_id("c", {"x": 3, "y": "3"})
         # test wrong ID type --> TypeError
-        self.assertRaises(TypeError, self.IDprop1.popID, 1)
+        self.assertRaises(TypeError, self.IDprop1.pop_id, 1)
         # test wrong ID val --> IDNotExistError
-        self.assertRaises(IDNotExistError, self.IDprop1.popID, "d")
+        self.assertRaises(IDNotExistError, self.IDprop1.pop_id, "d")
         # test if poped correctly
-        self.assertEqual(self.IDprop1.popID("b"), 1)
+        self.assertEqual(self.IDprop1.pop_id("b"), 1)
         self.assertEqual(self.IDprop1.lst, ["a", "c"])
         self.assertEqual(self.IDprop1.properties, ["x", "y"])
         self.assertEqual(self.IDprop1._prop, {"x": [1, 3], "y": ["1", "3"]})
-        self.IDprop1.popID("a")
-        self.IDprop1.popID("c")
+        self.IDprop1.pop_id("a")
+        self.IDprop1.pop_id("c")
         self.assertEqual(self.IDprop1._prop, {"x": [], "y": []})
 
     def test_add_id(self):

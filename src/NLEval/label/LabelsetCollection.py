@@ -86,7 +86,7 @@ class BaseLSC(IDHandler.IDprop):
             self.entity.update(lst)
         except Exception as e:
             # if entity list not updated successfully, pop the new labelset
-            self.popID(label_id)
+            self.pop_id(label_id)
             raise e
         self.update_labelset(lst, label_id)
 
@@ -98,7 +98,7 @@ class BaseLSC(IDHandler.IDprop):
 
         """
         self.reset_labelset(label_id)
-        self.popID(label_id)
+        self.pop_id(label_id)
 
     def update_labelset(self, lst, label_id):
         """Update an existing labelset.
@@ -151,7 +151,7 @@ class BaseLSC(IDHandler.IDprop):
                 self.entity.getAllProp(entity_id)
                 == self.entity.prop_default_val
             ):
-                self.entity.popID(entity_id)
+                self.entity.pop_id(entity_id)
         lbset.clear()
 
     def pop_entity(self, entity_id):
@@ -162,7 +162,7 @@ class BaseLSC(IDHandler.IDprop):
         labelset sizes before and after filtering.
 
         """
-        self.entity.popID(entity_id)
+        self.entity.pop_id(entity_id)
         for label_id in self.label_ids:
             self.get_labelset(label_id).difference_update([entity_id])
 

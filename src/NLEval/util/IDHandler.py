@@ -102,7 +102,7 @@ class IDlst:
         """:obj:`list` of :obj:`str`: list of IDs.
 
         Note: the returned list is a copy of self._lst to prevent userside
-        maniputation on data, use `.add_id()` or `.popID()` to modify data
+        maniputation on data, use `.add_id()` or `.pop_id()` to modify data
 
         """
         return self._lst.copy()
@@ -120,7 +120,7 @@ class IDlst:
         """Return true if ID list is empty"""
         return self.size == 0
 
-    def popID(self, identifier):
+    def pop_id(self, identifier):
         """Pop an ID out of list of IDs"""
         self._check_ID_existence(identifier, True)
         idx = self[identifier]
@@ -190,14 +190,14 @@ class IDmap(IDlst):
         """(dict of str:int): map from ID to index
 
         Note: the returned dict is a copy of self._map to prevent userside
-        maniputation on data, use `.add_id()` or `.popID()` to modify data
+        maniputation on data, use `.add_id()` or `.pop_id()` to modify data
 
         """
         return self._map.copy()
 
-    def popID(self, identifier):
+    def pop_id(self, identifier):
         self._check_ID_existence(identifier, True)
-        super().popID(identifier)
+        super().pop_id(identifier)
         idx = self._map.pop(identifier)
         for i, identifier in enumerate(self.lst[idx:]):
             self._map[identifier] = idx + i
@@ -354,9 +354,9 @@ class IDprop(IDmap):
         """Return all properties associated with an ID"""
         return {i: self.get_property(ideantifier, i) for i in self.properties}
 
-    def popID(self, ideantifier):
+    def pop_id(self, ideantifier):
         """Pop ID from ID list, and all properties lists."""
-        idx = super().popID(ideantifier)
+        idx = super().pop_id(ideantifier)
         for prop in self.properties:
             self._prop[prop].pop(idx)
         return idx
