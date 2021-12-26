@@ -39,10 +39,10 @@ class BaseLSC(IDHandler.IDprop):
         """Initialize BaseLSC object."""
         super().__init__()
         self.entity = IDHandler.IDprop()
-        self.entity.newProp("Noccur", 0, int)
-        self.newProp("Info", "NA", str)
-        self.newProp("Labelset", set(), set)
-        self.newProp("Negative", {None}, set)
+        self.entity.new_property("Noccur", 0, int)
+        self.new_property("Info", "NA", str)
+        self.new_property("Labelset", set(), set)
+        self.new_property("Negative", {None}, set)
 
     def _show(self):
         """Debugging prints."""
@@ -316,7 +316,7 @@ class BaseLSC(IDHandler.IDprop):
                 string to some other value
 
         """
-        self.entity.newProp(prop_name, default_val, default_type)
+        self.entity.new_property(prop_name, default_val, default_type)
         with open(fp, "r") as f:
             for i, line in enumerate(f):
                 if (i < skiprows) | line.startswith(comment):

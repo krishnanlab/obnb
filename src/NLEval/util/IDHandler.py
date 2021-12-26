@@ -287,7 +287,7 @@ class IDprop(IDmap):
         """:obj:`list` of :obj:`str`: list of properties names"""
         return list(self._prop)
 
-    def newProp(self, prop_name, default_val=None, default_type=None):
+    def new_property(self, prop_name, default_val=None, default_type=None):
         """Create a new property
 
         Args:
@@ -361,7 +361,7 @@ class IDprop(IDmap):
         """Add a new ID to list, optional input of properties
 
         Note: input properties must be one of the existing properties,
-        `IDNotExistError` raised other wise. Use `.newProp()` to add new
+        `IDNotExistError` raised other wise. Use `.new_property()` to add new
         property.
 
         Args:
