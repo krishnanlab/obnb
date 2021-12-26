@@ -229,7 +229,7 @@ class IDprop(IDmap):
         # check if properties have same values
         for prop in self.properties:
             for identifier in self:
-                if self.getProp(identifier, prop) != other.getProp(
+                if self.get_property(identifier, prop) != other.get_property(
                     identifier,
                     prop,
                 ):
@@ -317,8 +317,12 @@ class IDprop(IDmap):
         self._prop[prop_name] = prop_lst
 
     def setProp(self, ideantifier, prop_name, prop_val):
-        """Set a pericif property value of an ID, must match default type if available"""
-        self.getProp(ideantifier, prop_name)  # check ID and prop_name validity
+        """Set a specific property value of an ID.
+
+        Note: must match default type if available.
+
+        """
+        self.get_property(ideantifier, prop_name)  # check ID and prop_name
         if self.prop_default_type[prop_name] is not None:
             checkers.checkType(
                 f"Property value for {prop_name!r}",
@@ -327,7 +331,7 @@ class IDprop(IDmap):
             )
         self._prop[prop_name][self[ideantifier]] = prop_val
 
-    def getProp(self, ideantifier, prop_name):
+    def get_property(self, ideantifier, prop_name):
         """Return a specific properties associated with an ID
 
         Raises:
@@ -348,7 +352,7 @@ class IDprop(IDmap):
 
     def getAllProp(self, ideantifier):
         """Return all properties associated with an ID"""
-        return {i: self.getProp(ideantifier, i) for i in self.properties}
+        return {i: self.get_property(ideantifier, i) for i in self.properties}
 
     def popID(self, ideantifier):
         """Pop ID from ID list, and all properties lists."""

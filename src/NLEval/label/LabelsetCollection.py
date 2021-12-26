@@ -168,11 +168,11 @@ class BaseLSC(IDHandler.IDprop):
 
     def get_info(self, label_id):
         """Return description of a labelset."""
-        return self.getProp(label_id, "Info")
+        return self.get_property(label_id, "Info")
 
     def get_labelset(self, label_id):
         """Return set of entities associated with a label."""
-        return self.getProp(label_id, "Labelset")
+        return self.get_property(label_id, "Labelset")
 
     def get_negative(self, label_id):
         """Return set of negative samples of a labelset.
@@ -181,7 +181,7 @@ class BaseLSC(IDHandler.IDprop):
             If negative samples not available, use complement of labelset
 
         """
-        neg = self.getProp(label_id, "Negative")
+        neg = self.get_property(label_id, "Negative")
 
         if neg == {None}:
             all_positives = {
@@ -205,7 +205,7 @@ class BaseLSC(IDHandler.IDprop):
 
     def get_noccur(self, entity_id):
         """Return the number of labelsets in which an entity participates."""
-        return self.entity.getProp(entity_id, "Noccur")
+        return self.entity.get_property(entity_id, "Noccur")
 
     def apply(self, filter_func, inplace=False):
         """Apply filter to labelsets, see `NLEval.label.Filter` for more info.
