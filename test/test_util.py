@@ -396,7 +396,7 @@ class TestIDprop(unittest.TestCase):
         self.IDprop1.set_property("a", "x", 20)
         self.assertEqual(self.IDprop1.get_property("a", "x"), 20)
 
-    def test_delProp(self):
+    def test_remove_property(self):
         self.IDprop1.new_property("x", 1, int)
         self.IDprop1.new_property("y", "1", str)
         self.IDprop1.new_property("z", [1], list)
@@ -410,16 +410,16 @@ class TestIDprop(unittest.TestCase):
         )
         self.assertEqual(self.IDprop1.prop, {"x": [], "y": [], "z": []})
         # test if property deleted properly on empty ID list
-        self.IDprop1.delProp("y")
+        self.IDprop1.remove_property("y")
         self.assertEqual(self.IDprop1.prop_default_val, {"x": 1, "z": [1]})
         self.assertEqual(self.IDprop1.prop_default_type, {"x": int, "z": list})
         self.assertEqual(self.IDprop1.prop, {"x": [], "z": []})
         # test wrong ID type --> TypeError
-        self.assertRaises(TypeError, self.IDprop1.delProp, 1)
-        self.assertRaises(TypeError, self.IDprop1.delProp, [1, 2])
+        self.assertRaises(TypeError, self.IDprop1.remove_property, 1)
+        self.assertRaises(TypeError, self.IDprop1.remove_property, [1, 2])
         # test not exist prop name --> IDNotExistError
-        self.assertRaises(IDNotExistError, self.IDprop1.delProp, "X")
-        self.assertRaises(IDNotExistError, self.IDprop1.delProp, "Z")
+        self.assertRaises(IDNotExistError, self.IDprop1.remove_property, "X")
+        self.assertRaises(IDNotExistError, self.IDprop1.remove_property, "Z")
         # test if property deleted properly on filled IDlist
         self.IDprop1.add_id("a")
         self.IDprop1.add_id("b")
@@ -428,9 +428,9 @@ class TestIDprop(unittest.TestCase):
             self.IDprop1.prop,
             {"x": [1, 1, 1], "z": [[1], [1], [1]]},
         )
-        self.IDprop1.delProp("z")
+        self.IDprop1.remove_property("z")
         self.assertEqual(self.IDprop1.prop, {"x": [1, 1, 1]})
-        self.IDprop1.delProp("x")
+        self.IDprop1.remove_property("x")
         self.assertEqual(self.IDprop1.prop, {})
 
     def test_getAllProp(self):
