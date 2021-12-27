@@ -16,6 +16,10 @@ class IDlst:
         """Yield all IDs"""
         return self._lst.__iter__()
 
+    def __len__(self):
+        """Return the size of the id list."""
+        return self.size
+
     def __eq__(self, other):
         """Return true if two IDlst have same set of IDs"""
         checkers.checkType("other", self.__class__, other)
@@ -102,7 +106,7 @@ class IDlst:
         """:obj:`list` of :obj:`str`: list of IDs.
 
         Note: the returned list is a copy of self._lst to prevent userside
-        maniputation on data, use `.add_id()` or `.popID()` to modify data
+        maniputation on data, use `.add_id()` or `.pop_id()` to modify data
 
         """
         return self._lst.copy()
@@ -120,7 +124,7 @@ class IDlst:
         """Return true if ID list is empty"""
         return self.size == 0
 
-    def popID(self, identifier):
+    def pop_id(self, identifier):
         """Pop an ID out of list of IDs"""
         self._check_ID_existence(identifier, True)
         idx = self[identifier]
@@ -190,14 +194,14 @@ class IDmap(IDlst):
         """(dict of str:int): map from ID to index
 
         Note: the returned dict is a copy of self._map to prevent userside
-        maniputation on data, use `.add_id()` or `.popID()` to modify data
+        maniputation on data, use `.add_id()` or `.pop_id()` to modify data
 
         """
         return self._map.copy()
 
-    def popID(self, identifier):
+    def pop_id(self, identifier):
         self._check_ID_existence(identifier, True)
-        super().popID(identifier)
+        super().pop_id(identifier)
         idx = self._map.pop(identifier)
         for i, identifier in enumerate(self.lst[idx:]):
             self._map[identifier] = idx + i
@@ -224,12 +228,12 @@ class IDprop(IDmap):
         if not super().__eq__(other):
             return False
         # check if two objects have same set of properties
-        if not set(self.propLst) == set(other.propLst):
+        if not set(self.properties) == set(other.properties):
             return False
         # check if properties have same values
-        for prop in self.propLst:
+        for prop in self.properties:
             for identifier in self:
-                if self.getProp(identifier, prop) != other.getProp(
+                if self.get_property(identifier, prop) != other.get_property(
                     identifier,
                     prop,
                 ):
@@ -277,17 +281,17 @@ class IDprop(IDmap):
         property name to list of property values in the order of ID list
 
         Note: the returned dict is a copy of self._prop to prevent userside
-        maniputation on data, use `.setProp` to modify properties
+        maniputation on data, use `.set_property` to modify properties
 
         """
         return self._prop.copy()
 
     @property
-    def propLst(self):
+    def properties(self):
         """:obj:`list` of :obj:`str`: list of properties names"""
         return list(self._prop)
 
-    def newProp(self, prop_name, default_val=None, default_type=None):
+    def new_property(self, prop_name, default_val=None, default_type=None):
         """Create a new property
 
         Args:
@@ -316,18 +320,22 @@ class IDprop(IDmap):
         self._prop_default_type[prop_name] = default_type
         self._prop[prop_name] = prop_lst
 
-    def setProp(self, ideantifier, prop_name, prop_val):
-        """Set a pericif property value of an ID, must match default type if available"""
-        self.getProp(ideantifier, prop_name)  # check ID and prop_name validity
+    def set_property(self, identifier, prop_name, prop_val):
+        """Set a specific property value of an ID.
+
+        Note: must match default type if available.
+
+        """
+        self.get_property(identifier, prop_name)  # check ID and prop_name
         if self.prop_default_type[prop_name] is not None:
             checkers.checkType(
                 f"Property value for {prop_name!r}",
                 self.prop_default_type[prop_name],
                 prop_val,
             )
-        self._prop[prop_name][self[ideantifier]] = prop_val
+        self._prop[prop_name][self[identifier]] = prop_val
 
-    def getProp(self, ideantifier, prop_name):
+    def get_property(self, identifier, prop_name):
         """Return a specific properties associated with an ID
 
         Raises:
@@ -335,37 +343,37 @@ class IDprop(IDmap):
             TypeError: if either ID or prop_name is not string type
 
         """
-        self._check_ID_existence(ideantifier, True)
+        self._check_ID_existence(identifier, True)
         self._check_prop_existence(prop_name, True)
-        return self._prop[prop_name][self[ideantifier]]
+        return self._prop[prop_name][self[identifier]]
 
-    def delProp(self, prop_name):
-        """Delete a property, along with its default type and value"""
+    def remove_property(self, prop_name):
+        """Remove a property along with its default type and value"""
         self._check_prop_existence(prop_name, True)
         self._prop.pop(prop_name)
         self._prop_default_val.pop(prop_name)
         self._prop_default_type.pop(prop_name)
 
-    def getAllProp(self, ideantifier):
+    def get_all_properties(self, identifier):
         """Return all properties associated with an ID"""
-        return {prop: self.getProp(ideantifier, prop) for prop in self.propLst}
+        return {i: self.get_property(identifier, i) for i in self.properties}
 
-    def popID(self, ideantifier):
+    def pop_id(self, identifier):
         """Pop ID from ID list, and all properties lists."""
-        idx = super().popID(ideantifier)
-        for prop in self.propLst:
+        idx = super().pop_id(identifier)
+        for prop in self.properties:
             self._prop[prop].pop(idx)
         return idx
 
-    def add_id(self, ideantifier, prop=None):
+    def add_id(self, identifier, prop=None):
         """Add a new ID to list, optional input of properties
 
         Note: input properties must be one of the existing properties,
-        `IDNotExistError` raised other wise. Use `.newProp()` to add new
+        `IDNotExistError` raised other wise. Use `.new_property()` to add new
         property.
 
         Args:
-            ideantifier(str): ID to be added
+            identifier(str): ID to be added
             prop(:obj:`dict` of str:obj): dictionary specifying property(s)
                 of the input ID. Corresponding properties must follow default
                 type as specified in `.prop_default_type` if any. If `None`
@@ -392,6 +400,6 @@ class IDprop(IDmap):
                     prop[prop_name] = deepcopy(self.prop_default_val[prop_name])
         else:
             prop = deepcopy(self.prop_default_val)
-        super().add_id(ideantifier)
+        super().add_id(identifier)
         for prop_name, prop_val in prop.items():
             self._prop[prop_name].append(prop_val)

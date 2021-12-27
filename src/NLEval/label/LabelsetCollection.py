@@ -1,3 +1,5 @@
+from typing import Any, Iterator, List, Set, Tuple
+
 import numpy as np
 from NLEval.label import Filter
 from NLEval.util import IDHandler, checkers
@@ -39,10 +41,10 @@ class BaseLSC(IDHandler.IDprop):
         """Initialize BaseLSC object."""
         super().__init__()
         self.entity = IDHandler.IDprop()
-        self.entity.newProp("Noccur", 0, int)
-        self.newProp("Info", "NA", str)
-        self.newProp("Labelset", set(), set)
-        self.newProp("Negative", {None}, set)
+        self.entity.new_property("Noccur", 0, int)
+        self.new_property("Info", "NA", str)
+        self.new_property("Labelset", set(), set)
+        self.new_property("Negative", {None}, set)
 
     def _show(self):
         """Debugging prints."""
@@ -57,6 +59,28 @@ class BaseLSC(IDHandler.IDprop):
         print(self.entity._lst)
         print("Entities occurances:")
         print(self.entity._prop)
+
+    def stats(self) -> str:
+        """Print basic stats for the labelset collection."""
+        sizes = self.sizes
+        return (
+            f"Number of labelsets: {len(self)}\n"
+            f"max: {max(sizes)}\n"
+            f"min: {min(sizes)}\n"
+            f"med: {np.median(sizes):.2f}\n"
+            f"avg: {np.mean(sizes):.2f}\n"
+            f"std: {np.std(sizes):.2f}\n"
+        )
+
+    def items(self) -> Iterator[Tuple[int, Set[str]]]:
+        """Yield label name and the corresponding label set."""
+        for label in self:
+            yield label, self.get_labelset(label)
+
+    @property
+    def sizes(self) -> List[int]:
+        """Sizes of the labelsets."""
+        return [len(labelset) for _, labelset in self.items()]
 
     @property
     def entity_ids(self):
@@ -86,7 +110,7 @@ class BaseLSC(IDHandler.IDprop):
             self.entity.update(lst)
         except Exception as e:
             # if entity list not updated successfully, pop the new labelset
-            self.popID(label_id)
+            self.pop_id(label_id)
             raise e
         self.update_labelset(lst, label_id)
 
@@ -98,7 +122,7 @@ class BaseLSC(IDHandler.IDprop):
 
         """
         self.reset_labelset(label_id)
-        self.popID(label_id)
+        self.pop_id(label_id)
 
     def update_labelset(self, lst, label_id):
         """Update an existing labelset.
@@ -127,7 +151,7 @@ class BaseLSC(IDHandler.IDprop):
                 self.entity.add_id(entity_id)
             if entity_id not in lbset:
                 lbset.update([entity_id])
-                self.entity.setProp(
+                self.entity.set_property(
                     entity_id,
                     "Noccur",
                     self.get_noccur(entity_id) + 1,
@@ -142,16 +166,16 @@ class BaseLSC(IDHandler.IDprop):
         """
         lbset = self.get_labelset(label_id)
         for entity_id in lbset:
-            self.entity.setProp(
+            self.entity.set_property(
                 entity_id,
                 "Noccur",
                 self.get_noccur(entity_id) - 1,
             )
             if (
-                self.entity.getAllProp(entity_id)
+                self.entity.get_all_properties(entity_id)
                 == self.entity.prop_default_val
             ):
-                self.entity.popID(entity_id)
+                self.entity.pop_id(entity_id)
         lbset.clear()
 
     def pop_entity(self, entity_id):
@@ -162,17 +186,17 @@ class BaseLSC(IDHandler.IDprop):
         labelset sizes before and after filtering.
 
         """
-        self.entity.popID(entity_id)
+        self.entity.pop_id(entity_id)
         for label_id in self.label_ids:
             self.get_labelset(label_id).difference_update([entity_id])
 
     def get_info(self, label_id):
         """Return description of a labelset."""
-        return self.getProp(label_id, "Info")
+        return self.get_property(label_id, "Info")
 
     def get_labelset(self, label_id):
         """Return set of entities associated with a label."""
-        return self.getProp(label_id, "Labelset")
+        return self.get_property(label_id, "Labelset")
 
     def get_negative(self, label_id):
         """Return set of negative samples of a labelset.
@@ -181,7 +205,7 @@ class BaseLSC(IDHandler.IDprop):
             If negative samples not available, use complement of labelset
 
         """
-        neg = self.getProp(label_id, "Negative")
+        neg = self.get_property(label_id, "Negative")
 
         if neg == {None}:
             all_positives = {
@@ -201,11 +225,11 @@ class BaseLSC(IDHandler.IDprop):
                     f"Entity {entity_id!r} is positive in labelset, "
                     f"{label_id!r}, cannot be set to negative",
                 )
-        self.setProp(label_id, "Negative", set(lst))
+        self.set_property(label_id, "Negative", set(lst))
 
     def get_noccur(self, entity_id):
         """Return the number of labelsets in which an entity participates."""
-        return self.entity.getProp(entity_id, "Noccur")
+        return self.entity.get_property(entity_id, "Noccur")
 
     def apply(self, filter_func, inplace=False):
         """Apply filter to labelsets, see `NLEval.label.Filter` for more info.
@@ -316,7 +340,7 @@ class BaseLSC(IDHandler.IDprop):
                 string to some other value
 
         """
-        self.entity.newProp(prop_name, default_val, default_type)
+        self.entity.new_property(prop_name, default_val, default_type)
         with open(fp, "r") as f:
             for i, line in enumerate(f):
                 if (i < skiprows) | line.startswith(comment):
@@ -324,20 +348,21 @@ class BaseLSC(IDHandler.IDprop):
                 entity_id, val = line.strip().split()
                 if entity_id not in self.entity:
                     self.entity.add_id(entity_id)
-                self.entity.setProp(entity_id, prop_name, interpreter(val))
+                self.entity.set_property(entity_id, prop_name, interpreter(val))
 
     @classmethod
-    def from_gmt(cls, fp):
+    def from_gmt(cls, fp: str, sep: str = "\t") -> Any:
         """Load data from Gene Matrix Transpose `.gmt` file.
 
         Args:
-            fg(str): path to the `.gmt` file
+            fp: path to the `.gmt` file.
+            sep: seperator used in the GMT file.
 
         """
         lsc = cls()
         with open(fp, "r") as f:
             for line in f:
-                label_id, label_info, *lst = line.strip().split("\t")
+                label_id, label_info, *lst = line.strip().split(sep)
                 lsc.add_labelset(lst, label_id, label_info)
         return lsc
 

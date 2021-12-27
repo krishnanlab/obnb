@@ -64,7 +64,7 @@ class TestIDlst(unittest.TestCase):
     def test_xor(self):
         self.assertEqual(self.IDlst1, self.IDlst3 ^ self.IDlst4)
         self.IDlst4.add_id("b")
-        self.IDlst1.popID("b")
+        self.IDlst1.pop_id("b")
         self.assertEqual(self.IDlst1, self.IDlst3 ^ self.IDlst4)
 
     def test_contains(self):
@@ -91,7 +91,7 @@ class TestIDlst(unittest.TestCase):
         self.assertTrue(idlst.isempty())
         idlst.add_id("a")
         self.assertFalse(idlst.isempty())
-        idlst.popID("a")
+        idlst.pop_id("a")
         self.assertTrue(idlst.isempty())
 
     def test_copy(self):
@@ -103,11 +103,11 @@ class TestIDlst(unittest.TestCase):
         # deep
         self.assertNotEqual(idlst_deep_copy, self.IDlst1)
 
-    def test_popID(self):
-        self.assertEqual(self.IDlst1.popID("c"), 2)
+    def test_pop_id(self):
+        self.assertEqual(self.IDlst1.pop_id("c"), 2)
         self.assertEqual(self.IDlst1, self.IDlst3)
-        self.assertRaises(IDNotExistError, self.IDlst1.popID, "c")
-        self.assertRaises(TypeError, self.IDlst1.popID, 1)
+        self.assertRaises(IDNotExistError, self.IDlst1.pop_id, "c")
+        self.assertRaises(TypeError, self.IDlst1.pop_id, 1)
 
     def test_add_id(self):
         self.assertEqual(self.IDlst1.lst, ["a", "b", "c"])
@@ -235,13 +235,13 @@ class TestIDmap(unittest.TestCase):
         # deep
         self.assertNotEqual(idmap_deep_copy, self.idmap)
 
-    def test_popID(self):
+    def test_pop_id(self):
         self.idmap.add_id("b")
         self.idmap.add_id("c")
         self.assertEqual(self.idmap.lst, ["a", "b", "c"])
         self.assertEqual(self.idmap.map, {"a": 0, "b": 1, "c": 2})
-        self.assertRaises(IDNotExistError, self.idmap.popID, "d")
-        self.assertEqual(self.idmap.popID("b"), 1)
+        self.assertRaises(IDNotExistError, self.idmap.pop_id, "d")
+        self.assertEqual(self.idmap.pop_id("b"), 1)
         # make sure both lst and data poped
         self.assertEqual(self.idmap.lst, ["a", "c"])
         # make sure data updated with new mapping
@@ -298,37 +298,37 @@ class TestIDprop(unittest.TestCase):
         self.assertRaises(TypeError, self.IDprop1, IDHandler.IDmap())
         self.assertRaises(TypeError, self.IDprop1, ["a", "b", "c"])
 
-    def test_propLst(self):
-        self.IDprop1.newProp("x")
-        self.IDprop1.newProp("y")
-        self.IDprop1.newProp("z")
-        self.assertEqual(self.IDprop1.propLst, ["x", "y", "z"])
+    def test_properties(self):
+        self.IDprop1.new_property("x")
+        self.IDprop1.new_property("y")
+        self.IDprop1.new_property("z")
+        self.assertEqual(self.IDprop1.properties, ["x", "y", "z"])
 
-    def test_newProp(self):
+    def test_new_property(self):
         # test property name type check
-        self.assertRaises(TypeError, self.IDprop1.newProp, 10)
-        self.IDprop1.newProp("10")
+        self.assertRaises(TypeError, self.IDprop1.new_property, 10)
+        self.IDprop1.new_property("10")
         # test property existance check
-        self.assertRaises(IDExistsError, self.IDprop1.newProp, "10")
+        self.assertRaises(IDExistsError, self.IDprop1.new_property, "10")
         # test type consistency between default value and type
         self.assertRaises(
             TypeError,
-            self.IDprop1.newProp,
+            self.IDprop1.new_property,
             "x",
             default_val=int(10),
             default_type=float,
         )
-        self.IDprop1.newProp("x", default_val=int(10), default_type=int)
-        # test newProp on empty object
+        self.IDprop1.new_property("x", default_val=int(10), default_type=int)
+        # test new_property on empty object
         self.IDprop1.add_id("a")
         self.IDprop1.add_id("b")
-        # test newProp on object with some IDs
+        # test new_property on object with some IDs
         self.IDprop2.add_id("a")
         self.IDprop2.add_id("b")
-        self.IDprop2.newProp("x", default_val=int(10), default_type=int)
+        self.IDprop2.new_property("x", default_val=int(10), default_type=int)
         self.assertEqual(self.IDprop1._prop["x"], self.IDprop2._prop["x"])
         # test deepcopy of default val
-        self.IDprop1.newProp("y", default_val=[], default_type=list)
+        self.IDprop1.new_property("y", default_val=[], default_type=list)
         self.IDprop1._prop["y"][0].append(1)
         self.assertEqual(self.IDprop1._prop["y"], [[1], []])
         # test if default values and types set correctly
@@ -347,47 +347,59 @@ class TestIDprop(unittest.TestCase):
                 {"10": None, "x": type(int()), "y": type(list())},
             )
 
-    def test_setProp(self):
+    def test_set_property(self):
         self.IDprop1.add_id("a")
-        self.IDprop1.newProp("x", 1, int)
+        self.IDprop1.new_property("x", 1, int)
         # test wrong ID type --> TypeError
-        self.assertRaises(TypeError, self.IDprop1.setProp, 1, "x", 10)
+        self.assertRaises(TypeError, self.IDprop1.set_property, 1, "x", 10)
         # test not exist ID --> IDNotExistError
-        self.assertRaises(IDNotExistError, self.IDprop1.setProp, "b", "x", 10)
+        self.assertRaises(
+            IDNotExistError,
+            self.IDprop1.set_property,
+            "b",
+            "x",
+            10,
+        )
         # test wrong prop name type --> TypeError
-        self.assertRaises(TypeError, self.IDprop1.setProp, "a", 1, 10)
+        self.assertRaises(TypeError, self.IDprop1.set_property, "a", 1, 10)
         # test not exist prop name --> IDNotExistError
-        self.assertRaises(IDNotExistError, self.IDprop1.setProp, "a", "y", 10)
+        self.assertRaises(
+            IDNotExistError,
+            self.IDprop1.set_property,
+            "a",
+            "y",
+            10,
+        )
         # test wrong prop val type --> TypeError
-        self.assertRaises(TypeError, self.IDprop1.setProp, "a", "x", "10")
-        self.assertRaises(TypeError, self.IDprop1.setProp, "a", "x", 10.0)
+        self.assertRaises(TypeError, self.IDprop1.set_property, "a", "x", "10")
+        self.assertRaises(TypeError, self.IDprop1.set_property, "a", "x", 10.0)
         # test if correct val set
-        self.IDprop1.setProp("a", "x", 10)
+        self.IDprop1.set_property("a", "x", 10)
         self.assertEqual(self.IDprop1.prop, {"x": [10]})
         self.IDprop1.add_id("b")
-        self.IDprop1.setProp("b", "x", 34)
+        self.IDprop1.set_property("b", "x", 34)
         self.assertEqual(self.IDprop1.prop, {"x": [10, 34]})
 
-    def test_getProp(self):
+    def test_get_property(self):
         self.IDprop1.add_id("a")
-        self.IDprop1.newProp("x", 10, int)
+        self.IDprop1.new_property("x", 10, int)
         # test wrong ID type --> TypeError
-        self.assertRaises(TypeError, self.IDprop1.getProp, 1, "x")
+        self.assertRaises(TypeError, self.IDprop1.get_property, 1, "x")
         # test not exist ID value --> IDNotExistError
-        self.assertRaises(IDNotExistError, self.IDprop1.getProp, "b", "x")
+        self.assertRaises(IDNotExistError, self.IDprop1.get_property, "b", "x")
         # test wrong prop name type --> TypeError
-        self.assertRaises(TypeError, self.IDprop1.getProp, "a", 1)
+        self.assertRaises(TypeError, self.IDprop1.get_property, "a", 1)
         # test not exist prop name --> IDNotExistError
-        self.assertRaises(IDNotExistError, self.IDprop1.getProp, "a", "y")
+        self.assertRaises(IDNotExistError, self.IDprop1.get_property, "a", "y")
         # test if correct val retrieved
-        self.assertEqual(self.IDprop1.getProp("a", "x"), 10)
-        self.IDprop1.setProp("a", "x", 20)
-        self.assertEqual(self.IDprop1.getProp("a", "x"), 20)
+        self.assertEqual(self.IDprop1.get_property("a", "x"), 10)
+        self.IDprop1.set_property("a", "x", 20)
+        self.assertEqual(self.IDprop1.get_property("a", "x"), 20)
 
-    def test_delProp(self):
-        self.IDprop1.newProp("x", 1, int)
-        self.IDprop1.newProp("y", "1", str)
-        self.IDprop1.newProp("z", [1], list)
+    def test_remove_property(self):
+        self.IDprop1.new_property("x", 1, int)
+        self.IDprop1.new_property("y", "1", str)
+        self.IDprop1.new_property("z", [1], list)
         self.assertEqual(
             self.IDprop1.prop_default_val,
             {"x": 1, "y": "1", "z": [1]},
@@ -398,16 +410,16 @@ class TestIDprop(unittest.TestCase):
         )
         self.assertEqual(self.IDprop1.prop, {"x": [], "y": [], "z": []})
         # test if property deleted properly on empty ID list
-        self.IDprop1.delProp("y")
+        self.IDprop1.remove_property("y")
         self.assertEqual(self.IDprop1.prop_default_val, {"x": 1, "z": [1]})
         self.assertEqual(self.IDprop1.prop_default_type, {"x": int, "z": list})
         self.assertEqual(self.IDprop1.prop, {"x": [], "z": []})
         # test wrong ID type --> TypeError
-        self.assertRaises(TypeError, self.IDprop1.delProp, 1)
-        self.assertRaises(TypeError, self.IDprop1.delProp, [1, 2])
+        self.assertRaises(TypeError, self.IDprop1.remove_property, 1)
+        self.assertRaises(TypeError, self.IDprop1.remove_property, [1, 2])
         # test not exist prop name --> IDNotExistError
-        self.assertRaises(IDNotExistError, self.IDprop1.delProp, "X")
-        self.assertRaises(IDNotExistError, self.IDprop1.delProp, "Z")
+        self.assertRaises(IDNotExistError, self.IDprop1.remove_property, "X")
+        self.assertRaises(IDNotExistError, self.IDprop1.remove_property, "Z")
         # test if property deleted properly on filled IDlist
         self.IDprop1.add_id("a")
         self.IDprop1.add_id("b")
@@ -416,52 +428,55 @@ class TestIDprop(unittest.TestCase):
             self.IDprop1.prop,
             {"x": [1, 1, 1], "z": [[1], [1], [1]]},
         )
-        self.IDprop1.delProp("z")
+        self.IDprop1.remove_property("z")
         self.assertEqual(self.IDprop1.prop, {"x": [1, 1, 1]})
-        self.IDprop1.delProp("x")
+        self.IDprop1.remove_property("x")
         self.assertEqual(self.IDprop1.prop, {})
 
-    def test_getAllProp(self):
+    def test_get_all_properties(self):
         self.IDprop1.add_id("a")
-        self.IDprop1.newProp("x", 10, int)
-        self.IDprop1.newProp("y", 20.0, float)
+        self.IDprop1.new_property("x", 10, int)
+        self.IDprop1.new_property("y", 20.0, float)
         # test wrong ID type --> TypeError
-        self.assertRaises(TypeError, self.IDprop1.getAllProp, 1)
+        self.assertRaises(TypeError, self.IDprop1.get_all_properties, 1)
         # test wrong ID val --> IDNotExistError
-        self.assertRaises(IDNotExistError, self.IDprop1.getAllProp, "b")
+        self.assertRaises(IDNotExistError, self.IDprop1.get_all_properties, "b")
         # test if all prop val retrieved correctly
-        self.assertEqual(self.IDprop1.getAllProp("a"), {"x": 10, "y": 20.0})
+        self.assertEqual(
+            self.IDprop1.get_all_properties("a"),
+            {"x": 10, "y": 20.0},
+        )
 
-    def test_popID(self):
-        self.IDprop1.newProp("x", 1, int)
-        self.IDprop1.newProp("y", "1", str)
+    def test_pop_id(self):
+        self.IDprop1.new_property("x", 1, int)
+        self.IDprop1.new_property("y", "1", str)
         self.IDprop1.add_id("a")
         self.IDprop1.add_id("b", {"x": 2, "y": "2"})
         self.IDprop1.add_id("c", {"x": 3, "y": "3"})
         # test wrong ID type --> TypeError
-        self.assertRaises(TypeError, self.IDprop1.popID, 1)
+        self.assertRaises(TypeError, self.IDprop1.pop_id, 1)
         # test wrong ID val --> IDNotExistError
-        self.assertRaises(IDNotExistError, self.IDprop1.popID, "d")
+        self.assertRaises(IDNotExistError, self.IDprop1.pop_id, "d")
         # test if poped correctly
-        self.assertEqual(self.IDprop1.popID("b"), 1)
+        self.assertEqual(self.IDprop1.pop_id("b"), 1)
         self.assertEqual(self.IDprop1.lst, ["a", "c"])
-        self.assertEqual(self.IDprop1.propLst, ["x", "y"])
+        self.assertEqual(self.IDprop1.properties, ["x", "y"])
         self.assertEqual(self.IDprop1._prop, {"x": [1, 3], "y": ["1", "3"]})
-        self.IDprop1.popID("a")
-        self.IDprop1.popID("c")
+        self.IDprop1.pop_id("a")
+        self.IDprop1.pop_id("c")
         self.assertEqual(self.IDprop1._prop, {"x": [], "y": []})
 
     def test_add_id(self):
-        self.IDprop1.newProp("x", 1, int)
-        self.IDprop1.newProp("y", "1", str)
+        self.IDprop1.new_property("x", 1, int)
+        self.IDprop1.new_property("y", "1", str)
         # no specification of properties, use all default values
         self.IDprop1.add_id("a")
-        self.assertEqual(self.IDprop1.getProp("a", "x"), 1)
-        self.assertEqual(self.IDprop1.getProp("a", "y"), "1")
+        self.assertEqual(self.IDprop1.get_property("a", "x"), 1)
+        self.assertEqual(self.IDprop1.get_property("a", "y"), "1")
         # fully specified properties
         self.IDprop1.add_id("b", {"x": 2, "y": "2"})
-        self.assertEqual(self.IDprop1.getProp("b", "x"), 2)
-        self.assertEqual(self.IDprop1.getProp("b", "y"), "2")
+        self.assertEqual(self.IDprop1.get_property("b", "x"), 2)
+        self.assertEqual(self.IDprop1.get_property("b", "y"), "2")
         # test wrong ID type --> TypeError
         self.assertRaises(TypeError, self.IDprop1.add_id, (1, 2, 3))
         # test addd existed ID --> IDExistsError
@@ -487,27 +502,27 @@ class TestIDprop(unittest.TestCase):
             "c",
             {"x": 3},
         )  # only 'x' specified, 'y' will be default
-        self.assertEqual(self.IDprop1.getProp("c", "x"), 3)
-        self.assertEqual(self.IDprop1.getProp("c", "y"), "1")
+        self.assertEqual(self.IDprop1.get_property("c", "x"), 3)
+        self.assertEqual(self.IDprop1.get_property("c", "y"), "1")
         # test empty property dictionary, should be same as no `prop=None`
         self.IDprop1.add_id("d", {})
-        self.assertEqual(self.IDprop1.getProp("d", "x"), 1)
-        self.assertEqual(self.IDprop1.getProp("d", "y"), "1")
+        self.assertEqual(self.IDprop1.get_property("d", "x"), 1)
+        self.assertEqual(self.IDprop1.get_property("d", "y"), "1")
         # test if deepcopy used for fill in default properties for existing entities
         self.IDprop2.add_id("a")
         self.IDprop2.add_id("b")
-        self.IDprop2.newProp("x", list())
-        self.IDprop2.getProp("a", "x").append(1)
-        self.assertEqual(self.IDprop2.getProp("a", "x"), [1])
-        self.assertEqual(self.IDprop2.getProp("b", "x"), [])
+        self.IDprop2.new_property("x", list())
+        self.IDprop2.get_property("a", "x").append(1)
+        self.assertEqual(self.IDprop2.get_property("a", "x"), [1])
+        self.assertEqual(self.IDprop2.get_property("b", "x"), [])
         # test if deepcopy used for filling in missing properties of new ID
         self.IDprop2.add_id("c")
         self.IDprop2.add_id("d")
-        self.IDprop2.getProp("c", "x").append(2)
-        self.assertEqual(self.IDprop2.getProp("a", "x"), [1])
-        self.assertEqual(self.IDprop2.getProp("b", "x"), [])
-        self.assertEqual(self.IDprop2.getProp("c", "x"), [2])
-        self.assertEqual(self.IDprop2.getProp("d", "x"), [])
+        self.IDprop2.get_property("c", "x").append(2)
+        self.assertEqual(self.IDprop2.get_property("a", "x"), [1])
+        self.assertEqual(self.IDprop2.get_property("b", "x"), [])
+        self.assertEqual(self.IDprop2.get_property("c", "x"), [2])
+        self.assertEqual(self.IDprop2.get_property("d", "x"), [])
 
 
 class TestCheckers(unittest.TestCase):
