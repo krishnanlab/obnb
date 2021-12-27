@@ -4,8 +4,11 @@ import unittest
 import numpy as np
 from commonvar import SAMPLE_DATA_DIR
 from NLEval import valsplit
-from NLEval.label import labelset_filter, labelset_collection
-from NLEval.util.Exceptions import IDExistsError, IDNotExistError
+from NLEval.label import labelset_collection
+from NLEval.label import labelset_filter
+from NLEval.util.Exceptions import IDExistsError
+from NLEval.util.Exceptions import IDNotExistError
+from sklearn.model_selection import KFold
 
 
 class TestLSC(unittest.TestCase):
@@ -328,6 +331,87 @@ class TestLSC(unittest.TestCase):
         self.lsc.pop_labelset("Labelset1")
         self.lsc.pop_labelset("Labelset2")
         self.assertEqual(self.lsc.entity.map, {"a": 0, "c": 1, "d": 2})
+
+
+class TestSplit(unittest.TestCase):
+    def setUp(self):
+        self.lsc = labelset_collection.LSC()
+        self.lsc.add_labelset(["a", "b", "c"], "Labelset1", "Description1")
+        self.lsc.add_labelset(["b", "d"], "Labelset2", "Description2")
+
+    def test_raise_mask_names(self):
+        self.assertRaises(
+            ValueError,
+            self.lsc.split,
+            KFold(n_splits=2).split,
+            mask_names=("train", "val", "test"),
+        )
+
+    def test_raise_label_name(self):
+        self.assertRaises(
+            IDNotExistError,
+            self.lsc.split,
+            KFold(n_splits=2).split,
+            labelset_name="Labelset3",
+        )
+
+    def test_raise_property_name(self):
+        self.assertRaises(
+            IDNotExistError,
+            self.lsc.split,
+            KFold(n_splits=2).split,
+            property_name="something",
+        )
+
+    def test_two_fold(self):
+        train_mask = [[False, False, True, True], [True, True, False, False]]
+        test_mask = [[True, True, False, False], [False, False, True, True]]
+
+        y, masks, labelset_names = self.lsc.split(KFold(n_splits=2).split)
+        self.assertEqual(y.T.tolist(), [[1, 1, 1, 0], [0, 1, 0, 1]])
+        self.assertEqual(list(masks), ["train", "test"])
+        self.assertEqual(labelset_names, ["Labelset1", "Labelset2"])
+        self.assertEqual(masks["train"].T.tolist(), train_mask)
+        self.assertEqual(masks["test"].T.tolist(), test_mask)
+
+        y, masks, labelset_names = self.lsc.split(
+            KFold(n_splits=2).split,
+            labelset_name="Labelset1",
+        )
+        self.assertEqual(y.T.tolist(), [1, 1, 1, 0])
+        self.assertEqual(list(masks), ["train", "test"])
+        self.assertEqual(labelset_names, ["Labelset1"])
+        self.assertEqual(masks["train"].T.tolist(), train_mask)
+        self.assertEqual(masks["test"].T.tolist(), test_mask)
+
+    def test_three_fold(self):
+        train_mask = [
+            [False, False, True, True],
+            [True, True, False, True],
+            [True, True, True, False],
+        ]
+        test_mask = [
+            [True, True, False, False],
+            [False, False, True, False],
+            [False, False, False, True],
+        ]
+
+        y, masks, labelset_names = self.lsc.split(KFold(n_splits=3).split)
+        self.assertEqual(y.T.tolist(), [[1, 1, 1, 0], [0, 1, 0, 1]])
+        self.assertEqual(list(masks), ["train", "test"])
+        self.assertEqual(labelset_names, ["Labelset1", "Labelset2"])
+        self.assertEqual(masks["train"].T.tolist(), train_mask)
+        self.assertEqual(masks["test"].T.tolist(), test_mask)
+
+        y, masks, labelset_names = self.lsc.split(
+            KFold(n_splits=3).split,
+            labelset_name="Labelset1",
+        )
+        self.assertEqual(y.T.tolist(), [1, 1, 1, 0])
+        self.assertEqual(list(masks), ["train", "test"])
+        self.assertEqual(labelset_names, ["Labelset1"])
+        self.assertEqual(masks["train"].T.tolist(), train_mask)
+        self.assertEqual(masks["test"].T.tolist(), test_mask)
 
 
 class TestFilter(unittest.TestCase):
@@ -736,22 +820,25 @@ class TestFilter(unittest.TestCase):
             self.assertEqual(lsc.entity.map, {"a": 0, "b": 1, "c": 2})
 
     def test_NegativeFilterHypergeom(self):
-        # p-val threshold set to 0.5 since most large, group1-group4 smallest with pval = 0.286
+        # p-val threshold set to 0.5 since most large,
+        # group1-group4 smallest with pval = 0.286
         self.lsc.apply(
             labelset_filter.NegativeFilterHypergeom(p_thresh=0.5),
             inplace=True,
         )
-        # test wheter negative selected correctly for group1, 'f' should be excluded due to sim with group2
+        # test wheter negative selected correctly for group1,
+        # 'f' should be excluded due to sim with group2
         self.assertEqual(self.lsc.get_negative("Group1"), {"d", "e", "g", "h"})
 
-        # increase p-val thtreshold to 0.7 will also include group2 and group3, where pval = 0.643
+        # increase p-val thtreshold to 0.7 will also include group2 and group3,
+        # where pval = 0.643
         self.lsc.apply(
             labelset_filter.NegativeFilterHypergeom(p_thresh=0.7),
             inplace=True,
         )
         self.assertEqual(self.lsc.get_negative("Group1"), {"e", "g"})
 
-        # set p-val threshold to be greater than 1 -> no negatives should be left
+        # set p-val threshold to be greater than 1 -> no negative left
         self.lsc.apply(
             labelset_filter.NegativeFilterHypergeom(p_thresh=1.1),
             inplace=True,
