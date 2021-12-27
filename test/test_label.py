@@ -632,6 +632,44 @@ class TestFilter(unittest.TestCase):
             self.assertEqual(lsc.prop["Labelset"], [])
             self.assertEqual(lsc.entity.map, {})
 
+    def test_LabelsetRangeFilterJaccard(self):
+        with self.subTest(min_val=0.9):
+            lsc = self.lsc.apply(
+                Filter.LabelsetRangeFilterJaccard(max_val=0.9),
+                inplace=False,
+            )
+            self.assertEqual(
+                lsc.label_ids,
+                ["Group1", "Group2", "Group3", "Group4", "Group5"],
+            )
+        with self.subTest(min_val=0.4):
+            lsc = self.lsc.apply(
+                Filter.LabelsetRangeFilterJaccard(max_val=0.4),
+                inplace=False,
+            )
+            self.assertEqual(
+                lsc.label_ids,
+                ["Group2", "Group3", "Group4", "Group5"],
+            )
+        with self.subTest(min_val=0.2):
+            lsc = self.lsc.apply(
+                Filter.LabelsetRangeFilterJaccard(max_val=0.2),
+                inplace=False,
+            )
+            self.assertEqual(
+                lsc.label_ids,
+                ["Group2", "Group3", "Group5"],
+            )
+        with self.subTest(min_val=0):
+            lsc = self.lsc.apply(
+                Filter.LabelsetRangeFilterJaccard(max_val=0),
+                inplace=False,
+            )
+            self.assertEqual(
+                lsc.label_ids,
+                ["Group2", "Group5"],
+            )
+
     def test_LabelsetRangeFilterTrainTestPos(self):
         train_index = np.array(["a", "b", "c", "d"])
         test_index = np.array(["e", "f", "g", "h"])

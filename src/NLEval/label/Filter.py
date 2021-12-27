@@ -244,8 +244,10 @@ class LabelsetRangeFilterSize(BaseRangeFilter):
 class LabelsetRangeFilterJaccard(BaseRangeFilter):
     """Filter labelsets based on Jaccard index.
 
-    Compare all pairs of labelsets and if a pair of labelsets have a Jaccard
-    Index larger than ``max_val``, remove the one with a larger size.
+    For each labelset, compare against all other labelsets and record the
+    largest Jaccard index computed in the case that the current labelset has
+    more positives. If the largest recorded jaccard index is larger than the
+    specified ``max_val``, then the current labelset is removed.
 
     Note:
         Only support filtering with ``max_val``.
@@ -262,7 +264,7 @@ class LabelsetRangeFilterJaccard(BaseRangeFilter):
 
     @staticmethod
     def get_val_getter(lsc):
-        # if jjaccard index greater than threshold, determin whether or not to
+        # if jaccard index greater than threshold, determin whether or not to
         # discard depending on the size, only discard the larger one
         def val_getter(label_id):
             val = 0
@@ -272,7 +274,7 @@ class LabelsetRangeFilterJaccard(BaseRangeFilter):
                     continue
                 labelset2 = lsc.get_labelset(label_id2)
                 jidx = len(labelset & labelset2) / len(labelset | labelset2)
-                if (jidx > val) & (len(labelset) <= len(labelset2)):
+                if (jidx > val) & (len(labelset) >= len(labelset2)):
                     val = jidx
             return val
 
@@ -323,7 +325,7 @@ class LabelsetRangeFilterTrainTestPos(BaseRangeFilter):
         return lsc.pop_labelset  # replace with soft filter
 
 
-class ValueFilter(BaseFilter):
+class BaseValueFilter(BaseFilter):
     """Filter based on certain values.
 
     Attributes:
@@ -334,7 +336,7 @@ class ValueFilter(BaseFilter):
     """
 
     def __init__(self, val, remove=True):
-        """Initialize ValueFilter object."""
+        """Initialize BaseValueFilter object."""
         super().__init__()
         self.val = val
         self.remove = remove
