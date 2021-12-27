@@ -363,6 +363,22 @@ class TestSplit(unittest.TestCase):
             property_name="something",
         )
 
+    def test_reorder(self):
+        y, _, _ = self.lsc.split(KFold(n_splits=2).split)
+        self.assertEqual(y.T.tolist(), [[1, 1, 1, 0], [0, 1, 0, 1]])
+
+        y, _, _ = self.lsc.split(
+            KFold(n_splits=2).split,
+            target_ids=["a", "c", "b", "d"],
+        )
+        self.assertEqual(y.T.tolist(), [[1, 1, 1, 0], [0, 0, 1, 1]])
+
+        y, _, _ = self.lsc.split(
+            KFold(n_splits=2).split,
+            target_ids=["a", "e", "c", "b", "d", "f"],
+        )
+        self.assertEqual(y.T.tolist(), [[1, 0, 1, 1, 0, 0], [0, 0, 0, 1, 1, 0]])
+
     def test_two_fold(self):
         train_mask = [[False, False, True, True], [True, True, False, False]]
         test_mask = [[True, True, False, False], [False, False, True, True]]
@@ -383,6 +399,29 @@ class TestSplit(unittest.TestCase):
         self.assertEqual(labelset_names, ["Labelset1"])
         self.assertEqual(masks["train"].T.tolist(), train_mask)
         self.assertEqual(masks["test"].T.tolist(), test_mask)
+
+        y, masks, labelset_names = self.lsc.split(
+            KFold(n_splits=2).split,
+            labelset_name="Labelset1",
+            target_ids=["a", "e", "c", "b", "d", "f"],
+        )
+        self.assertEqual(y.T.tolist(), [1, 0, 1, 1, 0, 0])
+        self.assertEqual(list(masks), ["train", "test"])
+        self.assertEqual(labelset_names, ["Labelset1"])
+        self.assertEqual(
+            masks["train"].T.tolist(),
+            [
+                [False, False, True, False, True, False],
+                [True, False, False, True, False, False],
+            ],
+        )
+        self.assertEqual(
+            masks["test"].T.tolist(),
+            [
+                [True, False, False, True, False, False],
+                [False, False, True, False, True, False],
+            ],
+        )
 
     def test_three_fold(self):
         train_mask = [

@@ -335,7 +335,7 @@ class LSC(IDHandler.IDprop):
             y_out = np.zeros((len(target_ids), split_size), dtype=bool)
         y_out[to_target_idx] = y
 
-        return y, masks, labelset_names
+        return y_out, masks, labelset_names
 
     def apply(self, filter_func, inplace=False):
         """Apply filter to labelsets, see `NLEval.label.labelset_filter` for more info.
