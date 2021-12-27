@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 import numpy as np
 from scipy.stats import hypergeom
@@ -140,21 +140,27 @@ class LabelsetExistanceFilter(BaseExistanceFilter):
         return lsc.pop_labelset
 
 
-class RangeFilter(BaseFilter):
+class BaseRangeFilter(BaseFilter):
     """Filter entities in labelset collection by range of values.
 
     Notes:
-        If `None` specified for `min_val` or `max_val`, no filtering
+        If ``min_val`` or ``max_val`` is not specified, no filtering
         will be done on upper/lower bound.
-
-    Attributes:
-        min_val: minimum below which entities are removed
-        max_val: maximum beyound which entiteis are removed
 
     """
 
-    def __init__(self, min_val=None, max_val=None):
-        """Initialize RangeFilter object."""
+    def __init__(
+        self,
+        min_val: Optional[float] = None,
+        max_val: Optional[float] = None,
+    ) -> None:
+        """Initialize BaseRangeFilter object.
+
+        Args:
+            min_val: minimum below which entities are removed
+            max_val: maximum beyound which entiteis are removed
+
+        """
         super().__init__()
         self.min_val = min_val
         self.max_val = max_val
@@ -169,10 +175,23 @@ class RangeFilter(BaseFilter):
         return False
 
 
-class EntityRangeFilterNoccur(RangeFilter):
-    """Pop entities based on number of occurance."""
+class EntityRangeFilterNoccur(BaseRangeFilter):
+    """Filter entities based on number of occurance.
 
-    def __init__(self, min_val=None, max_val=None):
+    Example:
+        The following example removes any entity that occurs to be positive
+        in more than 10 labelsets.
+
+        >>> labelset_collection.apply(EntityRangeFilterNoccur(max_val=10),
+        >>>                           inplace=True)
+
+    """
+
+    def __init__(
+        self,
+        min_val: Optional[float] = None,
+        max_val: Optional[float] = None,
+    ):
         """Initialize EntityRangeFilterNoccur object."""
         super().__init__(min_val, max_val)
 
@@ -189,10 +208,23 @@ class EntityRangeFilterNoccur(RangeFilter):
         return lsc.pop_entity
 
 
-class LabelsetRangeFilterSize(RangeFilter):
-    """Pop labelsets based on size."""
+class LabelsetRangeFilterSize(BaseRangeFilter):
+    """Filter labelsets based on size.
 
-    def __init__(self, min_val=None, max_val=None):
+    Example:
+        The following example removes any labelset that has more less than 10
+        or more than 100 number of positives.
+
+        >>> labelset_collection.apply(
+        >>>     LabelsetRangeFilterSize(min_val=10, max_val=100), inplace=True)
+
+    """
+
+    def __init__(
+        self,
+        min_val: Optional[float] = None,
+        max_val: Optional[float] = None,
+    ):
         """Initialize LabelsetRangeFilterSize object."""
         super().__init__(min_val, max_val)
 
@@ -209,10 +241,22 @@ class LabelsetRangeFilterSize(RangeFilter):
         return lsc.pop_labelset
 
 
-class LabelsetRangeFilterJaccard(RangeFilter):
-    """Pop labelsets based on Jaccard index."""
+class LabelsetRangeFilterJaccard(BaseRangeFilter):
+    """Filter labelsets based on Jaccard index.
 
-    def __init__(self, max_val=None):
+    Compare all pairs of labelsets and if a pair of labelsets have a Jaccard
+    Index larger than ``max_val``, remove the one with a larger size.
+
+    Note:
+        Only support filtering with ``max_val``.
+
+    Example:
+        >>> labelset_collection.apply(LabelsetRangeFilterSize(max_val=0.7),
+        >>>                           inplace=True)
+
+    """
+
+    def __init__(self, max_val: float):
         """Initialize LabelsetRangeFilterJaccard object."""
         super().__init__(None, max_val)
 
@@ -243,8 +287,8 @@ class LabelsetRangeFilterJaccard(RangeFilter):
         return lsc.pop_labelset
 
 
-class LabelsetRangeFilterTrainTestPos(RangeFilter):
-    """Pop labelsets based on number of positives in train/test sets.
+class LabelsetRangeFilterTrainTestPos(BaseRangeFilter):
+    """Filter labelsets based on number of positives in train/test sets.
 
     Note:
         Only intended to be work with Holdout split type for now. Would not
@@ -254,7 +298,7 @@ class LabelsetRangeFilterTrainTestPos(RangeFilter):
 
     """
 
-    def __init__(self, min_val):
+    def __init__(self, min_val: float):
         """Initialize LabelsetRangeFilterTrainTestPos object."""
         super().__init__(min_val=min_val)
 
@@ -302,19 +346,27 @@ class ValueFilter(BaseFilter):
 class NegativeFilterHypergeom(BaseFilter):
     """Filter based on enrichment (hypergeometric test).
 
-    Notes:
-        Given a labelset, compare it with all other labelsets and if p-val
-        from hypergemetric test less than some threshold, exclude genes
-        from that labelset that are not possitive from training/testing sets,
-        i.e. set to neutral.
+    Given a labelset, it compares all pairs of labelsets via hypergometric
+    test. If the p-val is less than ``p_thresh``, then exclude the entities
+    from that labelset that are not possitive from training/testing sets,
+    i.e. set to neutral.
 
-    Attributes:
-        p_thresh: p-val threshold used for filtering
+    Example:
+        The following example set up the negatives for each labelset using
+        0.05 p-value threshold.
+
+        >>> labelset_collection.apply(NegativeFilterHypergeom(0.05),
+        >>>                           inplace=True)
 
     """
 
-    def __init__(self, p_thresh):
-        """Initialize NegativeFilterHypergeom object."""
+    def __init__(self, p_thresh: float) -> None:
+        """Initialize NegativeFilterHypergeom object.
+
+        Args:
+            p_thresh: p-val threshold of the hypergeometric test.
+
+        """
         self.p_thresh = p_thresh
 
     def __call__(self, lsc):
