@@ -129,8 +129,9 @@ class BaseLSC(IDHandler.IDprop):
 
         Take list of entities IDs and update current labelset with a label
         name matching `label_id`. Any ID in the input list `lst` that does
-        not exist in the entity list will be added to the entity list. Increment
-        the `Noccur` property of any newly added entites to the labelset by 1.
+        not exist in the entity list will be added to the entity list.
+        Increment the `Noccur` property of any newly added entites to the
+        labelset by 1.
 
         Note: label_id must already existed, use `.add_labelset()` for adding
         new labelset
@@ -179,16 +180,21 @@ class BaseLSC(IDHandler.IDprop):
         lbset.clear()
 
     def pop_entity(self, entity_id):
-        """Pop an entity from entity list, and also remove it from all labelsets.
+        """Pop an entity from entity list and remove it from all labelsets.
 
-        Note: Unlike `pop_labelset`, if after removal, a labelset beomes empty, the
-        labelset itself is NOT removed. This is for more convenient comparison of
-        labelset sizes before and after filtering.
+        Note:
+            Unlike `pop_labelset`, if after removal, a labelset beomes empty,
+            the labelset itself is NOT removed. This is for more convenient
+            comparison of labelset sizes before and after filtering.
 
         """
         self.entity.pop_id(entity_id)
         for label_id in self.label_ids:
             self.get_labelset(label_id).difference_update([entity_id])
+
+    def get_noccur(self, entity_id):
+        """Return the number of labelsets in which an entity participates."""
+        return self.entity.get_property(entity_id, "Noccur")
 
     def get_info(self, label_id):
         """Return description of a labelset."""
@@ -226,10 +232,6 @@ class BaseLSC(IDHandler.IDprop):
                     f"{label_id!r}, cannot be set to negative",
                 )
         self.set_property(label_id, "Negative", set(lst))
-
-    def get_noccur(self, entity_id):
-        """Return the number of labelsets in which an entity participates."""
-        return self.entity.get_property(entity_id, "Noccur")
 
     def apply(self, filter_func, inplace=False):
         """Apply filter to labelsets, see `NLEval.label.Filter` for more info.
@@ -306,7 +308,9 @@ class BaseLSC(IDHandler.IDprop):
         """Export self as a '.gmt' (Gene Matrix Transpose) file.
 
         Input:
-            fp(str): path to file to save, including file name, with/without extension.
+            fp(str): path to file to save, including file name, with/without
+                extension.
+
         """
         fp += "" if fp.endswith(".gmt") else ".gmt"
         with open(fp, "w") as f:
@@ -333,11 +337,11 @@ class BaseLSC(IDHandler.IDprop):
 
         Args:
             fp(str): path to the entity properties file.
-            default_val: default value of property of an entity
-                if not specified.
+            default_val: default value of property of an entity if not
+                specified.
             default_type(type): default type of the property.
-            interpreter: function to transfrom property value from
-                string to some other value
+            interpreter: function to transfrom property value from string to
+                some other value
 
         """
         self.entity.new_property(prop_name, default_val, default_type)
@@ -392,10 +396,10 @@ class SplitLSC(BaseLSC):
         Filter labelsets based on train/test samples
 
         Args:
-            prop_name(str): name of entity properties used for generating splits
-            min_pos(int): minimum number of positive in both training and testing
-                sets of a given labelset below which labelset is discarded. If
-                `None` specified, no filtering will be done.
+            prop_name(str): name of properties used for generating splits.
+            min_pos(int): minimum number of positive in both training and
+                testing sets of a given labelset below which labelset is
+                discarded. If ``None`` specified, no filtering will be done.
 
         """
         if self.valsplit is None:
