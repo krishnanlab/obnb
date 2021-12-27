@@ -16,7 +16,7 @@ g = graph.DenseGraph.DenseGraph.from_edglst(
     weighted=True,
     directed=False,
 )
-lsc = label.LabelsetCollection.SplitLSC.from_gmt(
+lsc = label.labelset_collection.SplitLSC.from_gmt(
     data_path + "labels/KEGGBP.gmt",
 )
 

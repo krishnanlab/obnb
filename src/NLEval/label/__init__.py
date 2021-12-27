@@ -1,3 +1,3 @@
-from NLEval.label import Filter, LabelsetCollection
+from NLEval.label import labelset_filter, labelset_collection
 
-__all__ = ["Filter", "LabelsetCollection"]
+__all__ = ["labelset_filter", "labelset_collection"]

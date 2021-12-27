@@ -12,11 +12,17 @@ g = graph.DenseGraph.DenseGraph.from_edglst(
     weighted=True,
     directed=False,
 )
-lsc = label.LabelsetCollection.SplitLSC.from_gmt(
+lsc = label.labelset_collection.SplitLSC.from_gmt(
     data_path + "labels/KEGGBP.gmt",
 )
-lsc.apply(label.Filter.EntityExistanceFilter(g.idmap.lst), inplace=True)
-lsc.apply(label.Filter.LabelsetRangeFilterSize(min_val=50), inplace=True)
+lsc.apply(
+    label.labelset_filter.EntityExistanceFilter(g.idmap.lst),
+    inplace=True,
+)
+lsc.apply(
+    label.labelset_filter.LabelsetRangeFilterSize(min_val=50),
+    inplace=True,
+)
 lsc.load_entity_properties(
     data_path + "/properties/pubcnt.txt",
     "Pubmed Count",

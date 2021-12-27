@@ -22,21 +22,24 @@ g = graph.SparseGraph.SparseGraph.from_edglst(
     weighted=False,
     directed=False,
 )
-lsc = label.LabelsetCollection.SplitLSC.from_gmt(labelset_fp)
+lsc = label.labelset_collection.SplitLSC.from_gmt(labelset_fp)
 lsc.valsplit = valsplit.Interface.SklSKF(
     shuffle=True,
     skl_kws={"n_splits": n_split},
 )
 
 lsc.apply(
-    label.Filter.EntityExistanceFilter(target_lst=g.idmap.lst),
+    label.labelset_filter.EntityExistanceFilter(target_lst=g.idmap.lst),
     inplace=True,
 )
 lsc.apply(
-    label.Filter.LabelsetRangeFilterSize(min_val=min_labelset_size),
+    label.labelset_filter.LabelsetRangeFilterSize(min_val=min_labelset_size),
     inplace=True,
 )
-lsc.apply(label.Filter.NegativeFilterHypergeom(p_thresh=p_thresh), inplace=True)
+lsc.apply(
+    label.labelset_filter.NegativeFilterHypergeom(p_thresh=p_thresh),
+    inplace=True,
+)
 print(
     f"After filtering, there are {len(lsc.label_ids)} number of effective labelsets",
 )
