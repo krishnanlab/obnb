@@ -5,7 +5,7 @@ from typing import Tuple
 
 import numpy as np
 from NLEval.util.checkers import checkTypeErrNone
-from NLEval.util.checkers import checkTypesInIterable
+from NLEval.util.checkers import checkTypesInIterableErrEmpty
 
 
 class BaseSplit:
@@ -59,9 +59,7 @@ class RatioHoldout(BaseHoldout):
 
     @ratios.setter
     def ratios(self, vals):
-        if not vals:
-            raise ValueError("No ratios specified")
-        checkTypesInIterable("ratios", Real, vals)
+        checkTypesInIterableErrEmpty("ratios", Real, vals)
         if min(vals) <= 0:
             raise ValueError(f"Ratios must be strictly positive: got {vals}")
         if sum(vals) != 1:
@@ -88,9 +86,7 @@ class ThresholdHoldout(BaseHoldout):
 
     @thresholds.setter
     def thresholds(self, vals: Tuple[float]):
-        if not vals:
-            raise ValueError("No thresholds specified")
-        checkTypesInIterable("thresholds", Real, vals)
+        checkTypesInIterableErrEmpty("thresholds", Real, vals)
         for item, count in Counter(vals).items():
             if count > 1:
                 raise ValueError(

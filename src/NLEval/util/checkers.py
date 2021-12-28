@@ -28,6 +28,7 @@ __all__ = [
     "checkTypesInList",
     "checkTypesInSet",
     "checkTypesInNumpyArray",
+    "checkTypesInIterableErrEmpty",
     "checkNumpyArrayIsNumeric",
     "checkNumpyArrayNDim",
     "checkNumpyArrayShape",
@@ -102,6 +103,13 @@ def checkTypesInSet(name, targetType, val):
 def checkTypesInNumpyArray(name, targetType, val):
     """Check types of all elements in a numpy array."""
     checkType(name, np.ndarray, val)
+    checkTypesInIterable(name, targetType, val)
+
+
+def checkTypesInIterableErrEmpty(name, targetType, val):
+    """Check the types of all elements in an iterable and error if empty."""
+    if len(val) == 0:
+        raise ValueError(f"No {name} specified")
     checkTypesInIterable(name, targetType, val)
 
 
