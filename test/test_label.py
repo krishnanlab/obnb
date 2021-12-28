@@ -492,6 +492,13 @@ class TestLabelsetSplit(unittest.TestCase):
                 "ThresholdHoldout(ascending=True, thresholds=(1, 2, 6))",
             )
 
+        with self.subTest(thresholds=(6, 1, 2), ascending=False):
+            splitter = labelset_split.ThresholdHoldout(6, 1, 2, ascending=False)
+            self.assertEqual(
+                repr(splitter),
+                "ThresholdHoldout(ascending=False, thresholds=(6, 2, 1))",
+            )
+
     def test_threshold_holdout_raises(self):
         with self.assertRaises(ValueError) as context:
             labelset_split.ThresholdHoldout(5, 4, 5)
@@ -621,6 +628,50 @@ class TestLabelsetSplit(unittest.TestCase):
             self.assertEqual(
                 masks["test"].T.tolist(),
                 [[1, 1, 1, 1, 1, 1, 1, 1]],
+            )
+
+        with self.subTest(thresholds=(2, 7)):
+            y, masks, _ = self.lsc.split(
+                labelset_split.ThresholdHoldout(2, 7),
+                property_name="test_property",
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list)
+            self.assertEqual(
+                masks["train"].T.tolist(),
+                [[1, 1, 0, 0, 0, 0, 0, 0]],
+            )
+            self.assertEqual(
+                masks["val"].T.tolist(),
+                [[0, 0, 1, 1, 1, 1, 1, 0]],
+            )
+            self.assertEqual(
+                masks["test"].T.tolist(),
+                [[0, 0, 0, 0, 0, 0, 0, 1]],
+            )
+
+        with self.subTest(thresholds=(5, 10, 20), ascending=False):
+            y, masks, _ = self.lsc.split(
+                labelset_split.ThresholdHoldout(5, 10, 20, ascending=False),
+                property_name="test_property",
+                mask_names=("mask1", "mask2", "mask3", "mask4"),
+            )
+            print(labelset_split.ThresholdHoldout(5, 10, 20, ascending=False))
+            self.assertEqual(y.T.tolist(), self.y_t_list)
+            self.assertEqual(
+                masks["mask1"].T.tolist(),
+                [[0, 0, 0, 0, 0, 0, 0, 0]],
+            )
+            self.assertEqual(
+                masks["mask2"].T.tolist(),
+                [[0, 0, 0, 0, 0, 0, 0, 0]],
+            )
+            self.assertEqual(
+                masks["mask3"].T.tolist(),
+                [[0, 0, 0, 0, 0, 0, 1, 1]],
+            )
+            self.assertEqual(
+                masks["mask4"].T.tolist(),
+                [[1, 1, 1, 1, 1, 1, 0, 0]],
             )
 
 

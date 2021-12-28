@@ -31,8 +31,9 @@ class BaseHoldout(BaseSplit):
         self._ascending = val
 
     def sort(self, x):
-        x_sorted_idx = x.argsort() if self.ascending else (-x).argsort()
-        x_sorted_val = x[x_sorted_idx]
+        x_val = x if self.ascending else -x
+        x_sorted_idx = x_val.argsort()
+        x_sorted_val = x_val[x_sorted_idx]
         return x_sorted_idx, x_sorted_val
 
     @staticmethod
@@ -82,6 +83,7 @@ class ThresholdHoldout(BaseHoldout):
         x_sorted_idx, x_sorted_val = self.sort(x)
         cut_idx = [None] * len(self.thresholds)
         for i, threshold in enumerate(self.thresholds):
+            threshold = threshold if self.ascending else -threshold
             where = np.where(x_sorted_val >= threshold)[0]
             cut_idx[i] = len(x) if where.size == 0 else where[0]
 
