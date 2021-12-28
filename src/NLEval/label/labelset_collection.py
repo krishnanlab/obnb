@@ -298,7 +298,12 @@ class LSC(IDHandler.IDprop):
             y[self.entity[labelset]] = True
 
         if property_name is not None:
-            x = [self.get_property(i, property_name) for i in self.entity_ids]
+            x = np.array(
+                [
+                    self.entity.get_property(i, property_name)
+                    for i in self.entity_ids
+                ],
+            )
         else:
             x = y
 
@@ -332,13 +337,15 @@ class LSC(IDHandler.IDprop):
         if labelset_name is not None:
             y_out = np.zeros(len(target_ids), dtype=bool)
         else:
-            y_out = np.zeros((len(target_ids), split_size), dtype=bool)
+            y_out = np.zeros((len(target_ids), y.shape[1]), dtype=bool)
         y_out[to_target_idx] = y
 
         return y_out, masks, labelset_names
 
     def apply(self, filter_func, inplace=False):
-        """Apply filter to labelsets, see `NLEval.label.labelset_filter` for more info.
+        """Apply filter to labelsets.
+
+        See `NLEval.label.labelset_filter` for more info.
 
         Args:
             filter_func
