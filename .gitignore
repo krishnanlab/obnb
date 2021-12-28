@@ -6,6 +6,9 @@ __pycache__
 
 *.egg-info/
 
+# vim buffer
+*.swp
+
 # Unit test / coverage reports
 htmlcov/
 .tox/
