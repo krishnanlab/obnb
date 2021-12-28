@@ -655,7 +655,6 @@ class TestLabelsetSplit(unittest.TestCase):
                 property_name="test_property",
                 mask_names=("mask1", "mask2", "mask3", "mask4"),
             )
-            print(labelset_split.ThresholdHoldout(5, 10, 20, ascending=False))
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(
                 masks["mask1"].T.tolist(),
@@ -673,6 +672,45 @@ class TestLabelsetSplit(unittest.TestCase):
                 masks["mask4"].T.tolist(),
                 [[1, 1, 1, 1, 1, 1, 0, 0]],
             )
+
+    def test_ratio_holdout_repr(self):
+        splitter = labelset_split.RatioHoldout(0.5, 0.5)
+        self.assertEqual(
+            repr(splitter),
+            "RatioHoldout(ascending=True, ratios=(0.5, 0.5))",
+        )
+
+        splitter = labelset_split.RatioHoldout(0.6, 0.2, 0.2, ascending=False)
+        self.assertEqual(
+            repr(splitter),
+            "RatioHoldout(ascending=False, ratios=(0.6, 0.2, 0.2))",
+        )
+
+    def test_ratio_holdout_raises(self):
+        with self.assertRaises(ValueError) as context:
+            labelset_split.RatioHoldout(0.2, 0.5)
+        self.assertEqual(
+            str(context.exception),
+            "Ratios must sum up to 1, specified ratios (0.2, 0.5) sum up "
+            "to 0.7 instead",
+        )
+
+        with self.assertRaises(ValueError) as context:
+            labelset_split.RatioHoldout(0.2, 0.8, 0)
+        self.assertEqual(
+            str(context.exception),
+            "Ratios must be strictly positive: got (0.2, 0.8, 0)",
+        )
+
+        with self.assertRaises(ValueError) as context:
+            labelset_split.RatioHoldout(0.2, 0.9, -0.1)
+        self.assertEqual(
+            str(context.exception),
+            "Ratios must be strictly positive: got (0.2, 0.9, -0.1)",
+        )
+
+    def test_ratio_holdout(self):
+        pass
 
 
 class TestFilter(unittest.TestCase):

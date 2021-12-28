@@ -47,8 +47,25 @@ class BaseHoldout(BaseSplit):
 class RatioHoldout(BaseHoldout):
     def __init__(self, *ratios: float, ascending: bool = True):
         super().__init__(ascending)
-        # TODO: check if add up to 1, use -1 for completion
         self.ratios = ratios
+
+    @property
+    def ratios(self):
+        return self._ratios
+
+    @ratios.setter
+    def ratios(self, vals):
+        if not vals:
+            raise ValueError("No ratios specified")
+        checkTypesInIterable("ratios", Real, vals)
+        if min(vals) <= 0:
+            raise ValueError(f"Ratios must be strictly positive: got {vals}")
+        if sum(vals) != 1:
+            raise ValueError(
+                f"Ratios must sum up to 1, specified ratios {vals} sum up to "
+                f"{sum(vals)} instead",
+            )
+        self._ratios = vals
 
     def __call__(self, x: np.ndarray, y: np.ndarray) -> Tuple[np.ndarray, ...]:
         x_sorted_idx = self.sort(x)[0]
@@ -69,7 +86,7 @@ class ThresholdHoldout(BaseHoldout):
     @thresholds.setter
     def thresholds(self, vals: Tuple[float]):
         if not vals:
-            raise ValueError(f"No thresholds specified")
+            raise ValueError("No thresholds specified")
         checkTypesInIterable("thresholds", Real, vals)
         for item, count in Counter(vals).items():
             if count > 1:
