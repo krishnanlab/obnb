@@ -492,6 +492,19 @@ class TestLabelsetSplit(unittest.TestCase):
                 "ThresholdHoldout(ascending=True, thresholds=(1, 2, 6))",
             )
 
+    def test_threshold_holdout_raises(self):
+        with self.assertRaises(ValueError) as context:
+            labelset_split.ThresholdHoldout(5, 4, 5)
+        self.assertEqual(
+            str(context.exception),
+            "Cannot have duplicated thresholds: 5 occured 2 times from "
+            "the input (5, 4, 5)",
+        )
+
+        with self.assertRaises(ValueError) as context:
+            labelset_split.ThresholdHoldout()
+        self.assertEqual(str(context.exception), "No thresholds specified")
+
     def test_threshold_holdout(self):
         with self.subTest(thresholds=(4,)):
             y, masks, _ = self.lsc.split(

@@ -1,7 +1,10 @@
+from collections import Counter
+from numbers import Real
 from typing import Iterator
 from typing import Tuple
 
 import numpy as np
+from NLEval.util.checkers import checkTypesInIterable
 
 
 class BaseSplit:
@@ -54,7 +57,15 @@ class ThresholdHoldout(BaseHoldout):
 
     @thresholds.setter
     def thresholds(self, vals: Tuple[float]):
-        # TODO: check type
+        if not vals:
+            raise ValueError(f"No thresholds specified")
+        checkTypesInIterable("thresholds", Real, vals)
+        for item, count in Counter(vals).items():
+            if count > 1:
+                raise ValueError(
+                    f"Cannot have duplicated thresholds: {item} occured "
+                    f"{count} times from the input {vals}",
+                )
         self._thresholds = (*sorted(vals, reverse=not self.ascending),)
 
     def __call__(self, x: np.ndarray, y: np.ndarray) -> Tuple[np.ndarray, ...]:
