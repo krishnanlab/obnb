@@ -311,15 +311,15 @@ class LSC(IDHandler.IDprop):
         splits = list(zip(*[*splitter(x, y)]))
         split_size = len(splits)
         if mask_names is not None:
-            if split_size != mask_names:
+            if split_size != len(mask_names):
                 raise ValueError(
                     f"{len(mask_names)} mask names specified: {mask_names!r}, "
                     f"but got {split_size} from the splitter.",
                 )
         elif split_size == 2:
-            mask_names = ["train", "test"]
+            mask_names = ("train", "test")
         elif split_size == 3:
-            mask_names = ["train", "val", "test"]
+            mask_names = ("train", "val", "test")
         else:
             raise ValueError(
                 f"Default mask_names expected split size of 2 or 3, "

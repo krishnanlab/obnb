@@ -470,6 +470,28 @@ class TestLabelsetSplit(unittest.TestCase):
             [0, 0, 0, 0, 1, 1, 1, 1],
         ]
 
+    def test_threshold_holdout_repr(self):
+        with self.subTest(thresholds=(4,)):
+            splitter = labelset_split.ThresholdHoldout(4)
+            self.assertEqual(
+                repr(splitter),
+                "ThresholdHoldout(ascending=True, thresholds=(4,))",
+            )
+
+        with self.subTest(thresholds=(2, 7)):
+            splitter = labelset_split.ThresholdHoldout(2, 7)
+            self.assertEqual(
+                repr(splitter),
+                "ThresholdHoldout(ascending=True, thresholds=(2, 7))",
+            )
+
+        with self.subTest(thresholds=(6, 1, 2)):
+            splitter = labelset_split.ThresholdHoldout(6, 1, 2)
+            self.assertEqual(
+                repr(splitter),
+                "ThresholdHoldout(ascending=True, thresholds=(1, 2, 6))",
+            )
+
     def test_threshold_holdout(self):
         with self.subTest(thresholds=(4,)):
             y, masks, _ = self.lsc.split(
@@ -503,6 +525,30 @@ class TestLabelsetSplit(unittest.TestCase):
             self.assertEqual(
                 masks["test"].T.tolist(),
                 [[0, 0, 0, 0, 0, 0, 0, 1]],
+            )
+
+        with self.subTest(thresholds=(6, 1, 2)):
+            y, masks, _ = self.lsc.split(
+                labelset_split.ThresholdHoldout(6, 1, 2),
+                property_name="test_property",
+                mask_names=("mask1", "mask2", "mask3", "mask4"),
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list)
+            self.assertEqual(
+                masks["mask1"].T.tolist(),
+                [[1, 0, 0, 0, 0, 0, 0, 0]],
+            )
+            self.assertEqual(
+                masks["mask2"].T.tolist(),
+                [[0, 1, 0, 0, 0, 0, 0, 0]],
+            )
+            self.assertEqual(
+                masks["mask3"].T.tolist(),
+                [[0, 0, 1, 1, 1, 1, 0, 0]],
+            )
+            self.assertEqual(
+                masks["mask4"].T.tolist(),
+                [[0, 0, 0, 0, 0, 0, 1, 1]],
             )
 
 

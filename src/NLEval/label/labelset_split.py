@@ -8,7 +8,8 @@ class BaseSplit:
     def __repr__(self):
         """Representation of the labelset split object."""
         name = self.__class__.__name__
-        attrstr = ", ".join([f"{i}={j!r}" for i, j in self.__dict__.items()])
+        attrs = [f"{i.lstrip('_')}={j!r}" for i, j in self.__dict__.items()]
+        attrstr = ", ".join(attrs)
         return f"{name}({attrstr})"
 
 
@@ -45,8 +46,16 @@ class RatioHoldout(BaseHoldout):
 class ThresholdHoldout(BaseHoldout):
     def __init__(self, *thresholds: float, ascending: bool = True):
         super().__init__(ascending)
-        # TODO: need to sort accordingly ascending
         self.thresholds = thresholds
+
+    @property
+    def thresholds(self):
+        return self._thresholds
+
+    @thresholds.setter
+    def thresholds(self, vals: Tuple[float]):
+        # TODO: check type
+        self._thresholds = (*sorted(vals, reverse=not self.ascending),)
 
     def __call__(self, x: np.ndarray, y: np.ndarray) -> Tuple[np.ndarray, ...]:
         x_sorted_idx, x_sorted_val = self.sort(x)
