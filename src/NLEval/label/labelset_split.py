@@ -24,9 +24,8 @@ class BaseHoldout(BaseSplit):
     @staticmethod
     def split_by_cut_idx(cut_idx, x_sorted_idx):
         idx = [0] + cut_idx + [len(x_sorted_idx)]
-        splits = (
-            *(x_sorted_idx[idx[i] : idx[i + 1]] for i in range(len(idx) - 1)),
-        )
+        slices = [slice(idx[i], idx[i + 1]) for i in range(len(idx) - 1)]
+        splits = (*(x_sorted_idx[i] for i in slices),)
         return splits
 
 
