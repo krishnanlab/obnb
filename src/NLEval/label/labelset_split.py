@@ -37,8 +37,7 @@ class BaseHoldout(BaseSplit):
         return x_sorted_idx, x_sorted_val
 
     @staticmethod
-    def split_by_cut_idx(cut_idx, x_sorted_idx):
-        idx = [0] + cut_idx + [len(x_sorted_idx)]
+    def split_by_idx(idx, x_sorted_idx):
         slices = [slice(idx[i], idx[i + 1]) for i in range(len(idx) - 1)]
         splits = (*(x_sorted_idx[i] for i in slices),)
         return splits
@@ -69,9 +68,9 @@ class RatioHoldout(BaseHoldout):
 
     def __call__(self, x: np.ndarray, y: np.ndarray) -> Tuple[np.ndarray, ...]:
         x_sorted_idx = self.sort(x)[0]
-        cut_idx = [np.floor(x.shape[0] * r).astype(int) for r in self.ratios]
-
-        yield self.split_by_cut_idx(cut_idx, x_sorted_idx)
+        ratio_cum_sum = np.cumsum((0,) + self.ratios)
+        idx = [np.floor(x.shape[0] * r).astype(int) for r in ratio_cum_sum]
+        yield self.split_by_idx(idx, x_sorted_idx)
 
 
 class ThresholdHoldout(BaseHoldout):
@@ -103,5 +102,5 @@ class ThresholdHoldout(BaseHoldout):
             threshold = threshold if self.ascending else -threshold
             where = np.where(x_sorted_val >= threshold)[0]
             cut_idx[i] = len(x) if where.size == 0 else where[0]
-
-        yield self.split_by_cut_idx(cut_idx, x_sorted_idx)
+        idx = [0] + cut_idx + [len(x)]
+        yield self.split_by_idx(idx, x_sorted_idx)

@@ -710,7 +710,58 @@ class TestLabelsetSplit(unittest.TestCase):
         )
 
     def test_ratio_holdout(self):
-        pass
+        with self.subTest(ratios=(0.5, 0.5)):
+            y, masks, _ = self.lsc.split(
+                labelset_split.RatioHoldout(0.5, 0.5),
+                property_name="test_property",
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list)
+            self.assertEqual(
+                masks["train"].T.tolist(),
+                [[1, 1, 1, 1, 0, 0, 0, 0]],
+            )
+            self.assertEqual(
+                masks["test"].T.tolist(),
+                [[0, 0, 0, 0, 1, 1, 1, 1]],
+            )
+
+        with self.subTest(ratios=(0.6, 0.2, 0.2)):
+            y, masks, _ = self.lsc.split(
+                labelset_split.RatioHoldout(0.6, 0.2, 0.2),
+                property_name="test_property",
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list)
+            self.assertEqual(
+                masks["train"].T.tolist(),
+                [[1, 1, 1, 1, 0, 0, 0, 0]],
+            )
+            self.assertEqual(
+                masks["val"].T.tolist(),
+                [[0, 0, 0, 0, 1, 1, 0, 0]],
+            )
+            self.assertEqual(
+                masks["test"].T.tolist(),
+                [[0, 0, 0, 0, 0, 0, 1, 1]],
+            )
+
+        with self.subTest(ratios=(0.6, 0.2, 0.2), ascending=False):
+            y, masks, _ = self.lsc.split(
+                labelset_split.RatioHoldout(0.6, 0.2, 0.2, ascending=False),
+                property_name="test_property",
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list)
+            self.assertEqual(
+                masks["train"].T.tolist(),
+                [[0, 0, 0, 0, 1, 1, 1, 1]],
+            )
+            self.assertEqual(
+                masks["val"].T.tolist(),
+                [[0, 0, 1, 1, 0, 0, 0, 0]],
+            )
+            self.assertEqual(
+                masks["test"].T.tolist(),
+                [[1, 1, 0, 0, 0, 0, 0, 0]],
+            )
 
 
 class TestFilter(unittest.TestCase):
