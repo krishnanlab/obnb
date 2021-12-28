@@ -6,6 +6,7 @@ from commonvar import SAMPLE_DATA_DIR
 from NLEval import valsplit
 from NLEval.label import labelset_collection
 from NLEval.label import labelset_filter
+from NLEval.label import labelset_split
 from NLEval.util.Exceptions import IDExistsError
 from NLEval.util.Exceptions import IDNotExistError
 from sklearn.model_selection import KFold
@@ -451,6 +452,58 @@ class TestSplit(unittest.TestCase):
         self.assertEqual(labelset_names, ["Labelset1"])
         self.assertEqual(masks["train"].T.tolist(), train_mask)
         self.assertEqual(masks["test"].T.tolist(), test_mask)
+
+
+class TestLabelsetSplit(unittest.TestCase):
+    def setUp(self):
+        self.lsc = labelset_collection.LSC()
+        self.lsc.add_labelset(["a", "b", "c"], "Labelset1", "Description1")
+        self.lsc.add_labelset(["b", "d"], "Labelset2", "Description2")
+        self.lsc.add_labelset(["e", "f", "g", "h"], "Labelset3")
+        self.lsc.entity.new_property("test_property", 0, int)
+        for i, j in enumerate(["a", "b", "c", "d", "e", "f", "g", "h"]):
+            self.lsc.entity.set_property(j, "test_property", i)
+
+        self.y_t_list = [
+            [1, 1, 1, 0, 0, 0, 0, 0],
+            [0, 1, 0, 1, 0, 0, 0, 0],
+            [0, 0, 0, 0, 1, 1, 1, 1],
+        ]
+
+    def test_threshold_holdout(self):
+        with self.subTest(thresholds=(4,)):
+            y, masks, _ = self.lsc.split(
+                labelset_split.ThresholdHoldout(4),
+                property_name="test_property",
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list)
+            self.assertEqual(
+                masks["train"].T.tolist(),
+                [[1, 1, 1, 1, 0, 0, 0, 0]],
+            )
+            self.assertEqual(
+                masks["test"].T.tolist(),
+                [[0, 0, 0, 0, 1, 1, 1, 1]],
+            )
+
+        with self.subTest(thresholds=(2, 7)):
+            y, masks, _ = self.lsc.split(
+                labelset_split.ThresholdHoldout(2, 7),
+                property_name="test_property",
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list)
+            self.assertEqual(
+                masks["train"].T.tolist(),
+                [[1, 1, 0, 0, 0, 0, 0, 0]],
+            )
+            self.assertEqual(
+                masks["val"].T.tolist(),
+                [[0, 0, 1, 1, 1, 1, 1, 0]],
+            )
+            self.assertEqual(
+                masks["test"].T.tolist(),
+                [[0, 0, 0, 0, 0, 0, 0, 1]],
+            )
 
 
 class TestFilter(unittest.TestCase):
