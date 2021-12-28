@@ -4,6 +4,7 @@ from typing import Iterator
 from typing import Tuple
 
 import numpy as np
+from NLEval.util.checkers import checkTypeErrNone
 from NLEval.util.checkers import checkTypesInIterable
 
 
@@ -18,7 +19,16 @@ class BaseSplit:
 
 class BaseHoldout(BaseSplit):
     def __init__(self, ascending: bool = True):
-        self.ascending = ascending  # TODO: check type
+        self.ascending = ascending
+
+    @property
+    def ascending(self):
+        return self._ascending
+
+    @ascending.setter
+    def ascending(self, val):
+        checkTypeErrNone("ascending", bool, val)
+        self._ascending = val
 
     def sort(self, x):
         x_sorted_idx = x.argsort() if self.ascending else (-x).argsort()

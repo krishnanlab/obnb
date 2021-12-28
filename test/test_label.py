@@ -505,6 +505,26 @@ class TestLabelsetSplit(unittest.TestCase):
             labelset_split.ThresholdHoldout()
         self.assertEqual(str(context.exception), "No thresholds specified")
 
+        self.assertRaises(
+            TypeError,
+            labelset_split.ThresholdHoldout,
+            5,
+            ascending="False",
+        )
+
+        self.assertRaises(
+            ValueError,
+            labelset_split.ThresholdHoldout,
+            5,
+            ascending=None,
+        )
+
+        self.assertRaises(
+            TypeError,
+            labelset_split.ThresholdHoldout,
+            "6",
+        )
+
     def test_threshold_holdout(self):
         with self.subTest(thresholds=(4,)):
             y, masks, _ = self.lsc.split(
