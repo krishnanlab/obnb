@@ -1,6 +1,6 @@
 """Type checking functions
 
-This module contains a collection of checkers which could be used to ensure input 
+This module contains a collection of checkers which could be used to ensure input
 values to function calls or class initializations are valid.
 
 Attributes:
@@ -11,9 +11,9 @@ Attributes:
     ITERABLE_TYPE(:obj:`tuple` of :obj:`type`): iterable type
 
 """
+from collections.abc import Iterable
 
 import numpy as np
-from collections.abc import Iterable
 
 __all__ = [
     "INT_TYPE",
@@ -41,7 +41,7 @@ ITERABLE_TYPE = Iterable
 
 
 def checkType(name, targetType, val):
-    """Check the type of an input value
+    """Check the type of an input value.
 
     Args:
         name(str): name of the value
@@ -59,7 +59,7 @@ def checkType(name, targetType, val):
 
 
 def checkTypeErrNone(name, targetType, val):
-    """Type cheking with `checkType` and raises `ValueError` `val` is `None`
+    """Type cheking with `checkType` and raises `ValueError` `val` is `None`.
 
     Raises:
         ValueError: if `val` is `None`
@@ -72,7 +72,7 @@ def checkTypeErrNone(name, targetType, val):
 
 
 def checkTypeAllowNone(name, targetType, val):
-    """Type cheking with `checkType` and allow `None` for `val`"""
+    """Type cheking with `checkType` and allow `None` for `val`."""
     if val is not None:
         checkType(name, targetType, val)
 
@@ -88,32 +88,32 @@ def checkTypesInIterable(name, targetType, val):
 
 
 def checkTypesInList(name, targetType, val):
-    """Check types of all elements in a list"""
+    """Check types of all elements in a list."""
     checkType(name, list, val)
     checkTypesInIterable(name, targetType, val)
 
 
 def checkTypesInSet(name, targetType, val):
-    """Check types of all elements in a set"""
+    """Check types of all elements in a set."""
     checkType(name, set, val)
     checkTypesInIterable(name, targetType, val)
 
 
 def checkTypesInNumpyArray(name, targetType, val):
-    """Check types of all elements in a numpy array"""
+    """Check types of all elements in a numpy array."""
     checkType(name, np.ndarray, val)
     checkTypesInIterable(name, targetType, val)
 
 
 def checkNumpyArrayIsNumeric(name, ary):
-    """Check if numpy array is numeric type"""
+    """Check if numpy array is numeric type."""
     checkType(name, np.ndarray, ary)
     if not any([ary.dtype == i for i in NUMERIC_TYPE]):
         raise TypeError(f"{name!r} should be numeric, not type {ary.dtype!r}")
 
 
 def checkNumpyArrayNDim(name, targetNDim, ary):
-    """Check the rank (number of dimension) of a numpy array
+    """Check the rank (number of dimension) of a numpy array.
 
     Args:
         name(str): name of the input array
@@ -136,7 +136,7 @@ def checkNumpyArrayNDim(name, targetNDim, ary):
 
 
 def checkNumpyArrayShape(name, targetShape, ary):
-    """Check the shape of a numpy array
+    """Check the shape of a numpy array.
 
     Args:
         name(str): name of the input array
