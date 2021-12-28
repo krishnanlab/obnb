@@ -70,6 +70,9 @@ class ThresholdHoldout(BaseHoldout):
 
     def __call__(self, x: np.ndarray, y: np.ndarray) -> Tuple[np.ndarray, ...]:
         x_sorted_idx, x_sorted_val = self.sort(x)
-        cut_idx = [(x_sorted_val >= t).argmax() for t in self.thresholds]
+        cut_idx = [None] * len(self.thresholds)
+        for i, threshold in enumerate(self.thresholds):
+            where = np.where(x_sorted_val >= threshold)[0]
+            cut_idx[i] = len(x) if where.size == 0 else where[0]
 
         yield self.split_by_cut_idx(cut_idx, x_sorted_idx)

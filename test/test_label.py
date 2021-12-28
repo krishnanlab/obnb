@@ -564,6 +564,45 @@ class TestLabelsetSplit(unittest.TestCase):
                 [[0, 0, 0, 0, 0, 0, 1, 1]],
             )
 
+        with self.subTest(thresholds=(5, 10, 20)):
+            y, masks, _ = self.lsc.split(
+                labelset_split.ThresholdHoldout(5, 10, 20),
+                property_name="test_property",
+                mask_names=("mask1", "mask2", "mask3", "mask4"),
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list)
+            self.assertEqual(
+                masks["mask1"].T.tolist(),
+                [[1, 1, 1, 1, 1, 0, 0, 0]],
+            )
+            self.assertEqual(
+                masks["mask2"].T.tolist(),
+                [[0, 0, 0, 0, 0, 1, 1, 1]],
+            )
+            self.assertEqual(
+                masks["mask3"].T.tolist(),
+                [[0, 0, 0, 0, 0, 0, 0, 0]],
+            )
+            self.assertEqual(
+                masks["mask4"].T.tolist(),
+                [[0, 0, 0, 0, 0, 0, 0, 0]],
+            )
+
+        with self.subTest(thresholds=(-1)):
+            y, masks, _ = self.lsc.split(
+                labelset_split.ThresholdHoldout(-1),
+                property_name="test_property",
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list)
+            self.assertEqual(
+                masks["train"].T.tolist(),
+                [[0, 0, 0, 0, 0, 0, 0, 0]],
+            )
+            self.assertEqual(
+                masks["test"].T.tolist(),
+                [[1, 1, 1, 1, 1, 1, 1, 1]],
+            )
+
 
 class TestFilter(unittest.TestCase):
     def setUp(self):
