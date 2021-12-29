@@ -3,10 +3,10 @@ import os.path as osp
 import numpy as np
 from NLEval import metrics
 from NLEval import model
-from NLEval import wrapper
 from NLEval.graph.SparseGraph import SparseGraph
 from NLEval.label import labelset_collection
 from NLEval.label import labelset_filter
+from NLEval.util.parallel import ParDatExe
 from NLEval.valsplit.Interface import SklSKF
 
 DATA_DIR = osp.join(osp.pardir, "data")
@@ -58,7 +58,7 @@ mdl = model.SupervisedLearning.LogReg(
 )
 
 
-@wrapper.ParWrap.ParDatExe(lsc.label_ids, n_workers=6, verbose=progressbar)
+@ParDatExe(lsc.label_ids, n_workers=6, verbose=progressbar)
 def predict_all_labelsets(label_id):
     np.random.seed()  # initialize random states for parallel processes
 

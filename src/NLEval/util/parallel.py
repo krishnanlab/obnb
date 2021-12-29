@@ -1,5 +1,9 @@
 import multiprocessing as mp
-from typing import Any, Iterator, List, Tuple, no_type_check
+from typing import Any
+from typing import Iterator
+from typing import List
+from typing import no_type_check
+from typing import Tuple
 
 from NLEval.util import checkers
 from tqdm import tqdm
