@@ -13,7 +13,7 @@ from NLEval.label import labelset_filter
 from NLEval.util import checkers
 from NLEval.util import IDHandler
 from NLEval.util.deprecated import Deprecated
-from NLEval.util.Exceptions import IDExistsError
+from NLEval.util.exceptions import IDExistsError
 from NLEval.valsplit import Base
 
 __all__ = ["LSC", "SplitLSC"]

@@ -7,8 +7,8 @@ from NLEval import valsplit
 from NLEval.label import labelset_collection
 from NLEval.label import labelset_filter
 from NLEval.label import labelset_split
-from NLEval.util.Exceptions import IDExistsError
-from NLEval.util.Exceptions import IDNotExistError
+from NLEval.util.exceptions import IDExistsError
+from NLEval.util.exceptions import IDNotExistError
 from sklearn.model_selection import KFold
 
 

@@ -2,8 +2,8 @@ from copy import deepcopy
 
 import numpy as np
 from NLEval.util import checkers
-from NLEval.util.Exceptions import IDExistsError
-from NLEval.util.Exceptions import IDNotExistError
+from NLEval.util.exceptions import IDExistsError
+from NLEval.util.exceptions import IDNotExistError
 
 __all__ = ["IDlst", "IDmap", "IDprop"]
 
