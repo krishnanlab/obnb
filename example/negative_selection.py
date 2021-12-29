@@ -30,10 +30,9 @@ for ID in lsc.label_ids:
 print(f"Average diff = {sum(diff_list) / len(diff_list):.2f}")
 
 print(
-    """
-Expected outcome
+    """Expected outcome
 --------------------------------------------------------------------------------
 Average diff = -543.58
 --------------------------------------------------------------------------------
-    """,
+""",
 )
