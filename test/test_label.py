@@ -345,7 +345,7 @@ class TestSplit(unittest.TestCase):
             ValueError,
             self.lsc.split,
             KFold(n_splits=2).split,
-            mask_names=("train", "val", "test"),
+            mask_names=["train", "val", "test"],
         )
 
     def test_raise_label_name(self):
@@ -571,7 +571,7 @@ class TestLabelsetSplit(unittest.TestCase):
             y, masks, _ = self.lsc.split(
                 labelset_split.ThresholdHoldout(6, 1, 2),
                 property_name="test_property",
-                mask_names=("mask1", "mask2", "mask3", "mask4"),
+                mask_names=["mask1", "mask2", "mask3", "mask4"],
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(
@@ -595,7 +595,7 @@ class TestLabelsetSplit(unittest.TestCase):
             y, masks, _ = self.lsc.split(
                 labelset_split.ThresholdHoldout(5, 10, 20),
                 property_name="test_property",
-                mask_names=("mask1", "mask2", "mask3", "mask4"),
+                mask_names=["mask1", "mask2", "mask3", "mask4"],
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(
@@ -653,7 +653,7 @@ class TestLabelsetSplit(unittest.TestCase):
             y, masks, _ = self.lsc.split(
                 labelset_split.ThresholdHoldout(5, 10, 20, ascending=False),
                 property_name="test_property",
-                mask_names=("mask1", "mask2", "mask3", "mask4"),
+                mask_names=["mask1", "mask2", "mask3", "mask4"],
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(

@@ -251,7 +251,7 @@ class LSC(IDHandler.IDprop):
         target_ids: Optional[List[str]] = None,
         labelset_name: Optional[str] = None,
         property_name: Optional[str] = None,
-        mask_names: Optional[Tuple[str]] = None,
+        mask_names: Optional[List[str]] = None,
     ) -> Tuple[np.ndarray, Dict[str, np.ndarray], List[str]]:
         """Split the entities based on the labelsets.
 
@@ -317,9 +317,9 @@ class LSC(IDHandler.IDprop):
                     f"but got {split_size} from the splitter.",
                 )
         elif split_size == 2:
-            mask_names = ("train", "test")
+            mask_names = ["train", "test"]
         elif split_size == 3:
-            mask_names = ("train", "val", "test")
+            mask_names = ["train", "val", "test"]
         else:
             raise ValueError(
                 f"Default mask_names expected split size of 2 or 3, "
