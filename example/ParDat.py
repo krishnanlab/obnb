@@ -1,8 +1,8 @@
-from sys import path
-
-path.append("../")
-from NLEval.wrapper.ParWrap import ParDat, ParDatMap, ParDatExe
 import time
+
+from NLEval.wrapper.ParWrap import ParDat
+from NLEval.wrapper.ParWrap import ParDatExe
+from NLEval.wrapper.ParWrap import ParDatMap
 
 lst = list(range(10))
 

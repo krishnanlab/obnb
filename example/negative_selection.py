@@ -1,17 +1,15 @@
-from sys import path
-
-path.append("../")
-from NLEval.label import LabelsetCollection, Filter
+from NLEval.label import labelset_collection
+from NLEval.label import labelset_filter
 
 # specify p-val threshold
 p_thresh = 0.05
 
-# construct LabelsetCollection object from KEGGBP.gmt
-lsc_orig = LabelsetCollection.SplitLSC.from_gmt("../../data/labels/KEGGBP.gmt")
+# construct labelset_collection object from KEGGBP.gmt
+lsc_orig = labelset_collection.SplitLSC.from_gmt("../../data/labels/KEGGBP.gmt")
 # make a copy for comparison, `apply` is inplace
 lsc = lsc_orig.copy()
 # create filer
-f = Filter.NegativeFilterHypergeom(p_thresh)
+f = labelset_filter.NegativeFilterHypergeom(p_thresh)
 
 # apply negative selection filter
 lsc.apply(f, inplace=True)

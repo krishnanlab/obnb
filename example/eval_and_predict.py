@@ -1,13 +1,15 @@
-from sys import path
-
-path.append("../")
 import numpy as np
-from NLEval import label, graph, valsplit, model, metrics, wrapper
+from NLEval import graph
+from NLEval import label
+from NLEval import metrics
+from NLEval import model
+from NLEval import valsplit
+from NLEval import wrapper
 
-data_path = "../../data/"
-network_fp = data_path + "networks/BioGRID_3.4.136.edg"
+DATA_DIR = "../data/"
+network_fp = DATA_DIR + "networks/BioGRID_3.4.136.edg"
 labelset_fp = (
-    data_path
+    DATA_DIR
     + "labels/c2.cp.kegg.v6.1.entrez.BP.gsea-min10-max200-ovlppt7-jacpt5.nonred.gmt"
 )
 
@@ -22,21 +24,24 @@ g = graph.SparseGraph.SparseGraph.from_edglst(
     weighted=False,
     directed=False,
 )
-lsc = label.LabelsetCollection.SplitLSC.from_gmt(labelset_fp)
+lsc = label.labelset_collection.SplitLSC.from_gmt(labelset_fp)
 lsc.valsplit = valsplit.Interface.SklSKF(
     shuffle=True,
     skl_kws={"n_splits": n_split},
 )
 
 lsc.apply(
-    label.Filter.EntityExistanceFilter(target_lst=g.idmap.lst),
+    label.labelset_filter.EntityExistanceFilter(target_lst=g.idmap.lst),
     inplace=True,
 )
 lsc.apply(
-    label.Filter.LabelsetRangeFilterSize(min_val=min_labelset_size),
+    label.labelset_filter.LabelsetRangeFilterSize(min_val=min_labelset_size),
     inplace=True,
 )
-lsc.apply(label.Filter.NegativeFilterHypergeom(p_thresh=p_thresh), inplace=True)
+lsc.apply(
+    label.labelset_filter.NegativeFilterHypergeom(p_thresh=p_thresh),
+    inplace=True,
+)
 print(
     f"After filtering, there are {len(lsc.label_ids)} number of effective labelsets",
 )

@@ -1,23 +1,23 @@
-from sys import path
-
-path.append("../")
-from NLEval import graph, valsplit, label, model
-from sklearn.metrics import roc_auc_score as auroc
 import numpy as np
+from NLEval import graph
+from NLEval import label
+from NLEval import model
+from NLEval import valsplit
+from sklearn.metrics import roc_auc_score as auroc
 
 # define connstatns
-data_path = "../../data/"  # path to data
+DATA_DIR = "../data/"  # path to data
 i = 54  # index of labelset
 k = 50  # numbers of top genes to display
 
 # load graph and labelset collection
 g = graph.DenseGraph.DenseGraph.from_edglst(
-    data_path + "networks/STRING-EXP.edg",
+    DATA_DIR + "networks/STRING-EXP.edg",
     weighted=True,
     directed=False,
 )
-lsc = label.LabelsetCollection.SplitLSC.from_gmt(
-    data_path + "labels/KEGGBP.gmt",
+lsc = label.labelset_collection.SplitLSC.from_gmt(
+    DATA_DIR + "labels/KEGGBP.gmt",
 )
 
 # initialize model

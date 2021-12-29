@@ -64,7 +64,7 @@ class TrainValTest(BaseHoldout):
         sorted_node_ids = sorted(
             common_ids,
             reverse=self.train_on == "bot",
-            key=lambda node_id: lsc_ids.getProp(node_id, prop_name),
+            key=lambda node_id: lsc_ids.get_property(node_id, prop_name),
         )
 
         n = len(sorted_node_ids)
@@ -115,7 +115,7 @@ class BinHold(BaseHoldout):
         sorted_node_ids = sorted(
             common_ids,
             reverse=self.train_on == "bot",
-            key=lambda node_id: lsc_ids.getProp(node_id, prop_name),
+            key=lambda node_id: lsc_ids.get_property(node_id, prop_name),
         )
         bin_size = np.floor(len(sorted_node_ids) / self.bin_num).astype(int)
         self._test_index = np.array(sorted_node_ids[:bin_size])
@@ -158,8 +158,8 @@ class ThreshHold(BaseHoldout):
         bot_list = []
         for node_id in node_ids.lst:
             if node_id in lsc_ids:
-                if lsc_ids.getProp(node_id, "Noccur") > 0:
-                    if lsc_ids.getProp(node_id, prop_name) >= self.cut_off:
+                if lsc_ids.get_property(node_id, "Noccur") > 0:
+                    if lsc_ids.get_property(node_id, prop_name) >= self.cut_off:
                         top_list.append(node_id)
                     else:
                         bot_list.append(node_id)

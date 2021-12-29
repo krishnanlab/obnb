@@ -1,7 +1,9 @@
-import numpy as np
-from NLEval.util.Exceptions import IDNotExistError, IDExistsError
-from NLEval.util import checkers
 from copy import deepcopy
+
+import numpy as np
+from NLEval.util import checkers
+from NLEval.util.Exceptions import IDExistsError
+from NLEval.util.Exceptions import IDNotExistError
 
 __all__ = ["IDlst", "IDmap", "IDprop"]
 
@@ -99,7 +101,7 @@ class IDlst:
         if (not existence) & (identifier in self):
             raise IDExistsError(f"Existing ID {identifier!r}")
         elif existence & (identifier not in self):
-            raise IDNotExistError(f"Unknown ID identifier!r")
+            raise IDNotExistError(f"Unknown ID {identifier!r}")
 
     @property
     def lst(self):

@@ -1,15 +1,15 @@
-from sys import path
-
-path.append("../")
-from NLEval import graph, valsplit, label, model
-from sklearn.metrics import roc_auc_score as auroc
 import numpy as np
+from NLEval import graph
+from NLEval import label
+from NLEval import model
+from NLEval import valsplit
+from sklearn.metrics import roc_auc_score as auroc
 
-data_path = "../../data/"
+DATA_DIR = "../data/"
 network = "STRING"
 dataset = "KEGGBP"
-network_fp = data_path + f"networks/{network}.edg"
-label_fp = data_path + f"labels/{dataset}.gmt"
+network_fp = DATA_DIR + f"networks/{network}.edg"
+label_fp = DATA_DIR + f"labels/{dataset}.gmt"
 
 train_ratio = 0.6
 test_ratio = 0.2
@@ -18,14 +18,20 @@ min_pos = 10
 print(f"Run test using network = {repr(network)} and dataset = {repr(dataset)}")
 
 g = graph.SparseGraph.SparseGraph.from_edglst(network_fp, True, False)
-lsc = label.LabelsetCollection.SplitLSC.from_gmt(label_fp)
+lsc = label.labelset_collection.SplitLSC.from_gmt(label_fp)
 
 print(f"Number of labelsets in original file: {len(lsc.label_ids)}")
 
-lsc.apply(label.Filter.EntityExistanceFilter(g.idmap.lst), inplace=True)
-lsc.apply(label.Filter.LabelsetRangeFilterSize(min_val=50), inplace=True)
+lsc.apply(
+    label.labelset_filter.EntityExistanceFilter(g.idmap.lst),
+    inplace=True,
+)
+lsc.apply(
+    label.labelset_filter.LabelsetRangeFilterSize(min_val=50),
+    inplace=True,
+)
 lsc.load_entity_properties(
-    data_path + "/properties/pubcnt.txt",
+    DATA_DIR + "/properties/pubcnt.txt",
     "Pubmed Count",
     0,
     int,
