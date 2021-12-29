@@ -44,7 +44,8 @@ print(
 )
 
 print(
-    """Expected outcome
+    """
+Expected outcome
 --------------------------------------------------------------------------------
 Run test using network = 'STRING-EXP' and dataset = 'KEGGBP'
 Number of labelsets in original file: 139

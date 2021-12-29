@@ -14,7 +14,6 @@ from NLEval.util import checkers
 from NLEval.util import idhandler
 from NLEval.util.deprecated import Deprecated
 from NLEval.util.exceptions import IDExistsError
-from NLEval.valsplit import Base
 
 __all__ = ["LSC", "SplitLSC"]
 
@@ -503,7 +502,6 @@ class SplitLSC(LSC):
 
     @valsplit.setter
     def valsplit(self, obj):
-        checkers.checkType("Validation split generator", Base.BaseValSplit, obj)
         self._valsplit = obj
 
     def train_test_setup(self, graph, prop_name=None, min_pos=10):
@@ -576,11 +574,6 @@ class SplitLSC(LSC):
                 of the nodes in the graph, used for filtering IDs
 
         """
-        checkers.checkType(
-            "Labelset collection splitter (only support Holdout split now)",
-            Base.BaseHoldout,
-            self.valsplit,
-        )
         valid = False if self.valsplit.valid_index is None else True
         self.valsplit.check_split_setup(valid)
 
