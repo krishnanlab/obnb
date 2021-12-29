@@ -1,34 +1,24 @@
+import os.path as osp
+
 import numpy as np
-from NLEval import graph
-from NLEval import label
 from NLEval import model
 from NLEval import valsplit
+from NLEval.graph.DenseGraph import DenseGraph
+from NLEval.label import labelset_collection
+from NLEval.label import labelset_filter
 from sklearn.metrics import roc_auc_score as auroc
 
-DATA_DIR = "../data/"
+DATA_DIR = osp.join(osp.pardir, "data")
+GRAPH_FP = osp.join(DATA_DIR, "networks", "STRING-EXP.edg")
+LABEL_FP = osp.join(DATA_DIR, "labels", "KEGGBP.gmt")
+PROPERTY_FP = osp.join(DATA_DIR, "properties", "pubcnt.txt")
 
-g = graph.DenseGraph.DenseGraph.from_edglst(
-    DATA_DIR + "networks/STRING-EXP.edg",
-    weighted=True,
-    directed=False,
-)
-lsc = label.labelset_collection.SplitLSC.from_gmt(
-    DATA_DIR + "labels/KEGGBP.gmt",
-)
-lsc.apply(
-    label.labelset_filter.EntityExistanceFilter(g.idmap.lst),
-    inplace=True,
-)
-lsc.apply(
-    label.labelset_filter.LabelsetRangeFilterSize(min_val=50),
-    inplace=True,
-)
-lsc.load_entity_properties(
-    DATA_DIR + "/properties/pubcnt.txt",
-    "Pubmed Count",
-    0,
-    int,
-)
+g = DenseGraph.from_edglst(GRAPH_FP, weighted=True, directed=False)
+lsc = labelset_collection.SplitLSC.from_gmt(LABEL_FP)
+lsc.apply(labelset_filter.EntityExistanceFilter(g.idmap.lst), inplace=True)
+lsc.apply(labelset_filter.LabelsetRangeFilterSize(min_val=50), inplace=True)
+lsc.load_entity_properties(PROPERTY_FP, "Pubmed Count", 0, int)
+
 # lsc.valsplit = valsplit.Holdout.BinHold(3, shuffle=True)
 lsc.valsplit = valsplit.Holdout.TrainValTest(
     train_ratio=1 / 3,
@@ -50,4 +40,13 @@ for label_id in lsc.label_ids:
 
 print(
     f"Average score = {np.mean(score_lst):.4f}, std = {np.std(score_lst):.4f}",
+)
+
+print(
+    """
+Expected outcome
+--------------------------------------------------------------------------------
+Average score = 0.6720, std = 0.1056
+--------------------------------------------------------------------------------
+    """,
 )
