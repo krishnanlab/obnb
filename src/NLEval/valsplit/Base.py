@@ -1,5 +1,6 @@
 import numpy as np
-from NLEval.util import IDHandler, checkers
+from NLEval.util import checkers
+from NLEval.util import IDHandler
 
 __all__ = ["BaseValSplit", "BaseHoldout", "BaseInterface"]
 
@@ -135,7 +136,7 @@ class BaseHoldout(BaseValSplit):
         for node_id in node_ids.lst:
             if node_id in lsc_ids:
                 # make sure entity is part of at least one labelset
-                if lsc_ids.getProp(node_id, "Noccur") > 0:
+                if lsc_ids.get_property(node_id, "Noccur") > 0:
                     common_ids.append(node_id)
         return common_ids
 
