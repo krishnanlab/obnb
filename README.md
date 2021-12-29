@@ -43,27 +43,26 @@ LPA_score_dict = LP_A.predict(positive_set, negative_set)
 
 ### Additional packages used for dev
 
-* [black](https://github.com/psf/black)
 * [tox](https://tox.wiki/en/latest/index.html)
 * [pytest](https://docs.pytest.org/en/6.2.x/)
-* [pytest-cov](https://pypi.org/project/pytest-cov/) (not used yet)
+* [pytest-cov](https://pypi.org/project/pytest-cov/)
+* [pre-commit](https://github.com/pre-commit/pre-commit)
 
-See ``requirements-dev.txt``.
-
-### Coding style
-
-[Update] now these are taken care by pre-commit hooks.
-
-Use [``black``](https://github.com/psf/black) to format code, also enforce max 80 line length.
+See ``requirements-dev.txt``. Run the following to install all dev dependencies
 
 ```bash
-$ black src/ -l 80
+$ pip install -r requirements-dev.txt
 ```
-
-The ``-l`` option specifies the maixmum line-length, which is set to be 88 originally.
 
 ### Testing
 
+Simply run ``pytest`` to run all tests
+
 ```bash
-$ pytest src/unit_tests  # TODO: move unit_tests to tests/ instead of src/
+$ pytest
+```
+
+Alternatively, can also show the coverage report
+```bash
+$ pytest --cov src/NLEval
 ```

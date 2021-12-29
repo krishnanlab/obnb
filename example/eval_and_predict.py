@@ -1,69 +1,64 @@
+import os.path as osp
+
 import numpy as np
-from NLEval import graph
-from NLEval import label
 from NLEval import metrics
 from NLEval import model
-from NLEval import valsplit
 from NLEval import wrapper
+from NLEval.graph.SparseGraph import SparseGraph
+from NLEval.label import labelset_collection
+from NLEval.label import labelset_filter
+from NLEval.valsplit.Interface import SklSKF
 
-DATA_DIR = "../data/"
-network_fp = DATA_DIR + "networks/BioGRID_3.4.136.edg"
-labelset_fp = (
-    DATA_DIR
-    + "labels/c2.cp.kegg.v6.1.entrez.BP.gsea-min10-max200-ovlppt7-jacpt5.nonred.gmt"
-)
+DATA_DIR = osp.join(osp.pardir, "data")
+GRAPH_FP = osp.join(DATA_DIR, "networks", "BioGRID_3.4.136.edg")
+LABEL_FP = osp.join(DATA_DIR, "labels", "KEGGBP.gmt")
 
 workers = 8  # number of parallel processes
 n_split = 5  # cross validation split number for evalution
 p_thresh = 0.05  # p-val for hypergeometric test to determin negatives
 min_labelset_size = 50  # minimum number of positive required in a labelset
 score_cutoff = 1.2  # minimum score required for prediction
+progressbar = True
 
-g = graph.SparseGraph.SparseGraph.from_edglst(
-    network_fp,
-    weighted=False,
-    directed=False,
-)
-lsc = label.labelset_collection.SplitLSC.from_gmt(labelset_fp)
-lsc.valsplit = valsplit.Interface.SklSKF(
-    shuffle=True,
-    skl_kws={"n_splits": n_split},
-)
+g = SparseGraph.from_edglst(GRAPH_FP, weighted=False, directed=False)
+lsc = labelset_collection.SplitLSC.from_gmt(LABEL_FP)
+lsc.valsplit = SklSKF(shuffle=True, skl_kws={"n_splits": n_split})
 
-lsc.apply(
-    label.labelset_filter.EntityExistanceFilter(target_lst=g.idmap.lst),
-    inplace=True,
-)
-lsc.apply(
-    label.labelset_filter.LabelsetRangeFilterSize(min_val=min_labelset_size),
-    inplace=True,
-)
-lsc.apply(
-    label.labelset_filter.NegativeFilterHypergeom(p_thresh=p_thresh),
-    inplace=True,
-)
+filters = [
+    labelset_filter.EntityExistanceFilter(target_lst=g.idmap.lst),
+    labelset_filter.LabelsetRangeFilterSize(min_val=min_labelset_size),
+    labelset_filter.NegativeFilterHypergeom(p_thresh=p_thresh),
+]
+
+for filter_ in filters:
+    lsc.apply(filter_, inplace=True)
 print(
-    f"After filtering, there are {len(lsc.label_ids)} number of effective labelsets",
+    f"Number of effective labelsets after filtering = {len(lsc.label_ids)}",
 )
 
-scoring_obj = lambda estimator, X, y: metrics.log2_auprc_prior(
-    y,
-    estimator.decision_function(X),
-)
-mdl = model.SupervisedLearning.LogRegCV(
+# scoring_obj = lambda estimator, X, y: metrics.log2_auprc_prior(
+#    y,
+#    estimator.decision_function(X),
+# )
+# mdl = model.SupervisedLearning.LogRegCV(
+#    g,
+#    penalty="l2",
+#    solver="liblinear",
+#    max_iter=500,
+#    cv=3,
+#    Cs=np.logspace(-6, 2, 10),
+#    class_weight="balanced",
+#    n_jobs=1,
+#    scoring=scoring_obj,
+# )
+mdl = model.SupervisedLearning.LogReg(
     g,
     penalty="l2",
     solver="liblinear",
-    max_iter=500,
-    cv=3,
-    Cs=np.logspace(-8, 4, 20),
-    class_weight="balanced",
-    n_jobs=1,
-    scoring=scoring_obj,
 )
 
 
-@wrapper.ParWrap.ParDat(lsc.label_ids, n_workers=1)
+@wrapper.ParWrap.ParDatExe(lsc.label_ids, n_workers=6, verbose=progressbar)
 def predict_all_labelsets(label_id):
     np.random.seed()  # initialize random states for parallel processes
 
@@ -93,12 +88,11 @@ def predict_all_labelsets(label_id):
     else:
         status_str = "(Discarded)"
 
-    print(
-        f"{label_id:<60} num_pos={len(pos_ids_set):>4}, "
-        f"num_neg={len(neg_ids_set):>4}, score={score:>3.2f} {status_str}",
-    )
+    if not progressbar:
+        print(
+            f"{label_id:<60} num_pos={len(pos_ids_set):>4}, "
+            f"num_neg={len(neg_ids_set):>4}, score={score:>3.2f} {status_str}",
+        )
 
 
-# depoly processes
-for i in predict_all_labelsets():
-    pass
+predict_all_labelsets()

@@ -173,7 +173,7 @@ class BaseInterface(BaseValSplit):
         super().__init__(shuffle=shuffle)
 
     def setup_split_func(self, split_func):
-        self.get_split_idx_ary = lambda id_ary, label_ary: split_func(
+        self.get_split_idx_ary = lambda id_ary, label_ary, valid: split_func(
             id_ary,
             label_ary,
         )

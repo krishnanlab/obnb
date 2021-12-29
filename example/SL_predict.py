@@ -1,27 +1,25 @@
+import os.path as osp
+
 import numpy as np
-from NLEval import graph
-from NLEval import label
 from NLEval import model
 from NLEval import valsplit
+from NLEval.graph.DenseGraph import DenseGraph
+from NLEval.label import labelset_collection
 from sklearn.metrics import roc_auc_score as auroc
 
-# define connstatns
-DATA_DIR = "../data/"  # path to data
+DATA_DIR = osp.join(osp.pardir, "data")
+GRAPH_FP = osp.join(DATA_DIR, "networks", "STRING-EXP.edg")
+LABEL_FP = osp.join(DATA_DIR, "labels", "KEGGBP.gmt")
+
 i = 54  # index of labelset
 k = 50  # numbers of top genes to display
 
 # load graph and labelset collection
-g = graph.DenseGraph.DenseGraph.from_edglst(
-    DATA_DIR + "networks/STRING-EXP.edg",
-    weighted=True,
-    directed=False,
-)
-lsc = label.labelset_collection.SplitLSC.from_gmt(
-    DATA_DIR + "labels/KEGGBP.gmt",
-)
+g = DenseGraph.from_edglst(GRAPH_FP, weighted=True, directed=False)
+lsc = labelset_collection.SplitLSC.from_gmt(LABEL_FP)
 
 # initialize model
-mdl = model.SupervisedLearning.LogReg(g, penalty="l2", solver="lbfgs")
+mdl = model.SupervisedLearning.LogReg(g, penalty="l2", solver="liblinear")
 
 # diplay choice of labelsets
 for l, m in enumerate(lsc.label_ids):
@@ -46,3 +44,4 @@ intersection = list(set(top_list) & pos)
 
 print(f"Top {k} genes: {repr(top_list)}")
 print(f"Known genes in top {k}: {repr(intersection)}")
+print(f"\nWARNING: This script fails to reproduce consistent results.")
