@@ -1,2 +1,2 @@
-__all__ = ["IDHandler", "checkers"]
+__all__ = ["idhandler", "checkers"]
 from . import *

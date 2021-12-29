@@ -105,8 +105,8 @@ class BinHold(BaseHoldout):
         """Set up training and testing.
 
         Args:
-            lsc_ids(:obj:`NLEval.util.IDHandler.IDprop`)
-            node_ids(:obj:`NLEval.util.IDHandler.IDmap`)
+            lsc_ids(:obj:`NLEval.util.idhandler.IDprop`)
+            node_ids(:obj:`NLEval.util.idhandler.IDmap`)
             prop_name(str): name of property to be used for splitting
 
         """
@@ -148,8 +148,8 @@ class ThreshHold(BaseHoldout):
         """Set up training and testing.
 
         Args:
-            lsc_ids(:obj:`NLEval.util.IDHandler.IDprop`)
-            node_ids(:obj:`NLEval.util.IDHandler.IDmap`)
+            lsc_ids(:obj:`NLEval.util.idhandler.IDprop`)
+            node_ids(:obj:`NLEval.util.idhandler.IDmap`)
             prop_name(str): name of property to be used for splitting
 
         """

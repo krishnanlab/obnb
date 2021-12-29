@@ -11,7 +11,7 @@ from typing import Tuple
 import numpy as np
 from NLEval.label import labelset_filter
 from NLEval.util import checkers
-from NLEval.util import IDHandler
+from NLEval.util import idhandler
 from NLEval.util.deprecated import Deprecated
 from NLEval.util.exceptions import IDExistsError
 from NLEval.valsplit import Base
@@ -21,7 +21,7 @@ __all__ = ["LSC", "SplitLSC"]
 Splitter = Callable[[np.ndarray, np.ndarray], Iterator[Tuple[np.ndarray, ...]]]
 
 
-class LSC(IDHandler.IDprop):
+class LSC(idhandler.IDprop):
     """Collection of labelsets.
 
     This class is used for managing collection of labelsets.
@@ -52,7 +52,7 @@ class LSC(IDHandler.IDprop):
     def __init__(self):
         """Initialize LSC object."""
         super().__init__()
-        self.entity = IDHandler.IDprop()
+        self.entity = idhandler.IDprop()
         self.entity.new_property("Noccur", 0, int)
         self.new_property("Info", "NA", str)
         self.new_property("Labelset", set(), set)
