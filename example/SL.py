@@ -1,19 +1,19 @@
-from sys import path
-
-path.append("../")
-from NLEval import graph, valsplit, label, model
-from sklearn.metrics import roc_auc_score as auroc
 import numpy as np
+from NLEval import graph
+from NLEval import label
+from NLEval import model
+from NLEval import valsplit
+from sklearn.metrics import roc_auc_score as auroc
 
-data_path = "../../data/"
+DATA_DIR = "../data/"
 
 g = graph.DenseGraph.DenseGraph.from_edglst(
-    data_path + "networks/STRING-EXP.edg",
+    DATA_DIR + "networks/STRING-EXP.edg",
     weighted=True,
     directed=False,
 )
 lsc = label.labelset_collection.SplitLSC.from_gmt(
-    data_path + "labels/KEGGBP.gmt",
+    DATA_DIR + "labels/KEGGBP.gmt",
 )
 lsc.apply(
     label.labelset_filter.EntityExistanceFilter(g.idmap.lst),
@@ -24,7 +24,7 @@ lsc.apply(
     inplace=True,
 )
 lsc.load_entity_properties(
-    data_path + "/properties/pubcnt.txt",
+    DATA_DIR + "/properties/pubcnt.txt",
     "Pubmed Count",
     0,
     int,

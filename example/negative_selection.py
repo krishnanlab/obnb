@@ -1,7 +1,5 @@
-from sys import path
-
-path.append("../")
-from NLEval.label import labelset_collection, labelset_filter
+from NLEval.label import labelset_collection
+from NLEval.label import labelset_filter
 
 # specify p-val threshold
 p_thresh = 0.05

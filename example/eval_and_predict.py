@@ -1,13 +1,15 @@
-from sys import path
-
-path.append("../")
 import numpy as np
-from NLEval import label, graph, valsplit, model, metrics, wrapper
+from NLEval import graph
+from NLEval import label
+from NLEval import metrics
+from NLEval import model
+from NLEval import valsplit
+from NLEval import wrapper
 
-data_path = "../../data/"
-network_fp = data_path + "networks/BioGRID_3.4.136.edg"
+DATA_DIR = "../data/"
+network_fp = DATA_DIR + "networks/BioGRID_3.4.136.edg"
 labelset_fp = (
-    data_path
+    DATA_DIR
     + "labels/c2.cp.kegg.v6.1.entrez.BP.gsea-min10-max200-ovlppt7-jacpt5.nonred.gmt"
 )
 
