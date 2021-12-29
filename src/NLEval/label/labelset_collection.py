@@ -12,6 +12,7 @@ import numpy as np
 from NLEval.label import labelset_filter
 from NLEval.util import checkers
 from NLEval.util import IDHandler
+from NLEval.util.deprecated import Deprecated
 from NLEval.util.Exceptions import IDExistsError
 from NLEval.valsplit import Base
 
@@ -489,6 +490,7 @@ class LSC(IDHandler.IDprop):
 class SplitLSC(LSC):
     """Labelset collection equipped with split generator."""
 
+    @Deprecated("SplitLSC is deprecated, use labelset_split instead")
     def __init__(self):
         """Initialize SplitLSC object."""
         super().__init__()
