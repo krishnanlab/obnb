@@ -117,6 +117,14 @@ class BaseHoldout(BaseSplit):
 
 
 class RatioHoldout(BaseHoldout):
+    """Split the dataset into parts of size proportional to some ratio.
+
+    First sort the dataset entities (data points) based on a 1-dimensional
+    entity property parsed in as ``x``, either ascendingly or descendingly.
+    Then split the dataset based on the defined ratios.
+
+    """
+
     def __init__(self, *ratios: Real, ascending: bool = True) -> None:
         """Initialize the RatioHoldout object.
 
@@ -159,6 +167,29 @@ class RatioHoldout(BaseHoldout):
 
 
 class ThresholdHoldout(BaseHoldout):
+    """Split the dataset according to some threshold values.
+
+    First sort the dataset entities (data points) based on a 1-dimensional
+    entity property parsed in as ``x``, either ascendingly or descendingly.
+    When sorted ascendingly, the first partition would be entities that have
+    properties with values up to but not including the first (smallest)
+    threshold value, and the second partition would be the entities that have
+    properties with values starting (inclusive) from the first threshold value
+    up to the second threshold value (not inclusive).
+
+    Example:
+        Suppose we have some dataset with properties x, then given the
+        specified thresholds, we would split the dataset as follows
+
+        >>> x = [0, 1, 1, 1, 2, 3, 4]
+        >>> thresholds = (1, 3)
+        >>>
+        >>> split1 = [0]
+        >>> split2 = [1, 2, 3, 4]
+        >>> split3 = [5, 6]
+
+    """
+
     def __init__(self, *thresholds: Real, ascending: bool = True) -> None:
         """Initialize the ThresholdHoldout object.
 
