@@ -1,12 +1,17 @@
+import os
 import os.path as osp
 
 import numpy as np
 from NLEval.graph.DenseGraph import DenseGraph
 from NLEval.label import labelset_filter
-from NLEval.label import labelset_split
 from NLEval.label.labelset_collection import LSC
+from NLEval.label.labelset_split import RatioHoldout
+from NLEval.model_trainer.supervised_learning import SupervisedLearningTrainer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
+
+# Disable unnecessary multithreading
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
 
 NETWORK = "STRING"
 LABEL = "KEGGBP"
@@ -32,15 +37,16 @@ print(f"Number of labelsets after filtering: {len(lsc.label_ids)}")
 lsc.load_entity_properties(PROPERTY_FP, "PubMed Count", 0, int)
 
 # 3/2 train/test split using genes with higher PubMed Count for training
-splitter = labelset_split.RatioHoldout(0.6, 0.4, ascending=False)
+splitter = RatioHoldout(0.6, 0.4, ascending=False)
 
 # Select model
-mdl = LogisticRegression(penalty="l2", solver="lbfgs")
+mdl = LogisticRegression(penalty="l2", solver="lbfgs", n_jobs=1)
 
-get_score = lambda mdl, x, y: auroc(y, mdl.decision_function(x))
+# Setup trainer, use auroc as the evaluation metric
+metrics = {"auroc": auroc}
+trainer = SupervisedLearningTrainer(metrics, g)
 
 scores = []
-X = g.mat
 for label_id in lsc.label_ids:
     y, masks, _ = lsc.split(
         splitter,
@@ -48,13 +54,9 @@ for label_id in lsc.label_ids:
         labelset_name=label_id,
         property_name="PubMed Count",
     )
-    train_mask = masks["train"][:, 0]
-    test_mask = masks["test"][:, 0]
-
-    mdl.fit(X[train_mask], y[train_mask])
-    train_score = get_score(mdl, X[train_mask], y[train_mask])
-    test_score = get_score(mdl, X[test_mask], y[test_mask])
-    scores.append(test_score)
+    results = trainer.train(mdl, y, masks)
+    scores.append(results["test_auroc"])
+    train_score, test_score = results["train_auroc"], results["test_auroc"]
     print(f"Train: {train_score:.4f}\tTest: {test_score:.4f}\t{label_id}")
 
 print(f"Average test score = {np.mean(scores):.4f}, std = {np.std(scores):.4f}")
