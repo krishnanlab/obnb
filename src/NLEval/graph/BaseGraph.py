@@ -1,5 +1,5 @@
-from NLEval.util import IDHandler
 from NLEval.util import checkers
+from NLEval.util import idhandler
 
 
 class BaseGraph:
@@ -7,7 +7,7 @@ class BaseGraph:
 
     def __init__(self):
         """Initialize BaseGraph object."""
-        self.idmap = IDHandler.IDmap()
+        self.idmap = idhandler.IDmap()
 
     @property
     def idmap(self):
@@ -15,7 +15,7 @@ class BaseGraph:
 
     @idmap.setter
     def idmap(self, idmap):
-        checkers.checkType("idmap", IDHandler.IDmap, idmap)
+        checkers.checkType("idmap", idhandler.IDmap, idmap)
         self._idmap = idmap
 
     def __contains__(self, graph):

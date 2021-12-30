@@ -11,16 +11,16 @@ from typing import Tuple
 import numpy as np
 from NLEval.label import labelset_filter
 from NLEval.util import checkers
-from NLEval.util import IDHandler
-from NLEval.util.Exceptions import IDExistsError
-from NLEval.valsplit import Base
+from NLEval.util import idhandler
+from NLEval.util.deprecated import Deprecated
+from NLEval.util.exceptions import IDExistsError
 
 __all__ = ["LSC", "SplitLSC"]
 
 Splitter = Callable[[np.ndarray, np.ndarray], Iterator[Tuple[np.ndarray, ...]]]
 
 
-class LSC(IDHandler.IDprop):
+class LSC(idhandler.IDprop):
     """Collection of labelsets.
 
     This class is used for managing collection of labelsets.
@@ -51,7 +51,7 @@ class LSC(IDHandler.IDprop):
     def __init__(self):
         """Initialize LSC object."""
         super().__init__()
-        self.entity = IDHandler.IDprop()
+        self.entity = idhandler.IDprop()
         self.entity.new_property("Noccur", 0, int)
         self.new_property("Info", "NA", str)
         self.new_property("Labelset", set(), set)
@@ -489,6 +489,7 @@ class LSC(IDHandler.IDprop):
 class SplitLSC(LSC):
     """Labelset collection equipped with split generator."""
 
+    @Deprecated("SplitLSC is deprecated, use labelset_split instead")
     def __init__(self):
         """Initialize SplitLSC object."""
         super().__init__()
@@ -501,7 +502,6 @@ class SplitLSC(LSC):
 
     @valsplit.setter
     def valsplit(self, obj):
-        checkers.checkType("Validation split generator", Base.BaseValSplit, obj)
         self._valsplit = obj
 
     def train_test_setup(self, graph, prop_name=None, min_pos=10):
@@ -574,11 +574,6 @@ class SplitLSC(LSC):
                 of the nodes in the graph, used for filtering IDs
 
         """
-        checkers.checkType(
-            "Labelset collection splitter (only support Holdout split now)",
-            Base.BaseHoldout,
-            self.valsplit,
-        )
         valid = False if self.valsplit.valid_index is None else True
         self.valsplit.check_split_setup(valid)
 

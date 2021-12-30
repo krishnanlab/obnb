@@ -1,7 +1,8 @@
 import numpy as np
 from NLEval.graph.BaseGraph import BaseGraph
 from NLEval.graph.SparseGraph import SparseGraph
-from NLEval.util import IDHandler, checkers
+from NLEval.util import checkers
+from NLEval.util import idhandler
 from scipy.spatial import distance
 
 __all__ = ["DenseGraph", "FeatureVec"]
@@ -70,15 +71,15 @@ class DenseGraph(BaseGraph):
         """Construct DenseGraph using ids and adjcency matrix.
 
         Args:
-            ids(list or :obj:`IDHandler.idmap`): list of IDs or idmap of the
+            ids(list or :obj:`idhandler.idmap`): list of IDs or idmap of the
                 adjacency matrix
             mat(:obj:`numpy.ndarray`): 2D numpy array of adjacency matrix
 
         """
         idmap = (
             ids
-            if isinstance(ids, IDHandler.IDmap)
-            else IDHandler.IDmap.from_list(ids)
+            if isinstance(ids, idhandler.IDmap)
+            else idhandler.IDmap.from_list(ids)
         )
         if idmap.size != mat.shape[0]:
             raise ValueError(
@@ -98,7 +99,7 @@ class DenseGraph(BaseGraph):
             First column of mat encodes ID, must be integers.
 
         """
-        idmap = IDHandler.IDmap()
+        idmap = idhandler.IDmap()
         for node_id in mat[:, 0]:
             if int(node_id) != node_id:
                 raise ValueError("ID must be int type")
@@ -213,7 +214,7 @@ class FeatureVec(DenseGraph):
     @classmethod
     def from_emd(cls, path_to_emd, **kwargs):
         fvec_lst = []
-        idmap = IDHandler.IDmap()
+        idmap = idhandler.IDmap()
         with open(path_to_emd, "r") as f:
             f.readline()  # skip header
             for line in f:

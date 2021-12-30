@@ -4,8 +4,10 @@ from copy import deepcopy
 
 import numpy as np
 from commonvar import SAMPLE_DATA_DIR
-from NLEval.graph import BaseGraph, DenseGraph, SparseGraph
-from NLEval.util import IDHandler
+from NLEval.graph import BaseGraph
+from NLEval.graph import DenseGraph
+from NLEval.graph import SparseGraph
+from NLEval.util import idhandler
 from scipy.spatial import distance
 
 
@@ -226,7 +228,7 @@ class TestDenseGraph(unittest.TestCase):
                 self.assertEqual(graph.get_edge(node_id1, node_id2), mat[i, j])
 
     def test_construc_graph(self):
-        idmap = IDHandler.IDmap()
+        idmap = idhandler.IDmap()
         idmap.add_id("a")
         idmap.add_id("b")
         mat1 = np.random.random((2, 2))

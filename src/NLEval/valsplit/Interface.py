@@ -1,10 +1,8 @@
 from NLEval.valsplit.Base import BaseInterface
-from sklearn.model_selection import (
-    LeaveOneOut,
-    LeavePOut,
-    StratifiedKFold,
-    StratifiedShuffleSplit,
-)
+from sklearn.model_selection import LeaveOneOut
+from sklearn.model_selection import LeavePOut
+from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedShuffleSplit
 
 __all__ = ["SklSKF", "SklSSS", "SklLOO", "SklLPO"]
 

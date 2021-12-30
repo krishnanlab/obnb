@@ -1,6 +1,6 @@
 import numpy as np
 from NLEval.util import checkers
-from NLEval.util import IDHandler
+from NLEval.util import idhandler
 
 __all__ = ["BaseValSplit", "BaseHoldout", "BaseInterface"]
 
@@ -121,17 +121,17 @@ class BaseHoldout(BaseValSplit):
             Only included IDs that are part of at least one labelset
 
         Args:
-            lsc_ids(:obj:`NLEval.util.IDHandler.IDprop`): ID list of labelset
+            lsc_ids(:obj:`NLEval.util.idhandler.IDprop`): ID list of labelset
                 collection
-            node_ids(:obj:`NLEval.util.IDHandler.IDmap`): ID list of graph
+            node_ids(:obj:`NLEval.util.idhandler.IDmap`): ID list of graph
 
         """
         checkers.checkType(
             "ID for labelset collection entities",
-            IDHandler.IDprop,
+            idhandler.IDprop,
             lsc_ids,
         )
-        checkers.checkType("ID for graph entities", IDHandler.IDmap, node_ids)
+        checkers.checkType("ID for graph entities", idhandler.IDmap, node_ids)
         common_ids = []
         for node_id in node_ids.lst:
             if node_id in lsc_ids:

@@ -1,7 +1,8 @@
 import unittest
 
 import numpy as np
-from NLEval.wrapper.ParWrap import ParDat, ParDatMap
+from NLEval.util.parallel import ParDat
+from NLEval.util.parallel import ParDatMap
 from sklearn.linear_model import LogisticRegression
 
 

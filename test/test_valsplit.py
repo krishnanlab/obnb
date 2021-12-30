@@ -1,12 +1,10 @@
 import unittest
 
 import numpy as np
-from NLEval.valsplit.Holdout import (
-    TrainValTest,
-    BinHold,
-    ThreshHold,
-    CustomHold,
-)
+from NLEval.valsplit.Holdout import BinHold
+from NLEval.valsplit.Holdout import CustomHold
+from NLEval.valsplit.Holdout import ThreshHold
+from NLEval.valsplit.Holdout import TrainValTest
 
 
 class TestRepr(unittest.TestCase):

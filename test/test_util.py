@@ -1,16 +1,18 @@
 import unittest
 
 import numpy as np
-from NLEval.util import checkers, IDHandler
-from NLEval.util.Exceptions import IDExistsError, IDNotExistError
+from NLEval.util import checkers
+from NLEval.util import idhandler
+from NLEval.util.exceptions import IDExistsError
+from NLEval.util.exceptions import IDNotExistError
 
 
 class TestIDlst(unittest.TestCase):
     def setUp(self):
-        self.IDlst1 = IDHandler.IDlst()
-        self.IDlst2 = IDHandler.IDlst()
-        self.IDlst3 = IDHandler.IDlst()
-        self.IDlst4 = IDHandler.IDlst()
+        self.IDlst1 = idhandler.IDlst()
+        self.IDlst2 = idhandler.IDlst()
+        self.IDlst3 = idhandler.IDlst()
+        self.IDlst4 = idhandler.IDlst()
         self.lst = ["a", "b", "c"]
         for i in self.lst:
             self.IDlst1.add_id(i)
@@ -53,11 +55,11 @@ class TestIDlst(unittest.TestCase):
     def test_sub(self):
         self.assertTrue(self.IDlst3 == self.IDlst1 - self.IDlst4)
         self.assertTrue(self.IDlst4 == self.IDlst1 - self.IDlst3)
-        self.assertTrue(IDHandler.IDlst() == self.IDlst1 - self.IDlst1)
+        self.assertTrue(idhandler.IDlst() == self.IDlst1 - self.IDlst1)
         self.template_test_type_consistency(self.IDlst1.__sub__)
 
     def test_and(self):
-        self.assertEqual(IDHandler.IDlst(), self.IDlst3 & self.IDlst4)
+        self.assertEqual(idhandler.IDlst(), self.IDlst3 & self.IDlst4)
         self.assertEqual(self.IDlst4, self.IDlst1 & self.IDlst4)
         self.assertEqual(self.IDlst3, self.IDlst1 & self.IDlst3)
 
@@ -85,9 +87,9 @@ class TestIDlst(unittest.TestCase):
     def test_size(self):
         self.assertEqual(self.IDlst1.size, 3)
         self.assertEqual(self.IDlst3.size, 2)
-        self.assertEqual(IDHandler.IDlst().size, 0)
+        self.assertEqual(idhandler.IDlst().size, 0)
 
-        idlst = IDHandler.IDlst()
+        idlst = idhandler.IDlst()
         self.assertTrue(idlst.isempty())
         idlst.add_id("a")
         self.assertFalse(idlst.isempty())
@@ -126,14 +128,14 @@ class TestIDlst(unittest.TestCase):
         self.assertRaises(TypeError, self.IDlst1.getID, "asdf")
 
     def test_from_list(self):
-        idlst = IDHandler.IDlst.from_list(self.lst)
+        idlst = idhandler.IDlst.from_list(self.lst)
         self.assertEqual(idlst, self.IDlst1)
         # test type check
         tpl = ("a", "b", "c")
-        self.assertRaises(TypeError, IDHandler.IDlst.from_list, tpl)
+        self.assertRaises(TypeError, idhandler.IDlst.from_list, tpl)
         # test redundant input
         lst = ["a", "b", "c", "a"]
-        self.assertRaises(IDExistsError, IDHandler.IDlst.from_list, lst)
+        self.assertRaises(IDExistsError, idhandler.IDlst.from_list, lst)
 
     def test_update(self):
         # test type check
@@ -155,7 +157,7 @@ class TestIDlst(unittest.TestCase):
 
 class TestIDmap(unittest.TestCase):
     def setUp(self):
-        self.idmap = IDHandler.IDmap()
+        self.idmap = idhandler.IDmap()
         self.idmap.add_id("a")
 
     def tearDown(self):
@@ -207,7 +209,7 @@ class TestIDmap(unittest.TestCase):
 
     def test_eq(self):
         self.idmap.add_id("b")
-        idmap = IDHandler.IDmap()
+        idmap = idhandler.IDmap()
         idmap.add_id("b")
         idmap.add_id("a")
         self.assertTrue(self.idmap == idmap)
@@ -248,7 +250,7 @@ class TestIDmap(unittest.TestCase):
         self.assertEqual(self.idmap.map, {"a": 0, "c": 1})
 
     def test_add(self):
-        idmap = IDHandler.IDmap()
+        idmap = idhandler.IDmap()
         idmap.add_id("b")
         idmap_combined = self.idmap + idmap
         self.assertEqual(idmap_combined.map, {"a": 0, "b": 1})
@@ -268,8 +270,8 @@ class TestIDmap(unittest.TestCase):
 
 class TestIDprop(unittest.TestCase):
     def setUp(self):
-        self.IDprop1 = IDHandler.IDprop()
-        self.IDprop2 = IDHandler.IDprop()
+        self.IDprop1 = idhandler.IDprop()
+        self.IDprop2 = idhandler.IDprop()
 
     def test_eq(self):
         # test if two object have same set of IDs
@@ -294,8 +296,8 @@ class TestIDprop(unittest.TestCase):
         self.IDprop2._prop = {"p2": [None, 2], "p1": [1, None]}
         self.assertEqual(self.IDprop1, self.IDprop2)
         # test type check
-        self.assertRaises(TypeError, self.IDprop1, IDHandler.IDlst())
-        self.assertRaises(TypeError, self.IDprop1, IDHandler.IDmap())
+        self.assertRaises(TypeError, self.IDprop1, idhandler.IDlst())
+        self.assertRaises(TypeError, self.IDprop1, idhandler.IDmap())
         self.assertRaises(TypeError, self.IDprop1, ["a", "b", "c"])
 
     def test_properties(self):

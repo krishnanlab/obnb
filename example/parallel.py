@@ -1,8 +1,8 @@
 import time
 
-from NLEval.wrapper.ParWrap import ParDat
-from NLEval.wrapper.ParWrap import ParDatExe
-from NLEval.wrapper.ParWrap import ParDatMap
+from NLEval.util.parallel import ParDat
+from NLEval.util.parallel import ParDatExe
+from NLEval.util.parallel import ParDatMap
 
 lst = list(range(10))
 
