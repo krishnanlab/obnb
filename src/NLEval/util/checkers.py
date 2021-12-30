@@ -24,6 +24,7 @@ __all__ = [
     "checkType",
     "checkTypeErrNone",
     "checkTypeAllowNone",
+    "checkNullableType",
     "checkTypesInIterable",
     "checkTypesInList",
     "checkTypesInSet",
@@ -76,6 +77,12 @@ def checkTypeAllowNone(name, targetType, val):
     """Type cheking with `checkType` and allow `None` for `val`."""
     if val is not None:
         checkType(name, targetType, val)
+
+
+def checkNullableType(name, targetType, val):
+    """Type cheking with `checkType` and allow `None` for `val`."""
+    # TODO: Update checkTypeAllowNone to checkNullableType
+    checkTypeAllowNone(name, targetType, val)
 
 
 def checkTypesInIterable(name, targetType, val):
