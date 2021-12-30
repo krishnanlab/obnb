@@ -1,4 +1,3 @@
-import os
 import os.path as osp
 
 import numpy as np
@@ -9,9 +8,6 @@ from NLEval.label.labelset_split import RatioHoldout
 from NLEval.model_trainer.supervised_learning import SupervisedLearningTrainer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
-
-# Disable unnecessary multithreading
-os.environ["OPENBLAS_NUM_THREADS"] = "1"
 
 NETWORK = "STRING"
 LABEL = "KEGGBP"

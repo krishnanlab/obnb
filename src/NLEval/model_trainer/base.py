@@ -80,17 +80,17 @@ class BaseTrainer:
                 or both are specified but the IDmaps do not align.
 
         """
-        if graph is None and features is None:
-            raise ValueError("Must specify either graph or features.")
-        elif graph is not None:
-            self._idmap = graph.idmap.copy()
-        elif features is not None:
-            self._idmap = features.idmap.copy()
-        elif graph is not None and features is not None:
+        if graph is not None and features is not None:
             # TODO: fix IDmap.__eq__ to compare list instead of set
             if not features.idmap.lst == graph.idmap.lst:
                 raise ValueError("Misaligned IDs between graph and features")
             self._idmap = graph.idmap.copy()
+        elif graph is not None:
+            self._idmap = graph.idmap.copy()
+        elif features is not None:
+            self._idmap = features.idmap.copy()
+        else:
+            raise ValueError("Must specify either graph or features.")
 
     def get_x(self, idx: Sequence[int]) -> np.ndarray:
         """Return features given list of node index."""
