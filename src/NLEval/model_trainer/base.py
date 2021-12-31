@@ -6,9 +6,6 @@ from typing import Sequence
 
 import numpy as np
 from NLEval.graph.BaseGraph import BaseGraph
-from NLEval.util import checkers
-
-MetricFunc = Callable[[np.ndarray, np.ndarray], float]
 
 
 class BaseTrainer:
@@ -21,7 +18,7 @@ class BaseTrainer:
 
     def __init__(
         self,
-        metrics: Dict[str, MetricFunc],
+        metrics: Dict[str, Callable[[np.ndarray, np.ndarray], float]],
         graph: Optional[BaseGraph] = None,
         features: Optional[BaseGraph] = None,
     ):
@@ -37,28 +34,6 @@ class BaseTrainer:
         self.set_idmap(graph, features)
         self.graph = graph
         self.features = features
-
-    @property
-    def graph(self) -> Optional[BaseGraph]:
-        """Graph object."""
-        return self._graph
-
-    @graph.setter
-    def graph(self, graph: Optional[BaseGraph]) -> None:
-        """Setter for graph."""
-        checkers.checkNullableType("Graph", BaseGraph, graph)
-        self._graph = graph
-
-    @property
-    def features(self) -> Optional[BaseGraph]:
-        """Node features."""
-        return self._features
-
-    @features.setter
-    def features(self, features: Optional[BaseGraph]) -> None:
-        """Setter for features."""
-        checkers.checkNullableType("Features", BaseGraph, features)
-        self._features = features
 
     @property
     def idmap(self):
