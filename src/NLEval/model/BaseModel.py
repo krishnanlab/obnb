@@ -1,6 +1,15 @@
+import warnings
+
 import numpy as np
 from NLEval.graph import BaseGraph
 from NLEval.util import checkers
+
+warnings.simplefilter("always", DeprecationWarning)
+warnings.warn(
+    "The BaseModel module and all it's children classes are deprecated",
+    category=DeprecationWarning,
+    stacklevel=2,
+)
 
 __all__ = ["BaseModel"]
 
