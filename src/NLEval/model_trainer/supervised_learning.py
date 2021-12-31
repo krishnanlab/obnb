@@ -41,10 +41,10 @@ class SupervisedLearningTrainer(BaseTrainer):
         masks: Dict[str, np.ndarray],
         split_idx: int = 0,
         train_on: str = "train",
-    ):
+    ) -> Dict[str, float]:
         """Train a supervised learning model.
 
-        The ``model`` in this case is a  supervised learning model that has a
+        The ``model`` in this case is a  upervised learning model that has a
         ``fit`` method for training the model, and a ``decision_function`` that
         returns the predict confidence scores given some features. See
         ``sklearn.linear_model.LogisticRegression`` for example.
