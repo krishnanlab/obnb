@@ -64,6 +64,15 @@ class IterativePropagation:
         self._max_iter = val
 
     def __call__(self, graph: BaseGraph, seed: np.ndarray) -> np.ndarray:
+        """Propagate the seed information over the network.
+
+        Args:
+            graph (:obj:`BaseGraph`): The underlying graph object used to
+                propagate the seed node information.
+            seed (`obj:`np.ndarray`): A 1-dimensional numpy array with the
+                size of the number of nodes in the graph.
+
+        """
         y_pred_new = y_pred = graph.propagate(seed)
         converged = False
         # TODO: restart
