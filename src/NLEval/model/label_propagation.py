@@ -2,6 +2,8 @@ import warnings
 
 import numpy as np
 from NLEval.graph.BaseGraph import BaseGraph
+from NLEval.util.checkers import checkValueNonnegative
+from NLEval.util.checkers import checkValuePositive
 from NLEval.util.exceptions import NotConvergedWarning
 
 
@@ -30,19 +32,45 @@ class IterativePropagation:
                 vector did not converge when the max number of iteration is
                 reached (default: ``True``)
 
+        Raises:
+            ValueError: If :attr:`tol` is not non-negative, or :attr:`max_iter`
+                is not positive.
+
         """
-        self.tol = tol  # TODO: check non neg
-        self.max_iter = max_iter  # TODO: check >= 1
+        self.tol = tol
+        self.max_iter = max_iter
         self.warn = warn
 
+    @property
+    def tol(self) -> float:
+        """Error tolerance."""
+        return self._tol
+
+    @tol.setter
+    def tol(self, val: float):
+        """Setter for :attr:`tol`."""
+        checkValueNonnegative("tol", val)
+        self._tol = val
+
+    @property
+    def max_iter(self) -> int:
+        """Max iteration."""
+        return self._max_iter
+
+    @max_iter.setter
+    def max_iter(self, val: int):
+        """Setter for :attr:`max_iter`."""
+        checkValuePositive("max_iter", val)
+        self._max_iter = val
+
     def __call__(self, graph: BaseGraph, seed: np.ndarray) -> np.ndarray:
-        y_pred = graph.propagate(seed)
-        y_pred_prev = y_pred.copy()
+        y_pred_new = y_pred = graph.propagate(seed)
         converged = False
+        # TODO: restart
         for _ in range(self.max_iter - 1):
-            y_pred = graph.propagate(y_pred_prev)
-            norm = np.norm(y_pred - y_pred_prev)
-            y_pred_prev, y_pred = y_pred, y_pred_prev  # switch pointers
+            y_pred_new = graph.propagate(y_pred)
+            norm = np.linalg.norm(y_pred_new - y_pred)
+            y_pred_new, y_pred = y_pred, y_pred_new  # switch pointers
             if norm < self.tol:
                 converged = True
                 break
@@ -66,7 +94,7 @@ class KHopPropagation(IterativePropagation):
             k (int): Number of hops to propagate.
 
         """
-        super().__init__(tol=np.inf, max_iter=k, warn=False)
+        super().__init__(tol=0.0, max_iter=k, warn=False)
 
 
 class OneHopPropagation(KHopPropagation):

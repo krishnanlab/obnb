@@ -189,6 +189,23 @@ class SparseGraph(BaseGraph):
         graph.read(npy, reader=reader, cut_threshold=cut_threshold)
         return graph
 
+    @classmethod
+    def construct_graph(cls, ids, mat):  # noqa
+        """Construct SparseGraph using ids and adjacency matrix.
+
+        Args:
+            ids(list or :obj:`idhandler.idmap`): list of IDs or idmap of the
+                adjacency matrix
+            mat(:obj:`numpy.ndarray`): 2D numpy array of adjacency matrix
+
+        """
+        graph = cls(weighted=True, directed=True)
+        for i in ids:
+            graph.add_id(i)
+        for i, j in zip(*np.where(mat != 0)):
+            graph.add_edge(graph.idmap.lst[i], graph.idmap.lst[j], mat[i, j])
+        return graph
+
     @staticmethod
     def edglst_writer(outpth, edge_gen, weighted, directed, cut_threshold):
         """Edge list file writer.
