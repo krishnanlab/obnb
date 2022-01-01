@@ -6,6 +6,7 @@ from typing import Sequence
 
 import numpy as np
 from NLEval.graph.BaseGraph import BaseGraph
+from NLEval.util.checkers import checkNumpyArrayShape
 
 
 class BaseTrainer:
@@ -82,6 +83,7 @@ class BaseTrainer:
 
     def get_x_from_mask(self, mask: np.ndarray):
         """Return features given an 1-dimensional node mask."""
+        checkNumpyArrayShape("mask", len(self.idmap), mask)
         idx = np.where(mask)[0]
         return self.get_x(idx)
 
