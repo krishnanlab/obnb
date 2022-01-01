@@ -4,9 +4,9 @@ import unittest
 import numpy as np
 from commonvar import SAMPLE_DATA_DIR
 from NLEval import valsplit
-from NLEval.label import labelset_collection
-from NLEval.label import labelset_filter
-from NLEval.label import labelset_split
+from NLEval.label import filters
+from NLEval.label import LabelsetCollection
+from NLEval.label import split
 from NLEval.util.exceptions import IDExistsError
 from NLEval.util.exceptions import IDNotExistError
 from sklearn.model_selection import KFold
@@ -33,7 +33,7 @@ class TestLSC(unittest.TestCase):
         self.toy1_property = [1, 0, 9, 2]
 
     def setUp(self):
-        self.lsc = labelset_collection.LSC()
+        self.lsc = LabelsetCollection()
         self.lsc.add_labelset(["a", "b", "c"], "Labelset1", "Description1")
         self.lsc.add_labelset(["b", "d"], "Labelset2", "Description2")
 
@@ -121,8 +121,8 @@ class TestLSC(unittest.TestCase):
     def test_eq(self):
         # make two identical labelset collections by shuffling the order of labelset
         shuffle_idx = [3, 0, 2, 1]
-        lsc1 = labelset_collection.LSC()
-        lsc2 = labelset_collection.LSC()
+        lsc1 = LabelsetCollection()
+        lsc2 = LabelsetCollection()
         for idx1 in range(4):
             idx2 = shuffle_idx[idx1]
             for lsc, idx in zip((lsc1, lsc2), (idx1, idx2)):
@@ -144,7 +144,7 @@ class TestLSC(unittest.TestCase):
         self.assertEqual(lsc1, lsc2)
 
     def test_from_gmt(self):
-        lsc = labelset_collection.LSC.from_gmt(self.toy1_gmt_fp)
+        lsc = LabelsetCollection.from_gmt(self.toy1_gmt_fp)
         self.assertEqual(lsc.label_ids, self.toy1_label_ids)
         self.assertEqual(lsc.prop["Info"], self.toy1_InfoLst)
         self.assertEqual(lsc.prop["Labelset"], self.toy1_labelsets)
@@ -336,7 +336,7 @@ class TestLSC(unittest.TestCase):
 
 class TestSplit(unittest.TestCase):
     def setUp(self):
-        self.lsc = labelset_collection.LSC()
+        self.lsc = LabelsetCollection()
         self.lsc.add_labelset(["a", "b", "c"], "Labelset1", "Description1")
         self.lsc.add_labelset(["b", "d"], "Labelset2", "Description2")
 
@@ -456,7 +456,7 @@ class TestSplit(unittest.TestCase):
 
 class TestLabelsetSplit(unittest.TestCase):
     def setUp(self):
-        self.lsc = labelset_collection.LSC()
+        self.lsc = LabelsetCollection()
         self.lsc.add_labelset(["a", "b", "c"], "Labelset1", "Description1")
         self.lsc.add_labelset(["b", "d"], "Labelset2", "Description2")
         self.lsc.add_labelset(["e", "f", "g", "h"], "Labelset3")
@@ -472,28 +472,28 @@ class TestLabelsetSplit(unittest.TestCase):
 
     def test_threshold_holdout_repr(self):
         with self.subTest(thresholds=(4,)):
-            splitter = labelset_split.ThresholdHoldout(4)
+            splitter = split.ThresholdHoldout(4)
             self.assertEqual(
                 repr(splitter),
                 "ThresholdHoldout(ascending=True, thresholds=(4,))",
             )
 
         with self.subTest(thresholds=(2, 7)):
-            splitter = labelset_split.ThresholdHoldout(2, 7)
+            splitter = split.ThresholdHoldout(2, 7)
             self.assertEqual(
                 repr(splitter),
                 "ThresholdHoldout(ascending=True, thresholds=(2, 7))",
             )
 
         with self.subTest(thresholds=(6, 1, 2)):
-            splitter = labelset_split.ThresholdHoldout(6, 1, 2)
+            splitter = split.ThresholdHoldout(6, 1, 2)
             self.assertEqual(
                 repr(splitter),
                 "ThresholdHoldout(ascending=True, thresholds=(1, 2, 6))",
             )
 
         with self.subTest(thresholds=(6, 1, 2), ascending=False):
-            splitter = labelset_split.ThresholdHoldout(6, 1, 2, ascending=False)
+            splitter = split.ThresholdHoldout(6, 1, 2, ascending=False)
             self.assertEqual(
                 repr(splitter),
                 "ThresholdHoldout(ascending=False, thresholds=(6, 2, 1))",
@@ -501,7 +501,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
     def test_threshold_holdout_raises(self):
         with self.assertRaises(ValueError) as context:
-            labelset_split.ThresholdHoldout(5, 4, 5)
+            split.ThresholdHoldout(5, 4, 5)
         self.assertEqual(
             str(context.exception),
             "Cannot have duplicated thresholds: 5 occured 2 times from "
@@ -509,33 +509,33 @@ class TestLabelsetSplit(unittest.TestCase):
         )
 
         with self.assertRaises(ValueError) as context:
-            labelset_split.ThresholdHoldout()
+            split.ThresholdHoldout()
         self.assertEqual(str(context.exception), "No thresholds specified")
 
         self.assertRaises(
             TypeError,
-            labelset_split.ThresholdHoldout,
+            split.ThresholdHoldout,
             5,
             ascending="False",
         )
 
         self.assertRaises(
             ValueError,
-            labelset_split.ThresholdHoldout,
+            split.ThresholdHoldout,
             5,
             ascending=None,
         )
 
         self.assertRaises(
             TypeError,
-            labelset_split.ThresholdHoldout,
+            split.ThresholdHoldout,
             "6",
         )
 
     def test_threshold_holdout(self):
         with self.subTest(thresholds=(4,)):
             y, masks, _ = self.lsc.split(
-                labelset_split.ThresholdHoldout(4),
+                split.ThresholdHoldout(4),
                 property_name="test_property",
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
@@ -550,7 +550,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
         with self.subTest(thresholds=(2, 7)):
             y, masks, _ = self.lsc.split(
-                labelset_split.ThresholdHoldout(2, 7),
+                split.ThresholdHoldout(2, 7),
                 property_name="test_property",
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
@@ -569,7 +569,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
         with self.subTest(thresholds=(6, 1, 2)):
             y, masks, _ = self.lsc.split(
-                labelset_split.ThresholdHoldout(6, 1, 2),
+                split.ThresholdHoldout(6, 1, 2),
                 property_name="test_property",
                 mask_names=["mask1", "mask2", "mask3", "mask4"],
             )
@@ -593,7 +593,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
         with self.subTest(thresholds=(5, 10, 20)):
             y, masks, _ = self.lsc.split(
-                labelset_split.ThresholdHoldout(5, 10, 20),
+                split.ThresholdHoldout(5, 10, 20),
                 property_name="test_property",
                 mask_names=["mask1", "mask2", "mask3", "mask4"],
             )
@@ -617,7 +617,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
         with self.subTest(thresholds=(-1)):
             y, masks, _ = self.lsc.split(
-                labelset_split.ThresholdHoldout(-1),
+                split.ThresholdHoldout(-1),
                 property_name="test_property",
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
@@ -632,7 +632,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
         with self.subTest(thresholds=(2, 7)):
             y, masks, _ = self.lsc.split(
-                labelset_split.ThresholdHoldout(2, 7),
+                split.ThresholdHoldout(2, 7),
                 property_name="test_property",
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
@@ -651,7 +651,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
         with self.subTest(thresholds=(5, 10, 20), ascending=False):
             y, masks, _ = self.lsc.split(
-                labelset_split.ThresholdHoldout(5, 10, 20, ascending=False),
+                split.ThresholdHoldout(5, 10, 20, ascending=False),
                 property_name="test_property",
                 mask_names=["mask1", "mask2", "mask3", "mask4"],
             )
@@ -674,13 +674,13 @@ class TestLabelsetSplit(unittest.TestCase):
             )
 
     def test_ratio_holdout_repr(self):
-        splitter = labelset_split.RatioHoldout(0.5, 0.5)
+        splitter = split.RatioHoldout(0.5, 0.5)
         self.assertEqual(
             repr(splitter),
             "RatioHoldout(ascending=True, ratios=(0.5, 0.5))",
         )
 
-        splitter = labelset_split.RatioHoldout(0.6, 0.2, 0.2, ascending=False)
+        splitter = split.RatioHoldout(0.6, 0.2, 0.2, ascending=False)
         self.assertEqual(
             repr(splitter),
             "RatioHoldout(ascending=False, ratios=(0.6, 0.2, 0.2))",
@@ -688,7 +688,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
     def test_ratio_holdout_raises(self):
         with self.assertRaises(ValueError) as context:
-            labelset_split.RatioHoldout(0.2, 0.5)
+            split.RatioHoldout(0.2, 0.5)
         self.assertEqual(
             str(context.exception),
             "Ratios must sum up to 1, specified ratios (0.2, 0.5) sum up "
@@ -696,14 +696,14 @@ class TestLabelsetSplit(unittest.TestCase):
         )
 
         with self.assertRaises(ValueError) as context:
-            labelset_split.RatioHoldout(0.2, 0.8, 0)
+            split.RatioHoldout(0.2, 0.8, 0)
         self.assertEqual(
             str(context.exception),
             "Ratios must be strictly positive: got (0.2, 0.8, 0)",
         )
 
         with self.assertRaises(ValueError) as context:
-            labelset_split.RatioHoldout(0.2, 0.9, -0.1)
+            split.RatioHoldout(0.2, 0.9, -0.1)
         self.assertEqual(
             str(context.exception),
             "Ratios must be strictly positive: got (0.2, 0.9, -0.1)",
@@ -712,7 +712,7 @@ class TestLabelsetSplit(unittest.TestCase):
     def test_ratio_holdout(self):
         with self.subTest(ratios=(0.5, 0.5)):
             y, masks, _ = self.lsc.split(
-                labelset_split.RatioHoldout(0.5, 0.5),
+                split.RatioHoldout(0.5, 0.5),
                 property_name="test_property",
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
@@ -727,7 +727,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
         with self.subTest(ratios=(0.6, 0.2, 0.2)):
             y, masks, _ = self.lsc.split(
-                labelset_split.RatioHoldout(0.6, 0.2, 0.2),
+                split.RatioHoldout(0.6, 0.2, 0.2),
                 property_name="test_property",
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
@@ -746,7 +746,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
         with self.subTest(ratios=(0.6, 0.2, 0.2), ascending=False):
             y, masks, _ = self.lsc.split(
-                labelset_split.RatioHoldout(0.6, 0.2, 0.2, ascending=False),
+                split.RatioHoldout(0.6, 0.2, 0.2, ascending=False),
                 property_name="test_property",
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
@@ -766,7 +766,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
 class TestFilter(unittest.TestCase):
     def setUp(self):
-        self.lsc = labelset_collection.SplitLSC()
+        self.lsc = LabelsetCollection()
         self.lsc.add_labelset(["a", "b", "c"], "Group1")
         self.lsc.add_labelset(["b", "d"], "Group2")
         self.lsc.add_labelset(["e", "f", "g"], "Group3")
@@ -780,7 +780,7 @@ class TestFilter(unittest.TestCase):
         target_lst = ["a", "b", "c"]
         with self.subTest(target_lst=target_lst):
             lsc = self.lsc.apply(
-                labelset_filter.EntityExistanceFilter(target_lst=target_lst),
+                filters.EntityExistanceFilter(target_lst=target_lst),
                 inplace=False,
             )
             self.assertEqual(
@@ -796,7 +796,7 @@ class TestFilter(unittest.TestCase):
             remove_specified=remove_specified,
         ):
             lsc = self.lsc.apply(
-                labelset_filter.EntityExistanceFilter(
+                filters.EntityExistanceFilter(
                     target_lst=target_lst,
                     remove_specified=remove_specified,
                 ),
@@ -815,7 +815,7 @@ class TestFilter(unittest.TestCase):
             remove_specified=remove_specified,
         ):
             lsc = self.lsc.apply(
-                labelset_filter.EntityExistanceFilter(
+                filters.EntityExistanceFilter(
                     target_lst=target_lst,
                     remove_specified=remove_specified,
                 ),
@@ -837,7 +837,7 @@ class TestFilter(unittest.TestCase):
             remove_specified=remove_specified,
         ):
             lsc = self.lsc.apply(
-                labelset_filter.EntityExistanceFilter(
+                filters.EntityExistanceFilter(
                     target_lst=target_lst,
                     remove_specified=remove_specified,
                 ),
@@ -856,7 +856,7 @@ class TestFilter(unittest.TestCase):
             remove_specified=remove_specified,
         ):
             lsc = self.lsc.apply(
-                labelset_filter.EntityExistanceFilter(
+                filters.EntityExistanceFilter(
                     target_lst=target_lst,
                     remove_specified=remove_specified,
                 ),
@@ -875,7 +875,7 @@ class TestFilter(unittest.TestCase):
         target_lst = ["Group1", "Group2"]
         with self.subTest(target_lst=target_lst):
             lsc = self.lsc.apply(
-                labelset_filter.LabelsetExistanceFilter(target_lst=target_lst),
+                filters.LabelsetExistanceFilter(target_lst=target_lst),
                 inplace=False,
             )
             self.assertEqual(
@@ -888,7 +888,7 @@ class TestFilter(unittest.TestCase):
         remove_specified = False
         with self.subTest(target_lst=target_lst):
             lsc = self.lsc.apply(
-                labelset_filter.LabelsetExistanceFilter(
+                filters.LabelsetExistanceFilter(
                     target_lst=target_lst,
                     remove_specified=remove_specified,
                 ),
@@ -904,7 +904,7 @@ class TestFilter(unittest.TestCase):
         remove_specified = True
         with self.subTest(target_lst=target_lst):
             lsc = self.lsc.apply(
-                labelset_filter.LabelsetExistanceFilter(
+                filters.LabelsetExistanceFilter(
                     target_lst=target_lst,
                     remove_specified=remove_specified,
                 ),
@@ -923,7 +923,7 @@ class TestFilter(unittest.TestCase):
         remove_specified = False
         with self.subTest(target_lst=target_lst):
             lsc = self.lsc.apply(
-                labelset_filter.LabelsetExistanceFilter(
+                filters.LabelsetExistanceFilter(
                     target_lst=target_lst,
                     remove_specified=remove_specified,
                 ),
@@ -936,7 +936,7 @@ class TestFilter(unittest.TestCase):
         remove_specified = True
         with self.subTest(target_lst=target_lst):
             lsc = self.lsc.apply(
-                labelset_filter.LabelsetExistanceFilter(
+                filters.LabelsetExistanceFilter(
                     target_lst=target_lst,
                     remove_specified=remove_specified,
                 ),
@@ -954,7 +954,7 @@ class TestFilter(unittest.TestCase):
     def test_EntityRangeFilterNoccur(self):
         with self.subTest(min_val=2):
             lsc = self.lsc.apply(
-                labelset_filter.EntityRangeFilterNoccur(min_val=2),
+                filters.EntityRangeFilterNoccur(min_val=2),
                 inplace=False,
             )
             self.assertEqual(
@@ -964,7 +964,7 @@ class TestFilter(unittest.TestCase):
             self.assertEqual(lsc.entity.map, {"a": 0, "b": 1, "c": 2, "f": 3})
         with self.subTest(min_val=3):
             lsc = self.lsc.apply(
-                labelset_filter.EntityRangeFilterNoccur(min_val=3),
+                filters.EntityRangeFilterNoccur(min_val=3),
                 inplace=False,
             )
             self.assertEqual(
@@ -974,7 +974,7 @@ class TestFilter(unittest.TestCase):
             self.assertEqual(lsc.entity.map, {"a": 0})
         with self.subTest(min_val=4):
             lsc = self.lsc.apply(
-                labelset_filter.EntityRangeFilterNoccur(min_val=4),
+                filters.EntityRangeFilterNoccur(min_val=4),
                 inplace=False,
             )
             self.assertEqual(
@@ -984,7 +984,7 @@ class TestFilter(unittest.TestCase):
             self.assertEqual(lsc.entity.map, {})
         with self.subTest(max_val=2):
             lsc = self.lsc.apply(
-                labelset_filter.EntityRangeFilterNoccur(max_val=2),
+                filters.EntityRangeFilterNoccur(max_val=2),
                 inplace=False,
             )
             self.assertEqual(
@@ -997,7 +997,7 @@ class TestFilter(unittest.TestCase):
             )
         with self.subTest(max_val=1):
             lsc = self.lsc.apply(
-                labelset_filter.EntityRangeFilterNoccur(max_val=1),
+                filters.EntityRangeFilterNoccur(max_val=1),
                 inplace=False,
             )
             self.assertEqual(
@@ -1007,7 +1007,7 @@ class TestFilter(unittest.TestCase):
             self.assertEqual(lsc.entity.map, {"d": 0, "e": 1, "g": 2, "h": 3})
         with self.subTest(max_val=0):
             lsc = self.lsc.apply(
-                labelset_filter.EntityRangeFilterNoccur(max_val=0),
+                filters.EntityRangeFilterNoccur(max_val=0),
                 inplace=False,
             )
             self.assertEqual(
@@ -1017,7 +1017,7 @@ class TestFilter(unittest.TestCase):
             self.assertEqual(lsc.entity.map, {})
         with self.subTest(min_val=2, max_val=2):
             lsc = self.lsc.apply(
-                labelset_filter.EntityRangeFilterNoccur(min_val=2, max_val=2),
+                filters.EntityRangeFilterNoccur(min_val=2, max_val=2),
                 inplace=False,
             )
             self.assertEqual(
@@ -1029,7 +1029,7 @@ class TestFilter(unittest.TestCase):
     def test_LabelsetRangeFilterSize(self):
         with self.subTest(min_val=3):
             lsc = self.lsc.apply(
-                labelset_filter.LabelsetRangeFilterSize(min_val=3),
+                filters.LabelsetRangeFilterSize(min_val=3),
                 inplace=False,
             )
             self.assertEqual(lsc.label_ids, ["Group1", "Group3", "Group4"])
@@ -1043,7 +1043,7 @@ class TestFilter(unittest.TestCase):
             )
         with self.subTest(min_val=4):
             lsc = self.lsc.apply(
-                labelset_filter.LabelsetRangeFilterSize(min_val=4),
+                filters.LabelsetRangeFilterSize(min_val=4),
                 inplace=False,
             )
             self.assertEqual(lsc.label_ids, [])
@@ -1051,7 +1051,7 @@ class TestFilter(unittest.TestCase):
             self.assertEqual(lsc.entity.map, {})
         with self.subTest(max_val=2):
             lsc = self.lsc.apply(
-                labelset_filter.LabelsetRangeFilterSize(max_val=2),
+                filters.LabelsetRangeFilterSize(max_val=2),
                 inplace=False,
             )
             self.assertEqual(lsc.label_ids, ["Group2", "Group5"])
@@ -1059,7 +1059,7 @@ class TestFilter(unittest.TestCase):
             self.assertEqual(lsc.entity.map, {"a": 0, "b": 1, "d": 2, "h": 3})
         with self.subTest(max_val=1):
             lsc = self.lsc.apply(
-                labelset_filter.LabelsetRangeFilterSize(max_val=1),
+                filters.LabelsetRangeFilterSize(max_val=1),
                 inplace=False,
             )
             self.assertEqual(lsc.label_ids, [])
@@ -1069,7 +1069,7 @@ class TestFilter(unittest.TestCase):
     def test_LabelsetRangeFilterJaccard(self):
         with self.subTest(min_val=0.9):
             lsc = self.lsc.apply(
-                labelset_filter.LabelsetRangeFilterJaccard(max_val=0.9),
+                filters.LabelsetRangeFilterJaccard(max_val=0.9),
                 inplace=False,
             )
             self.assertEqual(
@@ -1078,7 +1078,7 @@ class TestFilter(unittest.TestCase):
             )
         with self.subTest(min_val=0.4):
             lsc = self.lsc.apply(
-                labelset_filter.LabelsetRangeFilterJaccard(max_val=0.4),
+                filters.LabelsetRangeFilterJaccard(max_val=0.4),
                 inplace=False,
             )
             self.assertEqual(
@@ -1087,7 +1087,7 @@ class TestFilter(unittest.TestCase):
             )
         with self.subTest(min_val=0.2):
             lsc = self.lsc.apply(
-                labelset_filter.LabelsetRangeFilterJaccard(max_val=0.2),
+                filters.LabelsetRangeFilterJaccard(max_val=0.2),
                 inplace=False,
             )
             self.assertEqual(
@@ -1096,7 +1096,7 @@ class TestFilter(unittest.TestCase):
             )
         with self.subTest(min_val=0):
             lsc = self.lsc.apply(
-                labelset_filter.LabelsetRangeFilterJaccard(max_val=0),
+                filters.LabelsetRangeFilterJaccard(max_val=0),
                 inplace=False,
             )
             self.assertEqual(
@@ -1113,7 +1113,7 @@ class TestFilter(unittest.TestCase):
             splitter._test_index = splitter.custom_test_index
             self.lsc.valsplit = splitter
             lsc = self.lsc.apply(
-                labelset_filter.LabelsetRangeFilterTrainTestPos(min_val=1),
+                filters.LabelsetRangeFilterTrainTestPos(min_val=1),
                 inplace=False,
             )
             self.assertEqual(lsc.label_ids, ["Group4", "Group5"])
@@ -1131,7 +1131,7 @@ class TestFilter(unittest.TestCase):
             splitter._test_index = splitter.custom_test_index
             self.lsc.valsplit = splitter
             lsc = self.lsc.apply(
-                labelset_filter.LabelsetRangeFilterTrainTestPos(min_val=1),
+                filters.LabelsetRangeFilterTrainTestPos(min_val=1),
                 inplace=False,
             )
             self.assertEqual(lsc.label_ids, ["Group1", "Group3", "Group4"])
@@ -1162,7 +1162,7 @@ class TestFilter(unittest.TestCase):
             splitter._valid_index = splitter.custom_valid_index
             self.lsc.valsplit = splitter
             lsc = self.lsc.apply(
-                labelset_filter.LabelsetRangeFilterTrainTestPos(min_val=1),
+                filters.LabelsetRangeFilterTrainTestPos(min_val=1),
                 inplace=False,
             )
             self.assertEqual(lsc.label_ids, ["Group1"])
@@ -1173,7 +1173,7 @@ class TestFilter(unittest.TestCase):
         # p-val threshold set to 0.5 since most large,
         # group1-group4 smallest with pval = 0.286
         self.lsc.apply(
-            labelset_filter.NegativeFilterHypergeom(p_thresh=0.5),
+            filters.NegativeFilterHypergeom(p_thresh=0.5),
             inplace=True,
         )
         # test wheter negative selected correctly for group1,
@@ -1183,14 +1183,14 @@ class TestFilter(unittest.TestCase):
         # increase p-val thtreshold to 0.7 will also include group2 and group3,
         # where pval = 0.643
         self.lsc.apply(
-            labelset_filter.NegativeFilterHypergeom(p_thresh=0.7),
+            filters.NegativeFilterHypergeom(p_thresh=0.7),
             inplace=True,
         )
         self.assertEqual(self.lsc.get_negative("Group1"), {"e", "g"})
 
         # set p-val threshold to be greater than 1 -> no negative left
         self.lsc.apply(
-            labelset_filter.NegativeFilterHypergeom(p_thresh=1.1),
+            filters.NegativeFilterHypergeom(p_thresh=1.1),
             inplace=True,
         )
         self.assertEqual(self.lsc.get_negative("Group1"), set())

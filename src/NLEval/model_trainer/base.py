@@ -111,7 +111,7 @@ class BaseTrainer:
             y: Label array with the shape of (n_tot_samples, n_classes) or
                 (n_tot_samples,) if n_classes = 1.
             masks: Masks for splitting data, see the ``split`` method in
-                ``label.labelset_collection.LSC`` for moer info.
+                ``label.collection.LabelsetCollection`` for moer info.
             split_idx: Which split to use for training and evaluation.
             train_on: Which mask to use for training.
 

@@ -5,8 +5,11 @@ import numpy as np
 from scipy.stats import hypergeom
 
 __all__ = [
+    "EntityExistanceFilter",
+    "LabelsetExistanceFilter",
     "EntityRangeFilterNoccur",
     "LabelsetRangeFilterSize",
+    "LabelsetRangeFilterJaccard",
     "LabelsetRangeFilterTrainTestPos",
     "NegativeFilterHypergeom",
 ]
@@ -28,7 +31,7 @@ class BaseFilter:
             corresponding values
         get_mod_fun: return a function that modifies an instance
 
-    All three 'get' methods above take a `labelset_collection` object as input
+    All three 'get' methods above take a `LabelsetCollection` object as input
 
     """
 
