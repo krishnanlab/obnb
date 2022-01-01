@@ -81,7 +81,7 @@ class IDlst:
         else:
             raise TypeError(
                 f"ID key(s) must be stirng or iterables of "
-                f"string, not {type(ID)!r}",
+                f"string, not {type(identifier)!r}",
             )
 
     def _getitem_sinlge(self, identifier):

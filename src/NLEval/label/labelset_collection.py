@@ -337,6 +337,7 @@ class LSC(idhandler.IDprop):
         if labelset_name is not None:
             y_out = np.zeros(len(target_ids), dtype=bool)
         else:
+            # TODO: ravel if y.shape[1] = 1?
             y_out = np.zeros((len(target_ids), y.shape[1]), dtype=bool)
         y_out[to_target_idx] = y
 

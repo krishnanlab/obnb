@@ -56,6 +56,21 @@ class DenseGraph(BaseGraph):
                 )
         self._mat = val.copy()
 
+    def propagate(self, seed: np.ndarray) -> np.ndarray:
+        """Propagate label informmation.
+
+        Args:
+            seeds: 1-dimensinoal numpy array where each entry is the seed
+                information for a specific node.
+
+        Raises:
+            ValueError: If ``seed`` is not a 1-dimensional array with the size
+                of number of the nodes in the graph.
+
+        """
+        checkers.checkNumpyArrayShape("seed", self.size, seed)
+        return np.matmul(self.mat, seed)
+
     def get_edge(self, node_id1, node_id2):
         """Return edge weight between node_id1 and node_id2.
 
@@ -129,6 +144,7 @@ class FeatureVec(DenseGraph):
 
     def __init__(self, dim=None):
         """Initialize FeatureVec object."""
+        # TODO: create from dict
         super().__init__()
         self.dim = dim
 
@@ -190,6 +206,7 @@ class FeatureVec(DenseGraph):
 
     def add_vec(self, node_id, vec):
         """Add a new feature vector."""
+        # TODO: allow list
         checkers.checkNumpyArrayNDim("vec", 1, vec)
         checkers.checkNumpyArrayIsNumeric("vec", vec)
 

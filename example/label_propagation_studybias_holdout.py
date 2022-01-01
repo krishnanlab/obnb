@@ -1,12 +1,13 @@
 import os.path as osp
 
 import numpy as np
+from NLEval import model
 from NLEval.graph.DenseGraph import DenseGraph
 from NLEval.label import labelset_filter
 from NLEval.label.labelset_collection import LSC
 from NLEval.label.labelset_split import RatioHoldout
-from NLEval.model_trainer.supervised_learning import SupervisedLearningTrainer
-from sklearn.linear_model import LogisticRegression
+from NLEval.model.label_propagation import OneHopPropagation
+from NLEval.model_trainer.label_propagation import LabelPropagationTrainer
 from sklearn.metrics import roc_auc_score as auroc
 
 NETWORK = "STRING"
@@ -36,11 +37,11 @@ lsc.load_entity_properties(PROPERTY_FP, "PubMed Count", 0, int)
 splitter = RatioHoldout(0.6, 0.4, ascending=False)
 
 # Select model
-mdl = LogisticRegression(penalty="l2", solver="lbfgs", n_jobs=1)
+mdl = OneHopPropagation()
 
 # Setup trainer, use auroc as the evaluation metric
 metrics = {"auroc": auroc}
-trainer = SupervisedLearningTrainer(metrics, g)
+trainer = LabelPropagationTrainer(metrics, g)
 
 scores = []
 for label_id in lsc.label_ids:
@@ -65,7 +66,7 @@ NETWORK='STRING'
 LABEL='KEGGBP'
 Number of labelsets before filtering: 139
 Number of labelsets after filtering: 58
-Average test score = 0.9881, std = 0.0125
+Average test score = 0.9530, std = 0.0406
 --------------------------------------------------------------------------------
 """,
 )

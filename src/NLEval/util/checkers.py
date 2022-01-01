@@ -21,9 +21,12 @@ __all__ = [
     "NUMERIC_TYPE",
     "NUMSTRING_TYPE",
     "ITERABLE_TYPE",
+    "checkValuePositive",
+    "checkValueNonnegative",
     "checkType",
     "checkTypeErrNone",
     "checkTypeAllowNone",
+    "checkNullableType",
     "checkTypesInIterable",
     "checkTypesInList",
     "checkTypesInSet",
@@ -39,6 +42,18 @@ FLOAT_TYPE = (float, np.float32, np.float64, np.float128)
 NUMERIC_TYPE = INT_TYPE + FLOAT_TYPE
 NUMSTRING_TYPE = INT_TYPE + FLOAT_TYPE + (str,)
 ITERABLE_TYPE = Iterable
+
+
+def checkValuePositive(name, val):
+    """Check if the input value is positive."""
+    if not val > 0:
+        raise ValueError(f"{name!r} should be positive, got {val}")
+
+
+def checkValueNonnegative(name, val):
+    """Check if the input value is non-negative."""
+    if not val >= 0:
+        raise ValueError(f"{name!r} should be non-negative, got {val}")
 
 
 def checkType(name, targetType, val):
@@ -76,6 +91,12 @@ def checkTypeAllowNone(name, targetType, val):
     """Type cheking with `checkType` and allow `None` for `val`."""
     if val is not None:
         checkType(name, targetType, val)
+
+
+def checkNullableType(name, targetType, val):
+    """Type cheking with `checkType` and allow `None` for `val`."""
+    # TODO: Update checkTypeAllowNone to checkNullableType
+    checkTypeAllowNone(name, targetType, val)
 
 
 def checkTypesInIterable(name, targetType, val):
