@@ -144,6 +144,7 @@ class FeatureVec(DenseGraph):
 
     def __init__(self, dim=None):
         """Initialize FeatureVec object."""
+        # TODO: create from dict
         super().__init__()
         self.dim = dim
 
@@ -205,6 +206,7 @@ class FeatureVec(DenseGraph):
 
     def add_vec(self, node_id, vec):
         """Add a new feature vector."""
+        # TODO: allow list
         checkers.checkNumpyArrayNDim("vec", 1, vec)
         checkers.checkNumpyArrayIsNumeric("vec", vec)
 
