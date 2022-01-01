@@ -4,8 +4,8 @@ import numpy as np
 from NLEval import model
 from NLEval import valsplit
 from NLEval.graph import DenseGraph
-from NLEval.label import labelset_collection
-from NLEval.label import labelset_filter
+from NLEval.label import filters
+from NLEval.label.collection import SplitLSC
 from sklearn.metrics import roc_auc_score as auroc
 
 DATA_DIR = osp.join(osp.pardir, "data")
@@ -14,9 +14,9 @@ LABEL_FP = osp.join(DATA_DIR, "labels", "KEGGBP.gmt")
 PROPERTY_FP = osp.join(DATA_DIR, "properties", "pubcnt.txt")
 
 g = DenseGraph.from_edglst(GRAPH_FP, weighted=True, directed=False)
-lsc = labelset_collection.SplitLSC.from_gmt(LABEL_FP)
-lsc.apply(labelset_filter.EntityExistanceFilter(g.idmap.lst), inplace=True)
-lsc.apply(labelset_filter.LabelsetRangeFilterSize(min_val=50), inplace=True)
+lsc = SplitLSC.from_gmt(LABEL_FP)
+lsc.apply(filters.EntityExistenceFilter(g.idmap.lst), inplace=True)
+lsc.apply(filters.LabelsetRangeFilterSize(min_val=50), inplace=True)
 lsc.load_entity_properties(PROPERTY_FP, "Pubmed Count", 0, int)
 
 # lsc.valsplit = valsplit.Holdout.BinHold(3, shuffle=True)

@@ -3,9 +3,9 @@ import os.path as osp
 import numpy as np
 from NLEval import model
 from NLEval.graph import DenseGraph
-from NLEval.label import labelset_filter
-from NLEval.label.labelset_collection import LSC
-from NLEval.label.labelset_split import RatioHoldout
+from NLEval.label import filters
+from NLEval.label import LabelsetCollection
+from NLEval.label.split import RatioHoldout
 from NLEval.model.label_propagation import OneHopPropagation
 from NLEval.model_trainer.label_propagation import LabelPropagationTrainer
 from sklearn.metrics import roc_auc_score as auroc
@@ -21,12 +21,12 @@ print(f"{NETWORK=}\n{LABEL=}")
 
 # Load data
 g = DenseGraph.from_edglst(GRAPH_FP, weighted=True, directed=False)
-lsc = LSC.from_gmt(LABEL_FP)
+lsc = LabelsetCollection.from_gmt(LABEL_FP)
 
 # Filter labels
 print(f"Number of labelsets before filtering: {len(lsc.label_ids)}")
-lsc.apply(labelset_filter.EntityExistanceFilter(g.idmap.lst), inplace=True)
-lsc.apply(labelset_filter.LabelsetRangeFilterSize(min_val=50), inplace=True)
+lsc.apply(filters.EntityExistenceFilter(g.idmap.lst), inplace=True)
+lsc.apply(filters.LabelsetRangeFilterSize(min_val=50), inplace=True)
 print(f"Number of labelsets after filtering: {len(lsc.label_ids)}")
 
 # Load gene properties for study-bias holdout

@@ -775,12 +775,12 @@ class TestFilter(unittest.TestCase):
         # Noccur=[3, 2, 2, 1, 1, 2, 1, 1]
         # Size=[3, 2, 3, 3, 2]
 
-    def test_EntityExistanceFilter(self):
+    def test_EntityExistenceFilter(self):
         # make sure default options of remove_specified=False work
         target_lst = ["a", "b", "c"]
         with self.subTest(target_lst=target_lst):
             lsc = self.lsc.apply(
-                filters.EntityExistanceFilter(target_lst=target_lst),
+                filters.EntityExistenceFilter(target_lst=target_lst),
                 inplace=False,
             )
             self.assertEqual(
@@ -796,7 +796,7 @@ class TestFilter(unittest.TestCase):
             remove_specified=remove_specified,
         ):
             lsc = self.lsc.apply(
-                filters.EntityExistanceFilter(
+                filters.EntityExistenceFilter(
                     target_lst=target_lst,
                     remove_specified=remove_specified,
                 ),
@@ -815,7 +815,7 @@ class TestFilter(unittest.TestCase):
             remove_specified=remove_specified,
         ):
             lsc = self.lsc.apply(
-                filters.EntityExistanceFilter(
+                filters.EntityExistenceFilter(
                     target_lst=target_lst,
                     remove_specified=remove_specified,
                 ),
@@ -837,7 +837,7 @@ class TestFilter(unittest.TestCase):
             remove_specified=remove_specified,
         ):
             lsc = self.lsc.apply(
-                filters.EntityExistanceFilter(
+                filters.EntityExistenceFilter(
                     target_lst=target_lst,
                     remove_specified=remove_specified,
                 ),
@@ -856,7 +856,7 @@ class TestFilter(unittest.TestCase):
             remove_specified=remove_specified,
         ):
             lsc = self.lsc.apply(
-                filters.EntityExistanceFilter(
+                filters.EntityExistenceFilter(
                     target_lst=target_lst,
                     remove_specified=remove_specified,
                 ),
@@ -871,11 +871,11 @@ class TestFilter(unittest.TestCase):
                 {"a": 0, "c": 1, "d": 2, "f": 3, "g": 4},
             )
 
-    def test_LabelsetExistanceFilter(self):
+    def test_LabelsetExistenceFilter(self):
         target_lst = ["Group1", "Group2"]
         with self.subTest(target_lst=target_lst):
             lsc = self.lsc.apply(
-                filters.LabelsetExistanceFilter(target_lst=target_lst),
+                filters.LabelsetExistenceFilter(target_lst=target_lst),
                 inplace=False,
             )
             self.assertEqual(
@@ -888,7 +888,7 @@ class TestFilter(unittest.TestCase):
         remove_specified = False
         with self.subTest(target_lst=target_lst):
             lsc = self.lsc.apply(
-                filters.LabelsetExistanceFilter(
+                filters.LabelsetExistenceFilter(
                     target_lst=target_lst,
                     remove_specified=remove_specified,
                 ),
@@ -904,7 +904,7 @@ class TestFilter(unittest.TestCase):
         remove_specified = True
         with self.subTest(target_lst=target_lst):
             lsc = self.lsc.apply(
-                filters.LabelsetExistanceFilter(
+                filters.LabelsetExistenceFilter(
                     target_lst=target_lst,
                     remove_specified=remove_specified,
                 ),
@@ -923,7 +923,7 @@ class TestFilter(unittest.TestCase):
         remove_specified = False
         with self.subTest(target_lst=target_lst):
             lsc = self.lsc.apply(
-                filters.LabelsetExistanceFilter(
+                filters.LabelsetExistenceFilter(
                     target_lst=target_lst,
                     remove_specified=remove_specified,
                 ),
@@ -936,7 +936,7 @@ class TestFilter(unittest.TestCase):
         remove_specified = True
         with self.subTest(target_lst=target_lst):
             lsc = self.lsc.apply(
-                filters.LabelsetExistanceFilter(
+                filters.LabelsetExistenceFilter(
                     target_lst=target_lst,
                     remove_specified=remove_specified,
                 ),
@@ -1169,11 +1169,11 @@ class TestFilter(unittest.TestCase):
             self.assertEqual(lsc.prop["Labelset"], [{"a", "b", "c"}])
             self.assertEqual(lsc.entity.map, {"a": 0, "b": 1, "c": 2})
 
-    def test_NegativeFilterHypergeom(self):
+    def test_NegativeGeneratorHypergeom(self):
         # p-val threshold set to 0.5 since most large,
         # group1-group4 smallest with pval = 0.286
         self.lsc.apply(
-            filters.NegativeFilterHypergeom(p_thresh=0.5),
+            filters.NegativeGeneratorHypergeom(p_thresh=0.5),
             inplace=True,
         )
         # test wheter negative selected correctly for group1,
@@ -1183,14 +1183,14 @@ class TestFilter(unittest.TestCase):
         # increase p-val thtreshold to 0.7 will also include group2 and group3,
         # where pval = 0.643
         self.lsc.apply(
-            filters.NegativeFilterHypergeom(p_thresh=0.7),
+            filters.NegativeGeneratorHypergeom(p_thresh=0.7),
             inplace=True,
         )
         self.assertEqual(self.lsc.get_negative("Group1"), {"e", "g"})
 
         # set p-val threshold to be greater than 1 -> no negative left
         self.lsc.apply(
-            filters.NegativeFilterHypergeom(p_thresh=1.1),
+            filters.NegativeGeneratorHypergeom(p_thresh=1.1),
             inplace=True,
         )
         self.assertEqual(self.lsc.get_negative("Group1"), set())

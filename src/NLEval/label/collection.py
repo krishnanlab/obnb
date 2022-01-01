@@ -10,6 +10,7 @@ from typing import Tuple
 
 import numpy as np
 from NLEval.label import filters
+from NLEval.label.filters.base import BaseFilter
 from NLEval.util import checkers
 from NLEval.util import idhandler
 from NLEval.util.deprecated import Deprecated
@@ -358,7 +359,7 @@ class LabelsetCollection(idhandler.IDprop):
         """
         checkers.checkType(
             "filters",
-            filters.BaseFilter,
+            BaseFilter,
             filter_func,
         )
         checkers.checkType("inplace", bool, inplace)

@@ -4,8 +4,8 @@ import numpy as np
 from NLEval import metrics
 from NLEval import model
 from NLEval.graph import SparseGraph
-from NLEval.label import labelset_collection
-from NLEval.label import labelset_filter
+from NLEval.label import filters
+from NLEval.label.collection import SplitLSC
 from NLEval.util.parallel import ParDatExe
 from NLEval.valsplit.Interface import SklSKF
 
@@ -21,16 +21,16 @@ score_cutoff = 1.2  # minimum score required for prediction
 progressbar = True
 
 g = SparseGraph.from_edglst(GRAPH_FP, weighted=False, directed=False)
-lsc = labelset_collection.SplitLSC.from_gmt(LABEL_FP)
+lsc = SplitLSC.from_gmt(LABEL_FP)
 lsc.valsplit = SklSKF(shuffle=True, skl_kws={"n_splits": n_split})
 
-filters = [
-    labelset_filter.EntityExistanceFilter(target_lst=g.idmap.lst),
-    labelset_filter.LabelsetRangeFilterSize(min_val=min_labelset_size),
-    labelset_filter.NegativeFilterHypergeom(p_thresh=p_thresh),
+filter_list = [
+    filters.EntityExistenceFilter(target_lst=g.idmap.lst),
+    filters.LabelsetRangeFilterSize(min_val=min_labelset_size),
+    filters.NegativeFilterHypergeom(p_thresh=p_thresh),
 ]
 
-for filter_ in filters:
+for filter_ in filter_list:
     lsc.apply(filter_, inplace=True)
 print(
     f"Number of effective labelsets after filtering = {len(lsc.label_ids)}",

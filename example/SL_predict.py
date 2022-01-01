@@ -4,7 +4,7 @@ import numpy as np
 from NLEval import model
 from NLEval import valsplit
 from NLEval.graph import DenseGraph
-from NLEval.label import labelset_collection
+from NLEval.label.collection import SplitLSC
 from sklearn.metrics import roc_auc_score as auroc
 
 DATA_DIR = osp.join(osp.pardir, "data")
@@ -16,7 +16,7 @@ k = 50  # numbers of top genes to display
 
 # load graph and labelset collection
 g = DenseGraph.from_edglst(GRAPH_FP, weighted=True, directed=False)
-lsc = labelset_collection.SplitLSC.from_gmt(LABEL_FP)
+lsc = SplitLSC.from_gmt(LABEL_FP)
 
 # initialize model
 mdl = model.SupervisedLearning.LogReg(g, penalty="l2", solver="liblinear")
