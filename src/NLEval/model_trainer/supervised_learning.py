@@ -18,7 +18,7 @@ class SupervisedLearningTrainer(BaseTrainer):
         >>> trainer = SupervisedLearningTrainer(metrics, features)
         >>> results = trainer.train(LogisticRegression(), y, masks)
 
-        See the ``split`` method in ``label.labelset_collection.LSC`` for
+        See the ``split`` method in ``label.collection.LabelsetCollection`` for
         generating ``y`` and ``masks``.
 
     """

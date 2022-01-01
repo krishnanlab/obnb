@@ -4,6 +4,7 @@ import NLEval.model_trainer
 import numpy as np
 from NLEval import model_trainer
 from NLEval.graph import DenseGraph
+from NLEval.graph import FeatureVec
 from NLEval.model_trainer.base import BaseTrainer
 from NLEval.util.exceptions import IDNotExistError
 
@@ -18,11 +19,11 @@ class TestBaseTrainer(unittest.TestCase):
             "e": [5, 6, 7],
         }
         self.raw_data_list = list(map(raw_data.get, sorted(raw_data)))
-        self.features = DenseGraph.FeatureVec()
+        self.features = FeatureVec()
         for i, j in raw_data.items():
             self.features.add_vec(i, np.array(j))
 
-        self.graph = DenseGraph.DenseGraph()
+        self.graph = DenseGraph()
         for i in raw_data:
             self.graph.idmap.add_id(i)
 

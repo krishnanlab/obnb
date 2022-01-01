@@ -9,18 +9,17 @@ from typing import Set
 from typing import Tuple
 
 import numpy as np
-from NLEval.label import labelset_filter
+from NLEval.label import filters
+from NLEval.label.filters.base import BaseFilter
 from NLEval.util import checkers
 from NLEval.util import idhandler
 from NLEval.util.deprecated import Deprecated
 from NLEval.util.exceptions import IDExistsError
 
-__all__ = ["LSC", "SplitLSC"]
-
 Splitter = Callable[[np.ndarray, np.ndarray], Iterator[Tuple[np.ndarray, ...]]]
 
 
-class LSC(idhandler.IDprop):
+class LabelsetCollection(idhandler.IDprop):
     """Collection of labelsets.
 
     This class is used for managing collection of labelsets.
@@ -49,7 +48,7 @@ class LSC(idhandler.IDprop):
     """
 
     def __init__(self):
-        """Initialize LSC object."""
+        """Initialize LabelsetCollection object."""
         super().__init__()
         self.entity = idhandler.IDprop()
         self.entity.new_property("Noccur", 0, int)
@@ -346,7 +345,7 @@ class LSC(idhandler.IDprop):
     def apply(self, filter_func, inplace=False):
         """Apply filter to labelsets.
 
-        See `NLEval.label.labelset_filter` for more info.
+        See `NLEval.label.filters` for more info.
 
         Args:
             filter_func
@@ -359,8 +358,8 @@ class LSC(idhandler.IDprop):
 
         """
         checkers.checkType(
-            "labelset_filter",
-            labelset_filter.BaseFilter,
+            "filters",
+            BaseFilter,
             filter_func,
         )
         checkers.checkType("inplace", bool, inplace)
@@ -487,7 +486,7 @@ class LSC(idhandler.IDprop):
         return lsc
 
 
-class SplitLSC(LSC):
+class SplitLSC(LabelsetCollection):
     """Labelset collection equipped with split generator."""
 
     @Deprecated("SplitLSC is deprecated, use labelset_split instead")
@@ -530,7 +529,7 @@ class SplitLSC(LSC):
             # label_id_set = set(self.label_ids)
             self.valsplit.train_test_setup(self.entity, graph.idmap, prop_name)
             self.apply(
-                labelset_filter.LabelsetRangeFilterTrainTestPos(min_pos),
+                filters.LabelsetRangeFilterTrainTestPos(min_pos),
                 inplace=True,
             )
             # for i in label_id_set - set(self.label_ids):

@@ -1,8 +1,7 @@
 import numpy as np
-from NLEval.graph.BaseGraph import BaseGraph
 from NLEval.util import checkers
 
-__all__ = ["SparseGraph"]
+from .base import BaseGraph
 
 
 class SparseGraph(BaseGraph):

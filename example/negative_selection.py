@@ -1,7 +1,7 @@
 import os.path as osp
 
-from NLEval.label import labelset_collection
-from NLEval.label import labelset_filter
+from NLEval.label import filters
+from NLEval.label.collection import SplitLSC
 
 DATA_DIR = osp.join(osp.pardir, "data")
 LABEL_FP = osp.join(DATA_DIR, "labels", "KEGGBP.gmt")
@@ -10,10 +10,10 @@ LABEL_FP = osp.join(DATA_DIR, "labels", "KEGGBP.gmt")
 p_thresh = 0.05
 
 # construct labelset_collection object from KEGGBP.gmt
-lsc_orig = labelset_collection.SplitLSC.from_gmt(LABEL_FP)
+lsc_orig = SplitLSC.from_gmt(LABEL_FP)
 
 # apply negative selection filter
-lsc = lsc_orig.apply(labelset_filter.NegativeFilterHypergeom(p_thresh))
+lsc = lsc_orig.apply(filters.NegativeFilterHypergeom(p_thresh))
 
 print(f"p-val threshold = {p_thresh:.2f}")
 print(f"Compring the number of negatives before and after filtering")

@@ -1,7 +1,7 @@
 import warnings
 
 import numpy as np
-from NLEval.graph.BaseGraph import BaseGraph
+from NLEval.graph.base import BaseGraph
 from NLEval.util.checkers import checkValueNonnegative
 from NLEval.util.checkers import checkValuePositive
 from NLEval.util.exceptions import NotConvergedWarning

@@ -2,9 +2,9 @@ import os.path as osp
 
 import numpy as np
 from NLEval import model
-from NLEval.graph.SparseGraph import SparseGraph
-from NLEval.label import labelset_collection
-from NLEval.label import labelset_filter
+from NLEval.graph import SparseGraph
+from NLEval.label import filters
+from NLEval.label.collection import SplitLSC
 from NLEval.valsplit.Holdout import TrainValTest
 from sklearn.metrics import roc_auc_score as auroc
 
@@ -22,12 +22,12 @@ min_pos = 10
 print(f"Run test using network = {NETWORK!r} and dataset = {DATASET!r}")
 
 g = SparseGraph.from_edglst(GRAPH_FP, True, False)
-lsc = labelset_collection.SplitLSC.from_gmt(LABEL_FP)
+lsc = SplitLSC.from_gmt(LABEL_FP)
 
 print(f"Number of labelsets in original file: {len(lsc.label_ids)}")
 
-lsc.apply(labelset_filter.EntityExistanceFilter(g.idmap.lst), inplace=True)
-lsc.apply(labelset_filter.LabelsetRangeFilterSize(min_val=50), inplace=True)
+lsc.apply(filters.EntityExistenceFilter(g.idmap.lst), inplace=True)
+lsc.apply(filters.LabelsetRangeFilterSize(min_val=50), inplace=True)
 lsc.load_entity_properties(PROPERTY_FP, "Pubmed Count", 0, int)
 lsc.valsplit = TrainValTest(train_ratio=train_ratio, test_ratio=test_ratio)
 

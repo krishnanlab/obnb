@@ -8,6 +8,8 @@ import numpy as np
 from NLEval.util.checkers import checkTypeErrNone
 from NLEval.util.checkers import checkTypesInIterableErrEmpty
 
+__all__ = ["RatioHoldout", "ThresholdHoldout"]
+
 
 class BaseSplit:
     """BaseSplit object for splitting dataset.

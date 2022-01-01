@@ -1,11 +1,10 @@
 import numpy as np
-from NLEval.graph.BaseGraph import BaseGraph
-from NLEval.graph.SparseGraph import SparseGraph
 from NLEval.util import checkers
 from NLEval.util import idhandler
 from scipy.spatial import distance
 
-__all__ = ["DenseGraph", "FeatureVec"]
+from .base import BaseGraph
+from .sparse import SparseGraph
 
 
 class DenseGraph(BaseGraph):
@@ -251,6 +250,7 @@ class MultiFeatureVec(BaseGraph):
     """
 
     def __init__(self):
+        """Initialize MultiFeatureVec."""
         self.mat_list = []
         self.name_list = []
 
