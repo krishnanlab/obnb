@@ -4,9 +4,10 @@ from copy import deepcopy
 
 import numpy as np
 from commonvar import SAMPLE_DATA_DIR
-from NLEval.graph import BaseGraph
 from NLEval.graph import DenseGraph
+from NLEval.graph import FeatureVec
 from NLEval.graph import SparseGraph
+from NLEval.graph.base import BaseGraph
 from NLEval.util import idhandler
 from scipy.spatial import distance
 
@@ -14,7 +15,7 @@ from scipy.spatial import distance
 def shuffle_sparse(graph):
     n = graph.size
     shuffle_idx = np.random.choice(n, size=n, replace=False)
-    new_graph = SparseGraph.SparseGraph(
+    new_graph = SparseGraph(
         weighted=graph.weighted,
         directed=graph.directed,
     )
@@ -31,7 +32,7 @@ def shuffle_sparse(graph):
 def shuffle_dense(graph):
     n = graph.size
     shuffle_idx = np.random.choice(n, size=n, replace=False)
-    new_graph = DenseGraph.DenseGraph()
+    new_graph = DenseGraph()
 
     for i in shuffle_idx:
         node_id = graph.idmap.lst[i]
@@ -76,7 +77,7 @@ class test_case1:
 
 class TestBaseGraph(unittest.TestCase):
     def setUp(self):
-        self.graph = BaseGraph.BaseGraph()
+        self.graph = BaseGraph()
 
     def test_idmap_setter(self):
         with self.assertRaises(TypeError):
@@ -102,7 +103,7 @@ class TestSparseGraph(unittest.TestCase):
         cls.lst = [["1", "4"], ["2", "5"], ["5", "3", "2"]]
 
     def test_read_edglst_unweighted(self):
-        graph = SparseGraph.SparseGraph.from_edglst(
+        graph = SparseGraph.from_edglst(
             self.case.tu_fp,
             weighted=False,
             directed=False,
@@ -111,7 +112,7 @@ class TestSparseGraph(unittest.TestCase):
         self.assertEqual(graph.edge_data, self.case.data_unweighted)
 
     def test_read_edglst_weighted(self):
-        graph = SparseGraph.SparseGraph.from_edglst(
+        graph = SparseGraph.from_edglst(
             self.case.tw_fp,
             weighted=True,
             directed=False,
@@ -120,7 +121,7 @@ class TestSparseGraph(unittest.TestCase):
         self.assertEqual(graph.edge_data, self.case.data_weighted)
 
     def test_read_npymat_weighted(self):
-        graph = SparseGraph.SparseGraph.from_npy(
+        graph = SparseGraph.from_npy(
             self.case.data_mat,
             weighted=True,
             directed=False,
@@ -129,7 +130,7 @@ class TestSparseGraph(unittest.TestCase):
         self.assertEqual(graph.edge_data, self.case.data_weighted)
 
     def template_test_construct_adj_vec(self, weighted, directed, lst=None):
-        graph = SparseGraph.SparseGraph.from_npy(
+        graph = SparseGraph.from_npy(
             self.case.data_mat,
             weighted=weighted,
             directed=directed,
@@ -163,7 +164,7 @@ class TestSparseGraph(unittest.TestCase):
         )
 
     def test_eq(self):
-        graph = SparseGraph.SparseGraph.from_npy(
+        graph = SparseGraph.from_npy(
             self.case.data_mat,
             weighted=True,
             directed=False,
@@ -200,7 +201,7 @@ class TestDenseGraph(unittest.TestCase):
                     )
 
     def test_mat(self):
-        graph = DenseGraph.DenseGraph()
+        graph = DenseGraph()
         graph.idmap.add_id("a")
         graph.idmap.add_id("b")
         graph.mat = np.random.random((2, 2))
@@ -219,7 +220,7 @@ class TestDenseGraph(unittest.TestCase):
         graph.mat = np.random.random((2, 2))
 
     def test_get_edge(self):
-        graph = DenseGraph.DenseGraph.from_mat(self.case.data_mat)
+        graph = DenseGraph.from_mat(self.case.data_mat)
         mat = self.case.data_mat[:, 1:]
         for i in range(mat.shape[0]):
             for j in range(mat.shape[1]):
@@ -234,19 +235,19 @@ class TestDenseGraph(unittest.TestCase):
         mat1 = np.random.random((2, 2))
         mat2 = np.random.random((3, 2))
         # test consistent size input, using idmap --> success
-        DenseGraph.DenseGraph.construct_graph(idmap, mat1)
+        DenseGraph.construct_graph(idmap, mat1)
         # test consistent size input, using idlst --> success
-        DenseGraph.DenseGraph.construct_graph(idmap.lst, mat1)
+        DenseGraph.construct_graph(idmap.lst, mat1)
         # test inconsistent size input --> error
         self.assertRaises(
             ValueError,
-            DenseGraph.DenseGraph.construct_graph,
+            DenseGraph.construct_graph,
             idmap,
             mat2,
         )
 
     def test_from_edglst(self):
-        graph = DenseGraph.DenseGraph.from_edglst(
+        graph = DenseGraph.from_edglst(
             self.case.tw_fp,
             weighted=True,
             directed=False,
@@ -254,11 +255,11 @@ class TestDenseGraph(unittest.TestCase):
         self.check_graph(graph)
 
     def test_from_mat(self):
-        graph = DenseGraph.DenseGraph.from_mat(self.case.data_mat)
+        graph = DenseGraph.from_mat(self.case.data_mat)
         self.check_graph(graph)
 
     def test_eq(self):
-        graph = DenseGraph.DenseGraph.from_edglst(
+        graph = DenseGraph.from_edglst(
             self.case.tw_fp,
             weighted=True,
             directed=False,
@@ -282,7 +283,7 @@ class TestFeatureVec(unittest.TestCase):
         cls.vec_str = np.array(["1", "2", "3"])
 
     def test_dim(self):
-        graph = DenseGraph.FeatureVec()
+        graph = FeatureVec()
         # test type int --> success
         graph.dim = int(10)
         self.assertEqual(graph.dim, 10)
@@ -311,7 +312,7 @@ class TestFeatureVec(unittest.TestCase):
         self.assertEqual(graph.dim, 10)
 
     def test_mat(self):
-        graph = DenseGraph.FeatureVec()
+        graph = FeatureVec()
         graph.idmap.add_id("a")
         graph.idmap.add_id("b")
         graph.idmap.add_id("c")
@@ -332,7 +333,7 @@ class TestFeatureVec(unittest.TestCase):
         graph.mat = mat3
 
     def test_get_edge(self):
-        graph = DenseGraph.FeatureVec.from_emd(self.case.temd_fp)
+        graph = FeatureVec.from_emd(self.case.temd_fp)
         temd_data = np.loadtxt(
             os.path.join(SAMPLE_DATA_DIR, "toy1.emd"),
             delimiter=" ",
@@ -344,7 +345,7 @@ class TestFeatureVec(unittest.TestCase):
                 self.assertEqual(graph.get_edge(node_id1, node_id2), calculated)
 
     def test_add_vec(self):
-        graph = DenseGraph.FeatureVec(dim=4)
+        graph = FeatureVec(dim=4)
         # test if input vec must match preset dim
         self.assertRaises(ValueError, graph.add_vec, "a", self.vec_a)
         # test if only add ID when vec constructed successfully
@@ -359,7 +360,7 @@ class TestFeatureVec(unittest.TestCase):
         # test if only add_id when vec append to self.mat successfully
         self.assertEqual(graph.idmap.lst, ["a", "b", "c"])
 
-        graph = DenseGraph.FeatureVec()
+        graph = FeatureVec()
         self.assertTrue(graph.dim is None)
         graph.add_vec("a", self.vec_a)
         # test if automatically set dim correctly
@@ -369,7 +370,7 @@ class TestFeatureVec(unittest.TestCase):
         self.assertRaises(ValueError, graph.add_vec, "e", self.vec_a)
 
     def test_from_emd(self):
-        graph = DenseGraph.FeatureVec.from_emd(self.case.temd_fp)
+        graph = FeatureVec.from_emd(self.case.temd_fp)
         temd_data = np.loadtxt(
             os.path.join(SAMPLE_DATA_DIR, "toy1.emd"),
             delimiter=" ",

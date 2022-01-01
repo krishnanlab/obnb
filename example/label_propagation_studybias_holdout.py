@@ -2,7 +2,7 @@ import os.path as osp
 
 import numpy as np
 from NLEval import model
-from NLEval.graph.DenseGraph import DenseGraph
+from NLEval.graph import DenseGraph
 from NLEval.label import labelset_filter
 from NLEval.label.labelset_collection import LSC
 from NLEval.label.labelset_split import RatioHoldout

@@ -5,7 +5,7 @@ from typing import Optional
 from typing import Sequence
 
 import numpy as np
-from NLEval.graph.BaseGraph import BaseGraph
+from NLEval.graph.base import BaseGraph
 from NLEval.util.checkers import checkNumpyArrayShape
 
 

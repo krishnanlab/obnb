@@ -2,7 +2,7 @@ import os.path as osp
 
 import numpy as np
 from NLEval import model
-from NLEval.graph.SparseGraph import SparseGraph
+from NLEval.graph import SparseGraph
 from NLEval.label import labelset_collection
 from NLEval.label import labelset_filter
 from NLEval.valsplit.Holdout import TrainValTest

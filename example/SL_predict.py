@@ -3,7 +3,7 @@ import os.path as osp
 import numpy as np
 from NLEval import model
 from NLEval import valsplit
-from NLEval.graph.DenseGraph import DenseGraph
+from NLEval.graph import DenseGraph
 from NLEval.label import labelset_collection
 from sklearn.metrics import roc_auc_score as auroc
 

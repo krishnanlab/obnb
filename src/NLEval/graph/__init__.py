@@ -1,4 +1,5 @@
-from NLEval.graph import DenseGraph
-from NLEval.graph import SparseGraph
+from .dense import DenseGraph
+from .dense import FeatureVec
+from .sparse import SparseGraph
 
-__all__ = ["DenseGraph", "SparseGraph"]
+__all__ = ["DenseGraph", "FeatureVec", "SparseGraph"]

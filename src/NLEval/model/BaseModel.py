@@ -1,7 +1,7 @@
 import warnings
 
 import numpy as np
-from NLEval.graph import BaseGraph
+from NLEval.graph.base import BaseGraph
 from NLEval.util import checkers
 
 warnings.simplefilter("always", DeprecationWarning)
