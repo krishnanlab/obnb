@@ -44,7 +44,13 @@ mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=n_tasks)
 # Setup trainer, use auroc as the evaluation metric
 metrics = {"auroc": auroc}
 device = "cuda" if torch.cuda.is_available() else "cpu"
-trainer = SimpleGNNTrainer(metrics, g, device=device, metric_best="auroc")
+trainer = SimpleGNNTrainer(
+    metrics,
+    g,
+    device=device,
+    metric_best="auroc",
+    log=True,
+)
 
 y, masks, _ = lsc.split(
     splitter,
@@ -52,7 +58,7 @@ y, masks, _ = lsc.split(
     property_name="PubMed Count",
 )
 
-results = trainer.train(mdl, y, masks, epochs=200, log=True, lr=0.1)
+results = trainer.train(mdl, y, masks, epochs=200, lr=0.1)
 print(f"\nBest results:\n{results}\n")
 
 # Check to see if model is rewind back to the best model correctly

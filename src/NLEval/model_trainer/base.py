@@ -22,6 +22,7 @@ class BaseTrainer:
         metrics: Dict[str, Callable[[np.ndarray, np.ndarray], float]],
         graph: Optional[BaseGraph] = None,
         features: Optional[BaseGraph] = None,
+        train_on: str = "train",
     ):
         """Initialize BaseTraining.
 
@@ -29,12 +30,14 @@ class BaseTrainer:
             metrics: Dictionary of metrics used to train/evaluate the model.
             graph: Optional graph object.
             features: Optional node feature vectors.
+            train_on: Which mask to use for training.
 
         """
         self.metrics = metrics
         self.set_idmap(graph, features)
         self.graph = graph
         self.features = features
+        self.train_on = train_on
 
     @property
     def idmap(self):
@@ -102,7 +105,6 @@ class BaseTrainer:
         y: np.ndarray,
         masks: Dict[str, np.ndarray],
         split_idx: int = 0,
-        train_on: str = "train",
     ):
         """Train model and return metrics.
 
@@ -113,7 +115,6 @@ class BaseTrainer:
             masks: Masks for splitting data, see the ``split`` method in
                 ``label.collection.LabelsetCollection`` for moer info.
             split_idx: Which split to use for training and evaluation.
-            train_on: Which mask to use for training.
 
         """
         raise NotImplementedError(

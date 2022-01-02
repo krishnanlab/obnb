@@ -21,19 +21,33 @@ class GNNTrainer(BaseTrainer):
         metrics,
         graph,
         features=None,
+        train_on="train",
+        val_on="val",
         device: str = "cpu",
         metric_best: Optional[str] = None,
+        log: bool = False,
     ):
         """Initialize GNNTrainer.
 
         Args:
-            device (str): Training device.
-            metric_best (str): Metric used for determining the best model.
+            val_on (str): Validation mask name (default: :obj:`"train"`).
+            device (str): Training device (default: :obj:`"cpu"`).
+            metric_best (str): Metric used for determining the best model
+                (default: :obj:`None`).
+            log (bool): Print evaluation results at each evaluation epoch
+                if set to True (default: :obj:`False`)
 
         """
-        super().__init__(metrics, graph=graph, features=features)
+        super().__init__(
+            metrics,
+            graph=graph,
+            features=features,
+            train_on=train_on,
+        )
 
+        self.val_on = val_on
         self.metric_best = metric_best
+        self.log = log
 
         edge_index, edge_weight = graph.to_pyg_edges()
         self.data = Data(
@@ -81,11 +95,11 @@ class GNNTrainer(BaseTrainer):
     def new_stats(
         self,
         masks: Dict[str, np.ndarray],
-    ) -> Tuple[Dict[str, List], Dict[str, float], Dict[str, Any]]:
+    ) -> Tuple[Dict[str, List], Dict[str, float], Dict[str, torch.Tensor]]:
         """Create new stats for tracking model performance."""
         stats: Dict[str, List] = {"epoch": [], "loss": []}
         best_stats: Dict[str, float] = {"epoch": 0, "loss": 1e12}
-        best_model_state: Dict[str, Any] = {}
+        best_model_state: Dict[str, torch.Tensor] = {}
 
         for mask_name in masks:
             for metric_name in self.metrics:
@@ -104,7 +118,6 @@ class GNNTrainer(BaseTrainer):
         new_results: Dict[str, float],
         epoch: int,
         loss: float,
-        val_on: str,
     ) -> None:
         """Update model performance stats using the new evaluation results.
 
@@ -116,12 +129,11 @@ class GNNTrainer(BaseTrainer):
             new_results: New evaluation results.
             epoch: Current epoch.
             loss: Current loss.
-            val_on: Validation mask name.
 
         """
         new_results["epoch"] = epoch
         new_results["loss"] = loss
-        name = f"{val_on}_{self.metric_best}"
+        name = f"{self.val_on}_{self.metric_best}"
         if new_results[name] > best_stats[name]:
             best_stats.update(new_results)
             best_model_state.update(deepcopy(model.state_dict()))
@@ -168,32 +180,25 @@ class SimpleGNNTrainer(GNNTrainer):
         y,
         masks,
         split_idx=0,
-        train_on="train",
-        val_on: str = "val",
         lr: float = 0.01,
         epochs: int = 100,
         eval_steps: int = 10,
-        log: bool = False,
     ):
         """Train the GNN model.
 
         Args:
-            val_on (str): Validation mask name (default: :obj:`"train"`)
             lr (float): Learning rate (default: :obj:`0.01`)
             epochs (int): Total epochs (default: :obj:`100`)
             eval_steps (int): Interval for evaluation (default: :obj:`10`)
-            log (bool): Print evaluation results at each evaluation epoch
-                if set to True (default: :obj:`False`)
 
         """
         model.to(self.device)
         data = self.data
         optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-        train_mask = self.get_mask(masks, train_on, split_idx)
+        train_mask = self.get_mask(masks, self.train_on, split_idx)
         y_torch = torch.from_numpy(y.astype(float)).to(self.device)
 
         stats, best_stats, best_model_state = self.new_stats(masks)
-
         for epoch in range(epochs):
             loss = self.train_epoch(model, data, y_torch, train_mask, optimizer)
 
@@ -207,12 +212,12 @@ class SimpleGNNTrainer(GNNTrainer):
                     new_results,
                     epoch,
                     loss,
-                    val_on,
                 )
 
-                if log:
+                if self.log:
                     print(new_results)
 
+        # Rewind back to best model
         model.load_state_dict(best_model_state)
 
         return best_stats
