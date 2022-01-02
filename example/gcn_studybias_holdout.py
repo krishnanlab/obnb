@@ -1,6 +1,7 @@
 import os.path as osp
 
 import numpy as np
+import torch
 from NLEval.graph import SparseGraph
 from NLEval.label import filters
 from NLEval.label import LabelsetCollection
@@ -42,7 +43,8 @@ mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=n_tasks)
 
 # Setup trainer, use auroc as the evaluation metric
 metrics = {"auroc": auroc}
-trainer = SimpleGNNTrainer(metrics, g, device="cuda:0", metric_best="auroc")
+device = "cuda" if torch.cuda.is_available() else "cpu"
+trainer = SimpleGNNTrainer(metrics, g, device=device, metric_best="auroc")
 
 y, masks, _ = lsc.split(
     splitter,
@@ -50,5 +52,12 @@ y, masks, _ = lsc.split(
     property_name="PubMed Count",
 )
 
-results = trainer.train(mdl, y, masks, epochs=500, log=True)
-print(results)
+results = trainer.train(mdl, y, masks, epochs=200, log=True, lr=0.1)
+print(f"\nBest results:\n{results}\n")
+
+# Check to see if model is rewind back to the best model correctly
+args = (trainer.data.x, trainer.data.edge_index, trainer.data.edge_weight)
+y_pred = mdl(*args).detach().cpu().numpy()
+for mask_name in "train", "val", "test":
+    mask = masks[mask_name][:, 0]
+    print(f"{mask_name:>5}: {auroc(y[mask], y_pred[mask])}")

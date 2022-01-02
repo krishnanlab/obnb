@@ -35,8 +35,7 @@ class LabelPropagationTrainer(BaseTrainer):
         """
         # Train model using the training set
         train_mask = self.get_mask(masks, train_on, split_idx)
-        seed = y * train_mask
-        y_pred = model(self.graph, seed)
+        y_pred = model(self.graph, y * train_mask)
 
         # Evaluate the prediction using the specified metrics
         results = {}
