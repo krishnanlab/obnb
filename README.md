@@ -16,7 +16,7 @@ pip install -e .
 The ``-e`` option means 'editable', i.e. no need to reinstall the library if you make changes to the source code.
 Feel free to not use the ``-e`` option and simply do ``pip install .`` if you do not plan on modifying the source code.
 
-## Optional Pytorch Geometric installation
+### Optional Pytorch Geometric installation
 
 One can install [Pytorch Geomtric](https://github.com/pyg-team/pytorch_geometric) to enable some GNN related features.
 To install PyG, first need to install [PyTorch](https://pytorch.org).
@@ -28,7 +28,7 @@ conda install pytorch=1.9 torchvision torchaudio cudatoolkit=10.2 -c pytorch
 conda install pyg -c pyg -c conda-forge
 ```
 
-## Full dev installation
+### Full dev installation
 
 With Python3.8 or above and CUDA10.2:
 
