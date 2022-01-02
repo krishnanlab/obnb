@@ -61,7 +61,7 @@ y, masks, _ = lsc.split(
 results = trainer.train(mdl, y, masks, epochs=200, lr=0.1)
 print(f"\nBest results:\n{results}\n")
 
-# Check to see if model is rewind back to the best model correctly
+# Check to see if the model is rewinded back to the best model correctly
 args = (trainer.data.x, trainer.data.edge_index, trainer.data.edge_weight)
 y_pred = mdl(*args).detach().cpu().numpy()
 for mask_name in "train", "val", "test":
