@@ -5,7 +5,7 @@ from NLEval.graph import DenseGraph
 from NLEval.label import filters
 from NLEval.label import LabelsetCollection
 from NLEval.label.split import RatioHoldout
-from NLEval.model_trainer.supervised_learning import SupervisedLearningTrainer
+from NLEval.model_trainer import SupervisedLearningTrainer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
 
