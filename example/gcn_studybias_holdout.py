@@ -16,7 +16,7 @@ LABEL = "KEGGBP"
 DATA_DIR = osp.join(osp.pardir, "data")
 GRAPH_FP = osp.join(DATA_DIR, "networks", f"{NETWORK}.edg")
 LABEL_FP = osp.join(DATA_DIR, "labels", f"{LABEL}.gmt")
-PROPERTY_FP = osp.join(DATA_DIR, "properties", "pubcnt.txt")
+PROPERTY_FP = osp.join(DATA_DIR, "properties", "PubMedCount.txt")
 
 print(f"{NETWORK=}\n{LABEL=}")
 

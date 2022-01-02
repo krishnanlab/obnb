@@ -13,7 +13,7 @@ DATASET = "KEGGBP"
 DATA_DIR = osp.join(osp.pardir, "data")
 GRAPH_FP = osp.join(DATA_DIR, "networks", f"{NETWORK}.edg")
 LABEL_FP = osp.join(DATA_DIR, "labels", f"{DATASET}.gmt")
-PROPERTY_FP = osp.join(DATA_DIR, "properties", "pubcnt.txt")
+PROPERTY_FP = osp.join(DATA_DIR, "properties", "PubMedCount.txt")
 
 train_ratio = 0.6
 test_ratio = 0.2
