@@ -39,6 +39,11 @@ class SparseGraph(BaseGraph):
         checkers.checkType("directed", bool, val)
         self._directed = val
 
+    @property
+    def num_edges(self) -> int:
+        """int: Number of edges."""
+        return sum(len(nbrs) for nbrs in self.edge_data)
+
     def __getitem__(self, key):
         """Return slices of constructed adjacency matrix.
 
@@ -279,3 +284,26 @@ class SparseGraph(BaseGraph):
             for dst_node in src_nbrs:
                 mat[src_node, dst_node] = src_nbrs[dst_node]
         return mat
+
+    def to_pyg_edges(self):
+        """Convert to Pytorch Geometric edge_index and edge_weight."""
+        num_edges = self.num_edges
+        edge_index = np.zeros((2, num_edges), dtype=int)
+        edge_weight = np.zeros(num_edges, dtype=np.float32)
+
+        start_pos = 0
+        for node1, nbrs in enumerate(self.edge_data):
+            end_pos = start_pos + len(nbrs)
+            slice_ = slice(start_pos, end_pos)
+
+            edge_index[0, slice_] = node1
+            nbr_idx = sorted(nbrs)
+            edge_index[1, slice_] = nbr_idx
+            edge_weight[slice_] = list(map(nbrs.get, nbr_idx))
+
+            start_pos = end_pos
+
+        if not self.weighted:
+            edge_weight = None
+
+        return edge_index, edge_weight
