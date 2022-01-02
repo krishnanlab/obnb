@@ -9,14 +9,14 @@ from .base import BaseTrainer
 class LabelPropagationTrainer(BaseTrainer):
     """Label propagation trainer."""
 
-    def __init__(self, metrics, graph):
+    def __init__(self, metrics, graph, train_on="train"):
         """Initialize LabelPropagationTrainer.
 
         Note:
             Only takes graph as input.
 
         """
-        super().__init__(metrics, graph=graph)
+        super().__init__(metrics, graph=graph, train_on=train_on)
 
     def train(
         self,
@@ -24,7 +24,6 @@ class LabelPropagationTrainer(BaseTrainer):
         y: np.ndarray,
         masks: Dict[str, np.ndarray],
         split_idx: int = 0,
-        train_on: str = "train",
     ) -> Dict[str, float]:
         """Propagate labels.
 
@@ -34,9 +33,8 @@ class LabelPropagationTrainer(BaseTrainer):
 
         """
         # Train model using the training set
-        train_mask = self.get_mask(masks, train_on, split_idx)
-        seed = y * train_mask
-        y_pred = model(self.graph, seed)
+        train_mask = self.get_mask(masks, self.train_on, split_idx)
+        y_pred = model(self.graph, y * train_mask)
 
         # Evaluate the prediction using the specified metrics
         results = {}

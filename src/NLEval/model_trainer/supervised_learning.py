@@ -23,7 +23,7 @@ class SupervisedLearningTrainer(BaseTrainer):
 
     """
 
-    def __init__(self, metrics, features):
+    def __init__(self, metrics, features, train_on="train"):
         """Initialize SupervisedLearningTrainer.
 
         Note:
@@ -32,7 +32,7 @@ class SupervisedLearningTrainer(BaseTrainer):
             node features.
 
         """
-        super().__init__(metrics, features=features)
+        super().__init__(metrics, features=features, train_on=train_on)
 
     def train(
         self,
@@ -40,7 +40,6 @@ class SupervisedLearningTrainer(BaseTrainer):
         y: np.ndarray,
         masks: Dict[str, np.ndarray],
         split_idx: int = 0,
-        train_on: str = "train",
     ) -> Dict[str, float]:
         """Train a supervised learning model.
 
@@ -51,7 +50,7 @@ class SupervisedLearningTrainer(BaseTrainer):
 
         """
         # Train model using the training set
-        train_mask = self.get_mask(masks, train_on, split_idx)
+        train_mask = self.get_mask(masks, self.train_on, split_idx)
         # TODO: log time and other useful stats
         model.fit(self.get_x_from_mask(train_mask), y[train_mask])
 

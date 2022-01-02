@@ -7,7 +7,7 @@ from NLEval.label import filters
 from NLEval.label import LabelsetCollection
 from NLEval.label.split import RatioHoldout
 from NLEval.model.label_propagation import OneHopPropagation
-from NLEval.model_trainer.label_propagation import LabelPropagationTrainer
+from NLEval.model_trainer import LabelPropagationTrainer
 from sklearn.metrics import roc_auc_score as auroc
 
 NETWORK = "STRING"

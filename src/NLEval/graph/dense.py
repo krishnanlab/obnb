@@ -227,6 +227,10 @@ class FeatureVec(DenseGraph):
         self.idmap.add_id(node_id)
         self.mat = new_mat
 
+    def to_pyg_x(self):
+        """Return a copy of the feature matrix."""
+        return self.mat.copy()
+
     @classmethod
     def from_emd(cls, path_to_emd, **kwargs):
         fvec_lst = []
