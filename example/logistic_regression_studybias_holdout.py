@@ -9,12 +9,12 @@ from NLEval.model_trainer import SupervisedLearningTrainer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
 
-NETWORK = "STRING"
+NETWORK = "STRING-EXP"
 LABEL = "KEGGBP"
 DATA_DIR = osp.join(osp.pardir, "data")
 GRAPH_FP = osp.join(DATA_DIR, "networks", f"{NETWORK}.edg")
 LABEL_FP = osp.join(DATA_DIR, "labels", f"{LABEL}.gmt")
-PROPERTY_FP = osp.join(DATA_DIR, "properties", "pubcnt.txt")
+PROPERTY_FP = osp.join(DATA_DIR, "properties", "PubMedCount.txt")
 
 print(f"{NETWORK=}\n{LABEL=}")
 
@@ -61,11 +61,11 @@ print(
     """
 Expected outcome
 --------------------------------------------------------------------------------
-NETWORK='STRING'
+NETWORK='STRING-EXP'
 LABEL='KEGGBP'
 Number of labelsets before filtering: 139
-Number of labelsets after filtering: 58
-Average test score = 0.9881, std = 0.0125
+Number of labelsets after filtering: 54
+Average test score = 0.8390, std = 0.0944
 --------------------------------------------------------------------------------
 """,
 )

@@ -11,7 +11,7 @@ from sklearn.metrics import roc_auc_score as auroc
 DATA_DIR = osp.join(osp.pardir, "data")
 GRAPH_FP = osp.join(DATA_DIR, "networks", "STRING-EXP.edg")
 LABEL_FP = osp.join(DATA_DIR, "labels", "KEGGBP.gmt")
-PROPERTY_FP = osp.join(DATA_DIR, "properties", "pubcnt.txt")
+PROPERTY_FP = osp.join(DATA_DIR, "properties", "PubMedCount.txt")
 
 g = DenseGraph.from_edglst(GRAPH_FP, weighted=True, directed=False)
 lsc = SplitLSC.from_gmt(LABEL_FP)
