@@ -5,7 +5,7 @@ from NLEval import model
 from NLEval.graph import DenseGraph
 from NLEval.label import filters
 from NLEval.label import LabelsetCollection
-from NLEval.label.split import RatioHoldout
+from NLEval.label.split import RatioPartition
 from NLEval.model.label_propagation import OneHopPropagation
 from NLEval.model_trainer import LabelPropagationTrainer
 from sklearn.metrics import roc_auc_score as auroc
@@ -34,7 +34,7 @@ print(f"Number of labelsets after filtering: {len(lsc.label_ids)}")
 lsc.load_entity_properties(PROPERTY_FP, "PubMed Count", 0, int)
 
 # 3/2 train/test split using genes with higher PubMed Count for training
-splitter = RatioHoldout(0.6, 0.4, ascending=False)
+splitter = RatioPartition(0.6, 0.4, ascending=False)
 
 # Select model
 mdl = OneHopPropagation()
