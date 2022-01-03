@@ -140,6 +140,26 @@ class GNNTrainer(BaseTrainer):
         for i, j in new_results.items():
             stats[i].append(j)
 
+    def export_pyg_data(
+        self,
+        y: np.ndarray,
+        masks: Dict[str, np.ndarray],
+        mask_suffix: str = "_mask",
+    ) -> Data:
+        """Export PyTorch Geometric Data object.
+
+        Args:
+            y: Label array.
+            masks: Dictionary of masks.
+            mask_suffix (str): Mask name suffix.
+
+        """
+        data = deepcopy(self.data).to("cpu")
+        data.y = torch.from_numpy(y.astype(float))
+        for mask_name, mask in masks.items():
+            setattr(data, mask_name + mask_suffix, torch.from_numpy(mask))
+        return data
+
 
 class SimpleGNNTrainer(GNNTrainer):
     """Simple GNN trainer using Adam with fixed learning rate."""
