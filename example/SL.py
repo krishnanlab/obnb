@@ -16,8 +16,8 @@ PROPERTY_FP = osp.join(DATA_DIR, "properties", "PubMedCount.txt")
 g = DenseGraph.from_edglst(GRAPH_FP, weighted=True, directed=False)
 lsc = SplitLSC.from_gmt(LABEL_FP)
 
-lsc.apply(filters.EntityExistenceFilter(g.idmap.lst), inplace=True)
-lsc.apply(filters.LabelsetRangeFilterSize(min_val=50), inplace=True)
+lsc.iapply(filters.EntityExistenceFilter(g.idmap.lst))
+lsc.iapply(filters.LabelsetRangeFilterSize(min_val=50))
 
 lsc.load_entity_properties(PROPERTY_FP, "Pubmed Count", 0, int)
 # lsc.valsplit = valsplit.Holdout.BinHold(3, shuffle=True)

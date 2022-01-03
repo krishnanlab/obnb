@@ -12,7 +12,7 @@ from NLEval.util.exceptions import IDNotExistError
 from sklearn.model_selection import KFold
 
 
-class TestLSC(unittest.TestCase):
+class TestLabelsetCollection(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.toy1_gmt_fp = os.path.join(SAMPLE_DATA_DIR, "toy1.gmt")
@@ -774,6 +774,20 @@ class TestFilter(unittest.TestCase):
         self.lsc.add_labelset(["a", "h"], "Group5")
         # Noccur=[3, 2, 2, 1, 1, 2, 1, 1]
         # Size=[3, 2, 3, 3, 2]
+
+    def test_iapply(self):
+        # Make sure iapply work as an inplace version of apply
+        target_lst = ["a", "b", "c"]
+        lsc = self.lsc.apply(
+            filters.EntityExistenceFilter(target_lst=target_lst),
+            inplace=False,
+        )
+        self.lsc.iapply(filters.EntityExistenceFilter(target_lst=target_lst))
+        self.assertEqual(
+            self.lsc.prop["Labelset"],
+            lsc.prop["Labelset"],
+        )
+        self.assertEqual(lsc.entity.map, self.lsc.entity.map)
 
     def test_EntityExistenceFilter(self):
         # make sure default options of remove_specified=False work

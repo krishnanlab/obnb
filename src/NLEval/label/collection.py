@@ -367,6 +367,14 @@ class LabelsetCollection(idhandler.IDprop):
         filter_func(obj)
         return obj
 
+    def iapply(self, filter_func):
+        """Apply filter to labelsets inplace.
+
+        This is a shortcut for calling self.apply(filter_func, inplace=True).
+
+        """
+        self.apply(filter_func, inplace=True)
+
     def export(self, fp):
         """Export self as a '.lsc' file.
 

@@ -24,14 +24,9 @@ g = SparseGraph.from_edglst(GRAPH_FP, weighted=False, directed=False)
 lsc = SplitLSC.from_gmt(LABEL_FP)
 lsc.valsplit = SklSKF(shuffle=True, skl_kws={"n_splits": n_split})
 
-filter_list = [
-    filters.EntityExistenceFilter(target_lst=g.idmap.lst),
-    filters.LabelsetRangeFilterSize(min_val=min_labelset_size),
-    filters.NegativeFilterHypergeom(p_thresh=p_thresh),
-]
-
-for filter_ in filter_list:
-    lsc.apply(filter_, inplace=True)
+lsc.iapply(filters.EntityExistenceFilter(target_lst=g.idmap.lst))
+lsc.iapply(filters.LabelsetRangeFilterSize(min_val=min_labelset_size))
+lsc.iapply(filters.NegativeFilterHypergeom(p_thresh=p_thresh))
 print(
     f"Number of effective labelsets after filtering = {len(lsc.label_ids)}",
 )
