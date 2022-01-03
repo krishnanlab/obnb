@@ -52,7 +52,7 @@ trainer = SimpleGNNTrainer(
     log=True,
 )
 
-y, masks, _ = lsc.split(
+y, masks = lsc.split(
     splitter,
     target_ids=g.idmap.lst,
     property_name="PubMed Count",

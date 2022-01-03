@@ -251,7 +251,7 @@ class LabelsetCollection(idhandler.IDprop):
         labelset_name: Optional[str] = None,
         property_name: Optional[str] = None,
         mask_names: Optional[List[str]] = None,
-    ) -> Tuple[np.ndarray, Dict[str, np.ndarray], List[str]]:
+    ) -> Tuple[np.ndarray, Dict[str, np.ndarray]]:
         """Split the entities based on the labelsets.
 
         Args:
@@ -286,12 +286,11 @@ class LabelsetCollection(idhandler.IDprop):
 
         # Prepare 'x' and 'y' and pass to splitter
         if labelset_name is None:
-            labelset_names, labelsets = list(map(list, zip(*[*self.items()])))
+            labelsets = list(map(self.get_labelset, self.label_ids))
             y = np.zeros((len(self.entity_ids), len(labelsets)), dtype=bool)
             for i, labelset in enumerate(labelsets):
                 y[self.entity[labelset], i] = True
         else:
-            labelset_names = [labelset_name]
             labelset = self.get_labelset(labelset_name)
             y = np.zeros(len(self.entity_ids), dtype=bool)
             y[self.entity[labelset]] = True
@@ -340,7 +339,7 @@ class LabelsetCollection(idhandler.IDprop):
             y_out = np.zeros((len(target_ids), y.shape[1]), dtype=bool)
         y_out[to_target_idx] = y
 
-        return y_out, masks, labelset_names
+        return y_out, masks
 
     def apply(self, filter_func, inplace=False):
         """Apply filter to labelsets.

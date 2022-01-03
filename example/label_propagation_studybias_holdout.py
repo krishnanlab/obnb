@@ -45,7 +45,7 @@ trainer = LabelPropagationTrainer(metrics, g)
 
 scores = []
 for label_id in lsc.label_ids:
-    y, masks, _ = lsc.split(
+    y, masks = lsc.split(
         splitter,
         target_ids=g.idmap.lst,
         labelset_name=label_id,
