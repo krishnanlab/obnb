@@ -27,9 +27,7 @@ lsc.valsplit = SklSKF(shuffle=True, skl_kws={"n_splits": n_split})
 lsc.iapply(filters.EntityExistenceFilter(target_lst=g.idmap.lst))
 lsc.iapply(filters.LabelsetRangeFilterSize(min_val=min_labelset_size))
 lsc.iapply(filters.NegativeFilterHypergeom(p_thresh=p_thresh))
-print(
-    f"Number of effective labelsets after filtering = {len(lsc.label_ids)}",
-)
+print(f"Number of labelsets after filtering = {len(lsc.label_ids)}")
 
 # scoring_obj = lambda estimator, X, y: metrics.log2_auprc_prior(
 #    y,
