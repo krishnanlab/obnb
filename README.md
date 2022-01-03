@@ -40,26 +40,59 @@ conda install pyg -c pyg -c conda-forge
 ```
 
 ## Quick Demonstration
+
+### Setting up data and splits
+
 ```python
-from NLEval import graph, valsplit, label, model
+from NLEval import graph, label, model_trainer
 
-# specify data paths
-network_fp = '/path/to/network.edg' # edg for edgelist representation of sparse network
-labelset_fp = '/path/to/label.gmt' # label in the format of Gene Matrix Transpose
+# Load a weighted undirected graph from an edge list file
+g = graph.DenseGraph.from_edglst("data/networks/STRING-EXP.edg", weighted=True, directed=False)
 
-# load data (network and labelset collection)
-g = graph.DenseGraph.DenseGraph.from_edgelst(network_fp, weighted=True, directed=False)
-lsc = label.LabelsetCollection.SplitLSC.from_gmt(labelset_fp)
+# Load geneset collection from a GMT file
+lsc = label.LabelsetCollection.from_gmt("data/labels/KEGGBP.gmt")
 
-# initialize models (note that specific network is required to initialize model)
-SL_A = model.SupervisedLearning.LogReg(g, penalty='l2', solver='lbfgs')
-LP_A = model.LabelPropagation.LP(g)
+# Remove genes not present in the network from the geneset collection
+lsc.iapply(label.filters.EntityExistenceFilter(g.idmap.lst))
 
-# train model and get genomewide prediction scores
-positive_set = lsc.get_labelset(some_label_id)
-negative_set = lsc.get_negative(some_label_id)
-SLA_score_dict = SL_A.predict(positive_set, negative_set)
-LPA_score_dict = LP_A.predict(positive_set, negative_set)
+# Remove small genesets
+lsc.iapply(label.filters.LabelsetRangeFilterSize(min_val=50))
+
+# Load PubMed count and use it to setup study-bias holdout split
+lsc.load_entity_properties("data/properties/PubMedCount.txt", "PubMed Count", 0, int)
+splitter = RatioHoldout(0.6, 0.4, ascending=False)
+```
+
+### Evaluating models on the processed dataset
+```python
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_auc_score
+from NLEval.model.label_propagation import OneHopPropagation
+from NLEval.model_trainer import SupervisedLearningTrainer, LabelPropagationTrainer
+
+# Prepare study-bias holdout split on a specific geneset
+y, masks = lsc.split(splitter, target_ids=g.idmap.lst, labelset_name=label_id, property_name="PubMedCount")
+
+# Specify model(s) and metrics
+sl_mdl = LogisticRegression(penalty="l2", solver="lbfgs")
+lp_mdl = OneHopPropagation()
+metrics = {"auroc": roc_auc_score}
+
+sl_results = SupervisedLearningTrainer(metrics, g).train(sl_mdl, y, masks)
+lp_results = LabelPropagationTrainer(metrics, g).train(lp_mdl, y, masks)
+```
+
+### Evaluating GNN models on the processed dataset
+```python
+from torch_geometric.nn import GCN
+from NLEval.model_trainer.gnn import SimpleGNNTrainer
+
+# Prepare study-bias holdout split on the whole geneset collection
+y, masks = lsc.split(splitter, target_ids=g.idmap.lst, property_name="PubMedCount")
+
+# Evaluate GCN on the whole geneset collection
+gcn_mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=n_tasks)
+gcn_results = SimpleGNNTrainer(metrics, g, device="cuda", metric_best="auroc").train(mdl, y, masks)
 ```
 
 ## Contributing
@@ -69,6 +102,7 @@ LPA_score_dict = LP_A.predict(positive_set, negative_set)
 * [tox](https://tox.wiki/en/latest/index.html)
 * [pytest](https://docs.pytest.org/en/6.2.x/)
 * [pytest-cov](https://pypi.org/project/pytest-cov/)
+* [pytest-subtest](https://pypi.org/project/pytest-subtests/)
 * [pre-commit](https://github.com/pre-commit/pre-commit)
 
 See ``requirements-dev.txt``. Run the following to install all dev dependencies
@@ -88,4 +122,9 @@ $ pytest
 Alternatively, can also show the coverage report
 ```bash
 $ pytest --cov src/NLEval
+```
+
+Run type checks and coding style checks using mypy and flake8 via tox:
+```bash
+$ tox -e mypy,flake8
 ```

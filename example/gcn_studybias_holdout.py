@@ -26,8 +26,8 @@ lsc = LabelsetCollection.from_gmt(LABEL_FP)
 
 # Filter labels
 print(f"Number of labelsets before filtering: {len(lsc.label_ids)}")
-lsc.apply(filters.EntityExistenceFilter(g.idmap.lst), inplace=True)
-lsc.apply(filters.LabelsetRangeFilterSize(min_val=50), inplace=True)
+lsc.iapply(filters.EntityExistenceFilter(g.idmap.lst))
+lsc.iapply(filters.LabelsetRangeFilterSize(min_val=50))
 print(f"Number of labelsets after filtering: {len(lsc.label_ids)}")
 n_tasks = len(lsc.label_ids)
 
@@ -52,7 +52,7 @@ trainer = SimpleGNNTrainer(
     log=True,
 )
 
-y, masks, _ = lsc.split(
+y, masks = lsc.split(
     splitter,
     target_ids=g.idmap.lst,
     property_name="PubMed Count",

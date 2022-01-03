@@ -12,7 +12,7 @@ from NLEval.util.exceptions import IDNotExistError
 from sklearn.model_selection import KFold
 
 
-class TestLSC(unittest.TestCase):
+class TestLabelsetCollection(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.toy1_gmt_fp = os.path.join(SAMPLE_DATA_DIR, "toy1.gmt")
@@ -365,16 +365,16 @@ class TestSplit(unittest.TestCase):
         )
 
     def test_reorder(self):
-        y, _, _ = self.lsc.split(KFold(n_splits=2).split)
+        y, _ = self.lsc.split(KFold(n_splits=2).split)
         self.assertEqual(y.T.tolist(), [[1, 1, 1, 0], [0, 1, 0, 1]])
 
-        y, _, _ = self.lsc.split(
+        y, _ = self.lsc.split(
             KFold(n_splits=2).split,
             target_ids=["a", "c", "b", "d"],
         )
         self.assertEqual(y.T.tolist(), [[1, 1, 1, 0], [0, 0, 1, 1]])
 
-        y, _, _ = self.lsc.split(
+        y, _ = self.lsc.split(
             KFold(n_splits=2).split,
             target_ids=["a", "e", "c", "b", "d", "f"],
         )
@@ -384,31 +384,28 @@ class TestSplit(unittest.TestCase):
         train_mask = [[False, False, True, True], [True, True, False, False]]
         test_mask = [[True, True, False, False], [False, False, True, True]]
 
-        y, masks, labelset_names = self.lsc.split(KFold(n_splits=2).split)
+        y, masks = self.lsc.split(KFold(n_splits=2).split)
         self.assertEqual(y.T.tolist(), [[1, 1, 1, 0], [0, 1, 0, 1]])
         self.assertEqual(list(masks), ["train", "test"])
-        self.assertEqual(labelset_names, ["Labelset1", "Labelset2"])
         self.assertEqual(masks["train"].T.tolist(), train_mask)
         self.assertEqual(masks["test"].T.tolist(), test_mask)
 
-        y, masks, labelset_names = self.lsc.split(
+        y, masks = self.lsc.split(
             KFold(n_splits=2).split,
             labelset_name="Labelset1",
         )
         self.assertEqual(y.T.tolist(), [1, 1, 1, 0])
         self.assertEqual(list(masks), ["train", "test"])
-        self.assertEqual(labelset_names, ["Labelset1"])
         self.assertEqual(masks["train"].T.tolist(), train_mask)
         self.assertEqual(masks["test"].T.tolist(), test_mask)
 
-        y, masks, labelset_names = self.lsc.split(
+        y, masks = self.lsc.split(
             KFold(n_splits=2).split,
             labelset_name="Labelset1",
             target_ids=["a", "e", "c", "b", "d", "f"],
         )
         self.assertEqual(y.T.tolist(), [1, 0, 1, 1, 0, 0])
         self.assertEqual(list(masks), ["train", "test"])
-        self.assertEqual(labelset_names, ["Labelset1"])
         self.assertEqual(
             masks["train"].T.tolist(),
             [
@@ -436,20 +433,18 @@ class TestSplit(unittest.TestCase):
             [False, False, False, True],
         ]
 
-        y, masks, labelset_names = self.lsc.split(KFold(n_splits=3).split)
+        y, masks = self.lsc.split(KFold(n_splits=3).split)
         self.assertEqual(y.T.tolist(), [[1, 1, 1, 0], [0, 1, 0, 1]])
         self.assertEqual(list(masks), ["train", "test"])
-        self.assertEqual(labelset_names, ["Labelset1", "Labelset2"])
         self.assertEqual(masks["train"].T.tolist(), train_mask)
         self.assertEqual(masks["test"].T.tolist(), test_mask)
 
-        y, masks, labelset_names = self.lsc.split(
+        y, masks = self.lsc.split(
             KFold(n_splits=3).split,
             labelset_name="Labelset1",
         )
         self.assertEqual(y.T.tolist(), [1, 1, 1, 0])
         self.assertEqual(list(masks), ["train", "test"])
-        self.assertEqual(labelset_names, ["Labelset1"])
         self.assertEqual(masks["train"].T.tolist(), train_mask)
         self.assertEqual(masks["test"].T.tolist(), test_mask)
 
@@ -534,7 +529,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
     def test_threshold_holdout(self):
         with self.subTest(thresholds=(4,)):
-            y, masks, _ = self.lsc.split(
+            y, masks = self.lsc.split(
                 split.ThresholdHoldout(4),
                 property_name="test_property",
             )
@@ -549,7 +544,7 @@ class TestLabelsetSplit(unittest.TestCase):
             )
 
         with self.subTest(thresholds=(2, 7)):
-            y, masks, _ = self.lsc.split(
+            y, masks = self.lsc.split(
                 split.ThresholdHoldout(2, 7),
                 property_name="test_property",
             )
@@ -568,7 +563,7 @@ class TestLabelsetSplit(unittest.TestCase):
             )
 
         with self.subTest(thresholds=(6, 1, 2)):
-            y, masks, _ = self.lsc.split(
+            y, masks = self.lsc.split(
                 split.ThresholdHoldout(6, 1, 2),
                 property_name="test_property",
                 mask_names=["mask1", "mask2", "mask3", "mask4"],
@@ -592,7 +587,7 @@ class TestLabelsetSplit(unittest.TestCase):
             )
 
         with self.subTest(thresholds=(5, 10, 20)):
-            y, masks, _ = self.lsc.split(
+            y, masks = self.lsc.split(
                 split.ThresholdHoldout(5, 10, 20),
                 property_name="test_property",
                 mask_names=["mask1", "mask2", "mask3", "mask4"],
@@ -616,7 +611,7 @@ class TestLabelsetSplit(unittest.TestCase):
             )
 
         with self.subTest(thresholds=(-1)):
-            y, masks, _ = self.lsc.split(
+            y, masks = self.lsc.split(
                 split.ThresholdHoldout(-1),
                 property_name="test_property",
             )
@@ -631,7 +626,7 @@ class TestLabelsetSplit(unittest.TestCase):
             )
 
         with self.subTest(thresholds=(2, 7)):
-            y, masks, _ = self.lsc.split(
+            y, masks = self.lsc.split(
                 split.ThresholdHoldout(2, 7),
                 property_name="test_property",
             )
@@ -650,7 +645,7 @@ class TestLabelsetSplit(unittest.TestCase):
             )
 
         with self.subTest(thresholds=(5, 10, 20), ascending=False):
-            y, masks, _ = self.lsc.split(
+            y, masks = self.lsc.split(
                 split.ThresholdHoldout(5, 10, 20, ascending=False),
                 property_name="test_property",
                 mask_names=["mask1", "mask2", "mask3", "mask4"],
@@ -711,7 +706,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
     def test_ratio_holdout(self):
         with self.subTest(ratios=(0.5, 0.5)):
-            y, masks, _ = self.lsc.split(
+            y, masks = self.lsc.split(
                 split.RatioHoldout(0.5, 0.5),
                 property_name="test_property",
             )
@@ -726,7 +721,7 @@ class TestLabelsetSplit(unittest.TestCase):
             )
 
         with self.subTest(ratios=(0.6, 0.2, 0.2)):
-            y, masks, _ = self.lsc.split(
+            y, masks = self.lsc.split(
                 split.RatioHoldout(0.6, 0.2, 0.2),
                 property_name="test_property",
             )
@@ -745,7 +740,7 @@ class TestLabelsetSplit(unittest.TestCase):
             )
 
         with self.subTest(ratios=(0.6, 0.2, 0.2), ascending=False):
-            y, masks, _ = self.lsc.split(
+            y, masks = self.lsc.split(
                 split.RatioHoldout(0.6, 0.2, 0.2, ascending=False),
                 property_name="test_property",
             )
@@ -774,6 +769,20 @@ class TestFilter(unittest.TestCase):
         self.lsc.add_labelset(["a", "h"], "Group5")
         # Noccur=[3, 2, 2, 1, 1, 2, 1, 1]
         # Size=[3, 2, 3, 3, 2]
+
+    def test_iapply(self):
+        # Make sure iapply work as an inplace version of apply
+        target_lst = ["a", "b", "c"]
+        lsc = self.lsc.apply(
+            filters.EntityExistenceFilter(target_lst=target_lst),
+            inplace=False,
+        )
+        self.lsc.iapply(filters.EntityExistenceFilter(target_lst=target_lst))
+        self.assertEqual(
+            self.lsc.prop["Labelset"],
+            lsc.prop["Labelset"],
+        )
+        self.assertEqual(lsc.entity.map, self.lsc.entity.map)
 
     def test_EntityExistenceFilter(self):
         # make sure default options of remove_specified=False work

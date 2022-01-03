@@ -25,8 +25,8 @@ lsc = LabelsetCollection.from_gmt(LABEL_FP)
 
 # Filter labels
 print(f"Number of labelsets before filtering: {len(lsc.label_ids)}")
-lsc.apply(filters.EntityExistenceFilter(g.idmap.lst), inplace=True)
-lsc.apply(filters.LabelsetRangeFilterSize(min_val=50), inplace=True)
+lsc.iapply(filters.EntityExistenceFilter(g.idmap.lst))
+lsc.iapply(filters.LabelsetRangeFilterSize(min_val=50))
 print(f"Number of labelsets after filtering: {len(lsc.label_ids)}")
 
 # Load gene properties for study-bias holdout
@@ -45,7 +45,7 @@ trainer = LabelPropagationTrainer(metrics, g)
 
 scores = []
 for label_id in lsc.label_ids:
-    y, masks, _ = lsc.split(
+    y, masks = lsc.split(
         splitter,
         target_ids=g.idmap.lst,
         labelset_name=label_id,
