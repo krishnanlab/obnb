@@ -1,6 +1,5 @@
 from collections import Counter
 from numbers import Real
-from typing import Iterator
 from typing import List
 from typing import Tuple
 
@@ -13,26 +12,6 @@ from .base import BaseSortedSplit
 class BasePartition(BaseSortedSplit):
     """BasePartition object for splitting by partitioning the dataset."""
 
-    def __call__(
-        self,
-        x: np.ndarray,
-        y: np.ndarray,
-    ) -> Iterator[Tuple[np.ndarray, ...]]:
-        """Partition the dataset.
-
-        First sort the entity based on their 1-dimensional properties (x),
-        then find the list of index used to split the dataset based on the
-        sorted entities. Finally, yield the splits.
-
-        Note:
-            The use of yield instead of return is to make it compatible with
-            the sklearn split methods.
-
-        """
-        x_sorted_idx, x_sorted_val = self.sort(x)
-        idx = self.get_split_idx(x_sorted_val)
-        yield self.split_by_idx(idx, x_sorted_idx)
-
     @staticmethod
     def split_by_idx(
         idx: List[int],
@@ -41,7 +20,7 @@ class BasePartition(BaseSortedSplit):
         """Return the splits given the split index.
 
         Args:
-            idx: Index indicating to split intervals the sorted entities.
+            idx: Index indicating to split intervals of the sorted entities.
             x_sorted_idx: Sorted index of the entities (data points) in the
                 dataset.
 
@@ -49,9 +28,6 @@ class BasePartition(BaseSortedSplit):
         slices = [slice(idx[i], idx[i + 1]) for i in range(len(idx) - 1)]
         splits = (*(x_sorted_idx[i] for i in slices),)
         return splits
-
-    def get_split_idx(self, x_sorted_val):
-        raise NotImplementedError
 
 
 class RatioPartition(BasePartition):

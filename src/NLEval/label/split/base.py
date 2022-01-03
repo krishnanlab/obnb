@@ -1,3 +1,4 @@
+from typing import Iterator
 from typing import Tuple
 
 import numpy as np
@@ -38,6 +39,26 @@ class BaseSortedSplit(BaseSplit):
         """
         self.ascending = ascending
 
+    def __call__(
+        self,
+        x: np.ndarray,
+        y: np.ndarray,
+    ) -> Iterator[Tuple[np.ndarray, ...]]:
+        """Split the dataset based on split index.
+
+        First sort the entity based on their 1-dimensional properties (x),
+        then find the list of index used to split the dataset based on the
+        sorted entities. Finally, yield the splits.
+
+        Note:
+            The use of yield instead of return is to make it compatible with
+            the sklearn split methods.
+
+        """
+        x_sorted_idx, x_sorted_val = self.sort(x)
+        idx = self.get_split_idx(x_sorted_val)
+        yield self.split_by_idx(idx, x_sorted_idx)
+
     @property
     def ascending(self) -> bool:
         """Sort entities in the dataset ascendingly if set to True."""
@@ -70,3 +91,10 @@ class BaseSortedSplit(BaseSplit):
         x_sorted_idx = x_val.argsort()
         x_sorted_val = x_val[x_sorted_idx]
         return x_sorted_idx, x_sorted_val
+
+    def get_split_idx(self, x_sorted_val):
+        raise NotImplementedError
+
+    @staticmethod
+    def split_by_idx(idx, x_sorted_idx):
+        raise NotImplementedError
