@@ -1,5 +1,4 @@
 from collections import Counter
-from numbers import Real
 from typing import List
 from typing import Tuple
 
@@ -39,7 +38,7 @@ class RatioPartition(BasePartition):
 
     """
 
-    def __init__(self, *ratios: Real, ascending: bool = True) -> None:
+    def __init__(self, *ratios: float, ascending: bool = True) -> None:
         """Initialize the RatioPartition object.
 
         Ags:
@@ -50,12 +49,12 @@ class RatioPartition(BasePartition):
         self.ratios = ratios
 
     @property
-    def ratios(self) -> Tuple[Real, ...]:
+    def ratios(self) -> Tuple[float, ...]:
         """Ratio of each split."""
         return self._ratios
 
     @ratios.setter
-    def ratios(self, vals: Tuple[Real, ...]) -> None:
+    def ratios(self, vals: Tuple[float, ...]) -> None:
         """Setter for ratios.
 
         Raises:
@@ -63,7 +62,7 @@ class RatioPartition(BasePartition):
                 strictly positive, or the ratios do not add up to 1.
 
         """
-        checkTypesInIterableErrEmpty("ratios", Real, vals)
+        checkTypesInIterableErrEmpty("ratios", (int, float), vals)
         if min(vals) <= 0:
             raise ValueError(f"Ratios must be strictly positive: got {vals}")
         if sum(vals) != 1:
@@ -104,7 +103,7 @@ class ThresholdPartition(BasePartition):
 
     """
 
-    def __init__(self, *thresholds: Real, ascending: bool = True) -> None:
+    def __init__(self, *thresholds: float, ascending: bool = True) -> None:
         """Initialize the ThresholdPartition object.
 
         Args:
@@ -115,12 +114,12 @@ class ThresholdPartition(BasePartition):
         self.thresholds = thresholds
 
     @property
-    def thresholds(self) -> Tuple[Real, ...]:
+    def thresholds(self) -> Tuple[float, ...]:
         """Thresholds for splitting."""
         return self._thresholds
 
     @thresholds.setter
-    def thresholds(self, vals: Tuple[Real]) -> None:
+    def thresholds(self, vals: Tuple[float]) -> None:
         """Setter for thresholds.
 
         Raises:
@@ -128,7 +127,7 @@ class ThresholdPartition(BasePartition):
                 not threshold value is being specified.
 
         """
-        checkTypesInIterableErrEmpty("thresholds", Real, vals)
+        checkTypesInIterableErrEmpty("thresholds", (int, float), vals)
         for item, count in Counter(vals).items():
             if count > 1:
                 raise ValueError(

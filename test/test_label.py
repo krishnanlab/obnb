@@ -465,7 +465,7 @@ class TestLabelsetSplit(unittest.TestCase):
             [0, 0, 0, 0, 1, 1, 1, 1],
         ]
 
-    def test_threshold_holdout_repr(self):
+    def test_threshold_partition_repr(self):
         with self.subTest(thresholds=(4,)):
             splitter = split.ThresholdPartition(4)
             self.assertEqual(
@@ -494,7 +494,7 @@ class TestLabelsetSplit(unittest.TestCase):
                 "ThresholdPartition(ascending=False, thresholds=(6, 2, 1))",
             )
 
-    def test_threshold_holdout_raises(self):
+    def test_threshold_partition_raises(self):
         with self.assertRaises(ValueError) as context:
             split.ThresholdPartition(5, 4, 5)
         self.assertEqual(
@@ -527,7 +527,7 @@ class TestLabelsetSplit(unittest.TestCase):
             "6",
         )
 
-    def test_threshold_holdout(self):
+    def test_threshold_partition(self):
         with self.subTest(thresholds=(4,)):
             y, masks = self.lsc.split(
                 split.ThresholdPartition(4),
@@ -668,7 +668,7 @@ class TestLabelsetSplit(unittest.TestCase):
                 [[1, 1, 1, 1, 1, 1, 0, 0]],
             )
 
-    def test_ratio_holdout_repr(self):
+    def test_ratio_partition_repr(self):
         splitter = split.RatioPartition(0.5, 0.5)
         self.assertEqual(
             repr(splitter),
@@ -681,7 +681,7 @@ class TestLabelsetSplit(unittest.TestCase):
             "RatioPartition(ascending=False, ratios=(0.6, 0.2, 0.2))",
         )
 
-    def test_ratio_holdout_raises(self):
+    def test_ratio_partition_raises(self):
         with self.assertRaises(ValueError) as context:
             split.RatioPartition(0.2, 0.5)
         self.assertEqual(
@@ -704,7 +704,7 @@ class TestLabelsetSplit(unittest.TestCase):
             "Ratios must be strictly positive: got (0.2, 0.9, -0.1)",
         )
 
-    def test_ratio_holdout(self):
+    def test_ratio_partition(self):
         with self.subTest(ratios=(0.5, 0.5)):
             y, masks = self.lsc.split(
                 split.RatioPartition(0.5, 0.5),
