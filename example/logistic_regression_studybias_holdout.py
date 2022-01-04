@@ -26,6 +26,7 @@ lsc = LabelsetCollection.from_gmt(LABEL_FP)
 print(f"Number of labelsets before filtering: {len(lsc.label_ids)}")
 lsc.iapply(filters.EntityExistenceFilter(g.idmap.lst))
 lsc.iapply(filters.LabelsetRangeFilterSize(min_val=50))
+lsc.iapply(filters.NegativeGeneratorHypergeom(p_thresh=0.05))
 print(f"Number of labelsets after filtering: {len(lsc.label_ids)}")
 
 # Load gene properties for study-bias holdout
@@ -49,6 +50,7 @@ for label_id in lsc.label_ids:
         target_ids=g.idmap.lst,
         labelset_name=label_id,
         property_name="PubMed Count",
+        consider_negative=True,
     )
     results = trainer.train(mdl, y, masks)
     scores.append(results["test_auroc"])
@@ -65,7 +67,7 @@ NETWORK='STRING-EXP'
 LABEL='KEGGBP'
 Number of labelsets before filtering: 139
 Number of labelsets after filtering: 54
-Average test score = 0.8390, std = 0.0944
+Average test score = 0.8672, std = 0.0941
 --------------------------------------------------------------------------------
 """,
 )
