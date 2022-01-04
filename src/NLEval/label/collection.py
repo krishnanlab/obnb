@@ -251,6 +251,7 @@ class LabelsetCollection(idhandler.IDprop):
         labelset_name: Optional[str] = None,
         property_name: Optional[str] = None,
         mask_names: Optional[List[str]] = None,
+        consider_negative: bool = False,
     ) -> Tuple[np.ndarray, Dict[str, np.ndarray]]:
         """Split the entities based on the labelsets.
 
@@ -267,6 +268,14 @@ class LabelsetCollection(idhandler.IDprop):
                 not specified, use ``('train', 'test')`` when the splitter
                 generates two splits and use ``('train', 'val', 'test')`` when
                 the splitter generates three splits.
+            consider_negative (bool): Only use annotated negatives and remove
+                neutral data points where we do not know for sure they are
+                negatives (default: :obj:`False`).
+
+        Note:
+            The ``consider_negative`` option currently only works when one
+            explicitly specify the ``labelset_name``. In the future, might also
+            support this option with multiple labelsets.
 
         Raises:
             ValueError: If the length of the specified ``mask_names`` does not
@@ -277,7 +286,6 @@ class LabelsetCollection(idhandler.IDprop):
                 or the specified ``property_name` does not exist.
 
         """
-        # TODO: option for consider negatives (when handeling single labelset)
         # Prepare mapping from entity id to target index
         # TODO: check target_ids contain entity_ids
         target_ids = self.entity_ids if target_ids is None else target_ids
@@ -332,6 +340,23 @@ class LabelsetCollection(idhandler.IDprop):
             for i, j in enumerate(split):
                 mask[to_target_idx[j], i] = True
             masks[mask_name] = mask
+
+        if consider_negative:
+            if labelset_name is None:
+                # TODO: option for consider negatives with multiple labelsets
+                raise ValueError(
+                    "Considering multiple labelsets with negatives is not "
+                    "supported currently, specify labelset_name to pick one "
+                    "single labelset to consider negatives.",
+                )
+            else:
+                positives = self.get_labelset(labelset_name)
+                negatives = self.get_negative(labelset_name)
+                to_remove = set(self.entity_ids) - (positives | negatives)
+                if len(to_remove) > 0:  # skip if nothing to be removed
+                    target_idx_to_remove = to_target_idx[self.entity[to_remove]]
+                    for mask in masks.values():
+                        mask[target_idx_to_remove] = False
 
         # Map back to the order of target_ids
         if labelset_name is not None:

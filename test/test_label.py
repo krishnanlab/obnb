@@ -503,6 +503,59 @@ class TestLabelsetSplit(unittest.TestCase):
                 [[0, 0, 0, 1, 1, 1, 1, 1]],
             )
 
+    def test_threshold_holdout_with_negatives(self):
+        self.lsc.set_negative(["e"], "Labelset1")
+        self.lsc.set_negative(["a", "e"], "Labelset2")
+
+        # Only works when labelset_name is specified explicitly
+        self.assertRaises(
+            ValueError,
+            self.lsc.split,
+            split.ThresholdHoldout(4),
+            property_name="test_property",
+            consider_negative=True,
+        )
+
+        with self.subTest(threshold=4, labelset_name="Labelset1"):
+            y, masks = self.lsc.split(
+                split.ThresholdHoldout(4),
+                labelset_name="Labelset1",
+                property_name="test_property",
+                consider_negative=True,
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list[0])
+            self.assertEqual(
+                masks["test"].T.tolist(),
+                [[1, 1, 1, 0, 0, 0, 0, 0]],
+            )
+
+        with self.subTest(threshold=4, labelset_name="Labelset2"):
+            y, masks = self.lsc.split(
+                split.ThresholdHoldout(4),
+                labelset_name="Labelset2",
+                property_name="test_property",
+                consider_negative=True,
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list[1])
+            self.assertEqual(
+                masks["test"].T.tolist(),
+                [[1, 1, 0, 1, 0, 0, 0, 0]],
+            )
+
+        # If negatives are not set explicitly, use what's not positives
+        with self.subTest(threshold=4, labelset_name="Labelset3"):
+            y, masks = self.lsc.split(
+                split.ThresholdHoldout(4),
+                labelset_name="Labelset3",
+                property_name="test_property",
+                consider_negative=True,
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list[2])
+            self.assertEqual(
+                masks["test"].T.tolist(),
+                [[1, 1, 1, 1, 0, 0, 0, 0]],
+            )
+
     def test_ratio_holdout_repr(self):
         for ratio in [0.1, 0.5, 0.9]:
             with self.subTest(ratio=ratio):
