@@ -314,6 +314,8 @@ class LabelsetCollection(idhandler.IDprop):
                     f"{len(mask_names)} mask names specified: {mask_names!r}, "
                     f"but got {split_size} from the splitter.",
                 )
+        elif split_size == 1:
+            mask_names = ["test"]
         elif split_size == 2:
             mask_names = ["train", "test"]
         elif split_size == 3:

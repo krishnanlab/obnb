@@ -5,7 +5,7 @@ import torch
 from NLEval.graph import SparseGraph
 from NLEval.label import filters
 from NLEval.label import LabelsetCollection
-from NLEval.label.split import RatioHoldout
+from NLEval.label.split import RatioPartition
 from NLEval.model_trainer.gnn import SimpleGNNTrainer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
@@ -36,7 +36,7 @@ n_tasks = len(lsc.label_ids)
 lsc.load_entity_properties(PROPERTY_FP, "PubMed Count", 0, int)
 
 # 3/2 train/test split using genes with higher PubMed Count for training
-splitter = RatioHoldout(0.6, 0.2, 0.2, ascending=False)
+splitter = RatioPartition(0.6, 0.2, 0.2, ascending=False)
 
 # Select model
 mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=n_tasks)
