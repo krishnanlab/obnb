@@ -58,6 +58,9 @@ lsc.iapply(label.filters.EntityExistenceFilter(g.idmap.lst))
 # Remove small genesets
 lsc.iapply(label.filters.LabelsetRangeFilterSize(min_val=50))
 
+# Generate negatives via hypergeometric test
+lsc.iapply(label.filters.NegativeGeneratorHypergeom(p_thresh=0.05))
+
 # Load PubMed count and use it to setup study-bias holdout split
 lsc.load_entity_properties("data/properties/PubMedCount.txt", "PubMed Count", 0, int)
 splitter = RatioHoldout(0.6, 0.4, ascending=False)
@@ -70,8 +73,8 @@ from sklearn.metrics import roc_auc_score
 from NLEval.model.label_propagation import OneHopPropagation
 from NLEval.model_trainer import SupervisedLearningTrainer, LabelPropagationTrainer
 
-# Prepare study-bias holdout split on a specific geneset
-y, masks = lsc.split(splitter, target_ids=g.idmap.lst, labelset_name=label_id, property_name="PubMedCount")
+# Prepare study-bias holdout split on a specific geneset, taking into account of defined negatives
+y, masks = lsc.split(splitter, target_ids=g.idmap.lst, labelset_name=label_id, property_name="PubMedCount", consider_negative=True)
 
 # Specify model(s) and metrics
 sl_mdl = LogisticRegression(penalty="l2", solver="lbfgs")
@@ -87,7 +90,7 @@ lp_results = LabelPropagationTrainer(metrics, g).train(lp_mdl, y, masks)
 from torch_geometric.nn import GCN
 from NLEval.model_trainer.gnn import SimpleGNNTrainer
 
-# Prepare study-bias holdout split on the whole geneset collection
+# Prepare study-bias holdout split on the whole geneset collection, do not consider defined negatives
 y, masks = lsc.split(splitter, target_ids=g.idmap.lst, property_name="PubMedCount")
 
 # Evaluate GCN on the whole geneset collection
