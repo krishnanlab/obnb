@@ -465,6 +465,98 @@ class TestLabelsetSplit(unittest.TestCase):
             [0, 0, 0, 0, 1, 1, 1, 1],
         ]
 
+    def test_threshold_holdout_repr(self):
+        for threshold in [-4, 0.1, 4, 10.31]:
+            with self.subTest(threshold):
+                splitter = split.ThresholdHoldout(threshold)
+                self.assertEqual(
+                    repr(splitter),
+                    f"ThresholdHoldout(ascending=True, threshold={threshold})",
+                )
+
+    def test_threshold_holdout_raises(self):
+        self.assertRaises(ValueError, split.ThresholdHoldout, 5, ascending=None)
+        self.assertRaises(TypeError, split.ThresholdHoldout, "6")
+
+    def test_threshold_holdout(self):
+        with self.subTest(threshold=4):
+            y, masks = self.lsc.split(
+                split.ThresholdHoldout(4),
+                property_name="test_property",
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list)
+            self.assertEqual(list(masks), ["test"])
+            self.assertEqual(
+                masks["test"].T.tolist(),
+                [[1, 1, 1, 1, 0, 0, 0, 0]],
+            )
+
+        with self.subTest(threshold=2, ascending=False):
+            y, masks = self.lsc.split(
+                split.ThresholdHoldout(2, ascending=False),
+                property_name="test_property",
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list)
+            self.assertEqual(list(masks), ["test"])
+            self.assertEqual(
+                masks["test"].T.tolist(),
+                [[0, 0, 0, 1, 1, 1, 1, 1]],
+            )
+
+    def test_ratio_holdout_repr(self):
+        for ratio in [0.1, 0.5, 0.9]:
+            with self.subTest(ratio=ratio):
+                splitter = split.RatioHoldout(ratio)
+                self.assertEqual(
+                    repr(splitter),
+                    f"RatioHoldout(ascending=True, ratio={ratio})",
+                )
+
+    def test_ratio_partition_raises(self):
+        for ratio in [0, 1, 2.4]:
+            with self.subTest(ratio=ratio):
+                with self.assertRaises(ValueError) as context:
+                    split.RatioHoldout(ratio)
+                self.assertEqual(
+                    str(context.exception),
+                    "ratio must be strictly between 0 and 1, got {ratio}",
+                )
+
+    def test_ratio_holdout(self):
+        with self.subTest(ratio=0.2):
+            y, masks = self.lsc.split(
+                split.RatioHoldout(0.2),
+                property_name="test_property",
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list)
+            self.assertEqual(list(masks), ["test"])
+            self.assertEqual(
+                masks["test"].T.tolist(),
+                [[1, 0, 0, 0, 0, 0, 0, 0]],
+            )
+
+        with self.subTest(ratio=0.2, ascending=False):
+            y, masks = self.lsc.split(
+                split.RatioHoldout(0.2, ascending=False),
+                property_name="test_property",
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list)
+            self.assertEqual(list(masks), ["test"])
+            self.assertEqual(
+                masks["test"].T.tolist(),
+                [[0, 0, 0, 0, 0, 0, 0, 1]],
+            )
+
+        with self.subTest(ratio=0.5):
+            y, masks = self.lsc.split(
+                split.RatioHoldout(0.5),
+                property_name="test_property",
+            )
+            self.assertEqual(
+                masks["test"].T.tolist(),
+                [[1, 1, 1, 1, 0, 0, 0, 0]],
+            )
+
     def test_threshold_partition_repr(self):
         with self.subTest(thresholds=(4,)):
             splitter = split.ThresholdPartition(4)
