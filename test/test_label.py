@@ -556,6 +556,33 @@ class TestLabelsetSplit(unittest.TestCase):
                 [[1, 1, 1, 1, 0, 0, 0, 0]],
             )
 
+    def test_threshold_holdout_raises_target_ids(self):
+        splitter = split.ThresholdHoldout(4)
+
+        # target_ids contains all ids in the labelset, should work
+        self.lsc.split(
+            splitter,
+            target_ids=["a", "b", "c", "d", "e", "f", "g", "h"],
+            property_name="test_property",
+        )
+        self.lsc.split(
+            splitter,
+            target_ids=["a", "c", "b", "o", "k", "d", "e", "f", "g", "h"],
+            property_name="test_property",
+        )
+
+        # Missting "g"
+        with self.assertRaises(ValueError) as context:
+            self.lsc.split(
+                splitter,
+                target_ids=["a", "b", "c", "d", "e", "f", "h"],
+                property_name="test_property",
+            )
+        self.assertEqual(
+            str(context.exception),
+            "target_ids must contain all of entity_ids, but 'g' is missing",
+        )
+
     def test_ratio_holdout_repr(self):
         for ratio in [0.1, 0.5, 0.9]:
             with self.subTest(ratio=ratio):
