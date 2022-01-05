@@ -503,6 +503,86 @@ class TestLabelsetSplit(unittest.TestCase):
                 [[0, 0, 0, 1, 1, 1, 1, 1]],
             )
 
+    def test_threshold_holdout_with_negatives(self):
+        self.lsc.set_negative(["e"], "Labelset1")
+        self.lsc.set_negative(["a", "e"], "Labelset2")
+
+        # Only works when labelset_name is specified explicitly
+        self.assertRaises(
+            ValueError,
+            self.lsc.split,
+            split.ThresholdHoldout(4),
+            property_name="test_property",
+            consider_negative=True,
+        )
+
+        with self.subTest(threshold=4, labelset_name="Labelset1"):
+            y, masks = self.lsc.split(
+                split.ThresholdHoldout(4),
+                labelset_name="Labelset1",
+                property_name="test_property",
+                consider_negative=True,
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list[0])
+            self.assertEqual(
+                masks["test"].T.tolist(),
+                [[1, 1, 1, 0, 0, 0, 0, 0]],
+            )
+
+        with self.subTest(threshold=4, labelset_name="Labelset2"):
+            y, masks = self.lsc.split(
+                split.ThresholdHoldout(4),
+                labelset_name="Labelset2",
+                property_name="test_property",
+                consider_negative=True,
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list[1])
+            self.assertEqual(
+                masks["test"].T.tolist(),
+                [[1, 1, 0, 1, 0, 0, 0, 0]],
+            )
+
+        # If negatives are not set explicitly, use what's not positives
+        with self.subTest(threshold=4, labelset_name="Labelset3"):
+            y, masks = self.lsc.split(
+                split.ThresholdHoldout(4),
+                labelset_name="Labelset3",
+                property_name="test_property",
+                consider_negative=True,
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list[2])
+            self.assertEqual(
+                masks["test"].T.tolist(),
+                [[1, 1, 1, 1, 0, 0, 0, 0]],
+            )
+
+    def test_threshold_holdout_raises_target_ids(self):
+        splitter = split.ThresholdHoldout(4)
+
+        # target_ids contains all ids in the labelset, should work
+        self.lsc.split(
+            splitter,
+            target_ids=["a", "b", "c", "d", "e", "f", "g", "h"],
+            property_name="test_property",
+        )
+        self.lsc.split(
+            splitter,
+            target_ids=["a", "c", "b", "o", "k", "d", "e", "f", "g", "h"],
+            property_name="test_property",
+        )
+
+        # Missting "g"
+        with self.assertRaises(ValueError) as context:
+            self.lsc.split(
+                splitter,
+                target_ids=["a", "b", "c", "d", "e", "f", "h"],
+                property_name="test_property",
+            )
+        self.assertEqual(
+            str(context.exception),
+            "target_ids must contain all of entity_ids, but 'g' is missing",
+        )
+
     def test_ratio_holdout_repr(self):
         for ratio in [0.1, 0.5, 0.9]:
             with self.subTest(ratio=ratio):
