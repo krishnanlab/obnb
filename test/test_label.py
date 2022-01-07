@@ -475,7 +475,6 @@ class TestLabelsetSplit(unittest.TestCase):
                 )
 
     def test_threshold_holdout_raises(self):
-        self.assertRaises(ValueError, split.ThresholdHoldout, 5, ascending=None)
         self.assertRaises(TypeError, split.ThresholdHoldout, "6")
 
     def test_threshold_holdout(self):
@@ -678,20 +677,6 @@ class TestLabelsetSplit(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             split.ThresholdPartition()
         self.assertEqual(str(context.exception), "No thresholds specified")
-
-        self.assertRaises(
-            TypeError,
-            split.ThresholdPartition,
-            5,
-            ascending="False",
-        )
-
-        self.assertRaises(
-            ValueError,
-            split.ThresholdPartition,
-            5,
-            ascending=None,
-        )
 
         self.assertRaises(
             TypeError,

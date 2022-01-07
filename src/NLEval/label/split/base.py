@@ -59,23 +59,6 @@ class BaseSortedSplit(BaseSplit):
         idx = self.get_split_idx(x_sorted_val)
         yield self.split_by_idx(idx, x_sorted_idx)
 
-    @property
-    def ascending(self) -> bool:
-        """Sort entities in the dataset ascendingly if set to True."""
-        return self._ascending
-
-    @ascending.setter
-    def ascending(self, val: bool) -> None:
-        """Setter for ascending.
-
-        Raises:
-            TypeError: If the input value of ascending is no bool type.
-            ValueError: If the input value of ascending is None.
-
-        """
-        checkType("ascending", bool, val)
-        self._ascending = val
-
     def sort(self, x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """Return the sorted index and value of the entity properties.
 
