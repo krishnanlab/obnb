@@ -3,6 +3,7 @@ from typing import Tuple
 import numpy as np
 
 from ...util.checkers import checkType
+from .base import BaseRandomSplit
 from .base import BaseSortedSplit
 
 
@@ -125,3 +126,11 @@ class ThresholdHoldout(BaseHoldout):
         where = np.where(x_sorted_val >= threshold)[0]
         idx = x_size if where.size == 0 else where[0]
         return idx
+
+
+class RandomRatioHoldout(BaseRandomSplit, RatioHoldout):
+    """Randomly holdout some ratio of the dataset."""
+
+    def __init__(self, ratio, shuffle=True, random_state=None):
+        """Initialize RandomRatioHoldout."""
+        super().__init__(ratio, shuffle=shuffle, random_state=random_state)
