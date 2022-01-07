@@ -2,7 +2,7 @@ from typing import Tuple
 
 import numpy as np
 
-from ...util.checkers import checkTypeErrNone
+from ...util.checkers import checkType
 from .base import BaseSortedSplit
 
 
@@ -58,7 +58,7 @@ class RatioHoldout(BaseHoldout):
             ValueError: If the input value  is not strictly between 0 and 1.
 
         """
-        checkTypeErrNone("ratio", float, ratio)
+        checkType("ratio", float, ratio)
         if not 0 < ratio < 1:
             raise ValueError(
                 f"ratio must be strictly between 0 and 1, got {ratio}",
@@ -115,7 +115,7 @@ class ThresholdHoldout(BaseHoldout):
             TypeError: If the input value not float type.
 
         """
-        checkTypeErrNone("threshold", (int, float), threshold)
+        checkType("threshold", (int, float), threshold)
         self._threshold = threshold
 
     def get_split_idx(self, x_sorted_val: np.ndarray) -> int:

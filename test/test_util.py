@@ -579,6 +579,7 @@ class TestCheckers(unittest.TestCase):
             int,
             self.n_float,
         )
+
         checkers.checkType("n_float", float, self.n_float)
         self.assertRaises(
             TypeError,
@@ -588,6 +589,16 @@ class TestCheckers(unittest.TestCase):
             self.n_int,
         )
         checkers.checkType("n_str", str, self.n_str)
+
+        self.assertRaises(ValueError, checkers.checkType, "n", int, None)
+        self.assertRaises(
+            ValueError,
+            checkers.checkType,
+            "n",
+            float,
+            None,
+        )
+        self.assertRaises(ValueError, checkers.checkType, "n", str, None)
 
     def test_checkTypeInIterable(self):
         checkers.checkTypesInIterable(
@@ -663,21 +674,10 @@ class TestCheckers(unittest.TestCase):
             self.n_float_npary,
         )
 
-    def test_checkTypeErrNone(self):
-        self.assertRaises(ValueError, checkers.checkTypeErrNone, "n", int, None)
-        self.assertRaises(
-            ValueError,
-            checkers.checkTypeErrNone,
-            "n",
-            float,
-            None,
-        )
-        self.assertRaises(ValueError, checkers.checkTypeErrNone, "n", str, None)
-
-    def test_checkTypeAllowNone(self):
-        checkers.checkTypeAllowNone("n", int, None)
-        checkers.checkTypeAllowNone("n", float, None)
-        checkers.checkTypeAllowNone("n", str, None)
+    def test_checkNullableType(self):
+        checkers.checkNullableType("n", int, None)
+        checkers.checkNullableType("n", float, None)
+        checkers.checkNullableType("n", str, None)
 
     def test_checkNumpyArrayNDim(self):
         ary1 = np.ones(2)

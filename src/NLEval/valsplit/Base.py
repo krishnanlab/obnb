@@ -109,7 +109,7 @@ class BaseHoldout(BaseValSplit):
 
     @train_on.setter
     def train_on(self, val):
-        checkers.checkTypeErrNone("train_on", str, val)
+        checkers.checkType("train_on", str, val)
         if val not in ["top", "bot"]:
             raise ValueError(f"Train on must be 'top' or 'bot', not {val!r}")
         self._train_on = val

@@ -3,7 +3,7 @@ from typing import Tuple
 
 import numpy as np
 
-from ...util.checkers import checkTypeErrNone
+from ...util.checkers import checkType
 
 
 class BaseSplit:
@@ -73,7 +73,7 @@ class BaseSortedSplit(BaseSplit):
             ValueError: If the input value of ascending is None.
 
         """
-        checkTypeErrNone("ascending", bool, val)
+        checkType("ascending", bool, val)
         self._ascending = val
 
     def sort(self, x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:

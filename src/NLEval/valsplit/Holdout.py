@@ -36,7 +36,7 @@ class TrainValTest(BaseHoldout):
 
     @train_ratio.setter
     def train_ratio(self, val):
-        checkers.checkTypeErrNone("Training ratio", checkers.FLOAT_TYPE, val)
+        checkers.checkType("Training ratio", checkers.FLOAT_TYPE, val)
         if (val <= 0) | (val > 1):
             raise ValueError(
                 f"Training ratio must be between 0 and 1, received {val}",
@@ -45,7 +45,7 @@ class TrainValTest(BaseHoldout):
 
     @test_ratio.setter
     def test_ratio(self, val):
-        checkers.checkTypeErrNone("Testing ratio", checkers.FLOAT_TYPE, val)
+        checkers.checkType("Testing ratio", checkers.FLOAT_TYPE, val)
         if (val <= 0) | (val > 1):
             raise ValueError(
                 f"Testing ratio must be between 0 and 1, received {val}",
@@ -94,7 +94,7 @@ class BinHold(BaseHoldout):
 
     @bin_num.setter
     def bin_num(self, val):
-        checkers.checkTypeErrNone("Number of bins", checkers.INT_TYPE, val)
+        checkers.checkType("Number of bins", checkers.INT_TYPE, val)
         if val < 1:
             raise ValueError(
                 f"Number of bins must be greater than 1, received {val}",
@@ -141,7 +141,7 @@ class ThreshHold(BaseHoldout):
 
     @cut_off.setter
     def cut_off(self, val):
-        checkers.checkTypeErrNone("Cut off", checkers.NUMERIC_TYPE, val)
+        checkers.checkType("Cut off", checkers.NUMERIC_TYPE, val)
         self._cut_off = val
 
     def train_test_setup(self, lsc_ids, node_ids, prop_name, **kwargs):

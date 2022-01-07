@@ -33,5 +33,5 @@ class TimeIt:
 
     @verbose.setter
     def verbose(self, val: bool) -> None:
-        checkers.checkTypeErrNone("verbose", bool, val)
+        checkers.checkType("verbose", bool, val)
         self._verbose = val
