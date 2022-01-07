@@ -915,6 +915,43 @@ class TestLabelsetSplit(unittest.TestCase):
                 [[1, 1, 0, 0, 0, 0, 0, 0]],
             )
 
+    def test_random_ratio_partition(self):
+        with self.subTest(ratios=(0.5, 0.5), shuffle=False):
+            y, masks = self.lsc.split(
+                split.RandomRatioPartition(0.5, 0.5, shuffle=False),
+            )
+            self.assertEqual(y.T.tolist(), self.y_t_list)
+            self.assertEqual(list(masks), ["train", "test"])
+            self.assertEqual(
+                masks["train"].T.tolist(),
+                [[1, 1, 1, 1, 0, 0, 0, 0]],
+            )
+            self.assertEqual(
+                masks["test"].T.tolist(),
+                [[0, 0, 0, 0, 1, 1, 1, 1]],
+            )
+
+        for random_state in [0, 32, 60]:
+            with self.subTest(ratios=(0.5, 0.5), random_state=random_state):
+                y, masks = self.lsc.split(
+                    split.RandomRatioPartition(
+                        0.5,
+                        0.5,
+                        random_state=random_state,
+                    ),
+                )
+
+                # Manually compute expected random mask
+                np.random.seed(random_state)
+                random_x = np.random.choice(8, size=8, replace=False)
+                mask = np.zeros(8, dtype=bool)
+                mask[random_x.argsort()[:4]] = 1
+
+                self.assertEqual(y.T.tolist(), self.y_t_list)
+                self.assertEqual(list(masks), ["train", "test"])
+                self.assertEqual(masks["train"].T.tolist(), [mask.tolist()])
+                self.assertEqual(masks["test"].T.tolist(), [(~mask).tolist()])
+
 
 class TestFilter(unittest.TestCase):
     def setUp(self):
