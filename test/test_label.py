@@ -1337,71 +1337,43 @@ class TestFilter(unittest.TestCase):
                 ["Group2", "Group5"],
             )
 
-    @unittest.skip("WIP: updating to LabelsetRangeFilterSplit.")
-    def test_LabelsetRangeFilterTrainTestPos(self):
-        train_index = np.array(["a", "b", "c", "d"])
-        test_index = np.array(["e", "f", "g", "h"])
-        with self.subTest(train=train_index, test=test_index):
-            splitter = valsplit.Holdout.CustomHold(train_index, test_index)
-            splitter._train_index = splitter.custom_train_index
-            splitter._test_index = splitter.custom_test_index
-            self.lsc.valsplit = splitter
-            lsc = self.lsc.apply(
-                filters.LabelsetRangeFilterTrainTestPos(min_val=1),
-                inplace=False,
-            )
-            self.assertEqual(lsc.label_ids, ["Group4", "Group5"])
-            self.assertEqual(
-                lsc.prop["Labelset"],
-                [{"a", "f", "c"}, {"a", "h"}],
-            )
-            self.assertEqual(lsc.entity.map, {"a": 0, "c": 1, "f": 2, "h": 3})
+    def test_LabelsetRangeFilterSplit(self):
+        # Setup mock properties for generating splits
+        self.lsc.entity.new_property("test_property", 0, int)
+        for i, j in enumerate(["a", "b", "c", "d", "e", "f", "g", "h"]):
+            self.lsc.entity.set_property(j, "test_property", i)
 
-        train_index = np.array(["a", "c", "e"])
-        test_index = np.array(["b", "d", "f"])
-        with self.subTest(train=train_index, test=test_index):
-            splitter = valsplit.Holdout.CustomHold(train_index, test_index)
-            splitter._train_index = splitter.custom_train_index
-            splitter._test_index = splitter.custom_test_index
-            self.lsc.valsplit = splitter
+        # Train = [a, b], Test = [c, d, e, f, g, h], Group3 does not have any
+        # postives in the training split, hence should be removed
+        splitter = split.ThresholdPartition(2)
+        with self.subTest(splitter=splitter):
             lsc = self.lsc.apply(
-                filters.LabelsetRangeFilterTrainTestPos(min_val=1),
-                inplace=False,
-            )
-            self.assertEqual(lsc.label_ids, ["Group1", "Group3", "Group4"])
-            self.assertEqual(
-                lsc.prop["Labelset"],
-                [{"a", "b", "c"}, {"e", "f", "g"}, {"a", "f", "c"}],
+                filters.LabelsetRangeFilterSplit(
+                    1,
+                    splitter,
+                    property_name="test_property",
+                ),
             )
             self.assertEqual(
-                lsc.entity.map,
-                {"a": 0, "b": 1, "c": 2, "e": 3, "f": 4, "g": 5},
+                lsc.label_ids,
+                ["Group1", "Group2", "Group4", "Group5"],
             )
 
-        train_index = np.array(["a", "d"])
-        valid_index = np.array(["b", "e"])
-        test_index = np.array(["c", "f"])
-        with self.subTest(
-            train=train_index,
-            test=test_index,
-            valid=valid_index,
-        ):
-            splitter = valsplit.Holdout.CustomHold(
-                train_index,
-                test_index,
-                valid_index,
-            )
-            splitter._train_index = splitter.custom_train_index
-            splitter._test_index = splitter.custom_test_index
-            splitter._valid_index = splitter.custom_valid_index
-            self.lsc.valsplit = splitter
+        # Train = [a], Test = [b, c, d, e, f, g, h], Both Group2 and Group3 do
+        # not have any postives in the training split, hence should be removed
+        splitter = split.ThresholdPartition(1)
+        with self.subTest(splitter=splitter):
             lsc = self.lsc.apply(
-                filters.LabelsetRangeFilterTrainTestPos(min_val=1),
-                inplace=False,
+                filters.LabelsetRangeFilterSplit(
+                    1,
+                    splitter,
+                    property_name="test_property",
+                ),
             )
-            self.assertEqual(lsc.label_ids, ["Group1"])
-            self.assertEqual(lsc.prop["Labelset"], [{"a", "b", "c"}])
-            self.assertEqual(lsc.entity.map, {"a": 0, "b": 1, "c": 2})
+            self.assertEqual(
+                lsc.label_ids,
+                ["Group1", "Group4", "Group5"],
+            )
 
     def test_NegativeGeneratorHypergeom(self):
         # p-val threshold set to 0.5 since most large,
