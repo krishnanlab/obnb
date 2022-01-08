@@ -345,7 +345,7 @@ class TestSplit(unittest.TestCase):
             ValueError,
             self.lsc.split,
             KFold(n_splits=2).split,
-            mask_names=["train", "val", "test"],
+            mask_names=("train", "val", "test"),
         )
 
     def test_raise_label_name(self):
@@ -370,13 +370,13 @@ class TestSplit(unittest.TestCase):
 
         y, _ = self.lsc.split(
             KFold(n_splits=2).split,
-            target_ids=["a", "c", "b", "d"],
+            target_ids=("a", "c", "b", "d"),
         )
         self.assertEqual(y.T.tolist(), [[1, 1, 1, 0], [0, 0, 1, 1]])
 
         y, _ = self.lsc.split(
             KFold(n_splits=2).split,
-            target_ids=["a", "e", "c", "b", "d", "f"],
+            target_ids=("a", "e", "c", "b", "d", "f"),
         )
         self.assertEqual(y.T.tolist(), [[1, 0, 1, 1, 0, 0], [0, 0, 0, 1, 1, 0]])
 
@@ -402,7 +402,7 @@ class TestSplit(unittest.TestCase):
         y, masks = self.lsc.split(
             KFold(n_splits=2).split,
             labelset_name="Labelset1",
-            target_ids=["a", "e", "c", "b", "d", "f"],
+            target_ids=("a", "e", "c", "b", "d", "f"),
         )
         self.assertEqual(y.T.tolist(), [1, 0, 1, 1, 0, 0])
         self.assertEqual(list(masks), ["train", "test"])
@@ -561,12 +561,12 @@ class TestLabelsetSplit(unittest.TestCase):
         # target_ids contains all ids in the labelset, should work
         self.lsc.split(
             splitter,
-            target_ids=["a", "b", "c", "d", "e", "f", "g", "h"],
+            target_ids=("a", "b", "c", "d", "e", "f", "g", "h"),
             property_name="test_property",
         )
         self.lsc.split(
             splitter,
-            target_ids=["a", "c", "b", "o", "k", "d", "e", "f", "g", "h"],
+            target_ids=("a", "c", "b", "o", "k", "d", "e", "f", "g", "h"),
             property_name="test_property",
         )
 
@@ -574,7 +574,7 @@ class TestLabelsetSplit(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             self.lsc.split(
                 splitter,
-                target_ids=["a", "b", "c", "d", "e", "f", "h"],
+                target_ids=("a", "b", "c", "d", "e", "f", "h"),
                 property_name="test_property",
             )
         self.assertEqual(
@@ -723,7 +723,7 @@ class TestLabelsetSplit(unittest.TestCase):
             y, masks = self.lsc.split(
                 split.ThresholdPartition(6, 1, 2),
                 property_name="test_property",
-                mask_names=["mask1", "mask2", "mask3", "mask4"],
+                mask_names=("mask1", "mask2", "mask3", "mask4"),
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(
@@ -747,7 +747,7 @@ class TestLabelsetSplit(unittest.TestCase):
             y, masks = self.lsc.split(
                 split.ThresholdPartition(5, 10, 20),
                 property_name="test_property",
-                mask_names=["mask1", "mask2", "mask3", "mask4"],
+                mask_names=("mask1", "mask2", "mask3", "mask4"),
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(
@@ -805,7 +805,7 @@ class TestLabelsetSplit(unittest.TestCase):
             y, masks = self.lsc.split(
                 split.ThresholdPartition(5, 10, 20, ascending=False),
                 property_name="test_property",
-                mask_names=["mask1", "mask2", "mask3", "mask4"],
+                mask_names=("mask1", "mask2", "mask3", "mask4"),
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(
@@ -1337,70 +1337,118 @@ class TestFilter(unittest.TestCase):
                 ["Group2", "Group5"],
             )
 
-    def test_LabelsetRangeFilterTrainTestPos(self):
-        train_index = np.array(["a", "b", "c", "d"])
-        test_index = np.array(["e", "f", "g", "h"])
-        with self.subTest(train=train_index, test=test_index):
-            splitter = valsplit.Holdout.CustomHold(train_index, test_index)
-            splitter._train_index = splitter.custom_train_index
-            splitter._test_index = splitter.custom_test_index
-            self.lsc.valsplit = splitter
-            lsc = self.lsc.apply(
-                filters.LabelsetRangeFilterTrainTestPos(min_val=1),
-                inplace=False,
-            )
-            self.assertEqual(lsc.label_ids, ["Group4", "Group5"])
-            self.assertEqual(
-                lsc.prop["Labelset"],
-                [{"a", "f", "c"}, {"a", "h"}],
-            )
-            self.assertEqual(lsc.entity.map, {"a": 0, "c": 1, "f": 2, "h": 3})
+    def test_LabelsetRangeFilterSplit(self):
+        # Setup mock properties for generating splits
+        self.lsc.entity.new_property("test_property", 0, int)
+        for i, j in enumerate(["a", "b", "c", "d", "e", "f", "g", "h"]):
+            self.lsc.entity.set_property(j, "test_property", i)
 
-        train_index = np.array(["a", "c", "e"])
-        test_index = np.array(["b", "d", "f"])
-        with self.subTest(train=train_index, test=test_index):
-            splitter = valsplit.Holdout.CustomHold(train_index, test_index)
-            splitter._train_index = splitter.custom_train_index
-            splitter._test_index = splitter.custom_test_index
-            self.lsc.valsplit = splitter
+        # Train = [a, b], Test = [c, d, e, f, g, h], Group3 does not have any
+        # postives in the training split, hence should be removed
+        splitter = split.ThresholdPartition(2)
+        with self.subTest(splitter=splitter):
             lsc = self.lsc.apply(
-                filters.LabelsetRangeFilterTrainTestPos(min_val=1),
-                inplace=False,
-            )
-            self.assertEqual(lsc.label_ids, ["Group1", "Group3", "Group4"])
-            self.assertEqual(
-                lsc.prop["Labelset"],
-                [{"a", "b", "c"}, {"e", "f", "g"}, {"a", "f", "c"}],
+                filters.LabelsetRangeFilterSplit(
+                    1,
+                    splitter,
+                    property_name="test_property",
+                ),
             )
             self.assertEqual(
-                lsc.entity.map,
-                {"a": 0, "b": 1, "c": 2, "e": 3, "f": 4, "g": 5},
+                lsc.label_ids,
+                ["Group1", "Group2", "Group4", "Group5"],
             )
 
-        train_index = np.array(["a", "d"])
-        valid_index = np.array(["b", "e"])
-        test_index = np.array(["c", "f"])
-        with self.subTest(
-            train=train_index,
-            test=test_index,
-            valid=valid_index,
-        ):
-            splitter = valsplit.Holdout.CustomHold(
-                train_index,
-                test_index,
-                valid_index,
-            )
-            splitter._train_index = splitter.custom_train_index
-            splitter._test_index = splitter.custom_test_index
-            splitter._valid_index = splitter.custom_valid_index
-            self.lsc.valsplit = splitter
+        # Train = [a], Test = [b, c, d, e, f, g, h], Both Group2 and Group3 do
+        # not have any postives in the training split, hence should be removed
+        splitter = split.ThresholdPartition(1)
+        with self.subTest(splitter=splitter):
             lsc = self.lsc.apply(
-                filters.LabelsetRangeFilterTrainTestPos(min_val=1),
-                inplace=False,
+                filters.LabelsetRangeFilterSplit(
+                    1,
+                    splitter,
+                    property_name="test_property",
+                ),
             )
-            self.assertEqual(lsc.label_ids, ["Group1"])
-            self.assertEqual(lsc.prop["Labelset"], [{"a", "b", "c"}])
-            self.assertEqual(lsc.entity.map, {"a": 0, "b": 1, "c": 2})
+            self.assertEqual(
+                lsc.label_ids,
+                ["Group1", "Group4", "Group5"],
+            )
+
+        splitter = split.RatioPartition(0.25, 0.75)
+        with self.subTest(splitter=splitter):
+            """Iteratively apply ratio filter until nothing changes.
+
+            Notes:
+                The dotted line indicates the position of the partitioning;
+                'x' indicates the position of removed labels/entities due to
+                filtering at current step.
+
+            1) 1/3 split applied to the original y matrix:
+                    1   2   3   4   5
+                a   1   0   0   1   1
+                b   1   1   0   0   0
+                ---------------------
+                c   1   0   0   1   0
+                d   0   1   0   0   0
+                e   0   0   1   0   0 x (only group3 uses e)
+                f   0   0   1   1   0
+                g   0   0   1   0   0 x (only group3 uses g)
+                h   0   0   0   0   1
+                            x
+
+                Group3 removed since the first split do not have any positives,
+                but we required the minimum number of positives to be min_val=1.
+
+            2) 1/3 split applied to the new matrix:
+                    1   2   4   5
+                a   1   0   1   1
+                -----------------
+                b   1   1   0   0
+                c   1   0   1   0
+                d   0   1   0   0 x (only group2 uses d in the new matrix)
+                f   0   0   1   0
+                h   0   0   0   1
+                        x
+
+                Group2 removed since the first split do no have any positives.
+
+            3) 1/3 split applied to the new matrix from 2)
+                    1   4   5
+                a   1   1   1
+                -------------
+                b   1   0   0
+                c   1   1   0
+                f   0   1   0
+                h   0   0   1
+
+                Nothing will be filtered out in this matrix since the split
+                filtering criterion is met, i.e. at least one positives in
+                each split.
+
+            So our final filtered labelset would be:
+                * Group1: a, b, c
+                * Group4: a, c, f
+                * Group5: a, h
+
+            """
+            # TODO: automate this recursion..
+            lsc = self.lsc.copy()
+            old_num_labels = None
+            while len(lsc) != old_num_labels:
+                old_num_labels = len(lsc)
+                lsc = lsc.apply(
+                    filters.LabelsetRangeFilterSplit(
+                        1,
+                        splitter,
+                        property_name="test_property",
+                    ),
+                )
+
+            self.assertEqual(lsc.label_ids, ["Group1", "Group4", "Group5"])
+            self.assertEqual(lsc.get_labelset("Group1"), {"a", "b", "c"})
+            self.assertEqual(lsc.get_labelset("Group4"), {"a", "c", "f"})
+            self.assertEqual(lsc.get_labelset("Group5"), {"a", "h"})
 
     def test_NegativeGeneratorHypergeom(self):
         # p-val threshold set to 0.5 since most large,

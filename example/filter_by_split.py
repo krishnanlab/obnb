@@ -1,12 +1,14 @@
 import os.path as osp
+from time import perf_counter
 
 import numpy as np
+from NLEval import model
 from NLEval.graph import DenseGraph
 from NLEval.label import filters
 from NLEval.label import LabelsetCollection
 from NLEval.label.split import RatioPartition
-from NLEval.model_trainer import SupervisedLearningTrainer
-from sklearn.linear_model import LogisticRegression
+from NLEval.model.label_propagation import OneHopPropagation
+from NLEval.model_trainer import LabelPropagationTrainer
 from sklearn.metrics import roc_auc_score as auroc
 
 NETWORK = "STRING-EXP"
@@ -37,37 +39,45 @@ lsc.load_entity_properties(PROPERTY_FP, "PubMed Count", 0, int)
 splitter = RatioPartition(0.6, 0.4, ascending=False)
 
 # Select model
-mdl = LogisticRegression(penalty="l2", solver="lbfgs", n_jobs=1)
+mdl = OneHopPropagation()
 
 # Setup trainer, use auroc as the evaluation metric
 metrics = {"auroc": auroc}
-trainer = SupervisedLearningTrainer(metrics, g)
+trainer = LabelPropagationTrainer(metrics, g)
 
-scores = []
-for label_id in lsc.label_ids:
+
+def print_split_stats(lsc, name):
     y, masks = lsc.split(
         splitter,
         target_ids=g.node_ids,
-        labelset_name=label_id,
         property_name="PubMed Count",
-        consider_negative=True,
     )
-    results = trainer.train(mdl, y, masks)
-    scores.append(results["test_auroc"])
-    train_score, test_score = results["train_auroc"], results["test_auroc"]
-    print(f"Train: {train_score:.4f}\tTest: {test_score:.4f}\t{label_id}")
+    print(f"\nNumber of labelsets {name} split-filtering: {len(lsc.label_ids)}")
+    for name, mask in masks.items():
+        num_pos = y[mask[:, 0]].sum(0)
+        print(
+            f"{name}:\n\tMinimum number of positives = {min(num_pos)}\n"
+            f"\tAverage number of positives = {np.mean(num_pos):.2f}",
+        )
 
-print(f"Average test score = {np.mean(scores):.4f}, std = {np.std(scores):.4f}")
 
-print(
-    """
-Expected outcome
---------------------------------------------------------------------------------
-NETWORK='STRING-EXP'
-LABEL='KEGGBP'
-Number of labelsets before filtering: 139
-Number of labelsets after filtering: 54
-Average test score = 0.8672, std = 0.0941
---------------------------------------------------------------------------------
-""",
+# Check minimum number of positives in each split before filtering
+print_split_stats(lsc, "before")
+
+# Apply split-filter
+print(f"{'START FILTERING BY SPLITS':-^80}")
+elapsed = perf_counter()
+lsc.iapply(
+    filters.LabelsetRangeFilterSplit(
+        10,  # required minimum number of positives in each split
+        splitter,
+        property_name="PubMed Count",
+        verbose=True,
+    ),
 )
+elapsed = perf_counter() - elapsed
+endstr = f"DONE ({elapsed=:.2f})"
+print(f"{endstr:-^80}\n")
+
+# Check minimum number of positives in each split after filtering
+print_split_stats(lsc, "after")

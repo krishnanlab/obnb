@@ -4,7 +4,7 @@ from .negative_generator import NegativeGeneratorHypergeom
 from .range_filter import EntityRangeFilterNoccur
 from .range_filter import LabelsetRangeFilterJaccard
 from .range_filter import LabelsetRangeFilterSize
-from .range_filter import LabelsetRangeFilterTrainTestPos
+from .range_filter import LabelsetRangeFilterSplit
 
 __all__ = [
     "EntityExistenceFilter",
@@ -12,6 +12,6 @@ __all__ = [
     "EntityRangeFilterNoccur",
     "LabelsetRangeFilterSize",
     "LabelsetRangeFilterJaccard",
-    "LabelsetRangeFilterTrainTestPos",  # TODO: deprecate
+    "LabelsetRangeFilterSplit",
     "NegativeGeneratorHypergeom",
 ]

@@ -1,5 +1,7 @@
-from NLEval.util import checkers
-from NLEval.util import idhandler
+from typing import Tuple
+
+from ..util import checkers
+from ..util import idhandler
 
 
 class BaseGraph:
@@ -8,6 +10,11 @@ class BaseGraph:
     def __init__(self):
         """Initialize BaseGraph object."""
         self.idmap = idhandler.IDmap()
+
+    @property
+    def node_ids(self) -> Tuple[str, ...]:
+        """Return node IDs as a tuple."""
+        return tuple(self.idmap.lst)
 
     @property
     def idmap(self):
