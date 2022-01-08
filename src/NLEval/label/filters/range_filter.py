@@ -2,6 +2,7 @@ from typing import Optional
 
 import numpy as np
 
+from ..collection import Splitter
 from .base import BaseFilter
 
 
@@ -154,32 +155,49 @@ class LabelsetRangeFilterJaccard(BaseRangeFilter):
         return lsc.pop_labelset
 
 
-class LabelsetRangeFilterTrainTestPos(BaseRangeFilter):
-    """Filter labelsets based on number of positives in train/test sets.
+class LabelsetRangeFilterSplit(BaseRangeFilter):
+    """Filter labelsets based on number of positives in each dataset split."""
 
-    Note:
-        Only intended to be work with Holdout split type for now. Would not
-            raise error for other split types, but only will check the first
-            split. If validation set is available, will also check the
-            validation split.
+    def __init__(
+        self,
+        min_val: float,
+        splitter: Splitter,
+        verbose: bool = False,
+        **kwargs,
+    ):
+        """Initialize LabelsetRangeFilterTrainTestPos object.
 
-    """
+        Args:
+            verbose (bool): If set to True, print the relevant information at
+                the end of each iteration.
 
-    def __init__(self, min_val: float):
-        """Initialize LabelsetRangeFilterTrainTestPos object."""
+        """
         super().__init__(min_val=min_val)
+        self.splitter = splitter
+        self.kwargs = kwargs
+        self.verbose = verbose
 
-    @staticmethod
-    def get_val_getter(lsc):
-        return lambda label_id: min(
-            idx_ary.size
-            for idx_ary in next(
-                lsc.valsplit.get_split_idx_ary(
-                    np.array(list(lsc.get_labelset(label_id))),
-                    valid=lsc.valsplit.valid_index is not None,
-                ),
-            )
-        )
+    def get_val_getter(self, lsc):
+        """Return the value getter.
+
+        The value getter finds the minimum number of positives for a labelset
+        across all the dataset splits.
+
+        """
+
+        def val_getter(label_id):
+            y_all, masks = lsc.split(self.splitter, **self.kwargs)
+            y = y_all[:, lsc.label_ids.index(label_id)]
+            min_num_pos = np.inf
+            for mask in masks.values():
+                for i in range(mask.shape[1]):
+                    num_pos = y[mask[:, i]].sum()
+                    min_num_pos = min(min_num_pos, num_pos)
+            if self.verbose:
+                print(f"{label_id}, {min_num_pos=}")
+            return min_num_pos
+
+        return val_getter
 
     @staticmethod
     def get_ids(lsc):
@@ -187,4 +205,4 @@ class LabelsetRangeFilterTrainTestPos(BaseRangeFilter):
 
     @staticmethod
     def get_mod_fun(lsc):
-        return lsc.pop_labelset  # replace with soft filter
+        return lsc.pop_labelset
