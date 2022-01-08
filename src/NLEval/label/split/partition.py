@@ -5,6 +5,7 @@ from typing import Tuple
 import numpy as np
 
 from ...util.checkers import checkTypesInIterableErrEmpty
+from .base import BaseRandomSplit
 from .base import BaseSortedSplit
 
 
@@ -146,3 +147,11 @@ class ThresholdPartition(BasePartition):
             where = np.where(x_sorted_val >= threshold)[0]
             idx[i + 1] = x_size if where.size == 0 else where[0]
         return idx
+
+
+class RandomRatioPartition(BaseRandomSplit, RatioPartition):
+    """Randomly partition the dataset based on ratios."""
+
+    def __init__(self, *ratios, shuffle=True, random_state=None):
+        """Initialize RandomRatioPartition."""
+        super().__init__(*ratios, shuffle=shuffle, random_state=random_state)

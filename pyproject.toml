@@ -1,3 +1,12 @@
 [build-system]
 requires = ["setuptools>=42.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.mypy]
+ignore_missing_imports = true
+follow_imports = "skip"
+exclude = [
+    "src/NLEval/graph/",
+    "src/NLEval/valsplit/",
+    "src/NLEval/metrics.py",
+]

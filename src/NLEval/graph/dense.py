@@ -154,7 +154,7 @@ class FeatureVec(DenseGraph):
 
     @dim.setter
     def dim(self, d):
-        checkers.checkTypeAllowNone("d", checkers.INT_TYPE, d)
+        checkers.checkNullableType("d", checkers.INT_TYPE, d)
         if d is not None:
             if d < 1:
                 raise ValueError(

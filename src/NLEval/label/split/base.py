@@ -1,9 +1,8 @@
 from typing import Iterator
+from typing import Optional
 from typing import Tuple
 
 import numpy as np
-
-from ...util.checkers import checkTypeErrNone
 
 
 class BaseSplit:
@@ -59,23 +58,6 @@ class BaseSortedSplit(BaseSplit):
         idx = self.get_split_idx(x_sorted_val)
         yield self.split_by_idx(idx, x_sorted_idx)
 
-    @property
-    def ascending(self) -> bool:
-        """Sort entities in the dataset ascendingly if set to True."""
-        return self._ascending
-
-    @ascending.setter
-    def ascending(self, val: bool) -> None:
-        """Setter for ascending.
-
-        Raises:
-            TypeError: If the input value of ascending is no bool type.
-            ValueError: If the input value of ascending is None.
-
-        """
-        checkTypeErrNone("ascending", bool, val)
-        self._ascending = val
-
     def sort(self, x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """Return the sorted index and value of the entity properties.
 
@@ -98,3 +80,46 @@ class BaseSortedSplit(BaseSplit):
     @staticmethod
     def split_by_idx(idx, x_sorted_idx):
         raise NotImplementedError
+
+
+class BaseRandomSplit(BaseSortedSplit):
+    """BaseRandomSpilt object for randomly splitting dataset.
+
+    Randomly generates the node properties, then use specific sorted split
+    to split the dataset based on the random node properties.
+
+    """
+
+    def __init__(
+        self,
+        *args,
+        shuffle: bool = True,
+        random_state: Optional[int] = None,
+    ) -> None:
+        """Initialize BaseRandomSplit object.
+
+        Args:
+            shuffle (bool): Whether or not to shuffle the dataset ordering,
+                if not, use the original ordering (default: :obj:`True`)
+            random_state (int, optional): The random state used to shuffle
+                the data points (default: :obj:`None`)
+
+        """
+        super().__init__(*args)
+        self.shuffle = shuffle
+        self.random_state = random_state
+
+    def __call__(self, x, y):
+        """Split dataset based on random node properties."""
+        random_x = self.get_random_x(y)
+        yield next(super().__call__(random_x, y))
+
+    def get_random_x(self, y: np.ndarray) -> np.ndarray:
+        """Generate random node properties."""
+        n = y.shape[0]
+        if not self.shuffle:
+            x = np.arange(n)
+        else:
+            np.random.seed(self.random_state)
+            x = np.random.choice(n, size=n, replace=False)
+        return x

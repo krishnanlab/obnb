@@ -136,7 +136,7 @@ class ParDat:
     @n_workers.setter
     def n_workers(self, n: int) -> None:
         """Setter for n_workers."""
-        checkers.checkTypeErrNone("n_workers", int, n)
+        checkers.checkType("n_workers", int, n)
         if n == 0:
             n = mp.cpu_count()
         elif n < 0:
@@ -156,7 +156,7 @@ class ParDat:
     @job_list.setter
     def job_list(self, obj: List[Any]) -> None:
         """Setter for job_list."""
-        checkers.checkTypeErrNone("job_list", list, obj)
+        checkers.checkType("job_list", list, obj)
         self._job_list = obj
 
     @property
@@ -167,7 +167,7 @@ class ParDat:
     @verbose.setter
     def verbose(self, val: bool) -> None:
         """Setter for verbose."""
-        checkers.checkTypeErrNone("verbose", bool, val)
+        checkers.checkType("verbose", bool, val)
         self._verbose = val
 
     @no_type_check

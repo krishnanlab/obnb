@@ -24,8 +24,6 @@ __all__ = [
     "checkValuePositive",
     "checkValueNonnegative",
     "checkType",
-    "checkTypeErrNone",
-    "checkTypeAllowNone",
     "checkNullableType",
     "checkTypesInIterable",
     "checkTypesInList",
@@ -56,8 +54,8 @@ def checkValueNonnegative(name, val):
         raise ValueError(f"{name!r} should be non-negative, got {val}")
 
 
-def checkType(name, targetType, val):
-    """Check the type of an input value.
+def checkNullableType(name, targetType, val):
+    """Check the type of an input value and allow None.
 
     Args:
         name(str): name of the value
@@ -68,35 +66,18 @@ def checkType(name, targetType, val):
         TypeError: if `val` is not an instance of `targetType`
 
     """
-    if not isinstance(val, targetType):
+    if not isinstance(val, targetType) and val is not None:
         raise TypeError(
             f"{name!r} should be {targetType!r}, not {type(val)!r}: {val!r}",
         )
 
 
-def checkTypeErrNone(name, targetType, val):
-    """Type cheking with `checkType` and raises `ValueError` `val` is `None`.
-
-    Raises:
-        ValueError: if `val` is `None`
-
-    """
-    if val is not None:
-        checkType(name, targetType, val)
-    else:
+def checkType(name, targetType, val):
+    """Check the type of an input and raise ValueError if it is None."""
+    if val is None:
         raise ValueError(f"Value for {name!r} has not yet been provided")
-
-
-def checkTypeAllowNone(name, targetType, val):
-    """Type cheking with `checkType` and allow `None` for `val`."""
-    if val is not None:
-        checkType(name, targetType, val)
-
-
-def checkNullableType(name, targetType, val):
-    """Type cheking with `checkType` and allow `None` for `val`."""
-    # TODO: Update checkTypeAllowNone to checkNullableType
-    checkTypeAllowNone(name, targetType, val)
+    else:
+        checkNullableType(name, targetType, val)
 
 
 def checkTypesInIterable(name, targetType, val):
