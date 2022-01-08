@@ -1375,6 +1375,81 @@ class TestFilter(unittest.TestCase):
                 ["Group1", "Group4", "Group5"],
             )
 
+        splitter = split.RatioPartition(0.25, 0.75)
+        with self.subTest(splitter=splitter):
+            """Iteratively apply ratio filter until nothing changes.
+
+            Notes:
+                The dotted line indicates the position of the partitioning;
+                'x' indicates the position of removed labels/entities due to
+                filtering at current step.
+
+            1) 1/3 split applied to the original y matrix:
+                    1   2   3   4   5
+                a   1   0   0   1   1
+                b   1   1   0   0   0
+                ---------------------
+                c   1   0   0   1   0
+                d   0   1   0   0   0
+                e   0   0   1   0   0 x (only group3 uses e)
+                f   0   0   1   1   0
+                g   0   0   1   0   0 x (only group3 uses g)
+                h   0   0   0   0   1
+                            x
+
+                Group3 removed since the first split do not have any positives,
+                but we required the minimum number of positives to be min_val=1.
+
+            2) 1/3 split applied to the new matrix:
+                    1   2   4   5
+                a   1   0   1   1
+                -----------------
+                b   1   1   0   0
+                c   1   0   1   0
+                d   0   1   0   0 x (only group2 uses d in the new matrix)
+                f   0   0   1   0
+                h   0   0   0   1
+                        x
+
+                Group2 removed since the first split do no have any positives.
+
+            3) 1/3 split applied to the new matrix from 2)
+                    1   4   5
+                a   1   1   1
+                -------------
+                b   1   0   0
+                c   1   1   0
+                f   0   1   0
+                h   0   0   1
+
+                Nothing will be filtered out in this matrix since the split
+                filtering criterion is met, i.e. at least one positives in
+                each split.
+
+            So our final filtered labelset would be:
+                * Group1: a, b, c
+                * Group4: a, c, f
+                * Group5: a, h
+
+            """
+            # TODO: automate this recursion..
+            lsc = self.lsc.copy()
+            old_num_labels = None
+            while len(lsc) != old_num_labels:
+                old_num_labels = len(lsc)
+                lsc = lsc.apply(
+                    filters.LabelsetRangeFilterSplit(
+                        1,
+                        splitter,
+                        property_name="test_property",
+                    ),
+                )
+
+            self.assertEqual(lsc.label_ids, ["Group1", "Group4", "Group5"])
+            self.assertEqual(lsc.get_labelset("Group1"), {"a", "b", "c"})
+            self.assertEqual(lsc.get_labelset("Group4"), {"a", "c", "f"})
+            self.assertEqual(lsc.get_labelset("Group5"), {"a", "h"})
+
     def test_NegativeGeneratorHypergeom(self):
         # p-val threshold set to 0.5 since most large,
         # group1-group4 smallest with pval = 0.286
