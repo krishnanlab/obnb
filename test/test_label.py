@@ -345,7 +345,7 @@ class TestSplit(unittest.TestCase):
             ValueError,
             self.lsc.split,
             KFold(n_splits=2).split,
-            mask_names=["train", "val", "test"],
+            mask_names=("train", "val", "test"),
         )
 
     def test_raise_label_name(self):
@@ -370,13 +370,13 @@ class TestSplit(unittest.TestCase):
 
         y, _ = self.lsc.split(
             KFold(n_splits=2).split,
-            target_ids=["a", "c", "b", "d"],
+            target_ids=("a", "c", "b", "d"),
         )
         self.assertEqual(y.T.tolist(), [[1, 1, 1, 0], [0, 0, 1, 1]])
 
         y, _ = self.lsc.split(
             KFold(n_splits=2).split,
-            target_ids=["a", "e", "c", "b", "d", "f"],
+            target_ids=("a", "e", "c", "b", "d", "f"),
         )
         self.assertEqual(y.T.tolist(), [[1, 0, 1, 1, 0, 0], [0, 0, 0, 1, 1, 0]])
 
@@ -402,7 +402,7 @@ class TestSplit(unittest.TestCase):
         y, masks = self.lsc.split(
             KFold(n_splits=2).split,
             labelset_name="Labelset1",
-            target_ids=["a", "e", "c", "b", "d", "f"],
+            target_ids=("a", "e", "c", "b", "d", "f"),
         )
         self.assertEqual(y.T.tolist(), [1, 0, 1, 1, 0, 0])
         self.assertEqual(list(masks), ["train", "test"])
@@ -561,12 +561,12 @@ class TestLabelsetSplit(unittest.TestCase):
         # target_ids contains all ids in the labelset, should work
         self.lsc.split(
             splitter,
-            target_ids=["a", "b", "c", "d", "e", "f", "g", "h"],
+            target_ids=("a", "b", "c", "d", "e", "f", "g", "h"),
             property_name="test_property",
         )
         self.lsc.split(
             splitter,
-            target_ids=["a", "c", "b", "o", "k", "d", "e", "f", "g", "h"],
+            target_ids=("a", "c", "b", "o", "k", "d", "e", "f", "g", "h"),
             property_name="test_property",
         )
 
@@ -574,7 +574,7 @@ class TestLabelsetSplit(unittest.TestCase):
         with self.assertRaises(ValueError) as context:
             self.lsc.split(
                 splitter,
-                target_ids=["a", "b", "c", "d", "e", "f", "h"],
+                target_ids=("a", "b", "c", "d", "e", "f", "h"),
                 property_name="test_property",
             )
         self.assertEqual(
@@ -723,7 +723,7 @@ class TestLabelsetSplit(unittest.TestCase):
             y, masks = self.lsc.split(
                 split.ThresholdPartition(6, 1, 2),
                 property_name="test_property",
-                mask_names=["mask1", "mask2", "mask3", "mask4"],
+                mask_names=("mask1", "mask2", "mask3", "mask4"),
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(
@@ -747,7 +747,7 @@ class TestLabelsetSplit(unittest.TestCase):
             y, masks = self.lsc.split(
                 split.ThresholdPartition(5, 10, 20),
                 property_name="test_property",
-                mask_names=["mask1", "mask2", "mask3", "mask4"],
+                mask_names=("mask1", "mask2", "mask3", "mask4"),
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(
@@ -805,7 +805,7 @@ class TestLabelsetSplit(unittest.TestCase):
             y, masks = self.lsc.split(
                 split.ThresholdPartition(5, 10, 20, ascending=False),
                 property_name="test_property",
-                mask_names=["mask1", "mask2", "mask3", "mask4"],
+                mask_names=("mask1", "mask2", "mask3", "mask4"),
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(
@@ -1337,6 +1337,7 @@ class TestFilter(unittest.TestCase):
                 ["Group2", "Group5"],
             )
 
+    @unittest.skip("WIP: updating to LabelsetRangeFilterSplit.")
     def test_LabelsetRangeFilterTrainTestPos(self):
         train_index = np.array(["a", "b", "c", "d"])
         test_index = np.array(["e", "f", "g", "h"])

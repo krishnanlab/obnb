@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import Any
 from typing import Callable
 from typing import Dict
@@ -55,6 +56,24 @@ class LabelsetCollection(idhandler.IDprop):
         self.new_property("Info", "NA", str)
         self.new_property("Labelset", set(), set)
         self.new_property("Negative", {None}, set)
+
+    def __hash__(self):
+        """Hash a LabelsecCollection object.
+
+        Hash using the followings
+        - Entity IDs and number of occurances
+        - Labelsets along with negatives and their information
+
+        Note:
+            This is used for lru cach that decorates the split method.
+
+        """
+        eids = (*self.entity,)
+        enoccur = (*self.entity._prop["Noccur"],)
+        linfo = (*self._prop["Info"],)
+        llbs = (*map(frozenset, self._prop["Labelset"]),)
+        lneg = (*map(frozenset, self._prop["Negative"]),)
+        return hash(eids + enoccur + linfo + llbs + lneg)
 
     def _show(self):
         """Debugging prints."""
@@ -244,13 +263,14 @@ class LabelsetCollection(idhandler.IDprop):
         self.set_property(label_id, "Negative", set(lst))
 
     @no_type_check  # temporarily disable type checking
+    @lru_cache
     def split(
         self,
         splitter: Splitter,
-        target_ids: Optional[List[str]] = None,
+        target_ids: Optional[Tuple[str, ...]] = None,
         labelset_name: Optional[str] = None,
         property_name: Optional[str] = None,
-        mask_names: Optional[List[str]] = None,
+        mask_names: Optional[Tuple[str, ...]] = None,
         consider_negative: bool = False,
     ) -> Tuple[np.ndarray, Dict[str, np.ndarray]]:
         """Split the entities based on the labelsets.
@@ -301,6 +321,8 @@ class LabelsetCollection(idhandler.IDprop):
 
         # Prepare mapping from entity id to target index
         target_idmap = {j: i for i, j in enumerate(target_ids)}
+        # TODO: fix this entity_idmap...
+        entity_idmap = {j: i for i, j in enumerate(self.entity_ids)}
         to_target_idx = np.array([target_idmap[i] for i in self.entity_ids])
 
         # Prepare 'x' and 'y' and pass to splitter
@@ -308,11 +330,11 @@ class LabelsetCollection(idhandler.IDprop):
             labelsets = list(map(self.get_labelset, self.label_ids))
             y = np.zeros((len(self.entity_ids), len(labelsets)), dtype=bool)
             for i, labelset in enumerate(labelsets):
-                y[self.entity[labelset], i] = True
+                y[list(map(entity_idmap.get, labelset)), i] = True
         else:
             labelset = self.get_labelset(labelset_name)
             y = np.zeros(len(self.entity_ids), dtype=bool)
-            y[self.entity[labelset]] = True
+            y[list(map(entity_idmap.get, labelset))] = True
 
         if property_name is not None:
             x = np.array(
@@ -365,7 +387,9 @@ class LabelsetCollection(idhandler.IDprop):
                 negatives = self.get_negative(labelset_name)
                 to_remove = set(self.entity_ids) - (positives | negatives)
                 if len(to_remove) > 0:  # skip if nothing to be removed
-                    target_idx_to_remove = to_target_idx[self.entity[to_remove]]
+                    target_idx_to_remove = to_target_idx[
+                        list(map(entity_idmap.get, to_remove))
+                    ]
                     for mask in masks.values():
                         mask[target_idx_to_remove] = False
 
@@ -503,6 +527,7 @@ class LabelsetCollection(idhandler.IDprop):
                 some other value
 
         """
+        # TODO: option to skip non-existing entities
         self.entity.new_property(prop_name, default_val, default_type)
         with open(fp, "r") as f:
             for i, line in enumerate(f):
