@@ -47,7 +47,7 @@ scores = []
 for label_id in lsc.label_ids:
     y, masks = lsc.split(
         splitter,
-        target_ids=g.idmap.lst,
+        target_ids=g.node_ids,
         labelset_name=label_id,
         property_name="PubMed Count",
         consider_negative=True,
