@@ -4,7 +4,6 @@ from typing import Callable
 from typing import Dict
 from typing import Iterator
 from typing import List
-from typing import no_type_check
 from typing import Optional
 from typing import Set
 from typing import Tuple
@@ -262,7 +261,6 @@ class LabelsetCollection(idhandler.IDprop):
                 )
         self.set_property(label_id, "Negative", set(lst))
 
-    @no_type_check  # temporarily disable type checking
     @lru_cache
     def split(
         self,
@@ -356,11 +354,11 @@ class LabelsetCollection(idhandler.IDprop):
                     f"but got {split_size} from the splitter.",
                 )
         elif split_size == 1:
-            mask_names = ["test"]
+            mask_names = ("test",)
         elif split_size == 2:
-            mask_names = ["train", "test"]
+            mask_names = ("train", "test")
         elif split_size == 3:
-            mask_names = ["train", "val", "test"]
+            mask_names = ("train", "val", "test")
         else:
             raise ValueError(
                 f"Default mask_names expected split size of 2 or 3, "
