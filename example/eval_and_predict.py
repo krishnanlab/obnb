@@ -1,8 +1,6 @@
 import os.path as osp
 
 import numpy as np
-from NLEval import metrics
-from NLEval import model
 from NLEval.graph import DenseGraph
 from NLEval.label import filters
 from NLEval.label.collection import LabelsetCollection

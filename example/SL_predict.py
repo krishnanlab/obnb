@@ -1,10 +1,8 @@
 import os.path as osp
 
-import numpy as np
 from NLEval import model
 from NLEval.graph import DenseGraph
 from NLEval.label.collection import SplitLSC
-from sklearn.metrics import roc_auc_score as auroc
 
 DATA_DIR = osp.join(osp.pardir, "data")
 GRAPH_FP = osp.join(DATA_DIR, "networks", "STRING-EXP.edg")
@@ -21,9 +19,9 @@ lsc = SplitLSC.from_gmt(LABEL_FP)
 mdl = model.SupervisedLearning.LogReg(g, penalty="l2", solver="liblinear")
 
 # diplay choice of labelsets
-for l, m in enumerate(lsc.label_ids):
+for j, m in enumerate(lsc.label_ids):
     # index, labelset size, labelset ID
-    print(f"{l:>4d} {len(lsc.get_labelset(m)):>4d} {m}")
+    print(f"{j:>4d} {len(lsc.get_labelset(m)):>4d} {m}")
 print("")
 
 # get label_id
@@ -43,4 +41,4 @@ intersection = list(set(top_list) & pos)
 
 print(f"Top {k} genes: {repr(top_list)}")
 print(f"Known genes in top {k}: {repr(intersection)}")
-print(f"\nWARNING: This script fails to reproduce consistent results.")
+print("\nWARNING: This script fails to reproduce consistent results.")

@@ -1,13 +1,11 @@
 import os.path as osp
 
-import numpy as np
 import torch
 from NLEval.graph import SparseGraph
 from NLEval.label import filters
 from NLEval.label import LabelsetCollection
 from NLEval.label.split import RatioPartition
 from NLEval.model_trainer.gnn import SimpleGNNTrainer
-from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
 from torch_geometric.nn import GCN
 

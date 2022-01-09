@@ -2,7 +2,6 @@ import os.path as osp
 from time import perf_counter
 
 import numpy as np
-from NLEval import model
 from NLEval.graph import DenseGraph
 from NLEval.label import filters
 from NLEval.label import LabelsetCollection

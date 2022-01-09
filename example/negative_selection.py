@@ -16,7 +16,7 @@ lsc_orig = SplitLSC.from_gmt(LABEL_FP)
 lsc = lsc_orig.apply(filters.NegativeFilterHypergeom(p_thresh))
 
 print(f"p-val threshold = {p_thresh:.2f}")
-print(f"Compring the number of negatives before and after filtering")
+print("Compring the number of negatives before and after filtering")
 print(f"{'Term':<62} {'Original':<8} {'Filtered':<8} {'Diff':<8}")
 diff_list = []
 for ID in lsc.label_ids:
