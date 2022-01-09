@@ -655,6 +655,15 @@ class TestLabelsetSplit(unittest.TestCase):
                 self.assertEqual(y.T.tolist(), self.y_t_list)
                 self.assertEqual(masks["test"].T.tolist(), [mask.tolist()])
 
+    def test_all_holdout(self):
+        y, masks = self.lsc.split(split.AllHoldout())
+        self.assertEqual(y.T.tolist(), self.y_t_list)
+        self.assertEqual(list(masks), ["test"])
+        self.assertEqual(
+            masks["test"].T.tolist(),
+            [[1, 1, 1, 1, 1, 1, 1, 1]],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

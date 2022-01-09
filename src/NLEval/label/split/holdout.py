@@ -136,3 +136,11 @@ class RandomRatioHoldout(BaseRandomSplit, RatioHoldout):
     def __init__(self, ratio, shuffle=True, random_state=None):
         """Initialize RandomRatioHoldout."""
         super().__init__(ratio, shuffle=shuffle, random_state=random_state)
+
+
+class AllHoldout(RandomRatioHoldout):
+    """Holdout all available data points."""
+
+    def __init__(self, shuffle=False, random_state=None):
+        """Initialize the AllHoldout object."""
+        super().__init__(1.0, shuffle=shuffle, random_state=random_state)
