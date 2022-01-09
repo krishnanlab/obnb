@@ -2,7 +2,6 @@ import os.path as osp
 
 import numpy as np
 from NLEval import model
-from NLEval import valsplit
 from NLEval.graph import DenseGraph
 from NLEval.label.collection import SplitLSC
 from sklearn.metrics import roc_auc_score as auroc
