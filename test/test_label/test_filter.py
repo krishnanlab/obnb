@@ -1,15 +1,8 @@
-import os
 import unittest
 
-import numpy as np
-from commonvar import SAMPLE_DATA_DIR
-from NLEval import valsplit
 from NLEval.label import filters
 from NLEval.label import LabelsetCollection
 from NLEval.label import split
-from NLEval.util.exceptions import IDExistsError
-from NLEval.util.exceptions import IDNotExistError
-from sklearn.model_selection import KFold
 
 
 class TestFilter(unittest.TestCase):

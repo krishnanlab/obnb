@@ -1,13 +1,8 @@
-import os
 import unittest
 
 import numpy as np
-from commonvar import SAMPLE_DATA_DIR
-from NLEval import valsplit
-from NLEval.label import filters
 from NLEval.label import LabelsetCollection
 from NLEval.label import split
-from NLEval.util.exceptions import IDExistsError
 from NLEval.util.exceptions import IDNotExistError
 from sklearn.model_selection import KFold
 
@@ -269,16 +264,6 @@ class TestLabelsetSplit(unittest.TestCase):
                     f"RatioHoldout(ascending=True, ratio={ratio})",
                 )
 
-    def test_ratio_partition_raises(self):
-        for ratio in [0, 1, 2.4]:
-            with self.subTest(ratio=ratio):
-                with self.assertRaises(ValueError) as context:
-                    split.RatioHoldout(ratio)
-                self.assertEqual(
-                    str(context.exception),
-                    "ratio must be strictly between 0 and 1, got {ratio}",
-                )
-
     def test_ratio_holdout(self):
         with self.subTest(ratio=0.2):
             y, masks = self.lsc.split(
@@ -517,6 +502,15 @@ class TestLabelsetSplit(unittest.TestCase):
         )
 
     def test_ratio_partition_raises(self):
+        for ratio in [0.0, 1.0, 2.4]:
+            with self.subTest(ratio=ratio):
+                with self.assertRaises(ValueError) as context:
+                    split.RatioHoldout(ratio)
+                self.assertEqual(
+                    str(context.exception),
+                    f"ratio must be strictly between 0 and 1, got {ratio}",
+                )
+
         with self.assertRaises(ValueError) as context:
             split.RatioPartition(0.2, 0.5)
         self.assertEqual(
