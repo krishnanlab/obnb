@@ -56,13 +56,15 @@ class RatioHoldout(BaseHoldout):
 
         Riases:
             TypeError: If the input value is not float type.
-            ValueError: If the input value  is not strictly between 0 and 1.
+            ValueError: If the input value  is not between 0 (not including
+                zero) and 1 (including 1).
 
         """
         checkType("ratio", float, ratio)
-        if not 0 < ratio < 1:
+        if not 0 < ratio <= 1:
             raise ValueError(
-                f"ratio must be strictly between 0 and 1, got {ratio}",
+                f"ratio must be between 0 (exclusive) and 1 (inclusive), "
+                f"got {ratio}",
             )
         self._ratio = ratio
 

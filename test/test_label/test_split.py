@@ -502,13 +502,14 @@ class TestLabelsetSplit(unittest.TestCase):
         )
 
     def test_ratio_partition_raises(self):
-        for ratio in [0.0, 1.0, 2.4]:
+        template = "ratio must be between 0 (exclusive) and 1 (inclusive), got"
+        for ratio in [0.0, 1.000001, 2.4]:
             with self.subTest(ratio=ratio):
                 with self.assertRaises(ValueError) as context:
                     split.RatioHoldout(ratio)
                 self.assertEqual(
                     str(context.exception),
-                    f"ratio must be strictly between 0 and 1, got {ratio}",
+                    f"{template} {ratio}",
                 )
 
         with self.assertRaises(ValueError) as context:
