@@ -1,7 +1,7 @@
 import os.path as osp
 
 from NLEval.label import filters
-from NLEval.label.collection import SplitLSC
+from NLEval.label.collection import LabelsetCollection
 
 DATA_DIR = osp.join(osp.pardir, "data")
 LABEL_FP = osp.join(DATA_DIR, "labels", "KEGGBP.gmt")
@@ -10,13 +10,13 @@ LABEL_FP = osp.join(DATA_DIR, "labels", "KEGGBP.gmt")
 p_thresh = 0.05
 
 # construct labelset_collection object from KEGGBP.gmt
-lsc_orig = SplitLSC.from_gmt(LABEL_FP)
+lsc_orig = LabelsetCollection.from_gmt(LABEL_FP)
 
 # apply negative selection filter
-lsc = lsc_orig.apply(filters.NegativeFilterHypergeom(p_thresh))
+lsc = lsc_orig.apply(filters.NegativeGeneratorHypergeom(p_thresh))
 
 print(f"p-val threshold = {p_thresh:.2f}")
-print(f"Compring the number of negatives before and after filtering")
+print("Compring the number of negatives before and after filtering")
 print(f"{'Term':<62} {'Original':<8} {'Filtered':<8} {'Diff':<8}")
 diff_list = []
 for ID in lsc.label_ids:
