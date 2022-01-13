@@ -1,6 +1,11 @@
-import numpy as np
-from NLEval.util import checkers
+from typing import List
+from typing import Optional
+from typing import Union
 
+import numpy as np
+
+from ..util import checkers
+from ..util.idhandler import IDmap
 from .base import BaseGraph
 
 
@@ -196,12 +201,16 @@ class SparseGraph(BaseGraph):
         return graph
 
     @classmethod
-    def from_mat(cls, mat, ids):  # noqa
+    def from_mat(
+        cls,
+        mat,
+        ids: Optional[Union[List[str], IDmap]] = None,
+    ):  # noqa
         """Construct SparseGraph using ids and adjacency matrix.
 
         Args:
             mat(:obj:`numpy.ndarray`): 2D numpy array of adjacency matrix
-            ids(list or :obj:`idhandler.idmap`): list of IDs or idmap of the
+            ids(list or :obj:`IDmap`): list of IDs or idmap of the
                 adjacency matrix, if None, use input ordering of nodes as IDs.
 
         """
