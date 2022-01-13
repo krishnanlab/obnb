@@ -6,6 +6,7 @@ import numpy as np
 from commonvar import SAMPLE_DATA_DIR
 from NLEval.graph import DenseGraph
 from NLEval.graph import FeatureVec
+from NLEval.graph import MultiFeatureVec
 from NLEval.graph import SparseGraph
 from NLEval.graph.base import BaseGraph
 from NLEval.util import idhandler
@@ -389,6 +390,66 @@ class TestFeatureVec(unittest.TestCase):
             skiprows=1,
         )[:, 1:]
         self.assertTrue(np.all(graph.mat == temd_data))
+
+
+class TestMultiFeatureVec(unittest.TestCase):
+    def setUp(self):
+        rng = np.random.default_rng(0)
+        self.dims = [3, 2, 4]
+        self.indptr = np.array([0, 3, 5, 9])
+        self.mat1 = rng.random((5, self.dims[0]))
+        self.mat2 = rng.random((5, self.dims[1]))
+        self.mat3 = rng.random((5, self.dims[2]))
+        self.mats = [self.mat1, self.mat2, self.mat3]
+        self.mat = np.hstack(self.mats)
+        self.ids = ["a", "b", "c", "d", "e"]
+        self.fset_ids = ["Features1", "Features2", "Features3"]
+
+    def test_from_mat(self):
+        mfv = MultiFeatureVec.from_mat(
+            self.mat,
+            self.indptr,
+            self.ids,
+            self.fset_ids,
+        )
+        self.assertEqual(mfv.mat.tolist(), self.mat.tolist())
+        self.assertEqual(mfv.indptr.tolist(), self.indptr.tolist())
+        self.assertEqual(mfv.idmap.lst, self.ids)
+        self.assertEqual(mfv.fset_idmap.lst, self.fset_ids)
+
+    def test_from_mats(self):
+        mfv = MultiFeatureVec.from_mats(self.mats, self.ids, self.fset_ids)
+        self.assertEqual(mfv.mat.tolist(), self.mat.tolist())
+        self.assertEqual(mfv.indptr.tolist(), self.indptr.tolist())
+        self.assertEqual(mfv.idmap.lst, self.ids)
+        self.assertEqual(mfv.fset_idmap.lst, self.fset_ids)
+
+    def test_get_features(self):
+        mfv = MultiFeatureVec.from_mats(self.mats, self.ids, self.fset_ids)
+
+        with self.subTest(ids="a", fset_id="Features1"):
+            self.assertEqual(
+                mfv.get_features("a", "Features1").tolist(),
+                self.mat1[0].tolist(),
+            )
+
+        with self.subTest(ids=["a"], fset_id="Features1"):
+            self.assertEqual(
+                mfv.get_features(["a"], "Features1").tolist(),
+                [self.mat1[0].tolist()],
+            )
+
+        with self.subTest(ids=["a", "c"], fset_id="Features1"):
+            self.assertEqual(
+                mfv.get_features(["a", "c"], "Features1").tolist(),
+                self.mat1[[0, 2]].tolist(),
+            )
+
+        with self.subTest(ids=["a", "c"], fset_id="Features3"):
+            self.assertEqual(
+                mfv.get_features(["a", "c"], "Features3").tolist(),
+                self.mat3[[0, 2]].tolist(),
+            )
 
 
 if __name__ == "__main__":

@@ -238,18 +238,96 @@ class FeatureVec(DenseGraph):
         return cls.from_mat(mat, idmap)
 
 
-class MultiFeatureVec(BaseGraph):
-    """Multi feature vectors with ID maps.
-
-    Note: experimenting feature.
-
-    """
+class MultiFeatureVec(FeatureVec):
+    """Multiple feature vectors."""
 
     def __init__(self):
         """Initialize MultiFeatureVec."""
-        self.mat_list = []
-        self.name_list = []
+        super().__init__()
+        self.indptr = None
+        self.fset_idmap = IDmap()
 
-    def add_feature(self, val, name):
-        self.mat_list.append(val)
-        self.name_list.append(name)
+    def get_features(
+        self,
+        ids: Union[str, List[str]],
+        fset_id: str,
+    ) -> np.ndarray:
+        """Return features given node IDs and the selected feature set ID.
+
+        Args:
+            ids (str or list of str): node ID(s) of interest, return a 1-d
+                array if input a single id, otherwise return a 2-d array
+                where each row is the feature vector with the corresponding
+                node ID.
+            fset_id (str): feature set ID.
+
+        """
+        idx = self.idmap[ids]
+        fset_idx = self.fset_idmap[fset_id]
+        fset_slice = slice(self.indptr[fset_idx], self.indptr[fset_idx + 1])
+        return self.mat[idx, fset_slice]
+
+    @classmethod
+    def from_mat(
+        cls,
+        mat: np.ndarray,
+        indptr: np.ndarray,
+        ids: Optional[Union[List[str], IDmap]] = None,
+        fset_ids: Optional[Union[List[str], IDmap]] = None,
+    ):
+        """Construct MultiFeatureVec object.
+
+        Args:
+            mat (:obj:`numpy.ndarray`): concatenated feature vector matrix.
+            indptr (:obj:`numpy.ndarray`): index pointers indicating the start
+                and the end of each feature set (columns).
+            ids (list of str or :obj:`IDmap`, optional): node IDs, if not
+                specified, use the default ordering as node IDs.
+            fset_ids (list of str or :obj:`IDmap`, optional): feature set IDs,
+                if not specified, use the default ordering as feature set IDs.
+
+        """
+        # TODO: refactor the following block(s)
+        if ids is None:
+            ids = list(map(str, range(mat.shape[0])))
+        if isinstance(ids, IDmap):
+            idmap = ids
+        else:
+            idmap = IDmap.from_list(ids)
+
+        if fset_ids is None:
+            fset_ids = list(map(str, range(idptr.size - 1)))
+        if isinstance(ids, IDmap):
+            fset_idmap = fset_ids
+        else:
+            fset_idmap = IDmap.from_list(fset_ids)
+
+        graph = super().from_mat(mat, ids)
+        graph.indptr = indptr  # TODO: check indptr
+        graph.idmap = idmap
+        graph.fset_idmap = fset_idmap
+
+        return graph
+
+    @classmethod
+    def from_mats(
+        cls,
+        mats: List[np.ndarray],
+        ids: Optional[Union[List[str], IDmap]] = None,
+        fset_ids: Optional[Union[List[str], IDmap]] = None,
+    ):
+        """Construct MultiFeatureVec object from list of matrices.
+
+        Args:
+            mats (list of :obj:`numpy.ndarray`): list of feature vecotr
+                matrices.
+            ids (list of str or :obj:`IDmap`, optional): node IDs, if not
+                specified, use the default ordering as node IDs.
+            fset_ids (list of str or :obj:`IDmap`, optional): feature set IDs,
+                if not specified, use the default ordering as feature set IDs.
+
+        """
+        dims = [mat.shape[1] for mat in mats]
+        indptr = np.zeros(len(mats) + 1, dtype=np.uint32)
+        indptr[1:] = np.cumsum(dims)
+        return cls.from_mat(np.hstack(mats), indptr, ids, fset_ids)
