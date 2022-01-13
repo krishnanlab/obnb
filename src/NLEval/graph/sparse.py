@@ -196,13 +196,13 @@ class SparseGraph(BaseGraph):
         return graph
 
     @classmethod
-    def construct_graph(cls, ids, mat):  # noqa
+    def from_mat(cls, mat, ids):  # noqa
         """Construct SparseGraph using ids and adjacency matrix.
 
         Args:
-            ids(list or :obj:`idhandler.idmap`): list of IDs or idmap of the
-                adjacency matrix
             mat(:obj:`numpy.ndarray`): 2D numpy array of adjacency matrix
+            ids(list or :obj:`idhandler.idmap`): list of IDs or idmap of the
+                adjacency matrix, if None, use input ordering of nodes as IDs.
 
         """
         graph = cls(weighted=True, directed=True)

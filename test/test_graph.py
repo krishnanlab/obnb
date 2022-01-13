@@ -220,31 +220,16 @@ class TestDenseGraph(unittest.TestCase):
         graph.mat = np.random.random((2, 2))
 
     def test_get_edge(self):
-        graph = DenseGraph.from_mat(self.case.data_mat)
+        graph = DenseGraph.from_mat(
+            self.case.data_mat[:, 1:],
+            self.case.data_mat[:, 0].astype(int).astype(str).tolist(),
+        )
         mat = self.case.data_mat[:, 1:]
         for i in range(mat.shape[0]):
             for j in range(mat.shape[1]):
                 node_id1 = graph.idmap.lst[i]
                 node_id2 = graph.idmap.lst[j]
                 self.assertEqual(graph.get_edge(node_id1, node_id2), mat[i, j])
-
-    def test_construc_graph(self):
-        idmap = idhandler.IDmap()
-        idmap.add_id("a")
-        idmap.add_id("b")
-        mat1 = np.random.random((2, 2))
-        mat2 = np.random.random((3, 2))
-        # test consistent size input, using idmap --> success
-        DenseGraph.construct_graph(idmap, mat1)
-        # test consistent size input, using idlst --> success
-        DenseGraph.construct_graph(idmap.lst, mat1)
-        # test inconsistent size input --> error
-        self.assertRaises(
-            ValueError,
-            DenseGraph.construct_graph,
-            idmap,
-            mat2,
-        )
 
     def test_from_edglst(self):
         graph = DenseGraph.from_edglst(
@@ -255,8 +240,30 @@ class TestDenseGraph(unittest.TestCase):
         self.check_graph(graph)
 
     def test_from_mat(self):
-        graph = DenseGraph.from_mat(self.case.data_mat)
-        self.check_graph(graph)
+        with self.subTest("From matrix with first column ids"):
+            graph = DenseGraph.from_mat(
+                self.case.data_mat[:, 1:],
+                self.case.data_mat[:, 0].astype(int).astype(str).tolist(),
+            )
+            self.check_graph(graph)
+
+        with self.subTest("Using idmap"):
+            idmap = idhandler.IDmap()
+            idmap.add_id("a")
+            idmap.add_id("b")
+            mat1 = np.random.random((2, 2))
+            mat2 = np.random.random((3, 2))
+            # test consistent size input, using idmap --> success
+            DenseGraph.from_mat(mat1, idmap)
+            # test consistent size input, using idlst --> success
+            DenseGraph.from_mat(mat1, idmap.lst)
+            # test inconsistent size input --> error
+            self.assertRaises(
+                ValueError,
+                DenseGraph.from_mat,
+                mat2,
+                idmap,
+            )
 
     def test_eq(self):
         graph = DenseGraph.from_edglst(

@@ -81,13 +81,13 @@ class DenseGraph(BaseGraph):
         return self.mat[self.idmap[node_id1], self.idmap[node_id2]]
 
     @classmethod
-    def construct_graph(cls, ids, mat):
+    def from_mat(cls, mat, ids):
         """Construct DenseGraph using ids and adjcency matrix.
 
         Args:
-            ids(list or :obj:`idhandler.idmap`): list of IDs or idmap of the
-                adjacency matrix
             mat(:obj:`numpy.ndarray`): 2D numpy array of adjacency matrix
+            ids(list or :obj:`idhandler.idmap`): list of IDs or idmap of the
+                adjacency matrix, if None, use input ordering of nodes as IDs.
 
         """
         idmap = (
@@ -106,21 +106,6 @@ class DenseGraph(BaseGraph):
         return graph
 
     @classmethod
-    def from_mat(cls, mat):
-        """Construct DenseGraph object from numpy array.
-
-        Note:
-            First column of mat encodes ID, must be integers.
-
-        """
-        idmap = idhandler.IDmap()
-        for node_id in mat[:, 0]:
-            if int(node_id) != node_id:
-                raise ValueError("ID must be int type")
-            idmap.add_id(str(int(node_id)))
-        return cls.construct_graph(idmap, mat[:, 1:].astype(float))
-
-    @classmethod
     def from_npy(cls, path_to_npy, **kwargs):
         """Read numpy array from .npy file and construct BaseGraph."""
         mat = np.load(path_to_npy, **kwargs)
@@ -135,7 +120,7 @@ class DenseGraph(BaseGraph):
             directed,
             **kwargs,
         )
-        return cls.construct_graph(graph.idmap, graph.to_adjmat())
+        return cls.from_mat(graph.to_adjmat(), graph.idmap)
 
 
 class FeatureVec(DenseGraph):
@@ -243,7 +228,7 @@ class FeatureVec(DenseGraph):
                 idmap.add_id(node_id)
                 fvec_lst.append(np.array(terms[1:], dtype=float))
         mat = np.asarray(fvec_lst)
-        return cls.construct_graph(idmap, mat)
+        return cls.from_mat(mat, idmap)
 
 
 class MultiFeatureVec(BaseGraph):
