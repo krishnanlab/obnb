@@ -183,6 +183,9 @@ class FeatureVec(DenseGraph):
                     f"and specified dimension ({self.dim})",
                 )
 
+    def propagate(self, seed):
+        raise NotImplementedError("Feature vectors do can not propagate")
+
     def get_edge(self, node_id1, node_id2, dist_fun=distance.cosine):
         """Return pairwise similarity of two features as 'edge'.
 
@@ -296,7 +299,7 @@ class MultiFeatureVec(FeatureVec):
             idmap = IDmap.from_list(ids)
 
         if fset_ids is None:
-            fset_ids = list(map(str, range(idptr.size - 1)))
+            fset_ids = list(map(str, range(indptr.size - 1)))
         if isinstance(ids, IDmap):
             fset_idmap = fset_ids
         else:
