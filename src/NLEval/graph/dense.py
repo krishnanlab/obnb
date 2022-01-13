@@ -95,9 +95,12 @@ class DenseGraph(BaseGraph):
         Args:
             mat(:obj:`numpy.ndarray`): 2D numpy array of adjacency matrix
             ids(list or :obj:`IDmap`): list of IDs or idmap of the
-                adjacency matrix, if None, use input ordering of nodes as IDs.
+                adjacency matrix, if None, use input ordering of nodes as IDs
+                (default: :obj:`None`).
 
         """
+        if ids is None:
+            ids = list(map(str, range(mat.shape[0])))
         idmap = ids if isinstance(ids, IDmap) else IDmap.from_list(ids)
         if idmap.size != mat.shape[0]:
             raise ValueError(

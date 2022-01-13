@@ -265,6 +265,11 @@ class TestDenseGraph(unittest.TestCase):
                 idmap,
             )
 
+        with self.subTest("No ids specified."):
+            mat = np.random.random((5, 3))
+            graph = DenseGraph.from_mat(mat)
+            self.assertEqual(graph.idmap.lst, ["0", "1", "2", "3", "4"])
+
     def test_eq(self):
         graph = DenseGraph.from_edglst(
             self.case.tw_fp,
