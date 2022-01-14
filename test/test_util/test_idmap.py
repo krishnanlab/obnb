@@ -1,6 +1,7 @@
 import unittest
 
 import numpy as np
+from NLEval.graph import FeatureVec
 from NLEval.util import idhandler
 from NLEval.util.exceptions import IDExistsError
 from NLEval.util.exceptions import IDNotExistError
@@ -117,6 +118,47 @@ class TestIDmap(unittest.TestCase):
         diff = self.idmap - idmap
         self.assertEqual(diff.map, {"c": 0})
         self.assertEqual(diff.lst, ["c"])
+
+
+class TestIDmapAlign(unittest.TestCase):
+    def setUp(self):
+        self.ids1 = ["a", "b", "c", "d"]
+        self.ids2 = ["c", "b", "a", "e", "f"]
+
+        self.ids1_map = {"a": 0, "b": 1, "c": 2, "d": 3}
+        self.ids2_map = {"c": 0, "b": 1, "a": 2, "e": 3, "f": 4}
+
+        self.mat1 = np.array([[0, 1, 2], [1, 2, 3], [2, 3, 4], [3, 4, 5]])
+        self.mat2 = np.array([[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]])
+
+        self.fvec1 = FeatureVec.from_mat(self.mat1, self.ids1)
+        self.fvec2 = FeatureVec.from_mat(self.mat2, self.ids2)
+
+    def test_align_right(self):
+        idmap1 = self.fvec1.idmap.copy()
+        idmap2 = self.fvec2.idmap.copy()
+
+        self.assertEqual(idmap1.lst, self.ids1)
+        self.assertEqual(idmap2.lst, self.ids2)
+
+        right_idx, left_idx = idmap1.align(idmap2, join="right", update=False)
+        self.assertEqual(idmap1.lst, self.ids2)
+        self.assertEqual(idmap1.map, self.ids2_map)
+        self.assertEqual(idmap2.lst, self.ids2)
+        self.assertEqual(idmap2.map, self.ids2_map)
+
+        new_mat1 = np.zeros((len(self.ids2), self.mat1.shape[1]))
+        new_mat1[right_idx] = self.mat1[left_idx]
+        self.assertEqual(
+            new_mat1.astype(int).tolist(),
+            [
+                [2, 3, 4],
+                [1, 2, 3],
+                [0, 1, 2],
+                [0, 0, 0],
+                [0, 0, 0],
+            ],
+        )
 
 
 if __name__ == "__main__":

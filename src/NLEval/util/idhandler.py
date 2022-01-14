@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from copy import deepcopy
 
 import numpy as np
@@ -213,6 +215,41 @@ class IDmap(IDlst):
         new_idx = self.size
         super().add_id(identifier)
         self._map[self._lst[-1]] = new_idx
+
+    def align(
+        self,
+        new_idmap: IDmap,
+        join: str = "right",
+        update: bool = False,
+    ) -> np.ndarray:
+        """Align current idmap with another idmap.
+
+        Alignt the IDmaps and return alignment index (left, right).
+
+        Args:
+            new_idmap: The new idmap to align.
+            join (str): Strategy of selecting the IDs, choices:
+                * "intersection": Use common IDs from the old and ndew IDmaps.
+                * "right": Use all IDs from the new IDmap
+                * "left": Use all IDs from the old IDmap
+                * "union": Use all IDs from both the new and old IDmap
+            update (bool): Whether or not to update the IDmap passed in
+                (default: :obj:`False`)
+
+        """
+        # TODO: check type
+        if join == "right":
+            # TODO: raise error (or warnings) if no common ids
+            common_ids = list(set(self._map) & set(new_idmap._map))
+            left_idx = self[common_ids]
+            right_idx = new_idmap[common_ids]
+
+            self._lst = new_idmap.lst
+            self._map = new_idmap.map
+        else:
+            raise ValueError(f"Unknwon join type: {join!r}")
+
+        return left_idx, right_idx
 
 
 class IDprop(IDmap):
