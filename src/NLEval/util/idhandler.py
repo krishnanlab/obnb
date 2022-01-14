@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from typing import List
 
 import numpy as np
 from NLEval.util import checkers
@@ -216,7 +217,7 @@ class IDmap(IDlst):
         super().add_id(identifier)
         self._map[self._lst[-1]] = new_idx
 
-    def reset(self, identifiers: Optional[List[str]] = None):
+    def reset(self, identifiers: list[str] | None = None):
         """Reset the IDmap with a list of IDs.
 
         Args:
@@ -236,7 +237,7 @@ class IDmap(IDlst):
         new_idmap: IDmap,
         join: str = "right",
         update: bool = False,
-    ) -> np.ndarray:
+    ) -> tuple[np.ndarray, np.ndarray]:
         """Align current idmap with another idmap.
 
         Alignt the IDmaps and return alignment index (left, right).
@@ -253,30 +254,21 @@ class IDmap(IDlst):
 
         """
         # TODO: check type
-        if join == "right":
+        if join in ["right", "left", "intersection"]:
             # TODO: raise error (or warnings) if no common ids
             common_ids = sorted(set(self._map) & set(new_idmap._map))
             left_idx = self[common_ids]
             right_idx = new_idmap[common_ids]
 
-            self._lst = new_idmap.lst
-            self._map = new_idmap.map
-        elif join == "left":
-            common_ids = sorted(set(self._map) & set(new_idmap._map))
-            left_idx = self[common_ids]
-            right_idx = new_idmap[common_ids]
-
-            if update:
-                new_idmap._lst = self.lst
-                new_idmap._map = self.map
-        elif join == "intersection":
-            common_ids = sorted(set(self._map) & set(new_idmap._map))
-            left_idx = self[common_ids]
-            right_idx = new_idmap[common_ids]
-
-            self.reset(common_ids)
-            if update:
-                new_idmap.reset(common_ids)
+            if join == "right":
+                self.reset(new_idmap.lst)
+            elif join == "left":
+                if update:
+                    new_idmap.reset(self.lst)
+            elif join == "intersection":
+                self.reset(common_ids)
+                if update:
+                    new_idmap.reset(common_ids)
         elif join == "union":
             left_ids = self.lst
             right_ids = new_idmap.lst
