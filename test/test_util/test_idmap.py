@@ -139,10 +139,12 @@ class TestIDmapAlign(unittest.TestCase):
         self.ids1 = ["a", "b", "c", "d"]
         self.ids2 = ["c", "b", "a", "e", "f"]
         self.ids_intersection = ["a", "b", "c"]
+        self.ids_union = ["a", "b", "c", "d", "e", "f"]
 
         self.ids1_map = {"a": 0, "b": 1, "c": 2, "d": 3}
         self.ids2_map = {"c": 0, "b": 1, "a": 2, "e": 3, "f": 4}
         self.ids_intersection_map = {"a": 0, "b": 1, "c": 2}
+        self.ids_union_map = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5}
 
         self.mat1 = np.array([[0, 1, 2], [1, 2, 3], [2, 3, 4], [3, 4, 5]])
         self.mat2 = np.array([[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]])
@@ -226,6 +228,41 @@ class TestIDmapAlign(unittest.TestCase):
         self.assertEqual(
             new_mat2.astype(int).tolist(),
             [[2, 3], [1, 2], [0, 1]],
+        )
+
+    def test_align_union(self):
+        idmap1 = self.fvec1.idmap.copy()
+        idmap2 = self.fvec2.idmap.copy()
+
+        idmap1.align(idmap2, join="union", update=False)
+        self.assertEqual(idmap1.lst, self.ids_union)
+        self.assertEqual(idmap1.map, self.ids_union_map)
+        self.assertEqual(idmap2.lst, self.ids2)
+        self.assertEqual(idmap2.map, self.ids2_map)
+
+        idmap1 = self.fvec1.idmap.copy()
+        left_idx, right_idx = idmap1.align(
+            idmap2,
+            join="union",
+            update=True,
+        )
+        self.assertEqual(idmap1.lst, self.ids_union)
+        self.assertEqual(idmap1.map, self.ids_union_map)
+        self.assertEqual(idmap2.lst, self.ids_union)
+        self.assertEqual(idmap2.map, self.ids_union_map)
+
+        new_mat1 = np.zeros((len(self.ids_union), self.mat1.shape[1]))
+        new_mat1[left_idx] = self.mat1
+        self.assertEqual(
+            new_mat1.astype(int).tolist(),
+            [[0, 1, 2], [1, 2, 3], [2, 3, 4], [3, 4, 5], [0, 0, 0], [0, 0, 0]],
+        )
+
+        new_mat2 = np.zeros((len(self.ids_union), self.mat2.shape[1]))
+        new_mat2[right_idx] = self.mat2
+        self.assertEqual(
+            new_mat2.astype(int).tolist(),
+            [[2, 3], [1, 2], [0, 1], [0, 0], [3, 4], [4, 5]],
         )
 
 

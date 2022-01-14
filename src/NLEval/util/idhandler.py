@@ -277,6 +277,17 @@ class IDmap(IDlst):
             self.reset(common_ids)
             if update:
                 new_idmap.reset(common_ids)
+        elif join == "union":
+            left_ids = self.lst
+            right_ids = new_idmap.lst
+            full_ids = sorted(set(left_ids) | set(right_ids))
+
+            self.reset(full_ids)
+            if update:
+                new_idmap.reset(full_ids)
+
+            left_idx = self[left_ids]
+            right_idx = self[right_ids]
         else:
             raise ValueError(f"Unknwon join type: {join!r}")
 
