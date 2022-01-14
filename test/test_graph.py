@@ -6,6 +6,7 @@ import numpy as np
 from commonvar import SAMPLE_DATA_DIR
 from NLEval.graph import DenseGraph
 from NLEval.graph import FeatureVec
+from NLEval.graph import MultiFeatureVec
 from NLEval.graph import SparseGraph
 from NLEval.graph.base import BaseGraph
 from NLEval.util import idhandler
@@ -220,31 +221,16 @@ class TestDenseGraph(unittest.TestCase):
         graph.mat = np.random.random((2, 2))
 
     def test_get_edge(self):
-        graph = DenseGraph.from_mat(self.case.data_mat)
+        graph = DenseGraph.from_mat(
+            self.case.data_mat[:, 1:],
+            self.case.data_mat[:, 0].astype(int).astype(str).tolist(),
+        )
         mat = self.case.data_mat[:, 1:]
         for i in range(mat.shape[0]):
             for j in range(mat.shape[1]):
                 node_id1 = graph.idmap.lst[i]
                 node_id2 = graph.idmap.lst[j]
                 self.assertEqual(graph.get_edge(node_id1, node_id2), mat[i, j])
-
-    def test_construc_graph(self):
-        idmap = idhandler.IDmap()
-        idmap.add_id("a")
-        idmap.add_id("b")
-        mat1 = np.random.random((2, 2))
-        mat2 = np.random.random((3, 2))
-        # test consistent size input, using idmap --> success
-        DenseGraph.construct_graph(idmap, mat1)
-        # test consistent size input, using idlst --> success
-        DenseGraph.construct_graph(idmap.lst, mat1)
-        # test inconsistent size input --> error
-        self.assertRaises(
-            ValueError,
-            DenseGraph.construct_graph,
-            idmap,
-            mat2,
-        )
 
     def test_from_edglst(self):
         graph = DenseGraph.from_edglst(
@@ -255,8 +241,35 @@ class TestDenseGraph(unittest.TestCase):
         self.check_graph(graph)
 
     def test_from_mat(self):
-        graph = DenseGraph.from_mat(self.case.data_mat)
-        self.check_graph(graph)
+        with self.subTest("From matrix with first column ids"):
+            graph = DenseGraph.from_mat(
+                self.case.data_mat[:, 1:],
+                self.case.data_mat[:, 0].astype(int).astype(str).tolist(),
+            )
+            self.check_graph(graph)
+
+        with self.subTest("Using idmap"):
+            idmap = idhandler.IDmap()
+            idmap.add_id("a")
+            idmap.add_id("b")
+            mat1 = np.random.random((2, 2))
+            mat2 = np.random.random((3, 2))
+            # test consistent size input, using idmap --> success
+            DenseGraph.from_mat(mat1, idmap)
+            # test consistent size input, using idlst --> success
+            DenseGraph.from_mat(mat1, idmap.lst)
+            # test inconsistent size input --> error
+            self.assertRaises(
+                ValueError,
+                DenseGraph.from_mat,
+                mat2,
+                idmap,
+            )
+
+        with self.subTest("No ids specified."):
+            mat = np.random.random((5, 3))
+            graph = DenseGraph.from_mat(mat)
+            self.assertEqual(graph.idmap.lst, ["0", "1", "2", "3", "4"])
 
     def test_eq(self):
         graph = DenseGraph.from_edglst(
@@ -377,6 +390,66 @@ class TestFeatureVec(unittest.TestCase):
             skiprows=1,
         )[:, 1:]
         self.assertTrue(np.all(graph.mat == temd_data))
+
+
+class TestMultiFeatureVec(unittest.TestCase):
+    def setUp(self):
+        rng = np.random.default_rng(0)
+        self.dims = [3, 2, 4]
+        self.indptr = np.array([0, 3, 5, 9])
+        self.mat1 = rng.random((5, self.dims[0]))
+        self.mat2 = rng.random((5, self.dims[1]))
+        self.mat3 = rng.random((5, self.dims[2]))
+        self.mats = [self.mat1, self.mat2, self.mat3]
+        self.mat = np.hstack(self.mats)
+        self.ids = ["a", "b", "c", "d", "e"]
+        self.fset_ids = ["Features1", "Features2", "Features3"]
+
+    def test_from_mat(self):
+        mfv = MultiFeatureVec.from_mat(
+            self.mat,
+            self.indptr,
+            self.ids,
+            self.fset_ids,
+        )
+        self.assertEqual(mfv.mat.tolist(), self.mat.tolist())
+        self.assertEqual(mfv.indptr.tolist(), self.indptr.tolist())
+        self.assertEqual(mfv.idmap.lst, self.ids)
+        self.assertEqual(mfv.fset_idmap.lst, self.fset_ids)
+
+    def test_from_mats(self):
+        mfv = MultiFeatureVec.from_mats(self.mats, self.ids, self.fset_ids)
+        self.assertEqual(mfv.mat.tolist(), self.mat.tolist())
+        self.assertEqual(mfv.indptr.tolist(), self.indptr.tolist())
+        self.assertEqual(mfv.idmap.lst, self.ids)
+        self.assertEqual(mfv.fset_idmap.lst, self.fset_ids)
+
+    def test_get_features(self):
+        mfv = MultiFeatureVec.from_mats(self.mats, self.ids, self.fset_ids)
+
+        with self.subTest(ids="a", fset_id="Features1"):
+            self.assertEqual(
+                mfv.get_features("a", "Features1").tolist(),
+                self.mat1[0].tolist(),
+            )
+
+        with self.subTest(ids=["a"], fset_id="Features1"):
+            self.assertEqual(
+                mfv.get_features(["a"], "Features1").tolist(),
+                [self.mat1[0].tolist()],
+            )
+
+        with self.subTest(ids=["a", "c"], fset_id="Features1"):
+            self.assertEqual(
+                mfv.get_features(["a", "c"], "Features1").tolist(),
+                self.mat1[[0, 2]].tolist(),
+            )
+
+        with self.subTest(ids=["a", "c"], fset_id="Features3"):
+            self.assertEqual(
+                mfv.get_features(["a", "c"], "Features3").tolist(),
+                self.mat3[[0, 2]].tolist(),
+            )
 
 
 if __name__ == "__main__":

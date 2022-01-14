@@ -22,8 +22,8 @@ class TestLabelPropagation(unittest.TestCase):
 
         # Use lazy random walk propagation
         self.lazyrw = 0.5 * (np.eye(5) + self.mat / self.mat.sum(0))
-        self.dense_graph = DenseGraph.construct_graph(self.ids, self.lazyrw)
-        self.sparse_graph = SparseGraph.construct_graph(self.ids, self.lazyrw)
+        self.dense_graph = DenseGraph.from_mat(self.lazyrw, self.ids)
+        self.sparse_graph = SparseGraph.from_mat(self.lazyrw, self.ids)
 
     def tearDown(self):
         del self.mat, self.ids, self.dense_graph

@@ -1,8 +1,12 @@
+from typing import List
+from typing import Optional
+from typing import Union
+
 import numpy as np
-from NLEval.util import checkers
-from NLEval.util import idhandler
 from scipy.spatial import distance
 
+from ..util import checkers
+from ..util.idhandler import IDmap
 from .base import BaseGraph
 from .sparse import SparseGraph
 
@@ -81,20 +85,23 @@ class DenseGraph(BaseGraph):
         return self.mat[self.idmap[node_id1], self.idmap[node_id2]]
 
     @classmethod
-    def construct_graph(cls, ids, mat):
+    def from_mat(
+        cls,
+        mat: np.ndarray,
+        ids: Optional[Union[List[str], IDmap]] = None,
+    ):
         """Construct DenseGraph using ids and adjcency matrix.
 
         Args:
-            ids(list or :obj:`idhandler.idmap`): list of IDs or idmap of the
-                adjacency matrix
             mat(:obj:`numpy.ndarray`): 2D numpy array of adjacency matrix
+            ids(list or :obj:`IDmap`): list of IDs or idmap of the
+                adjacency matrix, if None, use input ordering of nodes as IDs
+                (default: :obj:`None`).
 
         """
-        idmap = (
-            ids
-            if isinstance(ids, idhandler.IDmap)
-            else idhandler.IDmap.from_list(ids)
-        )
+        if ids is None:
+            ids = list(map(str, range(mat.shape[0])))
+        idmap = ids if isinstance(ids, IDmap) else IDmap.from_list(ids)
         if idmap.size != mat.shape[0]:
             raise ValueError(
                 f"Inconsistent dimension between IDs ({idmap.size}) and the "
@@ -104,21 +111,6 @@ class DenseGraph(BaseGraph):
         graph.idmap = idmap
         graph.mat = mat
         return graph
-
-    @classmethod
-    def from_mat(cls, mat):
-        """Construct DenseGraph object from numpy array.
-
-        Note:
-            First column of mat encodes ID, must be integers.
-
-        """
-        idmap = idhandler.IDmap()
-        for node_id in mat[:, 0]:
-            if int(node_id) != node_id:
-                raise ValueError("ID must be int type")
-            idmap.add_id(str(int(node_id)))
-        return cls.construct_graph(idmap, mat[:, 1:].astype(float))
 
     @classmethod
     def from_npy(cls, path_to_npy, **kwargs):
@@ -135,7 +127,7 @@ class DenseGraph(BaseGraph):
             directed,
             **kwargs,
         )
-        return cls.construct_graph(graph.idmap, graph.to_adjmat())
+        return cls.from_mat(graph.to_adjmat(), graph.idmap)
 
 
 class FeatureVec(DenseGraph):
@@ -191,6 +183,9 @@ class FeatureVec(DenseGraph):
                     f"and specified dimension ({self.dim})",
                 )
 
+    def propagate(self, seed):
+        raise NotImplementedError("Feature vectors do can not propagate")
+
     def get_edge(self, node_id1, node_id2, dist_fun=distance.cosine):
         """Return pairwise similarity of two features as 'edge'.
 
@@ -234,7 +229,7 @@ class FeatureVec(DenseGraph):
     @classmethod
     def from_emd(cls, path_to_emd, **kwargs):
         fvec_lst = []
-        idmap = idhandler.IDmap()
+        idmap = IDmap()
         with open(path_to_emd, "r") as f:
             f.readline()  # skip header
             for line in f:
@@ -243,21 +238,99 @@ class FeatureVec(DenseGraph):
                 idmap.add_id(node_id)
                 fvec_lst.append(np.array(terms[1:], dtype=float))
         mat = np.asarray(fvec_lst)
-        return cls.construct_graph(idmap, mat)
+        return cls.from_mat(mat, idmap)
 
 
-class MultiFeatureVec(BaseGraph):
-    """Multi feature vectors with ID maps.
-
-    Note: experimenting feature.
-
-    """
+class MultiFeatureVec(FeatureVec):
+    """Multiple feature vectors."""
 
     def __init__(self):
         """Initialize MultiFeatureVec."""
-        self.mat_list = []
-        self.name_list = []
+        super().__init__()
+        self.indptr = None
+        self.fset_idmap = IDmap()
 
-    def add_feature(self, val, name):
-        self.mat_list.append(val)
-        self.name_list.append(name)
+    def get_features(
+        self,
+        ids: Union[str, List[str]],
+        fset_id: str,
+    ) -> np.ndarray:
+        """Return features given node IDs and the selected feature set ID.
+
+        Args:
+            ids (str or list of str): node ID(s) of interest, return a 1-d
+                array if input a single id, otherwise return a 2-d array
+                where each row is the feature vector with the corresponding
+                node ID.
+            fset_id (str): feature set ID.
+
+        """
+        idx = self.idmap[ids]
+        fset_idx = self.fset_idmap[fset_id]
+        fset_slice = slice(self.indptr[fset_idx], self.indptr[fset_idx + 1])
+        return self.mat[idx, fset_slice]
+
+    @classmethod
+    def from_mat(
+        cls,
+        mat: np.ndarray,
+        indptr: np.ndarray,
+        ids: Optional[Union[List[str], IDmap]] = None,
+        fset_ids: Optional[Union[List[str], IDmap]] = None,
+    ):
+        """Construct MultiFeatureVec object.
+
+        Args:
+            mat (:obj:`numpy.ndarray`): concatenated feature vector matrix.
+            indptr (:obj:`numpy.ndarray`): index pointers indicating the start
+                and the end of each feature set (columns).
+            ids (list of str or :obj:`IDmap`, optional): node IDs, if not
+                specified, use the default ordering as node IDs.
+            fset_ids (list of str or :obj:`IDmap`, optional): feature set IDs,
+                if not specified, use the default ordering as feature set IDs.
+
+        """
+        # TODO: refactor the following block(s)
+        if ids is None:
+            ids = list(map(str, range(mat.shape[0])))
+        if isinstance(ids, IDmap):
+            idmap = ids
+        else:
+            idmap = IDmap.from_list(ids)
+
+        if fset_ids is None:
+            fset_ids = list(map(str, range(indptr.size - 1)))
+        if isinstance(ids, IDmap):
+            fset_idmap = fset_ids
+        else:
+            fset_idmap = IDmap.from_list(fset_ids)
+
+        graph = super().from_mat(mat, ids)
+        graph.indptr = indptr  # TODO: check indptr
+        graph.idmap = idmap
+        graph.fset_idmap = fset_idmap
+
+        return graph
+
+    @classmethod
+    def from_mats(
+        cls,
+        mats: List[np.ndarray],
+        ids: Optional[Union[List[str], IDmap]] = None,
+        fset_ids: Optional[Union[List[str], IDmap]] = None,
+    ):
+        """Construct MultiFeatureVec object from list of matrices.
+
+        Args:
+            mats (list of :obj:`numpy.ndarray`): list of feature vecotr
+                matrices.
+            ids (list of str or :obj:`IDmap`, optional): node IDs, if not
+                specified, use the default ordering as node IDs.
+            fset_ids (list of str or :obj:`IDmap`, optional): feature set IDs,
+                if not specified, use the default ordering as feature set IDs.
+
+        """
+        dims = [mat.shape[1] for mat in mats]
+        indptr = np.zeros(len(mats) + 1, dtype=np.uint32)
+        indptr[1:] = np.cumsum(dims)
+        return cls.from_mat(np.hstack(mats), indptr, ids, fset_ids)

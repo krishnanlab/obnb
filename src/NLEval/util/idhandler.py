@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from copy import deepcopy
+from typing import List
 
 import numpy as np
 from NLEval.util import checkers
@@ -213,6 +216,81 @@ class IDmap(IDlst):
         new_idx = self.size
         super().add_id(identifier)
         self._map[self._lst[-1]] = new_idx
+
+    def reset(self, identifiers: list[str] | None = None):
+        """Reset the IDmap with a list of IDs.
+
+        Args:
+            identifiers (list of str): List of IDs to be used to construct the
+                new IDmap. If set to None, then leave as empty.
+
+        """
+        self._lst = []
+        self._map = {}
+
+        if identifiers is not None:
+            for identifier in identifiers:
+                self.add_id(identifier)
+
+    def align(
+        self,
+        new_idmap: IDmap,
+        join: str = "right",
+        update: bool = False,
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Align current idmap with another idmap.
+
+        Alignt the IDmaps and return alignment index (left, right).
+
+        Args:
+            new_idmap: The new idmap to align.
+            join (str): Strategy of selecting the IDs, choices:
+                * "right": Use all IDs from the new IDmap
+                * "left": Use all IDs from the old IDmap
+                * "intersection": Use common IDs from the old and ndew IDmaps.
+                * "union": Use all IDs from both the new and old IDmap
+            update (bool): Whether or not to update the IDmap passed in
+                (default: :obj:`False`)
+
+        Raises:
+            TypeError: If new_idmap is not of type IDmap
+            ValueError: If new_idmap is None; or no common IDs found (except
+                when join method is "union")
+
+        """
+        checkers.checkType("IDmap", IDmap, new_idmap)
+        if join in ["right", "left", "intersection"]:
+            common_ids = sorted(set(self._map) & set(new_idmap._map))
+            if not common_ids:
+                raise ValueError("Alignment failed since no common ID found")
+
+            left_idx = self[common_ids]
+            right_idx = new_idmap[common_ids]
+
+            if join == "right":
+                self.reset(new_idmap.lst)
+            elif join == "left" and update:
+                new_idmap.reset(self.lst)
+            elif join == "intersection":
+                self.reset(common_ids)
+                if update:
+                    new_idmap.reset(common_ids)
+
+        elif join == "union":
+            left_ids = self.lst
+            right_ids = new_idmap.lst
+            full_ids = sorted(set(left_ids) | set(right_ids))
+
+            self.reset(full_ids)
+            if update:
+                new_idmap.reset(full_ids)
+
+            left_idx = self[left_ids]
+            right_idx = self[right_ids]
+        else:
+            raise ValueError(f"Unknwon join type: {join!r}")
+
+        return left_idx, right_idx
 
 
 class IDprop(IDmap):
