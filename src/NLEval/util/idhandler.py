@@ -216,6 +216,21 @@ class IDmap(IDlst):
         super().add_id(identifier)
         self._map[self._lst[-1]] = new_idx
 
+    def reset(self, identifiers: Optional[List[str]] = None):
+        """Reset the IDmap with a list of IDs.
+
+        Args:
+            identifiers (list of str): List of IDs to be used to construct the
+                new IDmap. If set to None, then leave as empty.
+
+        """
+        self._lst = []
+        self._map = {}
+
+        if identifiers is not None:
+            for identifier in identifiers:
+                self.add_id(identifier)
+
     def align(
         self,
         new_idmap: IDmap,
@@ -229,9 +244,9 @@ class IDmap(IDlst):
         Args:
             new_idmap: The new idmap to align.
             join (str): Strategy of selecting the IDs, choices:
-                * "intersection": Use common IDs from the old and ndew IDmaps.
                 * "right": Use all IDs from the new IDmap
                 * "left": Use all IDs from the old IDmap
+                * "intersection": Use common IDs from the old and ndew IDmaps.
                 * "union": Use all IDs from both the new and old IDmap
             update (bool): Whether or not to update the IDmap passed in
                 (default: :obj:`False`)
@@ -240,20 +255,28 @@ class IDmap(IDlst):
         # TODO: check type
         if join == "right":
             # TODO: raise error (or warnings) if no common ids
-            common_ids = list(set(self._map) & set(new_idmap._map))
+            common_ids = sorted(set(self._map) & set(new_idmap._map))
             left_idx = self[common_ids]
             right_idx = new_idmap[common_ids]
 
             self._lst = new_idmap.lst
             self._map = new_idmap.map
         elif join == "left":
-            common_ids = list(set(self._map) & set(new_idmap._map))
+            common_ids = sorted(set(self._map) & set(new_idmap._map))
             left_idx = self[common_ids]
             right_idx = new_idmap[common_ids]
 
             if update:
                 new_idmap._lst = self.lst
                 new_idmap._map = self.map
+        elif join == "intersection":
+            common_ids = sorted(set(self._map) & set(new_idmap._map))
+            left_idx = self[common_ids]
+            right_idx = new_idmap[common_ids]
+
+            self.reset(common_ids)
+            if update:
+                new_idmap.reset(common_ids)
         else:
             raise ValueError(f"Unknwon join type: {join!r}")
 

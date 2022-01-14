@@ -119,14 +119,30 @@ class TestIDmap(unittest.TestCase):
         self.assertEqual(diff.map, {"c": 0})
         self.assertEqual(diff.lst, ["c"])
 
+    def test_reset(self):
+        idmap = self.idmap.copy()
+
+        self.assertEqual(idmap.lst, ["a"])
+        self.assertEqual(idmap.map, {"a": 0})
+
+        idmap.reset(["b", "c"])
+        self.assertEqual(idmap.lst, ["b", "c"])
+        self.assertEqual(idmap.map, {"b": 0, "c": 1})
+
+        idmap.reset()
+        self.assertEqual(idmap.lst, [])
+        self.assertEqual(idmap.map, {})
+
 
 class TestIDmapAlign(unittest.TestCase):
     def setUp(self):
         self.ids1 = ["a", "b", "c", "d"]
         self.ids2 = ["c", "b", "a", "e", "f"]
+        self.ids_intersection = ["a", "b", "c"]
 
         self.ids1_map = {"a": 0, "b": 1, "c": 2, "d": 3}
         self.ids2_map = {"c": 0, "b": 1, "a": 2, "e": 3, "f": 4}
+        self.ids_intersection_map = {"a": 0, "b": 1, "c": 2}
 
         self.mat1 = np.array([[0, 1, 2], [1, 2, 3], [2, 3, 4], [3, 4, 5]])
         self.mat2 = np.array([[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]])
@@ -151,21 +167,12 @@ class TestIDmapAlign(unittest.TestCase):
         new_mat1[right_idx] = self.mat1[left_idx]
         self.assertEqual(
             new_mat1.astype(int).tolist(),
-            [
-                [2, 3, 4],
-                [1, 2, 3],
-                [0, 1, 2],
-                [0, 0, 0],
-                [0, 0, 0],
-            ],
+            [[2, 3, 4], [1, 2, 3], [0, 1, 2], [0, 0, 0], [0, 0, 0]],
         )
 
     def test_align_left(self):
         idmap1 = self.fvec1.idmap.copy()
         idmap2 = self.fvec2.idmap.copy()
-
-        self.assertEqual(idmap1.lst, self.ids1)
-        self.assertEqual(idmap2.lst, self.ids2)
 
         idmap1.align(idmap2, join="left", update=False)
         self.assertEqual(idmap1.lst, self.ids1)
@@ -183,12 +190,42 @@ class TestIDmapAlign(unittest.TestCase):
         new_mat2[right_idx] = self.mat2[left_idx]
         self.assertEqual(
             new_mat2.astype(int).tolist(),
-            [
-                [2, 3],
-                [1, 2],
-                [0, 1],
-                [0, 0],
-            ],
+            [[2, 3], [1, 2], [0, 1], [0, 0]],
+        )
+
+    def test_align_intersection(self):
+        idmap1 = self.fvec1.idmap.copy()
+        idmap2 = self.fvec2.idmap.copy()
+
+        idmap1.align(idmap2, join="intersection", update=False)
+        self.assertEqual(idmap1.lst, self.ids_intersection)
+        self.assertEqual(idmap1.map, self.ids_intersection_map)
+        self.assertEqual(idmap2.lst, self.ids2)
+        self.assertEqual(idmap2.map, self.ids2_map)
+
+        idmap1 = self.fvec1.idmap.copy()
+        left_idx, right_idx = idmap1.align(
+            idmap2,
+            join="intersection",
+            update=True,
+        )
+        self.assertEqual(idmap1.lst, self.ids_intersection)
+        self.assertEqual(idmap1.map, self.ids_intersection_map)
+        self.assertEqual(idmap2.lst, self.ids_intersection)
+        self.assertEqual(idmap2.map, self.ids_intersection_map)
+
+        new_mat1 = np.zeros((len(self.ids_intersection), self.mat1.shape[1]))
+        new_mat1[:] = self.mat1[left_idx]
+        self.assertEqual(
+            new_mat1.astype(int).tolist(),
+            [[0, 1, 2], [1, 2, 3], [2, 3, 4]],
+        )
+
+        new_mat2 = np.zeros((len(self.ids_intersection), self.mat2.shape[1]))
+        new_mat2[:] = self.mat2[right_idx]
+        self.assertEqual(
+            new_mat2.astype(int).tolist(),
+            [[2, 3], [1, 2], [0, 1]],
         )
 
 
