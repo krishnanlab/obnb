@@ -246,6 +246,14 @@ class IDmap(IDlst):
 
             self._lst = new_idmap.lst
             self._map = new_idmap.map
+        elif join == "left":
+            common_ids = list(set(self._map) & set(new_idmap._map))
+            left_idx = self[common_ids]
+            right_idx = new_idmap[common_ids]
+
+            if update:
+                new_idmap._lst = self.lst
+                new_idmap._map = self.map
         else:
             raise ValueError(f"Unknwon join type: {join!r}")
 

@@ -160,6 +160,37 @@ class TestIDmapAlign(unittest.TestCase):
             ],
         )
 
+    def test_align_left(self):
+        idmap1 = self.fvec1.idmap.copy()
+        idmap2 = self.fvec2.idmap.copy()
+
+        self.assertEqual(idmap1.lst, self.ids1)
+        self.assertEqual(idmap2.lst, self.ids2)
+
+        idmap1.align(idmap2, join="left", update=False)
+        self.assertEqual(idmap1.lst, self.ids1)
+        self.assertEqual(idmap1.map, self.ids1_map)
+        self.assertEqual(idmap2.lst, self.ids2)
+        self.assertEqual(idmap2.map, self.ids2_map)
+
+        right_idx, left_idx = idmap1.align(idmap2, join="left", update=True)
+        self.assertEqual(idmap1.lst, self.ids1)
+        self.assertEqual(idmap1.map, self.ids1_map)
+        self.assertEqual(idmap2.lst, self.ids1)
+        self.assertEqual(idmap2.map, self.ids1_map)
+
+        new_mat2 = np.zeros((len(self.ids1), self.mat2.shape[1]))
+        new_mat2[right_idx] = self.mat2[left_idx]
+        self.assertEqual(
+            new_mat2.astype(int).tolist(),
+            [
+                [2, 3],
+                [1, 2],
+                [0, 1],
+                [0, 0],
+            ],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
