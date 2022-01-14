@@ -22,7 +22,7 @@ class GNNTrainer(BaseTrainer):
         graph,
         features=None,
         train_on="train",
-        val_on="val",
+        val_on: str = "val",
         device: str = "cpu",
         metric_best: Optional[str] = None,
         log: bool = False,

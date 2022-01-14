@@ -1,5 +1,6 @@
 from typing import List
 from typing import Optional
+from typing import Sequence
 from typing import Union
 
 import numpy as np
@@ -250,6 +251,22 @@ class MultiFeatureVec(FeatureVec):
         self.indptr = None
         self.fset_idmap = IDmap()
 
+    def get_features_from_idx(
+        self,
+        idx: Sequence[int],
+        fset_id: str,
+    ) -> np.ndarray:
+        """Return features given node index and the selected feature set ID.
+
+        Args:
+            idx (sequence of int): node index of interest.
+            fset_id (str): feature set ID.
+
+        """
+        fset_idx = self.fset_idmap[fset_id]
+        fset_slice = slice(self.indptr[fset_idx], self.indptr[fset_idx + 1])
+        return self.mat[idx, fset_slice]
+
     def get_features(
         self,
         ids: Union[str, List[str]],
@@ -266,9 +283,7 @@ class MultiFeatureVec(FeatureVec):
 
         """
         idx = self.idmap[ids]
-        fset_idx = self.fset_idmap[fset_id]
-        fset_slice = slice(self.indptr[fset_idx], self.indptr[fset_idx + 1])
-        return self.mat[idx, fset_slice]
+        return self.get_features_from_idx(idx, fset_id)
 
     @classmethod
     def from_mat(
@@ -300,7 +315,7 @@ class MultiFeatureVec(FeatureVec):
 
         if fset_ids is None:
             fset_ids = list(map(str, range(indptr.size - 1)))
-        if isinstance(ids, IDmap):
+        if isinstance(fset_ids, IDmap):
             fset_idmap = fset_ids
         else:
             fset_idmap = IDmap.from_list(fset_ids)
