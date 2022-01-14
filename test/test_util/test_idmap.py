@@ -152,6 +152,16 @@ class TestIDmapAlign(unittest.TestCase):
         self.fvec1 = FeatureVec.from_mat(self.mat1, self.ids1)
         self.fvec2 = FeatureVec.from_mat(self.mat2, self.ids2)
 
+    def test_align_raises(self):
+        idmap = self.fvec1.idmap.copy()
+        self.assertRaises(TypeError, idmap.align, self.ids1)
+        self.assertRaises(ValueError, idmap.align, None)
+
+        # Aligned with idmap with no common IDs
+        new_idmap = idhandler.IDmap.from_list(["e", "f"])
+        self.assertRaises(ValueError, idmap.align, new_idmap, join="right")
+        self.assertRaises(ValueError, idmap.align, new_idmap, join="left")
+
     def test_align_right(self):
         idmap1 = self.fvec1.idmap.copy()
         idmap2 = self.fvec2.idmap.copy()

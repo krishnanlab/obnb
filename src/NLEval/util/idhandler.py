@@ -252,23 +252,30 @@ class IDmap(IDlst):
             update (bool): Whether or not to update the IDmap passed in
                 (default: :obj:`False`)
 
+        Raises:
+            TypeError: If new_idmap is not of type IDmap
+            ValueError: If new_idmap is None; or no common IDs found (except
+                when join method is "union")
+
         """
-        # TODO: check type
+        checkers.checkType("IDmap", IDmap, new_idmap)
         if join in ["right", "left", "intersection"]:
-            # TODO: raise error (or warnings) if no common ids
             common_ids = sorted(set(self._map) & set(new_idmap._map))
+            if not common_ids:
+                raise ValueError("Alignment failed since no common ID found")
+
             left_idx = self[common_ids]
             right_idx = new_idmap[common_ids]
 
             if join == "right":
                 self.reset(new_idmap.lst)
-            elif join == "left":
-                if update:
-                    new_idmap.reset(self.lst)
+            elif join == "left" and update:
+                new_idmap.reset(self.lst)
             elif join == "intersection":
                 self.reset(common_ids)
                 if update:
                     new_idmap.reset(common_ids)
+
         elif join == "union":
             left_ids = self.lst
             right_ids = new_idmap.lst
