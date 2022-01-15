@@ -1,3 +1,4 @@
+"""Graph and feature vector objects."""
 from .dense import DenseGraph
 from .dense import FeatureVec
 from .dense import MultiFeatureVec

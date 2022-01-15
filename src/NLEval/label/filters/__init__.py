@@ -1,3 +1,4 @@
+"""Filter objecst for preprocessing the labelset collection."""
 from .existence_filter import EntityExistenceFilter
 from .existence_filter import LabelsetExistenceFilter
 from .negative_generator import NegativeGeneratorHypergeom
