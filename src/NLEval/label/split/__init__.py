@@ -1,3 +1,4 @@
+"""Genearting data splits from the labelset collection."""
 from .holdout import AllHoldout
 from .holdout import RandomRatioHoldout
 from .holdout import RatioHoldout
