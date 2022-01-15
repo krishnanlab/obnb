@@ -1,8 +1,10 @@
 from typing import Any
 from typing import Dict
+from typing import Optional
 
 import numpy as np
 
+from ..util.checkers import checkNumpyArrayShape
 from .base import BaseTrainer
 
 
@@ -64,3 +66,63 @@ class SupervisedLearningTrainer(BaseTrainer):
                 results[f"{mask_name}_{metric_name}"] = score
 
         return results
+
+
+class MultiSupervisedLearningTrainer(SupervisedLearningTrainer):
+    """Supervised learning model trainer with multiple feature sets.
+
+    Used primarily for auto hyperparameter selection.
+
+    """
+
+    def __init__(
+        self,
+        metrics,
+        features,
+        train_on="train",
+        val_on: str = "val",
+        metric_best: Optional[str] = None,
+        log: bool = False,
+    ):
+        """Initialize MultiSupervisedLearningTrainer."""
+        super().__init__(metrics, features=features, train_on=train_on)
+
+        self.log = log
+        self.val_on = val_on
+        if metric_best is None:
+            self.metric_best = list(metrics)[0]
+        else:
+            self.metric_best = metric_best
+
+    def get_x_from_mask(self, mask):
+        """Obtain features of specific nodes from a specific feature set."""
+        checkNumpyArrayShape("mask", len(self.idmap), mask)
+        idx = np.where(mask)[0]
+        return self.features.get_features_from_idx(idx, self._curr_fset_name)
+
+    def train(self, model, y, masks, split_idx=0):
+        """Train a supervised learning mode and select based on validation."""
+        best_results = None
+        best_val_score = 0
+        val_mask_name = f"{self.val_on}_{self.metric_best}"
+
+        val_scores = []
+        for fset_name in self.features.fset_idmap.lst:
+            self._curr_fset_name = fset_name
+            results = super().train(model, y, masks, split_idx)
+            val_score = results[val_mask_name]
+            val_scores.append(val_score)
+
+            if val_score > best_val_score:
+                best_results = results
+                best_val_score = val_score
+                best_fset_name = self._curr_fset_name
+
+        if self.log:
+            score_str = ", ".join([f"{i:.3f}" for i in val_scores])
+            print(
+                f"Best val score: {best_val_score:.3f} (via "
+                f"{best_fset_name}) Other val scores: [{score_str}]",
+            )
+
+        return best_results
