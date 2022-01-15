@@ -1,7 +1,7 @@
 """Graph and feature vector objects."""
 from .dense import DenseGraph
-from .dense import FeatureVec
-from .dense import MultiFeatureVec
+from .featurevec import FeatureVec
+from .featurevec import MultiFeatureVec
 from .sparse import SparseGraph
 
 __all__ = [
