@@ -1,7 +1,6 @@
-from typing import List
-from typing import Optional
+from __future__ import annotations
+
 from typing import Sequence
-from typing import Union
 
 import numpy as np
 from scipy.spatial import distance
@@ -107,6 +106,47 @@ class FeatureVec(DenseGraph):
         """Return a copy of the feature matrix."""
         return self.mat.copy()
 
+    def align(
+        self,
+        new_fvec: FeatureVec,
+        join: str = "right",
+        update: bool = False,
+    ):
+        """Align FeatureVec object with another FeatureVec.
+
+        Utilizes the ``align`` method of ``IDmap`` to align, then update the
+        feature vector matrix based on the returned left and right index.
+
+        """
+        checkers.checkType("Feature vectors", FeatureVec, new_fvec)
+        new_idmap = new_fvec.idmap
+        l_idx, r_idx = self.idmap.align(new_idmap, join=join, update=update)
+
+        if join == "right":
+            new_mat = np.zeros((len(new_idmap), self.mat.shape[1]))
+            new_mat[r_idx] = self.mat[l_idx]
+            self._mat = new_mat
+        elif join == "left":
+            if update:
+                new_mat = np.zeros((len(self.idmap), new_fvec.mat.shape[1]))
+                new_mat[l_idx] = new_fvec.mat[r_idx]
+                new_fvec._mat = new_mat
+        elif join == "intersection":
+            self._mat = self._mat[l_idx]
+            if update:
+                new_fvec._mat = new_fvec._mat[r_idx]
+        elif join == "union":
+            new_mat = np.zeros((len(self.idmap), self.mat.shape[1]))
+            new_mat[l_idx] = self._mat
+            self._mat = new_mat
+
+            if update:
+                new_mat = np.zeros((len(self.idmap), new_fvec.mat.shape[1]))
+                new_mat[r_idx] = new_fvec._mat
+                new_fvec._mat = new_mat
+        else:
+            raise ValueError(f"Unrecognized join type {join!r}")
+
     @classmethod
     def from_emd(cls, path_to_emd, **kwargs):
         fvec_lst = []
@@ -149,7 +189,7 @@ class MultiFeatureVec(FeatureVec):
 
     def get_features(
         self,
-        ids: Union[str, List[str]],
+        ids: str | list[str],
         fset_id: str,
     ) -> np.ndarray:
         """Return features given node IDs and the selected feature set ID.
@@ -170,8 +210,8 @@ class MultiFeatureVec(FeatureVec):
         cls,
         mat: np.ndarray,
         indptr: np.ndarray,
-        ids: Optional[Union[List[str], IDmap]] = None,
-        fset_ids: Optional[Union[List[str], IDmap]] = None,
+        ids: list[str] | IDmap | None = None,
+        fset_ids: list[str] | IDmap | None = None,
     ):
         """Construct MultiFeatureVec object.
 
@@ -210,9 +250,9 @@ class MultiFeatureVec(FeatureVec):
     @classmethod
     def from_mats(
         cls,
-        mats: List[np.ndarray],
-        ids: Optional[Union[List[str], IDmap]] = None,
-        fset_ids: Optional[Union[List[str], IDmap]] = None,
+        mats: list[np.ndarray],
+        ids: list[str] | IDmap | None = None,
+        fset_ids: list[str] | IDmap | None = None,
     ):
         """Construct MultiFeatureVec object from list of matrices.
 

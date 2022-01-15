@@ -1,10 +1,8 @@
 from typing import List
 from typing import Optional
-from typing import Sequence
 from typing import Union
 
 import numpy as np
-from scipy.spatial import distance
 
 from ..util import checkers
 from ..util.idhandler import IDmap
