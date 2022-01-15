@@ -87,6 +87,7 @@ class MultiSupervisedLearningTrainer(SupervisedLearningTrainer):
         """Initialize MultiSupervisedLearningTrainer."""
         super().__init__(metrics, features=features, train_on=train_on)
 
+        self.log = log
         self.val_on = val_on
         if metric_best is None:
             self.metric_best = list(metrics)[0]
