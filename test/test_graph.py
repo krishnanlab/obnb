@@ -430,7 +430,7 @@ class TestMultiFeatureVec(unittest.TestCase):
         with self.subTest(ids="a", fset_id="Features1"):
             self.assertEqual(
                 mfv.get_features("a", "Features1").tolist(),
-                self.mat1[0].tolist(),
+                [self.mat1[0].tolist()],
             )
 
         with self.subTest(ids=["a"], fset_id="Features1"):
@@ -449,6 +449,24 @@ class TestMultiFeatureVec(unittest.TestCase):
             self.assertEqual(
                 mfv.get_features(["a", "c"], "Features3").tolist(),
                 self.mat3[[0, 2]].tolist(),
+            )
+
+        with self.subTest(ids="a", fset_id=["Features3", "Features1"]):
+            self.assertEqual(
+                mfv.get_features(
+                    "a",
+                    ["Features3", "Features1"],
+                ).tolist(),
+                [self.mat[0, [5, 6, 7, 8, 0, 1, 2]].tolist()],
+            )
+
+        with self.subTest(ids=["a", "c"], fset_id=["Features3", "Features1"]):
+            self.assertEqual(
+                mfv.get_features(
+                    ["a", "c"],
+                    ["Features3", "Features1"],
+                ).tolist(),
+                self.mat[[0, 2]][:, [5, 6, 7, 8, 0, 1, 2]].tolist(),
             )
 
 

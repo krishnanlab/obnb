@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from itertools import chain
 from typing import Sequence
 
 import numpy as np
@@ -187,19 +188,29 @@ class MultiFeatureVec(FeatureVec):
 
     def get_features_from_idx(
         self,
-        idx: Sequence[int],
-        fset_id: str,
+        idx: Sequence[int] | int,
+        fset_idx: Sequence[int] | int,
     ) -> np.ndarray:
-        """Return features given node index and the selected feature set ID.
+        """Return features given node index and feature set inde.
 
         Args:
-            idx (sequence of int): node index of interest.
-            fset_id (str): feature set ID.
+            idx (int or sequence of int): node index of interest.
+            fset_id (int or sequence of int): feature set index of interest.
 
         """
-        fset_idx = self.fset_idmap[fset_id]
-        fset_slice = slice(self.indptr[fset_idx], self.indptr[fset_idx + 1])
-        return self.mat[idx, fset_slice]
+        if isinstance(idx, int):  # return as one 2-d array with one row
+            idx = slice(idx, idx + 1)
+
+        indptr = self.indptr
+        if isinstance(fset_idx, int):
+            fset_slice = slice(indptr[fset_idx], indptr[fset_idx + 1])
+        else:
+            fset_slices = [
+                list(range(indptr[i], indptr[i + 1])) for i in fset_idx
+            ]
+            fset_slice = list(chain(*fset_slices))
+
+        return self.mat[idx][:, fset_slice]
 
     def get_features(
         self,
@@ -217,7 +228,8 @@ class MultiFeatureVec(FeatureVec):
 
         """
         idx = self.idmap[ids]
-        return self.get_features_from_idx(idx, fset_id)
+        fset_idx = self.fset_idmap[fset_id]
+        return self.get_features_from_idx(idx, fset_idx)
 
     @classmethod
     def from_mat(
