@@ -427,31 +427,31 @@ class TestMultiFeatureVec(unittest.TestCase):
     def test_get_features(self):
         mfv = MultiFeatureVec.from_mats(self.mats, self.ids, self.fset_ids)
 
-        with self.subTest(ids="a", fset_id="Features1"):
+        with self.subTest(ids="a", fset_ids="Features1"):
             self.assertEqual(
                 mfv.get_features("a", "Features1").tolist(),
                 [self.mat1[0].tolist()],
             )
 
-        with self.subTest(ids=["a"], fset_id="Features1"):
+        with self.subTest(ids=["a"], fset_ids="Features1"):
             self.assertEqual(
                 mfv.get_features(["a"], "Features1").tolist(),
                 [self.mat1[0].tolist()],
             )
 
-        with self.subTest(ids=["a", "c"], fset_id="Features1"):
+        with self.subTest(ids=["a", "c"], fset_ids="Features1"):
             self.assertEqual(
                 mfv.get_features(["a", "c"], "Features1").tolist(),
                 self.mat1[[0, 2]].tolist(),
             )
 
-        with self.subTest(ids=["a", "c"], fset_id="Features3"):
+        with self.subTest(ids=["a", "c"], fset_ids="Features3"):
             self.assertEqual(
                 mfv.get_features(["a", "c"], "Features3").tolist(),
                 self.mat3[[0, 2]].tolist(),
             )
 
-        with self.subTest(ids="a", fset_id=["Features3", "Features1"]):
+        with self.subTest(ids="a", fset_ids=["Features3", "Features1"]):
             self.assertEqual(
                 mfv.get_features(
                     "a",
@@ -460,13 +460,37 @@ class TestMultiFeatureVec(unittest.TestCase):
                 [self.mat[0, [5, 6, 7, 8, 0, 1, 2]].tolist()],
             )
 
-        with self.subTest(ids=["a", "c"], fset_id=["Features3", "Features1"]):
+        with self.subTest(ids=["a", "c"], fset_ids=["Features3", "Features1"]):
             self.assertEqual(
                 mfv.get_features(
                     ["a", "c"],
                     ["Features3", "Features1"],
                 ).tolist(),
                 self.mat[[0, 2]][:, [5, 6, 7, 8, 0, 1, 2]].tolist(),
+            )
+
+        with self.subTest(ids=None, fset_ids=["Features3", "Features1"]):
+            self.assertEqual(
+                mfv.get_features(fset_ids=["Features3", "Features1"]).tolist(),
+                self.mat[:, [5, 6, 7, 8, 0, 1, 2]].tolist(),
+            )
+
+        with self.subTest(ids=None, fset_ids="Features3"):
+            self.assertEqual(
+                mfv.get_features(fset_ids="Features3").tolist(),
+                self.mat[:, [5, 6, 7, 8]].tolist(),
+            )
+
+        with self.subTest(ids=["a", "c"], fset_ids=None):
+            self.assertEqual(
+                mfv.get_features(["a", "c"]).tolist(),
+                self.mat[[0, 2]].tolist(),
+            )
+
+        with self.subTest(ids="c", fset_ids=None):
+            self.assertEqual(
+                mfv.get_features("c").tolist(),
+                self.mat[[2]].tolist(),
             )
 
 

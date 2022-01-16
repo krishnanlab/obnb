@@ -199,7 +199,7 @@ class MultiFeatureVec(FeatureVec):
 
         """
         if isinstance(idx, int):  # return as one 2-d array with one row
-            idx = slice(idx, idx + 1)
+            idx = [idx]
 
         indptr = self.indptr
         if isinstance(fset_idx, int):
@@ -214,21 +214,30 @@ class MultiFeatureVec(FeatureVec):
 
     def get_features(
         self,
-        ids: str | list[str],
-        fset_id: str,
+        ids: str | list[str] | None = None,
+        fset_ids: str | list[str] | None = None,
     ) -> np.ndarray:
         """Return features given node IDs and the selected feature set ID.
 
         Args:
-            ids (str or list of str): node ID(s) of interest, return a 1-d
-                array if input a single id, otherwise return a 2-d array
+            ids (str or list of str, optional): node ID(s) of interest, return
+                a 1-d array if input a single id, otherwise return a 2-d array
                 where each row is the feature vector with the corresponding
-                node ID.
-            fset_id (str): feature set ID.
+                node ID. If not specified, use all rows.
+            fset_ids (str or list of str, optional): feature set ID(s) of
+                interest. If not specified, use all columns.
 
         """
-        idx = self.idmap[ids]
-        fset_idx = self.fset_idmap[fset_id]
+        if ids is None:
+            idx = list(range(len(self.idmap)))
+        else:
+            idx = self.idmap[ids]
+
+        if fset_ids is None:
+            fset_idx = list(range(len(self.fset_idmap)))
+        else:
+            fset_idx = self.fset_idmap[fset_ids]
+
         return self.get_features_from_idx(idx, fset_idx)
 
     @classmethod
