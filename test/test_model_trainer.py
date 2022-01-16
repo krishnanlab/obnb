@@ -18,10 +18,10 @@ class TestBaseTrainer(unittest.TestCase):
             "d": [4, 5, 6],
             "e": [5, 6, 7],
         }
-        self.raw_data_list = list(map(raw_data.get, sorted(raw_data)))
-        self.features = FeatureVec()
-        for i, j in raw_data.items():
-            self.features.add_vec(i, np.array(j))
+        self.ids = sorted(raw_data)
+        self.raw_data_list = list(map(raw_data.get, self.ids))
+        self.mat = np.vstack(self.raw_data_list)
+        self.features = FeatureVec.from_mat(self.mat, self.ids)
 
         self.graph = DenseGraph()
         for i in raw_data:
