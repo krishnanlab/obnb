@@ -1,16 +1,17 @@
 import os.path as osp
+import shutil
+import subprocess
+import tempfile
 
 import numpy as np
-from NLEval.graph import DenseGraph
 from NLEval.graph import FeatureVec
 from NLEval.graph import MultiFeatureVec
+from NLEval.graph import SparseGraph
 from NLEval.label import filters
 from NLEval.label import LabelsetCollection
 from NLEval.label.split import RatioPartition
 from NLEval.model_trainer import MultiSupervisedLearningTrainer
 from NLEval.model_trainer import SupervisedLearningTrainer
-from numba import set_num_threads
-from pecanpy.pecanpy import PreComp
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
 
@@ -21,10 +22,30 @@ GRAPH_FP = osp.join(DATA_DIR, "networks", f"{NETWORK}.edg")
 LABEL_FP = osp.join(DATA_DIR, "labels", f"{LABEL}.gmt")
 PROPERTY_FP = osp.join(DATA_DIR, "properties", "PubMedCount.txt")
 
+TEMP_DIR = tempfile.mkdtemp()
+PECANPY_ARGS = [
+    "pecanpy",
+    "--input",
+    GRAPH_FP,
+    "--workers",
+    "6",
+    "--mode",
+    "PreComp",
+]
+
+# Start embedding processes in the backgroud
+print(f"Start generating embeddings and saving to: {TEMP_DIR}")
+qs = [0.01, 0.1, 1, 10, 100]
+processes = []
+for q in qs:
+    fp = osp.join(TEMP_DIR, f"{NETWORK}_q={q}.emd")
+    args = PECANPY_ARGS + ["--q", str(q), "--output", fp]
+    processes.append(subprocess.Popen(args))
+
 print(f"{NETWORK=}\n{LABEL=}")
 
 # Load data
-g = DenseGraph.from_edglst(GRAPH_FP, weighted=True, directed=False)
+g = SparseGraph.from_edglst(GRAPH_FP, weighted=True, directed=False)
 lsc = LabelsetCollection.from_gmt(LABEL_FP)
 
 # Filter labels
@@ -53,20 +74,17 @@ print(f"Number of labelsets after split filtering: {len(lsc.label_ids)}")
 mdl = LogisticRegression(penalty="l2", solver="lbfgs", n_jobs=1)
 metrics = {"auroc": auroc}
 
-set_num_threads(28)
-mats = []
-qs = [0.01, 0.1, 1, 10, 100]
+# Wait until all embeddings are generated to proceed
+for process in processes:
+    process.wait()
+
+fvecs = []
 for q in qs:
-    g_n2v = PreComp.from_mat(
-        g.mat,
-        g.idmap.lst,
-        p=1,
-        q=q,
-        workers=28,
-        verbose=True,
-    )
-    g_n2v.preprocess_transition_probs()
-    mats.append(g_n2v.embed())
+    fp = osp.join(TEMP_DIR, f"{NETWORK}_q={q}.emd")
+    fvecs.append(FeatureVec.from_emd(fp))
+    fvecs[-1].align_to_idmap(g.idmap)
+
+mats = [fvec.mat for fvec in fvecs]
 mfvec = MultiFeatureVec.from_mats(mats, g.idmap, [f"{q=}" for q in qs])
 
 # Train with hyperparameter selection using validation set
@@ -94,15 +112,13 @@ print(
 )
 
 # No hyperparameter selection
-for q, mat in zip(qs, mats):
-    fvec = FeatureVec.from_mat(mat, g.idmap)
+for q, fvec in zip(qs, fvecs):
     trainer = SupervisedLearningTrainer(metrics, fvec)
     scores = []
     for label_id in lsc.label_ids:
         y, masks = lsc.split(
             splitter,
-            # target_ids=g.node_ids,
-            target_ids=(*g_n2v.IDlst,),
+            target_ids=g.node_ids,
             labelset_name=label_id,
             property_name="PubMed Count",
             consider_negative=True,
@@ -113,3 +129,7 @@ for q, mat in zip(qs, mats):
         f"Average test score ({q=}) = {np.mean(scores):.4f}, "
         f"std = {np.std(scores):.4f}",
     )
+
+# Remove temp files after done
+print(f"\nFinished testing, removing temporary files in {TEMP_DIR}")
+shutil.rmtree(TEMP_DIR)

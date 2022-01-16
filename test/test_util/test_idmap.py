@@ -178,7 +178,7 @@ class TestIDmapAlign(unittest.TestCase):
         new_mat1 = np.zeros((len(self.ids2), self.mat1.shape[1]))
         new_mat1[right_idx] = self.mat1[left_idx]
         self.assertEqual(
-            new_mat1.astype(int).tolist(),
+            new_mat1.tolist(),
             [[2, 3, 4], [1, 2, 3], [0, 1, 2], [0, 0, 0], [0, 0, 0]],
         )
 
@@ -201,7 +201,7 @@ class TestIDmapAlign(unittest.TestCase):
         new_mat2 = np.zeros((len(self.ids1), self.mat2.shape[1]))
         new_mat2[right_idx] = self.mat2[left_idx]
         self.assertEqual(
-            new_mat2.astype(int).tolist(),
+            new_mat2.tolist(),
             [[2, 3], [1, 2], [0, 1], [0, 0]],
         )
 
@@ -229,14 +229,14 @@ class TestIDmapAlign(unittest.TestCase):
         new_mat1 = np.zeros((len(self.ids_intersection), self.mat1.shape[1]))
         new_mat1[:] = self.mat1[left_idx]
         self.assertEqual(
-            new_mat1.astype(int).tolist(),
+            new_mat1.tolist(),
             [[0, 1, 2], [1, 2, 3], [2, 3, 4]],
         )
 
         new_mat2 = np.zeros((len(self.ids_intersection), self.mat2.shape[1]))
         new_mat2[:] = self.mat2[right_idx]
         self.assertEqual(
-            new_mat2.astype(int).tolist(),
+            new_mat2.tolist(),
             [[2, 3], [1, 2], [0, 1]],
         )
 
@@ -264,14 +264,14 @@ class TestIDmapAlign(unittest.TestCase):
         new_mat1 = np.zeros((len(self.ids_union), self.mat1.shape[1]))
         new_mat1[left_idx] = self.mat1
         self.assertEqual(
-            new_mat1.astype(int).tolist(),
+            new_mat1.tolist(),
             [[0, 1, 2], [1, 2, 3], [2, 3, 4], [3, 4, 5], [0, 0, 0], [0, 0, 0]],
         )
 
         new_mat2 = np.zeros((len(self.ids_union), self.mat2.shape[1]))
         new_mat2[right_idx] = self.mat2
         self.assertEqual(
-            new_mat2.astype(int).tolist(),
+            new_mat2.tolist(),
             [[2, 3], [1, 2], [0, 1], [0, 0], [3, 4], [4, 5]],
         )
 

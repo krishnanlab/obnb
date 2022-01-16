@@ -452,5 +452,145 @@ class TestMultiFeatureVec(unittest.TestCase):
             )
 
 
+class TestFeatureVecAlign(unittest.TestCase):
+    def setUp(self):
+        self.ids1 = ["a", "b", "c", "d"]
+        self.ids2 = ["c", "b", "a", "e", "f"]
+        self.ids_intersection = ["a", "b", "c"]
+        self.ids_union = ["a", "b", "c", "d", "e", "f"]
+
+        self.ids1_map = {"a": 0, "b": 1, "c": 2, "d": 3}
+        self.ids2_map = {"c": 0, "b": 1, "a": 2, "e": 3, "f": 4}
+        self.ids_intersection_map = {"a": 0, "b": 1, "c": 2}
+        self.ids_union_map = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5}
+
+        self.mat1 = np.array([[0, 1, 2], [1, 2, 3], [2, 3, 4], [3, 4, 5]])
+        self.mat2 = np.array([[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]])
+
+        self.fvec1 = FeatureVec.from_mat(self.mat1, self.ids1)
+        self.fvec2 = FeatureVec.from_mat(self.mat2, self.ids2)
+
+    def test_align_raises(self):
+        self.assertRaises(TypeError, self.fvec1.align, self.ids1)
+        self.assertRaises(ValueError, self.fvec1.align, None)
+
+    def test_align_to_idmap(self):
+        fvec1, fvec2 = self.fvec1.copy(), self.fvec2.copy()
+        idmap = idhandler.IDmap.from_list(["b", "k", "a"])
+
+        fvec1.align_to_idmap(idmap)
+        self.assertEqual(fvec1.idmap.lst, idmap.lst)
+        self.assertEqual(fvec1.mat.tolist(), [[1, 2, 3], [0, 0, 0], [0, 1, 2]])
+
+        fvec2.align_to_idmap(idmap)
+        self.assertEqual(fvec2.idmap.lst, idmap.lst)
+        self.assertEqual(fvec2.mat.tolist(), [[1, 2], [0, 0], [2, 3]])
+
+    def test_align_right(self):
+        fvec1, fvec2 = self.fvec1.copy(), self.fvec2.copy()
+        fvec1.align(fvec2, join="right", update=True)
+
+        self.assertEqual(fvec1.idmap.lst, self.ids2)
+        self.assertEqual(fvec2.idmap.lst, self.ids2)
+
+        self.assertEqual(
+            fvec1.mat.tolist(),
+            [[2, 3, 4], [1, 2, 3], [0, 1, 2], [0, 0, 0], [0, 0, 0]],
+        )
+        self.assertEqual(fvec2.mat.tolist(), self.mat2.tolist())
+
+    def test_align_left(self):
+        with self.subTest(update=False):
+            fvec1, fvec2 = self.fvec1.copy(), self.fvec2.copy()
+            fvec1.align(fvec2, join="left", update=False)
+
+            self.assertEqual(fvec1.idmap.lst, self.ids1)
+            self.assertEqual(fvec2.idmap.lst, self.ids2)
+
+        with self.subTest(update=True):
+            fvec1, fvec2 = self.fvec1.copy(), self.fvec2.copy()
+            fvec1.align(fvec2, join="left", update=True)
+
+            self.assertEqual(fvec1.idmap.lst, self.ids1)
+            self.assertEqual(fvec2.idmap.lst, self.ids1)
+
+            self.assertEqual(fvec1.mat.tolist(), self.mat1.tolist())
+            self.assertEqual(
+                fvec2.mat.tolist(),
+                [[2, 3], [1, 2], [0, 1], [0, 0]],
+            )
+
+    def test_align_intersection(self):
+        with self.subTest(update=False):
+            fvec1, fvec2 = self.fvec1.copy(), self.fvec2.copy()
+            fvec1.align(fvec2, join="intersection", update=False)
+
+            self.assertEqual(fvec1.idmap.lst, self.ids_intersection)
+            self.assertEqual(fvec2.idmap.lst, self.ids2)
+
+            self.assertEqual(
+                fvec1.mat.tolist(),
+                [[0, 1, 2], [1, 2, 3], [2, 3, 4]],
+            )
+            self.assertEqual(fvec2.mat.tolist(), self.mat2.tolist())
+
+        with self.subTest(update=True):
+            fvec1, fvec2 = self.fvec1.copy(), self.fvec2.copy()
+            fvec1.align(fvec2, join="intersection", update=True)
+
+            self.assertEqual(fvec1.idmap.lst, self.ids_intersection)
+            self.assertEqual(fvec2.idmap.lst, self.ids_intersection)
+
+            self.assertEqual(
+                fvec1.mat.tolist(),
+                [[0, 1, 2], [1, 2, 3], [2, 3, 4]],
+            )
+            self.assertEqual(fvec2.mat.tolist(), [[2, 3], [1, 2], [0, 1]])
+
+    def test_align_union(self):
+        with self.subTest(update=False):
+            fvec1, fvec2 = self.fvec1.copy(), self.fvec2.copy()
+            fvec1.align(fvec2, join="union", update=False)
+
+            self.assertEqual(fvec1.idmap.lst, self.ids_union)
+            self.assertEqual(fvec2.idmap.lst, self.ids2)
+
+            self.assertEqual(
+                fvec1.mat.tolist(),
+                [
+                    [0, 1, 2],
+                    [1, 2, 3],
+                    [2, 3, 4],
+                    [3, 4, 5],
+                    [0, 0, 0],
+                    [0, 0, 0],
+                ],
+            )
+            self.assertEqual(fvec2.mat.tolist(), self.mat2.tolist())
+
+        with self.subTest(update=True):
+            fvec1, fvec2 = self.fvec1.copy(), self.fvec2.copy()
+            fvec1.align(fvec2, join="union", update=True)
+
+            self.assertEqual(fvec1.idmap.lst, self.ids_union)
+            self.assertEqual(fvec2.idmap.lst, self.ids_union)
+
+            self.assertEqual(
+                fvec1.mat.tolist(),
+                [
+                    [0, 1, 2],
+                    [1, 2, 3],
+                    [2, 3, 4],
+                    [3, 4, 5],
+                    [0, 0, 0],
+                    [0, 0, 0],
+                ],
+            )
+            self.assertEqual(
+                fvec2.mat.tolist(),
+                [[2, 3], [1, 2], [0, 1], [0, 0], [3, 4], [4, 5]],
+            )
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Tuple
 
 from ..util import checkers
@@ -24,6 +25,9 @@ class BaseGraph:
     def idmap(self, idmap):
         checkers.checkType("idmap", idhandler.IDmap, idmap)
         self._idmap = idmap
+
+    def copy(self):
+        return deepcopy(self)
 
     def __contains__(self, graph):
         """Return true if contains the input graph."""
