@@ -144,6 +144,12 @@ class TestLabelsetCollection(unittest.TestCase):
         self.assertEqual(lsc.prop["Info"], self.toy1_InfoLst)
         self.assertEqual(lsc.prop["Labelset"], self.toy1_labelsets)
 
+    def test_from_dict(self):
+        input_dict = {"a": "L1", "b": "L2", "c": "L1", "f": "L2", "h": "L1"}
+        lsc = LabelsetCollection.from_dict(input_dict)
+        self.assertEqual(lsc.get_labelset("L1"), {"a", "c", "h"})
+        self.assertEqual(lsc.get_labelset("L2"), {"b", "f"})
+
     def test_add_labelset(self):
         with self.subTest(msg="Input checks"):
             # test lst input type, only list of string allowed

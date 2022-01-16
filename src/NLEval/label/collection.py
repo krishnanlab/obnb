@@ -1,5 +1,4 @@
 from functools import lru_cache
-from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Iterator
@@ -539,7 +538,7 @@ class LabelsetCollection(idhandler.IDprop):
                 self.entity.set_property(entity_id, prop_name, interpreter(val))
 
     @classmethod
-    def from_gmt(cls, fp: str, sep: str = "\t") -> Any:
+    def from_gmt(cls, fp: str, sep: str = "\t"):
         """Load data from Gene Matrix Transpose `.gmt` file.
 
         Args:
@@ -552,4 +551,20 @@ class LabelsetCollection(idhandler.IDprop):
             for line in f:
                 label_id, label_info, *lst = line.strip().split(sep)
                 lsc.add_labelset(lst, label_id, label_info)
+        return lsc
+
+    @classmethod
+    def from_dict(cls, input_dict: Dict[str, str]):
+        """Load data from entity label dictionary.
+
+        Args:
+            input_dict (:obj:`dict` from :obj:`str` to :obj:`str): A dictionary
+                mapping from entities to their unique label IDs.
+
+        """
+        lsc = cls()
+        for entity, label_id in input_dict.items():
+            if label_id not in lsc:
+                lsc.new_labelset(label_id)
+            lsc.update_labelset([entity], label_id)
         return lsc
