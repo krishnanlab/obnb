@@ -108,7 +108,7 @@ class BaseTrainer:
         # TODO: make this more generic, e.g. what if we want to use SparseGraph
         if self.features is not None:
             mat = self.features.mat
-            return mat[:, idx] if self.dual else mat[idx]
+            return mat[:, idx].T if self.dual else mat[idx]
         else:
             raise ValueError("Features not set")
 

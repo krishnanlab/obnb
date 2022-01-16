@@ -104,7 +104,7 @@ class TestBaseTrainer(unittest.TestCase):
         for idx in test_list:
             with self.subTest(idx=idx):
                 self.assertEqual(
-                    trainer.get_x(idx).T.tolist(),
+                    trainer.get_x(idx).tolist(),
                     [self.features.mat[:, i].tolist() for i in idx],
                 )
 
@@ -165,7 +165,7 @@ class TestBaseTrainer(unittest.TestCase):
         for ids, idx in zip(test_ids_list, test_idx_list):
             with self.subTest(ids=ids):
                 self.assertEqual(
-                    trainer.get_x_from_ids(ids).T.tolist(),
+                    trainer.get_x_from_ids(ids).tolist(),
                     [self.features.mat[:, i].tolist() for i in idx],
                 )
 
@@ -200,7 +200,7 @@ class TestBaseTrainer(unittest.TestCase):
         for mask in test_list:
             with self.subTest(mask=mask):
                 self.assertEqual(
-                    trainer.get_x_from_mask(np.array(mask)).T.tolist(),
+                    trainer.get_x_from_mask(np.array(mask)).tolist(),
                     [fmat[:, i].tolist() for i in np.where(mask)[0]],
                 )
 
