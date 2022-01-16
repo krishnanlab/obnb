@@ -4,13 +4,22 @@ import NLEval.model_trainer
 import numpy as np
 from NLEval import model_trainer
 from NLEval.graph import DenseGraph
-from NLEval.graph import FeatureVec
+from NLEval.graph import MultiFeatureVec
 from NLEval.model_trainer.base import BaseTrainer
 from NLEval.util.exceptions import IDNotExistError
 
 
 class TestBaseTrainer(unittest.TestCase):
     def setUp(self):
+        """Setup toy multi-feature vector object.
+
+           f1  f2  f3
+        a   1   2   3
+        b   2   3   4
+        c   3   4   5
+        d   4   5   6
+        e   5   6   7
+        """
         self.raw_data = raw_data = {
             "a": [1, 2, 3],
             "b": [2, 3, 4],
@@ -18,10 +27,13 @@ class TestBaseTrainer(unittest.TestCase):
             "d": [4, 5, 6],
             "e": [5, 6, 7],
         }
-        self.ids = sorted(raw_data)
-        self.raw_data_list = list(map(raw_data.get, self.ids))
-        self.mat = np.vstack(self.raw_data_list)
-        self.features = FeatureVec.from_mat(self.mat, self.ids)
+        self.ids = ids = sorted(raw_data)
+        self.fset_ids = fset_ids = ["f1", "f2", "f3"]
+        self.raw_data_list = list(map(raw_data.get, ids))
+
+        mat = np.vstack(self.raw_data_list)
+        indptr = np.array([0, 1, 2, 3])
+        self.features = MultiFeatureVec.from_mat(mat, indptr, ids, fset_ids)
 
         self.graph = DenseGraph()
         for i in raw_data:
