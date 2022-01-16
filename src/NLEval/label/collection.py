@@ -262,6 +262,42 @@ class LabelsetCollection(idhandler.IDprop):
                 )
         self.set_property(label_id, "Negative", set(lst))
 
+    def get_y(
+        self,
+        target_ids: Tuple[str, ...],
+        labelset_name: Optional[str] = None,
+    ) -> np.ndarray:
+        """Return the y matrix.
+
+        Args:
+            target_ids: Tuple of entity ids used to order the rows.
+            labelset_name: A specific labelset to use, if not set, use all the
+                labelests (default: :obj:`None`).
+
+        """
+        # TODO: Clean up this, reduce redundancy with split
+        target_idmap = {j: i for i, j in enumerate(target_ids)}
+        entity_idmap = {j: i for i, j in enumerate(self.entity_ids)}
+        to_target_idx = np.array([target_idmap[i] for i in self.entity_ids])
+
+        if labelset_name is None:
+            labelsets = list(map(self.get_labelset, self.label_ids))
+            y = np.zeros((len(self.entity_ids), len(labelsets)), dtype=bool)
+            for i, labelset in enumerate(labelsets):
+                y[list(map(entity_idmap.get, labelset)), i] = True
+        else:
+            labelset = self.get_labelset(labelset_name)
+            y = np.zeros(len(self.entity_ids), dtype=bool)
+            y[list(map(entity_idmap.get, labelset))] = True
+
+        if labelset_name is not None or len(y.shape) == 1:
+            y_out = np.zeros(len(target_ids), dtype=bool)
+        else:
+            y_out = np.zeros((len(target_ids), y.shape[1]), dtype=bool)
+        y_out[to_target_idx] = y
+
+        return y_out
+
     @lru_cache
     def split(
         self,
@@ -277,7 +313,7 @@ class LabelsetCollection(idhandler.IDprop):
         Args:
             splitter: A splitter function that split the entities based on
                 their labels and optionally the an entity.
-            target_ids: List of entity ids for the output masks and label
+            target_ids: Tuple of entity ids for the output masks and label
                 vector to align with. Use ``self.entity_ids`` if not specified.
             labelset_name: Indicate which specific labelset to split. Split
                 based on all available sets if not specified.

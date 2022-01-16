@@ -334,6 +334,16 @@ class TestLabelsetCollection(unittest.TestCase):
         self.lsc.pop_labelset("Labelset2")
         self.assertEqual(self.lsc.entity.map, {"a": 0, "c": 1, "d": 2})
 
+    def test_get_y(self):
+        input_dict = {"a": "L1", "b": "L2", "c": "L1", "f": "L2", "h": "L1"}
+        lsc = LabelsetCollection.from_dict(input_dict)
+
+        y = lsc.get_y(("a", "b", "c", "f", "h"))
+        self.assertEqual(y.T.tolist(), [[1, 0, 1, 0, 1], [0, 1, 0, 1, 0]])
+
+        y = lsc.get_y(("a", "c", "b", "x", "f", "h"))
+        self.assertEqual(y.T.tolist(), [[1, 1, 0, 0, 0, 1], [0, 0, 1, 0, 1, 0]])
+
 
 if __name__ == "__main__":
     unittest.main()

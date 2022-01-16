@@ -25,7 +25,7 @@ class SupervisedLearningTrainer(BaseTrainer):
 
     """
 
-    def __init__(self, metrics, features, train_on="train"):
+    def __init__(self, metrics, features, train_on="train", dual=False):
         """Initialize SupervisedLearningTrainer.
 
         Note:
@@ -34,7 +34,12 @@ class SupervisedLearningTrainer(BaseTrainer):
             node features.
 
         """
-        super().__init__(metrics, features=features, train_on=train_on)
+        super().__init__(
+            metrics,
+            features=features,
+            train_on=train_on,
+            dual=dual,
+        )
 
     def train(
         self,
