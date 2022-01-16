@@ -94,6 +94,53 @@ class TestBaseTrainer(unittest.TestCase):
             x = trainer.get_x([0, 1])
         self.assertEqual(str(context.exception), "Features not set")
 
+    def test_get_x_dual(self):
+        trainer = BaseTrainer(
+            self.toy_metrics,
+            features=self.features,
+            dual=True,
+        )
+        test_list = [[0, 2], [1], [0, 1, 2]]
+        for idx in test_list:
+            with self.subTest(idx=idx):
+                self.assertEqual(
+                    trainer.get_x(idx).T.tolist(),
+                    [self.features.mat[:, i].tolist() for i in idx],
+                )
+
+        # Index out of range
+        self.assertRaises(IndexError, trainer.get_x, [1, 3])
+
+        # Dual mode should only work when with MultiFeatureVec
+        with self.assertRaises(TypeError) as context:
+            trainer = BaseTrainer(
+                self.toy_metrics,
+                features=self.graph,
+                dual=True,
+            )
+        self.assertEqual(
+            str(context.exception),
+            "'dual' mode only works when the features is of type "
+            "MultiFeatureVec, but received type "
+            "<class 'NLEval.graph.dense.DenseGraph'>",
+        )
+
+        # Dual mode should only work when all feature sets are one-dimensioanl
+        fvec = MultiFeatureVec.from_mats(
+            [np.random.random((10, 1)), np.random.random((10, 1))],
+        )
+        trainer = BaseTrainer(self.toy_metrics, features=fvec, dual=True)
+        with self.assertRaises(ValueError) as context:
+            fvec = MultiFeatureVec.from_mats(
+                [np.random.random((10, 1)), np.random.random((10, 2))],
+            )
+            trainer = BaseTrainer(self.toy_metrics, features=fvec, dual=True)
+        self.assertEqual(
+            str(context.exception),
+            "'dual' mode only works when the MultiFeatureVec only contains "
+            "one-dimensional feature sets.",
+        )
+
     def test_get_x_from_ids(self):
         trainer = BaseTrainer(self.toy_metrics, features=self.features)
         test_list = [["a", "c"], ["d"], ["a", "b", "c", "d", "e"]]
@@ -106,6 +153,24 @@ class TestBaseTrainer(unittest.TestCase):
 
         # Unkown node id "f"
         self.assertRaises(IDNotExistError, trainer.get_x_from_ids, ["a", "f"])
+
+    def test_get_x_from_ids_dual(self):
+        trainer = BaseTrainer(
+            self.toy_metrics,
+            features=self.features,
+            dual=True,
+        )
+        test_ids_list = [["f1", "f2"], ["f1"], ["f1", "f2", "f3"]]
+        test_idx_list = [[0, 1], [0], [0, 1, 2]]
+        for ids, idx in zip(test_ids_list, test_idx_list):
+            with self.subTest(ids=ids):
+                self.assertEqual(
+                    trainer.get_x_from_ids(ids).T.tolist(),
+                    [self.features.mat[:, i].tolist() for i in idx],
+                )
+
+        # Unkown node id "f4"
+        self.assertRaises(IDNotExistError, trainer.get_x_from_ids, ["f2", "f4"])
 
     def test_get_x_from_mask(self):
         trainer = BaseTrainer(self.toy_metrics, features=self.features)
@@ -122,6 +187,28 @@ class TestBaseTrainer(unittest.TestCase):
             ValueError,
             trainer.get_x_from_mask,
             np.array([1, 0, 1, 0, 0, 0]),
+        )
+
+    def test_get_x_from_mask_dual(self):
+        trainer = BaseTrainer(
+            self.toy_metrics,
+            features=self.features,
+            dual=True,
+        )
+        test_list = [[1, 0, 0], [1, 0, 1], [1, 1, 1]]
+        fmat = self.features.mat
+        for mask in test_list:
+            with self.subTest(mask=mask):
+                self.assertEqual(
+                    trainer.get_x_from_mask(np.array(mask)).T.tolist(),
+                    [fmat[:, i].tolist() for i in np.where(mask)[0]],
+                )
+
+        # Incorrect mask size
+        self.assertRaises(
+            ValueError,
+            trainer.get_x_from_mask,
+            np.array([1, 0, 1, 0]),
         )
 
 
