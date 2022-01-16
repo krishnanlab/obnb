@@ -187,7 +187,7 @@ class MultiFeatureVec(FeatureVec):
         self.fset_idmap = IDmap()
 
     @property
-    def feature_ids(self) -> Tuple[str, ...]:
+    def feature_ids(self) -> tuple[str, ...]:
         """Return feature IDs as a tuple."""
         return tuple(self.fset_idmap.lst)
 
