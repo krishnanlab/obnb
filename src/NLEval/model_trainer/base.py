@@ -5,8 +5,10 @@ from typing import Optional
 from typing import Sequence
 
 import numpy as np
-from NLEval.graph.base import BaseGraph
-from NLEval.util.checkers import checkNumpyArrayShape
+
+from ..graph.base import BaseGraph
+from ..graph.featurevec import MultiFeatureVec
+from ..util.checkers import checkNumpyArrayShape
 
 
 class BaseTrainer:
@@ -23,14 +25,19 @@ class BaseTrainer:
         graph: Optional[BaseGraph] = None,
         features: Optional[BaseGraph] = None,
         train_on: str = "train",
+        dual: bool = False,
     ):
         """Initialize BaseTraining.
+
+        Note: "dual" mode only works if the input features is MultiFeatureVec.
 
         Args:
             metrics: Dictionary of metrics used to train/evaluate the model.
             graph: Optional graph object.
             features: Optional node feature vectors.
             train_on: Which mask to use for training.
+            dual (bool): If set to true, predict the label of individual
+                feature, i.e.  individual columns (default: :obj:`False`)
 
         """
         self.metrics = metrics
@@ -38,6 +45,7 @@ class BaseTrainer:
         self.graph = graph
         self.features = features
         self.train_on = train_on
+        self.dual = dual
 
     @property
     def idmap(self):
@@ -71,22 +79,48 @@ class BaseTrainer:
         else:
             raise ValueError("Must specify either graph or features.")
 
+    @property
+    def dual(self):
+        return self._dual
+
+    @dual.setter
+    def dual(self, dual):
+        if dual:
+            if not isinstance(self.features, MultiFeatureVec):
+                raise TypeError(
+                    "'dual' mode only works when the features is of type Multi"
+                    f"FeatureVec, but received type {type(self.features)!r}",
+                )
+            target_indptr = np.arange(self.features.indptr.size)
+            if not np.all(self.features.indptr == target_indptr):
+                raise ValueError(
+                    "'dual' mode only works when the MultiFeatureVec only "
+                    "contains one-dimensional feature sets.",
+                )
+            self._dual = True
+            self.fset_idmap = self.features.fset_idmap.copy()
+        else:
+            self._dual = False
+            self.fset_idmap = None
+
     def get_x(self, idx: Sequence[int]) -> np.ndarray:
-        """Return features given list of node index."""
+        """Return features given list of node or feature index."""
         # TODO: make this more generic, e.g. what if we want to use SparseGraph
         if self.features is not None:
-            return self.features.mat[idx]
+            mat = self.features.mat
+            return mat[:, idx].T if self.dual else mat[idx]
         else:
             raise ValueError("Features not set")
 
     def get_x_from_ids(self, ids: Sequence[str]):
-        """Return features given list of node IDs."""
-        idx = self.idmap[ids]
+        """Return features given list of node or feature IDs."""
+        idx = self.fset_idmap[ids] if self.dual else self.idmap[ids]
         return self.get_x(idx)
 
     def get_x_from_mask(self, mask: np.ndarray):
         """Return features given an 1-dimensional node mask."""
-        checkNumpyArrayShape("mask", len(self.idmap), mask)
+        shape = len(self.fset_idmap) if self.dual else len(self.idmap)
+        checkNumpyArrayShape("mask", shape, mask)
         idx = np.where(mask)[0]
         return self.get_x(idx)
 

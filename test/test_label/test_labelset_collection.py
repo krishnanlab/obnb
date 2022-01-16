@@ -144,6 +144,12 @@ class TestLabelsetCollection(unittest.TestCase):
         self.assertEqual(lsc.prop["Info"], self.toy1_InfoLst)
         self.assertEqual(lsc.prop["Labelset"], self.toy1_labelsets)
 
+    def test_from_dict(self):
+        input_dict = {"a": "L1", "b": "L2", "c": "L1", "f": "L2", "h": "L1"}
+        lsc = LabelsetCollection.from_dict(input_dict)
+        self.assertEqual(lsc.get_labelset("L1"), {"a", "c", "h"})
+        self.assertEqual(lsc.get_labelset("L2"), {"b", "f"})
+
     def test_add_labelset(self):
         with self.subTest(msg="Input checks"):
             # test lst input type, only list of string allowed
@@ -327,6 +333,16 @@ class TestLabelsetCollection(unittest.TestCase):
         self.lsc.pop_labelset("Labelset1")
         self.lsc.pop_labelset("Labelset2")
         self.assertEqual(self.lsc.entity.map, {"a": 0, "c": 1, "d": 2})
+
+    def test_get_y(self):
+        input_dict = {"a": "L1", "b": "L2", "c": "L1", "f": "L2", "h": "L1"}
+        lsc = LabelsetCollection.from_dict(input_dict)
+
+        y = lsc.get_y(("a", "b", "c", "f", "h"))
+        self.assertEqual(y.T.tolist(), [[1, 0, 1, 0, 1], [0, 1, 0, 1, 0]])
+
+        y = lsc.get_y(("a", "c", "b", "x", "f", "h"))
+        self.assertEqual(y.T.tolist(), [[1, 1, 0, 0, 0, 1], [0, 0, 1, 0, 1, 0]])
 
 
 if __name__ == "__main__":

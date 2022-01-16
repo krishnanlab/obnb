@@ -1,5 +1,4 @@
 from functools import lru_cache
-from typing import Any
 from typing import Callable
 from typing import Dict
 from typing import Iterator
@@ -118,6 +117,13 @@ class LabelsetCollection(idhandler.IDprop):
         """:obj:`list` of :obj:`str`: list of all labelset names."""
         return self.lst
 
+    def new_labelset(self, label_id, label_info=None):
+        """Create a new empty labelset."""
+        self.add_id(
+            label_id,
+            {} if label_info is None else {"Info": label_info},
+        )
+
     def add_labelset(self, lst, label_id, label_info=None):
         """Add a new labelset.
 
@@ -128,10 +134,7 @@ class LabelsetCollection(idhandler.IDprop):
             label_info(str): description of label
 
         """
-        self.add_id(
-            label_id,
-            {} if label_info is None else {"Info": label_info},
-        )
+        self.new_labelset(label_id, label_info=label_info)
         try:
             self.entity.update(lst)
         except Exception as e:
@@ -259,6 +262,42 @@ class LabelsetCollection(idhandler.IDprop):
                 )
         self.set_property(label_id, "Negative", set(lst))
 
+    def get_y(
+        self,
+        target_ids: Tuple[str, ...],
+        labelset_name: Optional[str] = None,
+    ) -> np.ndarray:
+        """Return the y matrix.
+
+        Args:
+            target_ids: Tuple of entity ids used to order the rows.
+            labelset_name: A specific labelset to use, if not set, use all the
+                labelests (default: :obj:`None`).
+
+        """
+        # TODO: Clean up this, reduce redundancy with split
+        target_idmap = {j: i for i, j in enumerate(target_ids)}
+        entity_idmap = {j: i for i, j in enumerate(self.entity_ids)}
+        to_target_idx = np.array([target_idmap[i] for i in self.entity_ids])
+
+        if labelset_name is None:
+            labelsets = list(map(self.get_labelset, self.label_ids))
+            y = np.zeros((len(self.entity_ids), len(labelsets)), dtype=bool)
+            for i, labelset in enumerate(labelsets):
+                y[list(map(entity_idmap.get, labelset)), i] = True
+        else:
+            labelset = self.get_labelset(labelset_name)
+            y = np.zeros(len(self.entity_ids), dtype=bool)
+            y[list(map(entity_idmap.get, labelset))] = True
+
+        if labelset_name is not None or len(y.shape) == 1:
+            y_out = np.zeros(len(target_ids), dtype=bool)
+        else:
+            y_out = np.zeros((len(target_ids), y.shape[1]), dtype=bool)
+        y_out[to_target_idx] = y
+
+        return y_out
+
     @lru_cache
     def split(
         self,
@@ -274,7 +313,7 @@ class LabelsetCollection(idhandler.IDprop):
         Args:
             splitter: A splitter function that split the entities based on
                 their labels and optionally the an entity.
-            target_ids: List of entity ids for the output masks and label
+            target_ids: Tuple of entity ids for the output masks and label
                 vector to align with. Use ``self.entity_ids`` if not specified.
             labelset_name: Indicate which specific labelset to split. Split
                 based on all available sets if not specified.
@@ -535,7 +574,7 @@ class LabelsetCollection(idhandler.IDprop):
                 self.entity.set_property(entity_id, prop_name, interpreter(val))
 
     @classmethod
-    def from_gmt(cls, fp: str, sep: str = "\t") -> Any:
+    def from_gmt(cls, fp: str, sep: str = "\t"):
         """Load data from Gene Matrix Transpose `.gmt` file.
 
         Args:
@@ -548,4 +587,20 @@ class LabelsetCollection(idhandler.IDprop):
             for line in f:
                 label_id, label_info, *lst = line.strip().split(sep)
                 lsc.add_labelset(lst, label_id, label_info)
+        return lsc
+
+    @classmethod
+    def from_dict(cls, input_dict: Dict[str, str]):
+        """Load data from entity label dictionary.
+
+        Args:
+            input_dict (:obj:`dict` from :obj:`str` to :obj:`str): A dictionary
+                mapping from entities to their unique label IDs.
+
+        """
+        lsc = cls()
+        for entity, label_id in input_dict.items():
+            if label_id not in lsc:
+                lsc.new_labelset(label_id)
+            lsc.update_labelset([entity], label_id)
         return lsc
