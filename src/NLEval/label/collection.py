@@ -118,6 +118,13 @@ class LabelsetCollection(idhandler.IDprop):
         """:obj:`list` of :obj:`str`: list of all labelset names."""
         return self.lst
 
+    def new_labelset(self, label_id, label_info=None):
+        """Create a new empty labelset."""
+        self.add_id(
+            label_id,
+            {} if label_info is None else {"Info": label_info},
+        )
+
     def add_labelset(self, lst, label_id, label_info=None):
         """Add a new labelset.
 
@@ -128,10 +135,7 @@ class LabelsetCollection(idhandler.IDprop):
             label_info(str): description of label
 
         """
-        self.add_id(
-            label_id,
-            {} if label_info is None else {"Info": label_info},
-        )
+        self.new_labelset(label_id, label_info=label_info)
         try:
             self.entity.update(lst)
         except Exception as e:
