@@ -82,10 +82,7 @@ fvecs = []
 for q in qs:
     fp = osp.join(TEMP_DIR, f"{NETWORK}_q={q}.emd")
     fvecs.append(FeatureVec.from_emd(fp))
-
-    # Align feature vectors with the first one
-    if len(fvecs) > 0:
-        fvecs[0].align(fvecs[-1], join="left", update=True)
+    fvecs[-1].align_to_idmap(g.idmap)
 
 mats = [fvec.mat for fvec in fvecs]
 mfvec = MultiFeatureVec.from_mats(mats, g.idmap, [f"{q=}" for q in qs])
@@ -96,8 +93,7 @@ scores = []
 for label_id in lsc.label_ids:
     y, masks = lsc.split(
         splitter,
-        # target_ids=g.node_ids,
-        target_ids=(*fvecs[0].idmap.lst,),
+        target_ids=g.node_ids,
         labelset_name=label_id,
         property_name="PubMed Count",
         consider_negative=True,
@@ -122,8 +118,7 @@ for q, fvec in zip(qs, fvecs):
     for label_id in lsc.label_ids:
         y, masks = lsc.split(
             splitter,
-            # target_ids=g.node_ids,
-            target_ids=(*fvecs[0].idmap.lst,),
+            target_ids=g.node_ids,
             labelset_name=label_id,
             property_name="PubMed Count",
             consider_negative=True,
