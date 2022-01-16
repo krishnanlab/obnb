@@ -244,7 +244,7 @@ class MultiFeatureVec(FeatureVec):
     def from_mat(
         cls,
         mat: np.ndarray,
-        indptr: np.ndarray,
+        indptr: np.ndarray | None = None,
         ids: list[str] | IDmap | None = None,
         fset_ids: list[str] | IDmap | None = None,
     ):
@@ -252,14 +252,29 @@ class MultiFeatureVec(FeatureVec):
 
         Args:
             mat (:obj:`numpy.ndarray`): concatenated feature vector matrix.
-            indptr (:obj:`numpy.ndarray`): index pointers indicating the start
-                and the end of each feature set (columns).
+            indptr (:obj:`numpy.ndarray`, optional): index pointers indicating
+                the start and the end of each feature set (columns). If set to
+                None, and the dimension of fset_ids matches the number of
+                columns in the input matrix, then automatically set indptr
+                to corresponding to all ones.
             ids (list of str or :obj:`IDmap`, optional): node IDs, if not
                 specified, use the default ordering as node IDs.
             fset_ids (list of str or :obj:`IDmap`, optional): feature set IDs,
                 if not specified, use the default ordering as feature set IDs.
 
         """
+        if indptr is None:
+            if fset_ids is None:
+                raise ValueError("Cannot set both indptr and fset_ids to None.")
+            if len(fset_ids) != mat.shape[1]:
+                raise ValueError(
+                    "Cannot asign indptr automatically because the  dimension "
+                    f"of fset_ids ({len(fset_ids)}) does not match the number "
+                    f"of columsn in the input matrix ({mat.shape[1]}). Please "
+                    "specify fset_ids",
+                )
+            indptr = np.arange(mat.shape[1] + 1)
+
         # TODO: refactor the following block(s)
         if ids is None:
             ids = list(map(str, range(mat.shape[0])))

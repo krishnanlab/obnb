@@ -417,6 +417,25 @@ class TestMultiFeatureVec(unittest.TestCase):
         self.assertEqual(mfv.idmap.lst, self.ids)
         self.assertEqual(mfv.fset_idmap.lst, self.fset_ids)
 
+        # Implicit indptr setting
+        fset_ids = list(map(str, range(9)))
+        mfv = MultiFeatureVec.from_mat(self.mat, fset_ids=fset_ids)
+        self.assertEqual(mfv.mat.tolist(), self.mat.tolist())
+        self.assertEqual(mfv.indptr.tolist(), list(range(10)))
+        self.assertEqual(mfv.idmap.lst, list(map(str, range(5))))
+        self.assertEqual(mfv.fset_idmap.lst, fset_ids)
+
+        # Cannot have both fset_ids and indptr set to None
+        self.assertRaises(ValueError, MultiFeatureVec.from_mat, self.mat)
+
+        # Mismatch between fset_ids dimensiona and matrix columns number
+        self.assertRaises(
+            ValueError,
+            MultiFeatureVec.from_mat,
+            self.mat,
+            fset_ids=list(map(str, range(10))),
+        )
+
     def test_from_mats(self):
         mfv = MultiFeatureVec.from_mats(self.mats, self.ids, self.fset_ids)
         self.assertEqual(mfv.mat.tolist(), self.mat.tolist())
