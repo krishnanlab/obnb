@@ -474,6 +474,18 @@ class TestFeatureVecAlign(unittest.TestCase):
         self.assertRaises(TypeError, self.fvec1.align, self.ids1)
         self.assertRaises(ValueError, self.fvec1.align, None)
 
+    def test_align_to_idmap(self):
+        fvec1, fvec2 = self.fvec1.copy(), self.fvec2.copy()
+        idmap = idhandler.IDmap.from_list(["b", "k", "a"])
+
+        fvec1.align_to_idmap(idmap)
+        self.assertEqual(fvec1.idmap.lst, idmap.lst)
+        self.assertEqual(fvec1.mat.tolist(), [[1, 2, 3], [0, 0, 0], [0, 1, 2]])
+
+        fvec2.align_to_idmap(idmap)
+        self.assertEqual(fvec2.idmap.lst, idmap.lst)
+        self.assertEqual(fvec2.mat.tolist(), [[1, 2], [0, 0], [2, 3]])
+
     def test_align_right(self):
         fvec1, fvec2 = self.fvec1.copy(), self.fvec2.copy()
         fvec1.align(fvec2, join="right", update=True)

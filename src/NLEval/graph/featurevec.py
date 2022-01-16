@@ -147,6 +147,20 @@ class FeatureVec(DenseGraph):
         else:
             raise ValueError(f"Unrecognized join type {join!r}")
 
+    def align_to_idmap(self, new_idmap):
+        """Align FeatureVec to a given idmap.
+
+        This is essentially right align with update = False, i.e. reorder the
+        current FeatureVec using the new_idmap.
+
+        """
+        checkers.checkType("IDmap", IDmap, new_idmap)
+        l_idx, r_idx = self.idmap.align(new_idmap, join="right", update=False)
+
+        new_mat = np.zeros((len(new_idmap), self.mat.shape[1]))
+        new_mat[r_idx] = self.mat[l_idx]
+        self._mat = new_mat
+
     @classmethod
     def from_emd(cls, path_to_emd, **kwargs):
         fvec_lst = []
