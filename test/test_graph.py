@@ -237,6 +237,42 @@ class TestCX(unittest.TestCase):
     def tearDownClass(cls):
         shutil.rmtree(cls.tmp_dir)
 
+    def test_dense_from_cx_stream_file_biogridzm(self):
+        graph = DenseGraph.from_cx_stream_file(self.biogridzm_data_path)
+
+        for node1, node2 in self.biogridzm_expected_edges:
+            idx1 = graph.idmap[node1]
+            idx2 = graph.idmap[node2]
+            self.assertTrue(graph.mat[idx1, idx2] == 1)
+            self.assertTrue(graph.mat[idx2, idx1] == 1)
+
+    def test_dense_from_cx_stream_file_anfkb(self):
+        for interaction_types in [
+            None,
+            ["controls-state-change-of"],
+            ["controls-phosphorylation-of"],
+            ["in-complex-with"],
+            ["controls-state-change-of", "in-complex-with"],
+        ]:
+            with self.subTest(interaction_types=interaction_types):
+                graph = DenseGraph.from_cx_stream_file(
+                    self.anfkb_data_path,
+                    undirected=False,
+                    interaction_types=interaction_types,
+                    node_id_entry="n",
+                    node_id_prefix=None,
+                )
+
+                for i, j, k in self.anfkb_expected_edges:
+                    if interaction_types is None or k in interaction_types:
+                        idx1 = graph.idmap[i]
+                        idx2 = graph.idmap[j]
+                        self.assertTrue(graph.mat[idx1, idx2] == 1)
+
+                        # Check directedness
+                        if (j, i) not in self.anfkb_expected_edges:
+                            self.assertFalse(graph.mat[idx2, idx1] == 1)
+
     def test_sparse_from_cx_stream_file_biogridzm(self):
         graph = SparseGraph.from_cx_stream_file(self.biogridzm_data_path)
 
