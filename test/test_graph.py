@@ -1,7 +1,11 @@
 import os
+import os.path as osp
+import shutil
+import tempfile
 import unittest
 from copy import deepcopy
 
+import ndex2
 import numpy as np
 from commonvar import SAMPLE_DATA_DIR
 from NLEval.graph import DenseGraph
@@ -177,6 +181,51 @@ class TestSparseGraph(unittest.TestCase):
         graph2 = deepcopy(graph)
         graph2.add_id("x")
         self.assertFalse(graph == graph2)
+
+
+class TestCX(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp_dir = tempfile.mkdtemp()
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.tmp_dir)
+
+    def test_sparse_from_cx_stream_file_biogridzm(self):
+        # Test using BioGRID PPI (Z. mays)
+        # https://www.ndexbio.org/viewer/networks/81994440-23dd-11e8-b939-0ac135e8bacf
+        client = ndex2.client.Ndex2()
+        uuid = "81994440-23dd-11e8-b939-0ac135e8bacf"
+        client_resp = client.get_network_as_cx_stream(uuid)
+
+        tmp_path = osp.join(self.tmp_dir, "data.cx")
+        with open(tmp_path, "wb") as f:
+            f.write(client_resp.content)
+
+        graph = SparseGraph.from_cx_stream_file(tmp_path)
+
+        expected_edges = [
+            ("542425", "541915"),
+            ("541867", "541867"),
+            ("541867", "542687"),
+            ("103630348", "828791"),
+            ("542391", "819549"),
+            ("542391", "820356"),
+            ("100384477", "542384"),
+            ("841321", "542373"),
+            ("100125650", "103637824"),
+            ("541812", "542682"),
+            ("100191882", "100191882"),
+            ("100191882", "100125653"),
+            ("3480", "542291"),
+        ]
+
+        for node1, node2 in expected_edges:
+            idx1 = graph.idmap[node1]
+            idx2 = graph.idmap[node2]
+            self.assertTrue(idx2 in graph._edge_data[idx1])
+            self.assertTrue(idx1 in graph._edge_data[idx2])
 
 
 class TestDenseGraph(unittest.TestCase):
