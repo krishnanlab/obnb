@@ -188,24 +188,11 @@ class TestCX(unittest.TestCase):
     def setUpClass(cls):
         cls.tmp_dir = tempfile.mkdtemp()
 
-    @classmethod
-    def tearDownClass(cls):
-        shutil.rmtree(cls.tmp_dir)
-
-    def test_sparse_from_cx_stream_file_biogridzm(self):
         # Test using BioGRID PPI (Z. mays)
         # https://www.ndexbio.org/viewer/networks/81994440-23dd-11e8-b939-0ac135e8bacf
-        client = ndex2.client.Ndex2()
-        uuid = "81994440-23dd-11e8-b939-0ac135e8bacf"
-        client_resp = client.get_network_as_cx_stream(uuid)
-
-        tmp_path = osp.join(self.tmp_dir, "data.cx")
-        with open(tmp_path, "wb") as f:
-            f.write(client_resp.content)
-
-        graph = SparseGraph.from_cx_stream_file(tmp_path)
-
-        expected_edges = [
+        cls.biogridzm_uuid = "81994440-23dd-11e8-b939-0ac135e8bacf"
+        cls.biogridzm_data_path = osp.join(cls.tmp_dir, "biogridzm_data.cx")
+        cls.biogridzm_expected_edges = [
             ("542425", "541915"),
             ("541867", "541867"),
             ("541867", "542687"),
@@ -221,24 +208,11 @@ class TestCX(unittest.TestCase):
             ("3480", "542291"),
         ]
 
-        for node1, node2 in expected_edges:
-            idx1 = graph.idmap[node1]
-            idx2 = graph.idmap[node2]
-            self.assertTrue(idx2 in graph._edge_data[idx1])
-            self.assertTrue(idx1 in graph._edge_data[idx2])
-
-    def test_sparse_from_cx_stream_file_anfkb(self):
         # Test using the alternative NF-kaapaB pathway
         # https://www.ndexbio.org/viewer/networks/4199e31c-78c3-11e8-a4bf-0ac135e8bacf
-        client = ndex2.client.Ndex2()
-        uuid = "4199e31c-78c3-11e8-a4bf-0ac135e8bacf"
-        client_resp = client.get_network_as_cx_stream(uuid)
-
-        tmp_path = osp.join(self.tmp_dir, "data.cx")
-        with open(tmp_path, "wb") as f:
-            f.write(client_resp.content)
-
-        expected_edges = [
+        cls.anfkb_uuid = "4199e31c-78c3-11e8-a4bf-0ac135e8bacf"
+        cls.anfkb_data_path = osp.join(cls.tmp_dir, "anfkb_data.cx")
+        cls.anfkb_expected_edges = [
             ("BTRC", "NFKB2", "controls-state-change-of"),
             ("BTRC", "RELB", "controls-state-change-of"),
             ("CHUK", "NFKB2", "controls-phosphorylation-of"),
@@ -250,6 +224,29 @@ class TestCX(unittest.TestCase):
             ("NFKB2", "RELB", "in-complex-with"),
         ]
 
+        uuids = [cls.biogridzm_uuid, cls.anfkb_uuid]
+        data_paths = [cls.biogridzm_data_path, cls.anfkb_data_path]
+
+        for uuid, data_path in zip(uuids, data_paths):
+            client = ndex2.client.Ndex2()
+            client_resp = client.get_network_as_cx_stream(uuid)
+            with open(data_path, "wb") as f:
+                f.write(client_resp.content)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.tmp_dir)
+
+    def test_sparse_from_cx_stream_file_biogridzm(self):
+        graph = SparseGraph.from_cx_stream_file(self.biogridzm_data_path)
+
+        for node1, node2 in self.biogridzm_expected_edges:
+            idx1 = graph.idmap[node1]
+            idx2 = graph.idmap[node2]
+            self.assertTrue(idx2 in graph._edge_data[idx1])
+            self.assertTrue(idx1 in graph._edge_data[idx2])
+
+    def test_sparse_from_cx_stream_file_anfkb(self):
         for interaction_types in [
             None,
             ["controls-state-change-of"],
@@ -259,21 +256,21 @@ class TestCX(unittest.TestCase):
         ]:
             with self.subTest(interaction_types=interaction_types):
                 graph = SparseGraph.from_cx_stream_file(
-                    tmp_path,
+                    self.anfkb_data_path,
                     undirected=False,
                     interaction_types=interaction_types,
                     node_id_entry="n",
                     node_id_prefix=None,
                 )
 
-                for i, j, k in expected_edges:
+                for i, j, k in self.anfkb_expected_edges:
                     if interaction_types is None or k in interaction_types:
                         idx1 = graph.idmap[i]
                         idx2 = graph.idmap[j]
                         self.assertTrue(idx2 in graph._edge_data[idx1])
 
                         # Check directedness
-                        if (j, i) not in expected_edges:
+                        if (j, i) not in self.anfkb_expected_edges:
                             self.assertFalse(idx1 in graph._edge_data[idx2])
 
 
