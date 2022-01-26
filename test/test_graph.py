@@ -272,6 +272,10 @@ class TestCX(unittest.TestCase):
                         idx2 = graph.idmap[j]
                         self.assertTrue(idx2 in graph._edge_data[idx1])
 
+                        # Check directedness
+                        if (j, i) not in expected_edges:
+                            self.assertFalse(idx1 in graph._edge_data[idx2])
+
 
 class TestDenseGraph(unittest.TestCase):
     @classmethod
