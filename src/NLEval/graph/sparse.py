@@ -231,6 +231,7 @@ class SparseGraph(BaseGraph):
         undirected: bool = True,
         interaction_types: Optional[List[str]] = None,
         node_id_prefix: Optional[str] = "ncbigene",
+        node_id_entry: str = "r",
     ):
         """Construct SparseGraph from CX stream file.
 
@@ -242,9 +243,14 @@ class SparseGraph(BaseGraph):
                 be considered if not set, consider all (default: :obj:`None`).
             node_id_prefix (str, optional): Prefix of the ID to be considered,
                 if not set, consider all IDs (default: "ncbigene").
+            node_id_entry (str): use "n" for name of the entity, or "r" for
+                other reprentations (default: "r").
 
         """
         import json  # noreorder
+
+        if node_id_entry not in ["r", "n"]:
+            raise ValueError(f"Unkown node ID entry {node_id_entry!r}")
 
         with open(path, "r") as f:
             cx_stream = json.load(f)
@@ -255,30 +261,36 @@ class SparseGraph(BaseGraph):
 
         node_id_to_idx = {}
         for node in raw_nodes:
-            node_name = node["r"]
-            if (
-                not node_name.startswith(node_id_prefix)
-                and node_id_prefix is not None
-            ):
-                continue
-            node_name = node_name.split(":")[1]
+            node_name = node[node_id_entry]
+            if node_id_prefix is not None:
+                if not node_name.startswith(node_id_prefix):
+                    print(
+                        f"Skipping node: {node_name!r} due to mismatch "
+                        f"node_id_prefix. {node}",
+                    )
+                    continue
+                node_name = node_name.split(":")[1]
             node_id_to_idx[node["@id"]] = node_name
 
         # TODO: currently only load network as unweighted, need to find out
         # whether there is any weighted network, and how to obtain edge weights
-        graph = cls(weighted=False, directed=False)
+        graph = cls(weighted=False, directed=not undirected)
         for edge in raw_edges:
             try:
                 node_id1 = node_id_to_idx[edge["s"]]
                 node_id2 = node_id_to_idx[edge["t"]]
                 if (
                     interaction_types is not None
-                    and edge["i"] in interaction_types
+                    and edge["i"] not in interaction_types
                 ):
+                    print(
+                        f"Skipping edge: {edge} due to mismatched interaction "
+                        f"type with the specified {interaction_types}",
+                    )
                     continue
                 graph.add_edge(node_id1, node_id2)
             except KeyError:
-                print(f"Skipping edge: {edge}")
+                print(f"Skipping edge: {edge} due to unkown nodes")
 
         return graph
 

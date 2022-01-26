@@ -227,6 +227,51 @@ class TestCX(unittest.TestCase):
             self.assertTrue(idx2 in graph._edge_data[idx1])
             self.assertTrue(idx1 in graph._edge_data[idx2])
 
+    def test_sparse_from_cx_stream_file_anfkb(self):
+        # Test using the alternative NF-kaapaB pathway
+        # https://www.ndexbio.org/viewer/networks/4199e31c-78c3-11e8-a4bf-0ac135e8bacf
+        client = ndex2.client.Ndex2()
+        uuid = "4199e31c-78c3-11e8-a4bf-0ac135e8bacf"
+        client_resp = client.get_network_as_cx_stream(uuid)
+
+        tmp_path = osp.join(self.tmp_dir, "data.cx")
+        with open(tmp_path, "wb") as f:
+            f.write(client_resp.content)
+
+        expected_edges = [
+            ("BTRC", "NFKB2", "controls-state-change-of"),
+            ("BTRC", "RELB", "controls-state-change-of"),
+            ("CHUK", "NFKB2", "controls-phosphorylation-of"),
+            ("CHUK", "RELB", "controls-state-change-of"),
+            ("MAP3K14", "CHUK", "controls-phosphorylation-of"),
+            ("MAP3K14", "NFKB2", "controls-phosphorylation-of"),
+            ("MAP3K14", "RELB", "controls-state-change-of"),
+            ("NFKB1", "RELB", "in-complex-with"),
+            ("NFKB2", "RELB", "in-complex-with"),
+        ]
+
+        for interaction_types in [
+            None,
+            ["controls-state-change-of"],
+            ["controls-phosphorylation-of"],
+            ["in-complex-with"],
+            ["controls-state-change-of", "in-complex-with"],
+        ]:
+            with self.subTest(interaction_types=interaction_types):
+                graph = SparseGraph.from_cx_stream_file(
+                    tmp_path,
+                    undirected=False,
+                    interaction_types=interaction_types,
+                    node_id_entry="n",
+                    node_id_prefix=None,
+                )
+
+                for i, j, k in expected_edges:
+                    if interaction_types is None or k in interaction_types:
+                        idx1 = graph.idmap[i]
+                        idx2 = graph.idmap[j]
+                        self.assertTrue(idx2 in graph._edge_data[idx1])
+
 
 class TestDenseGraph(unittest.TestCase):
     @classmethod
