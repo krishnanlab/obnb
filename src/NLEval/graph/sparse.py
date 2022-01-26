@@ -84,8 +84,8 @@ class SparseGraph(BaseGraph):
         self.idmap.add_id(node_id)
         self._edge_data.append({})
 
-    def add_edge(self, node_id1, node_id2, weight):
-        # TODO: default weight = 1
+    def add_edge(self, node_id1: str, node_id2: str, weight: float = 1.0):
+        # TODO: add option for undirected
         for node_id in [node_id1, node_id2]:
             # check if node_id exists, add new if not
             if node_id not in self.idmap:
@@ -222,6 +222,76 @@ class SparseGraph(BaseGraph):
             graph.add_id(i)
         for i, j in zip(*np.where(mat != 0)):
             graph.add_edge(graph.idmap.lst[i], graph.idmap.lst[j], mat[i, j])
+        return graph
+
+    @classmethod
+    def from_cx_stream_file(
+        cls,
+        path: str,
+        undirected: bool = True,
+        interaction_types: Optional[List[str]] = None,
+        node_id_prefix: Optional[str] = "ncbigene",
+        node_id_entry: str = "r",
+    ):
+        """Construct SparseGraph from CX stream file.
+
+        Args:
+            path (str): Path to the cx file.
+            undirected (bool): Whether or not to treat the edges as undirected
+                (default: :obj:`True`).
+            interaction_types (list of str, optional): Types of interactions to
+                be considered if not set, consider all (default: :obj:`None`).
+            node_id_prefix (str, optional): Prefix of the ID to be considered,
+                if not set, consider all IDs (default: "ncbigene").
+            node_id_entry (str): use "n" for name of the entity, or "r" for
+                other reprentations (default: "r").
+
+        """
+        import json  # noreorder
+
+        if node_id_entry not in ["r", "n"]:
+            raise ValueError(f"Unkown node ID entry {node_id_entry!r}")
+
+        with open(path, "r") as f:
+            cx_stream = json.load(f)
+
+        entry_map = {list(j)[0]: i for i, j in enumerate(cx_stream)}
+        raw_nodes = cx_stream[entry_map["nodes"]]["nodes"]
+        raw_edges = cx_stream[entry_map["edges"]]["edges"]
+
+        node_id_to_idx = {}
+        for node in raw_nodes:
+            node_name = node[node_id_entry]
+            if node_id_prefix is not None:
+                if not node_name.startswith(node_id_prefix):
+                    print(
+                        f"Skipping node: {node_name!r} due to mismatch "
+                        f"node_id_prefix. {node}",
+                    )
+                    continue
+                node_name = node_name.split(":")[1]
+            node_id_to_idx[node["@id"]] = node_name
+
+        # TODO: currently only load network as unweighted, need to find out
+        # whether there is any weighted network, and how to obtain edge weights
+        graph = cls(weighted=False, directed=not undirected)
+        for edge in raw_edges:
+            try:
+                node_id1 = node_id_to_idx[edge["s"]]
+                node_id2 = node_id_to_idx[edge["t"]]
+                if (
+                    interaction_types is not None
+                    and edge["i"] not in interaction_types
+                ):
+                    print(
+                        f"Skipping edge: {edge} due to mismatched interaction "
+                        f"type with the specified {interaction_types}",
+                    )
+                    continue
+                graph.add_edge(node_id1, node_id2)
+            except KeyError:
+                print(f"Skipping edge: {edge} due to unkown nodes")
+
         return graph
 
     @staticmethod

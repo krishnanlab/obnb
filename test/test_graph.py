@@ -1,7 +1,11 @@
 import os
+import os.path as osp
+import shutil
+import tempfile
 import unittest
 from copy import deepcopy
 
+import ndex2
 import numpy as np
 from commonvar import SAMPLE_DATA_DIR
 from NLEval.graph import DenseGraph
@@ -177,6 +181,133 @@ class TestSparseGraph(unittest.TestCase):
         graph2 = deepcopy(graph)
         graph2.add_id("x")
         self.assertFalse(graph == graph2)
+
+
+class TestCX(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp_dir = tempfile.mkdtemp()
+
+        # Test using BioGRID PPI (Z. mays)
+        # https://www.ndexbio.org/viewer/networks/81994440-23dd-11e8-b939-0ac135e8bacf
+        cls.biogridzm_uuid = "81994440-23dd-11e8-b939-0ac135e8bacf"
+        cls.biogridzm_data_path = osp.join(cls.tmp_dir, "biogridzm_data.cx")
+        cls.biogridzm_expected_edges = [
+            ("542425", "541915"),
+            ("541867", "541867"),
+            ("541867", "542687"),
+            ("103630348", "828791"),
+            ("542391", "819549"),
+            ("542391", "820356"),
+            ("100384477", "542384"),
+            ("841321", "542373"),
+            ("100125650", "103637824"),
+            ("541812", "542682"),
+            ("100191882", "100191882"),
+            ("100191882", "100125653"),
+            ("3480", "542291"),
+        ]
+
+        # Test using the alternative NF-kaapaB pathway
+        # https://www.ndexbio.org/viewer/networks/4199e31c-78c3-11e8-a4bf-0ac135e8bacf
+        cls.anfkb_uuid = "4199e31c-78c3-11e8-a4bf-0ac135e8bacf"
+        cls.anfkb_data_path = osp.join(cls.tmp_dir, "anfkb_data.cx")
+        cls.anfkb_expected_edges = [
+            ("BTRC", "NFKB2", "controls-state-change-of"),
+            ("BTRC", "RELB", "controls-state-change-of"),
+            ("CHUK", "NFKB2", "controls-phosphorylation-of"),
+            ("CHUK", "RELB", "controls-state-change-of"),
+            ("MAP3K14", "CHUK", "controls-phosphorylation-of"),
+            ("MAP3K14", "NFKB2", "controls-phosphorylation-of"),
+            ("MAP3K14", "RELB", "controls-state-change-of"),
+            ("NFKB1", "RELB", "in-complex-with"),
+            ("NFKB2", "RELB", "in-complex-with"),
+        ]
+
+        uuids = [cls.biogridzm_uuid, cls.anfkb_uuid]
+        data_paths = [cls.biogridzm_data_path, cls.anfkb_data_path]
+
+        for uuid, data_path in zip(uuids, data_paths):
+            client = ndex2.client.Ndex2()
+            client_resp = client.get_network_as_cx_stream(uuid)
+            with open(data_path, "wb") as f:
+                f.write(client_resp.content)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.tmp_dir)
+
+    def test_dense_from_cx_stream_file_biogridzm(self):
+        graph = DenseGraph.from_cx_stream_file(self.biogridzm_data_path)
+
+        for node1, node2 in self.biogridzm_expected_edges:
+            idx1 = graph.idmap[node1]
+            idx2 = graph.idmap[node2]
+            self.assertTrue(graph.mat[idx1, idx2] == 1)
+            self.assertTrue(graph.mat[idx2, idx1] == 1)
+
+    def test_dense_from_cx_stream_file_anfkb(self):
+        for interaction_types in [
+            None,
+            ["controls-state-change-of"],
+            ["controls-phosphorylation-of"],
+            ["in-complex-with"],
+            ["controls-state-change-of", "in-complex-with"],
+        ]:
+            with self.subTest(interaction_types=interaction_types):
+                graph = DenseGraph.from_cx_stream_file(
+                    self.anfkb_data_path,
+                    undirected=False,
+                    interaction_types=interaction_types,
+                    node_id_entry="n",
+                    node_id_prefix=None,
+                )
+
+                for i, j, k in self.anfkb_expected_edges:
+                    if interaction_types is None or k in interaction_types:
+                        idx1 = graph.idmap[i]
+                        idx2 = graph.idmap[j]
+                        self.assertTrue(graph.mat[idx1, idx2] == 1)
+
+                        # Check directedness
+                        if (j, i) not in self.anfkb_expected_edges:
+                            self.assertFalse(graph.mat[idx2, idx1] == 1)
+
+    def test_sparse_from_cx_stream_file_biogridzm(self):
+        graph = SparseGraph.from_cx_stream_file(self.biogridzm_data_path)
+
+        for node1, node2 in self.biogridzm_expected_edges:
+            idx1 = graph.idmap[node1]
+            idx2 = graph.idmap[node2]
+            self.assertTrue(idx2 in graph._edge_data[idx1])
+            self.assertTrue(idx1 in graph._edge_data[idx2])
+
+    def test_sparse_from_cx_stream_file_anfkb(self):
+        for interaction_types in [
+            None,
+            ["controls-state-change-of"],
+            ["controls-phosphorylation-of"],
+            ["in-complex-with"],
+            ["controls-state-change-of", "in-complex-with"],
+        ]:
+            with self.subTest(interaction_types=interaction_types):
+                graph = SparseGraph.from_cx_stream_file(
+                    self.anfkb_data_path,
+                    undirected=False,
+                    interaction_types=interaction_types,
+                    node_id_entry="n",
+                    node_id_prefix=None,
+                )
+
+                for i, j, k in self.anfkb_expected_edges:
+                    if interaction_types is None or k in interaction_types:
+                        idx1 = graph.idmap[i]
+                        idx2 = graph.idmap[j]
+                        self.assertTrue(idx2 in graph._edge_data[idx1])
+
+                        # Check directedness
+                        if (j, i) not in self.anfkb_expected_edges:
+                            self.assertFalse(idx1 in graph._edge_data[idx2])
 
 
 class TestDenseGraph(unittest.TestCase):

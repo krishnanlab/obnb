@@ -127,3 +127,9 @@ class DenseGraph(BaseGraph):
             **kwargs,
         )
         return cls.from_mat(graph.to_adjmat(), graph.idmap)
+
+    @classmethod
+    def from_cx_stream_file(cls, *args, **kwargs):
+        """Construct DenseGraph from CX stream files."""
+        graph = SparseGraph.from_cx_stream_file(*args, **kwargs)
+        return cls.from_mat(graph.to_adjmat(), graph.idmap)
