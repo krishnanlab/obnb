@@ -295,7 +295,7 @@ class SparseGraph(BaseGraph):
         else:
             if node_id_prefix is None:
                 raise ValueError(
-                    f"Must specify node_id_prefix when use_node_alias is set.",
+                    "Must specify node_id_prefix when use_node_alias is set.",
                 )
             for na in cx_stream[entry_map["nodeAttributes"]]["nodeAttributes"]:
                 if na["n"] == "alias":
