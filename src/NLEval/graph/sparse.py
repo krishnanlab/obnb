@@ -296,7 +296,7 @@ class SparseGraph(BaseGraph):
                         )
                     edge_weight_dict[ea["po"]] = float(ea["v"])
 
-        # Create write edges
+        # Write edges
         for edge in raw_edges:
             try:
                 node_id1 = node_id_to_idx[edge["s"]]
