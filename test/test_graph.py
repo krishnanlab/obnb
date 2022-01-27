@@ -189,8 +189,8 @@ class TestCX(unittest.TestCase):
         cls.tmp_dir = tempfile.mkdtemp()
 
         # Test using BioGRID PPI (Z. mays)
-        # https://www.ndexbio.org/viewer/networks/81994440-23dd-11e8-b939-0ac135e8bacf
-        cls.biogridzm_uuid = "81994440-23dd-11e8-b939-0ac135e8bacf"
+        # https://www.ndexbio.org/viewer/networks/291b1f2c-7f05-11ec-b3be-0ac135e8bacf
+        cls.biogridzm_uuid = "291b1f2c-7f05-11ec-b3be-0ac135e8bacf"
         cls.biogridzm_data_path = osp.join(cls.tmp_dir, "biogridzm_data.cx")
         cls.biogridzm_expected_edges = [
             ("542425", "541915"),
@@ -209,8 +209,8 @@ class TestCX(unittest.TestCase):
         ]
 
         # Test using the alternative NF-kaapaB pathway
-        # https://www.ndexbio.org/viewer/networks/4199e31c-78c3-11e8-a4bf-0ac135e8bacf
-        cls.anfkb_uuid = "4199e31c-78c3-11e8-a4bf-0ac135e8bacf"
+        # https://www.ndexbio.org/viewer/networks/28e3e28a-7f05-11ec-b3be-0ac135e8bacf
+        cls.anfkb_uuid = "28e3e28a-7f05-11ec-b3be-0ac135e8bacf"
         cls.anfkb_data_path = osp.join(cls.tmp_dir, "anfkb_data.cx")
         cls.anfkb_expected_edges = [
             ("BTRC", "NFKB2", "controls-state-change-of"),
