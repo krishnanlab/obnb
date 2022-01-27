@@ -189,8 +189,8 @@ class TestCX(unittest.TestCase):
         cls.tmp_dir = tempfile.mkdtemp()
 
         # Test using BioGRID PPI (Z. mays)
-        # https://www.ndexbio.org/viewer/networks/81994440-23dd-11e8-b939-0ac135e8bacf
-        cls.biogridzm_uuid = "81994440-23dd-11e8-b939-0ac135e8bacf"
+        # https://www.ndexbio.org/viewer/networks/291b1f2c-7f05-11ec-b3be-0ac135e8bacf
+        cls.biogridzm_uuid = "291b1f2c-7f05-11ec-b3be-0ac135e8bacf"
         cls.biogridzm_data_path = osp.join(cls.tmp_dir, "biogridzm_data.cx")
         cls.biogridzm_expected_edges = [
             ("542425", "541915"),
@@ -209,8 +209,8 @@ class TestCX(unittest.TestCase):
         ]
 
         # Test using the alternative NF-kaapaB pathway
-        # https://www.ndexbio.org/viewer/networks/4199e31c-78c3-11e8-a4bf-0ac135e8bacf
-        cls.anfkb_uuid = "4199e31c-78c3-11e8-a4bf-0ac135e8bacf"
+        # https://www.ndexbio.org/viewer/networks/28e3e28a-7f05-11ec-b3be-0ac135e8bacf
+        cls.anfkb_uuid = "28e3e28a-7f05-11ec-b3be-0ac135e8bacf"
         cls.anfkb_data_path = osp.join(cls.tmp_dir, "anfkb_data.cx")
         cls.anfkb_expected_edges = [
             ("BTRC", "NFKB2", "controls-state-change-of"),
@@ -224,10 +224,28 @@ class TestCX(unittest.TestCase):
             ("NFKB2", "RELB", "in-complex-with"),
         ]
 
-        uuids = [cls.biogridzm_uuid, cls.anfkb_uuid]
-        data_paths = [cls.biogridzm_data_path, cls.anfkb_data_path]
+        # Test using the HCM-RH PE-measure 0.01 network
+        # https://www.ndexbio.org/viewer/networks/292ef54e-7f05-11ec-b3be-0ac135e8bacf
+        cls.hcmrh_uuid = "292ef54e-7f05-11ec-b3be-0ac135e8bacf"
+        cls.hcmrh_data_path = osp.join(cls.tmp_dir, "hcmrh_data.cx")
+        # source, target, interaction, k=0
+        cls.hcmrh_expected_edges = [
+            ("dome", "cytokine", "Complex", 0.5),
+            ("PSMD4", "Death", "Activation", 0.5),
+            ("INS", "glucose", "Inhibition", 0.5),
+            ("Heart", "rehospitalization", "Inhibition", 0.5),
+            ("DCM", "Death", "Activation", 0.5),
+            ("ivabradine hydrochloride", "Heart Rate", "Inhibition", 0.5),
+            ("NLRP3", "IL1B", "Activation", 0.5),
+        ]
 
-        for uuid, data_path in zip(uuids, data_paths):
+        uuids_data_paths = [
+            (cls.biogridzm_uuid, cls.biogridzm_data_path),
+            (cls.anfkb_uuid, cls.anfkb_data_path),
+            (cls.hcmrh_uuid, cls.hcmrh_data_path),
+        ]
+
+        for uuid, data_path in uuids_data_paths:
             client = ndex2.client.Ndex2()
             client_resp = client.get_network_as_cx_stream(uuid)
             with open(data_path, "wb") as f:
@@ -273,6 +291,34 @@ class TestCX(unittest.TestCase):
                         if (j, i) not in self.anfkb_expected_edges:
                             self.assertFalse(graph.mat[idx2, idx1] == 1)
 
+    def test_dense_from_cx_stream_file_hcmrh(self):
+        for interaction_types in [
+            None,
+            ["complex"],
+            ["activation"],
+            ["inhibition"],
+            ["activation", "inhibition"],
+        ]:
+            with self.subTest(interaction_types=interaction_types):
+                graph = DenseGraph.from_cx_stream_file(
+                    self.hcmrh_data_path,
+                    undirected=False,
+                    interaction_types=interaction_types,
+                    node_id_entry="n",
+                    node_id_prefix=None,
+                    edge_weight_attr_name=" k = 0 ",
+                )
+
+                for i, j, k, l in self.hcmrh_expected_edges:
+                    if interaction_types is None or k in interaction_types:
+                        idx1 = graph.idmap[i]
+                        idx2 = graph.idmap[j]
+                        self.assertEqual(graph.mat[idx1, idx2], l)
+
+                        # Check directedness
+                        if (j, i) not in self.hcmrh_expected_edges:
+                            self.assertEqual(graph.mat[idx2, idx1], 0)
+
     def test_sparse_from_cx_stream_file_biogridzm(self):
         graph = SparseGraph.from_cx_stream_file(self.biogridzm_data_path)
 
@@ -307,6 +353,34 @@ class TestCX(unittest.TestCase):
 
                         # Check directedness
                         if (j, i) not in self.anfkb_expected_edges:
+                            self.assertFalse(idx1 in graph._edge_data[idx2])
+
+    def test_sparse_from_cx_stream_file_hcmrh(self):
+        for interaction_types in [
+            None,
+            ["complex"],
+            ["activation"],
+            ["inhibition"],
+            ["activation", "inhibition"],
+        ]:
+            with self.subTest(interaction_types=interaction_types):
+                graph = SparseGraph.from_cx_stream_file(
+                    self.hcmrh_data_path,
+                    undirected=False,
+                    interaction_types=interaction_types,
+                    node_id_entry="n",
+                    node_id_prefix=None,
+                    edge_weight_attr_name=" k = 0 ",
+                )
+
+                for i, j, k, l in self.hcmrh_expected_edges:
+                    if interaction_types is None or k in interaction_types:
+                        idx1 = graph.idmap[i]
+                        idx2 = graph.idmap[j]
+                        self.assertEqual(graph._edge_data[idx1][idx2], l)
+
+                        # Check directedness
+                        if (j, i) not in self.hcmrh_expected_edges:
                             self.assertFalse(idx1 in graph._edge_data[idx2])
 
 

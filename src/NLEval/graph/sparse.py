@@ -232,6 +232,8 @@ class SparseGraph(BaseGraph):
         interaction_types: Optional[List[str]] = None,
         node_id_prefix: Optional[str] = "ncbigene",
         node_id_entry: str = "r",
+        default_edge_weight: float = 1.0,
+        edge_weight_attr_name: Optional[str] = None,
     ):
         """Construct SparseGraph from CX stream file.
 
@@ -245,6 +247,12 @@ class SparseGraph(BaseGraph):
                 if not set, consider all IDs (default: "ncbigene").
             node_id_entry (str): use "n" for name of the entity, or "r" for
                 other reprentations (default: "r").
+            default_edge_weight (float): edge weight to use if no edge weights
+                specified by edge attributes (default: 1.0).
+            edge_weight_attr_name (str, optional): name of the edge attribute
+                to use for edge weights, must be numeric type, i.e. "d" must
+                be "double" or "integer" or "long". If not set, do to use any
+                edge attributes (default: :obj:`None`)
 
         """
         import json  # noreorder
@@ -259,6 +267,7 @@ class SparseGraph(BaseGraph):
         raw_nodes = cx_stream[entry_map["nodes"]]["nodes"]
         raw_edges = cx_stream[entry_map["edges"]]["edges"]
 
+        # Load node IDs
         node_id_to_idx = {}
         for node in raw_nodes:
             node_name = node[node_id_entry]
@@ -272,8 +281,19 @@ class SparseGraph(BaseGraph):
                 node_name = node_name.split(":")[1]
             node_id_to_idx[node["@id"]] = node_name
 
-        # TODO: currently only load network as unweighted, need to find out
-        # whether there is any weighted network, and how to obtain edge weights
+        # Load edge weights using the specified edge attribute name
+        edge_weight_dict = {}
+        if edge_weight_attr_name is not None:
+            for ea in cx_stream[entry_map["edgeAttributes"]]["edgeAttributes"]:
+                if ea["n"] == edge_weight_attr_name:
+                    if not ea["d"] in ["double", "integer", "long"]:
+                        raise TypeError(
+                            "Only allow numeric type edge attribute to be used"
+                            f" as edge weights, got {ea['d']!r}: {ea}",
+                        )
+                    edge_weight_dict[ea["po"]] = float(ea["v"])
+
+        # Create graph and write edges
         graph = cls(weighted=False, directed=not undirected)
         for edge in raw_edges:
             try:
@@ -288,7 +308,15 @@ class SparseGraph(BaseGraph):
                         f"type with the specified {interaction_types}",
                     )
                     continue
-                graph.add_edge(node_id1, node_id2)
+
+                eid = edge["@id"]
+                weight = (
+                    edge_weight_dict[eid]
+                    if eid in edge_weight_dict
+                    else default_edge_weight
+                )
+                graph.add_edge(node_id1, node_id2, weight)
+
             except KeyError:
                 print(f"Skipping edge: {edge} due to unkown nodes")
 
