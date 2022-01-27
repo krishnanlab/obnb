@@ -225,22 +225,25 @@ class SparseGraph(BaseGraph):
         return graph
 
     @classmethod
-    def from_cx_stream_file(
-        cls,
+    def from_cx_stream_file(cls, path: str, undirected: bool = True, **kwargs):
+        """Read from a CX stream file."""
+        graph = cls(weighted=True, directed=not undirected)
+        graph.read_cx_stream_file(path, **kwargs)
+        return graph
+
+    def read_cx_stream_file(
+        self,
         path: str,
-        undirected: bool = True,
         interaction_types: Optional[List[str]] = None,
         node_id_prefix: Optional[str] = "ncbigene",
         node_id_entry: str = "r",
         default_edge_weight: float = 1.0,
         edge_weight_attr_name: Optional[str] = None,
     ):
-        """Construct SparseGraph from CX stream file.
+        """Construct SparseGraph from a CX stream file.
 
         Args:
             path (str): Path to the cx file.
-            undirected (bool): Whether or not to treat the edges as undirected
-                (default: :obj:`True`).
             interaction_types (list of str, optional): Types of interactions to
                 be considered if not set, consider all (default: :obj:`None`).
             node_id_prefix (str, optional): Prefix of the ID to be considered,
@@ -293,8 +296,7 @@ class SparseGraph(BaseGraph):
                         )
                     edge_weight_dict[ea["po"]] = float(ea["v"])
 
-        # Create graph and write edges
-        graph = cls(weighted=False, directed=not undirected)
+        # Create write edges
         for edge in raw_edges:
             try:
                 node_id1 = node_id_to_idx[edge["s"]]
@@ -315,12 +317,10 @@ class SparseGraph(BaseGraph):
                     if eid in edge_weight_dict
                     else default_edge_weight
                 )
-                graph.add_edge(node_id1, node_id2, weight)
+                self.add_edge(node_id1, node_id2, weight)
 
             except KeyError:
                 print(f"Skipping edge: {edge} due to unkown nodes")
-
-        return graph
 
     @staticmethod
     def edglst_writer(outpth, edge_gen, weighted, directed, cut_threshold):
