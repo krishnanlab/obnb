@@ -239,6 +239,7 @@ class SparseGraph(BaseGraph):
         node_id_entry: str = "r",
         default_edge_weight: float = 1.0,
         edge_weight_attr_name: Optional[str] = None,
+        use_node_alias: bool = False,
     ):
         """Construct SparseGraph from a CX stream file.
 
@@ -256,6 +257,13 @@ class SparseGraph(BaseGraph):
                 to use for edge weights, must be numeric type, i.e. "d" must
                 be "double" or "integer" or "long". If not set, do to use any
                 edge attributes (default: :obj:`None`)
+            use_node_alias (bool): If set, use node alias as node ID, otherwise
+                use the default node aspect for reading node ID. Similar to the
+                default node ID option, this requires that the prefix matches
+                node_id_prefix if set. Note that when use_node_alias is set,
+                the node_id_prefix becomes mandatory.If multiple node ID
+                aliases with matching prefix are available, use the first one.
+                (defaut: :obj:`False`)
 
         """
         import json  # noreorder
@@ -267,22 +275,36 @@ class SparseGraph(BaseGraph):
             cx_stream = json.load(f)
 
         entry_map = {list(j)[0]: i for i, j in enumerate(cx_stream)}
-        raw_nodes = cx_stream[entry_map["nodes"]]["nodes"]
         raw_edges = cx_stream[entry_map["edges"]]["edges"]
 
         # Load node IDs
         node_id_to_idx = {}
-        for node in raw_nodes:
-            node_name = node[node_id_entry]
-            if node_id_prefix is not None:
-                if not node_name.startswith(node_id_prefix):
-                    print(
-                        f"Skipping node: {node_name!r} due to mismatch "
-                        f"node_id_prefix. {node}",
-                    )
-                    continue
-                node_name = node_name.split(":")[1]
-            node_id_to_idx[node["@id"]] = node_name
+        if not use_node_alias:
+            raw_nodes = cx_stream[entry_map["nodes"]]["nodes"]
+            for node in raw_nodes:
+                node_name = node[node_id_entry]
+                if node_id_prefix is not None:
+                    if not node_name.startswith(node_id_prefix):
+                        print(
+                            f"Skipping node: {node_name!r} due to mismatch "
+                            f"node_id_prefix. {node}",
+                        )
+                        continue
+                    node_name = node_name.split(":")[1]
+                node_id_to_idx[node["@id"]] = node_name
+        else:
+            if node_id_prefix is None:
+                raise ValueError(
+                    f"Must specify node_id_prefix when use_node_alias is set.",
+                )
+            for na in cx_stream[entry_map["nodeAttributes"]]["nodeAttributes"]:
+                if na["n"] == "alias":
+                    idx, values = na["po"], na["v"]
+                    values = values if isinstance(values, list) else [values]
+                    for value in values:
+                        if value.startswith(node_id_prefix):
+                            node_id_to_idx[idx] = value.split(":")[1]
+                            break
 
         # Load edge weights using the specified edge attribute name
         edge_weight_dict = {}
