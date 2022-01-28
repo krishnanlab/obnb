@@ -7,7 +7,7 @@ class STRING(BaseNdexData):
     cx_uuid = "d14db454-3d18-11e8-a935-0ac135e8bacf"
 
     def __init__(self, root: str):
-        """Initialize the BioGRID network data."""
+        """Initialize the STRING network data."""
         # TODO: edge weights mean reduction when multiple values are available
         super().__init__(
             root,

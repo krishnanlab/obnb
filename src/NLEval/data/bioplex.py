@@ -7,7 +7,7 @@ class BioPlex(BaseNdexData):
     cx_uuid = "f7a218c0-2376-11ea-bb65-0ac135e8bacf"
 
     def __init__(self, root: str):
-        """Initialize the BioGRID network data."""
+        """Initialize the BioPlex network data."""
         super().__init__(
             root,
             weighted=False,
