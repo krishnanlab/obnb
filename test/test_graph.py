@@ -223,6 +223,14 @@ class TestCX(unittest.TestCase):
             ("NFKB1", "RELB", "in-complex-with"),
             ("NFKB2", "RELB", "in-complex-with"),
         ]
+        cls.anfkb_node_alias = {
+            "BTRC": "Q5W141",
+            "NFKB2": "D3DR83",
+            "RELB": "Q6GTX7",
+            "CHUK": "O15111",
+            "MAP3K14": "D3DX67",
+            "NFKB1": "B3KVE8",
+        }
 
         # Test using the HCM-RH PE-measure 0.01 network
         # https://www.ndexbio.org/viewer/networks/292ef54e-7f05-11ec-b3be-0ac135e8bacf
@@ -272,24 +280,35 @@ class TestCX(unittest.TestCase):
             ["in-complex-with"],
             ["controls-state-change-of", "in-complex-with"],
         ]:
-            with self.subTest(interaction_types=interaction_types):
-                graph = DenseGraph.from_cx_stream_file(
-                    self.anfkb_data_path,
-                    undirected=False,
+            for use_node_alias in False, True:
+                with self.subTest(
                     interaction_types=interaction_types,
-                    node_id_entry="n",
-                    node_id_prefix=None,
-                )
+                    use_node_alias=use_node_alias,
+                ):
+                    node_id_prefix = "uniprot" if use_node_alias else None
+                    graph = DenseGraph.from_cx_stream_file(
+                        self.anfkb_data_path,
+                        undirected=False,
+                        interaction_types=interaction_types,
+                        node_id_entry="n",
+                        node_id_prefix=node_id_prefix,
+                        use_node_alias=use_node_alias,
+                    )
 
-                for i, j, k in self.anfkb_expected_edges:
-                    if interaction_types is None or k in interaction_types:
-                        idx1 = graph.idmap[i]
-                        idx2 = graph.idmap[j]
-                        self.assertTrue(graph.mat[idx1, idx2] == 1)
+                    for i, j, k in self.anfkb_expected_edges:
+                        node1, node2 = i, j
+                        if use_node_alias:
+                            node1 = self.anfkb_node_alias[i]
+                            node2 = self.anfkb_node_alias[j]
 
-                        # Check directedness
-                        if (j, i) not in self.anfkb_expected_edges:
-                            self.assertFalse(graph.mat[idx2, idx1] == 1)
+                        if interaction_types is None or k in interaction_types:
+                            idx1 = graph.idmap[node1]
+                            idx2 = graph.idmap[node2]
+                            self.assertTrue(graph.mat[idx1, idx2] == 1)
+
+                            # Check directedness
+                            if (j, i) not in self.anfkb_expected_edges:
+                                self.assertFalse(graph.mat[idx2, idx1] == 1)
 
     def test_dense_from_cx_stream_file_hcmrh(self):
         for interaction_types in [

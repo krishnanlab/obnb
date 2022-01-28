@@ -225,22 +225,26 @@ class SparseGraph(BaseGraph):
         return graph
 
     @classmethod
-    def from_cx_stream_file(
-        cls,
+    def from_cx_stream_file(cls, path: str, undirected: bool = True, **kwargs):
+        """Read from a CX stream file."""
+        graph = cls(weighted=True, directed=not undirected)
+        graph.read_cx_stream_file(path, **kwargs)
+        return graph
+
+    def read_cx_stream_file(
+        self,
         path: str,
-        undirected: bool = True,
         interaction_types: Optional[List[str]] = None,
         node_id_prefix: Optional[str] = "ncbigene",
         node_id_entry: str = "r",
         default_edge_weight: float = 1.0,
         edge_weight_attr_name: Optional[str] = None,
+        use_node_alias: bool = False,
     ):
-        """Construct SparseGraph from CX stream file.
+        """Construct SparseGraph from a CX stream file.
 
         Args:
             path (str): Path to the cx file.
-            undirected (bool): Whether or not to treat the edges as undirected
-                (default: :obj:`True`).
             interaction_types (list of str, optional): Types of interactions to
                 be considered if not set, consider all (default: :obj:`None`).
             node_id_prefix (str, optional): Prefix of the ID to be considered,
@@ -253,6 +257,13 @@ class SparseGraph(BaseGraph):
                 to use for edge weights, must be numeric type, i.e. "d" must
                 be "double" or "integer" or "long". If not set, do to use any
                 edge attributes (default: :obj:`None`)
+            use_node_alias (bool): If set, use node alias as node ID, otherwise
+                use the default node aspect for reading node ID. Similar to the
+                default node ID option, this requires that the prefix matches
+                node_id_prefix if set. Note that when use_node_alias is set,
+                the node_id_prefix becomes mandatory.If multiple node ID
+                aliases with matching prefix are available, use the first one.
+                (defaut: :obj:`False`)
 
         """
         import json  # noreorder
@@ -264,22 +275,36 @@ class SparseGraph(BaseGraph):
             cx_stream = json.load(f)
 
         entry_map = {list(j)[0]: i for i, j in enumerate(cx_stream)}
-        raw_nodes = cx_stream[entry_map["nodes"]]["nodes"]
         raw_edges = cx_stream[entry_map["edges"]]["edges"]
 
         # Load node IDs
         node_id_to_idx = {}
-        for node in raw_nodes:
-            node_name = node[node_id_entry]
-            if node_id_prefix is not None:
-                if not node_name.startswith(node_id_prefix):
-                    print(
-                        f"Skipping node: {node_name!r} due to mismatch "
-                        f"node_id_prefix. {node}",
-                    )
-                    continue
-                node_name = node_name.split(":")[1]
-            node_id_to_idx[node["@id"]] = node_name
+        if not use_node_alias:
+            raw_nodes = cx_stream[entry_map["nodes"]]["nodes"]
+            for node in raw_nodes:
+                node_name = node[node_id_entry]
+                if node_id_prefix is not None:
+                    if not node_name.startswith(node_id_prefix):
+                        print(
+                            f"Skipping node: {node_name!r} due to mismatch "
+                            f"node_id_prefix. {node}",
+                        )
+                        continue
+                    node_name = node_name.split(":")[1]
+                node_id_to_idx[node["@id"]] = node_name
+        else:
+            if node_id_prefix is None:
+                raise ValueError(
+                    "Must specify node_id_prefix when use_node_alias is set.",
+                )
+            for na in cx_stream[entry_map["nodeAttributes"]]["nodeAttributes"]:
+                if na["n"] == "alias":
+                    idx, values = na["po"], na["v"]
+                    values = values if isinstance(values, list) else [values]
+                    for value in values:
+                        if value.startswith(node_id_prefix):
+                            node_id_to_idx[idx] = value.split(":")[1]
+                            break
 
         # Load edge weights using the specified edge attribute name
         edge_weight_dict = {}
@@ -293,8 +318,7 @@ class SparseGraph(BaseGraph):
                         )
                     edge_weight_dict[ea["po"]] = float(ea["v"])
 
-        # Create graph and write edges
-        graph = cls(weighted=False, directed=not undirected)
+        # Write edges
         for edge in raw_edges:
             try:
                 node_id1 = node_id_to_idx[edge["s"]]
@@ -315,12 +339,10 @@ class SparseGraph(BaseGraph):
                     if eid in edge_weight_dict
                     else default_edge_weight
                 )
-                graph.add_edge(node_id1, node_id2, weight)
+                self.add_edge(node_id1, node_id2, weight)
 
             except KeyError:
                 print(f"Skipping edge: {edge} due to unkown nodes")
-
-        return graph
 
     @staticmethod
     def edglst_writer(outpth, edge_gen, weighted, directed, cut_threshold):
