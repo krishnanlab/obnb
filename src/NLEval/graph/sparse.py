@@ -84,28 +84,43 @@ class SparseGraph(BaseGraph):
         self.idmap.add_id(node_id)
         self._edge_data.append({})
 
-    def add_edge(self, node_id1: str, node_id2: str, weight: float = 1.0):
-        # TODO: add option for undirected
+    def add_edge(
+        self,
+        node_id1: str,
+        node_id2: str,
+        weight: float = 1.0,
+        reduction: Optional[str] = None,
+    ):
+        # Check reduction type
+        if reduction not in [None, "max", "min"]:
+            raise ValueError(f"Unknown reduction type {reduction!r}")
+
+        # Check if node_id exists, add new if not
         for node_id in [node_id1, node_id2]:
-            # check if node_id exists, add new if not
             if node_id not in self.idmap:
                 self.add_id(node_id)
-        try:
-            old_weight = self._edge_data[self.idmap[node_id1]][
-                self.idmap[node_id2]
-            ]
-            if old_weight != weight:  # check if edge exists
-                print(
-                    f"WARNING: edge between {self.idmap[node_id1]} and "
-                    f"{self.idmap[node_id2]} exists with weight {old_weight:.2f}"
-                    f", overwriting with {weight:.2f}",
-                )
-        except KeyError:
-            self._edge_data[self.idmap[node_id1]][self.idmap[node_id2]] = weight
-            if not self.directed:
-                self._edge_data[self.idmap[node_id2]][
-                    self.idmap[node_id1]
-                ] = weight
+
+        node_idx1 = self.idmap[node_id1]
+        node_idx2 = self.idmap[node_id2]
+
+        # Check duplicated edge weights and apply reduction
+        if node_idx2 in self._edge_data[node_idx1]:
+            old_weight = self._edge_data[node_idx1][node_idx2]
+            if old_weight != weight:  # check if edge weight is modified
+                if reduction is None:
+                    print(
+                        f"WARNING: edge between {self.idmap[node_id1]} and "
+                        f"{self.idmap[node_id2]} exists with weight "
+                        f"{old_weight:.2f}, overwriting with {weight:.2f}",
+                    )
+                elif reduction == "max":
+                    weight = max(old_weight, weight)
+                elif reduction == "min":
+                    weight = min(old_weight, weight)
+
+        self._edge_data[node_idx1][node_idx2] = weight
+        if not self.directed:
+            self._edge_data[node_idx2][node_idx1] = weight
 
     def get_edge(self, node_id1, node_id2):
         try:
@@ -117,7 +132,8 @@ class SparseGraph(BaseGraph):
     def edglst_reader(edg_fp, weighted, directed, cut_threshold):
         """Edge list file reader.
 
-        Read line by line from a edge list file and yield node_id1, node_id2, weight
+        Read line by line from a edge list file and yield (node_id1, node_id2,
+        weight)
 
         """
         with open(edg_fp, "r") as f:
@@ -239,6 +255,7 @@ class SparseGraph(BaseGraph):
         node_id_entry: str = "r",
         default_edge_weight: float = 1.0,
         edge_weight_attr_name: Optional[str] = None,
+        reduction: Optional[str] = "max",
         use_node_alias: bool = False,
     ):
         """Construct SparseGraph from a CX stream file.
@@ -257,6 +274,11 @@ class SparseGraph(BaseGraph):
                 to use for edge weights, must be numeric type, i.e. "d" must
                 be "double" or "integer" or "long". If not set, do to use any
                 edge attributes (default: :obj:`None`)
+            reduction (str, optional): How to due with duplicated edge weights,
+                current options are "max" and "min", which uses the maximum or
+                minimum value among the duplicated edge weights; alternatively,
+                if set to :obj:`None`, then it will use the last edge weight
+                seen (default: "max").
             use_node_alias (bool): If set, use node alias as node ID, otherwise
                 use the default node aspect for reading node ID. Similar to the
                 default node ID option, this requires that the prefix matches
@@ -339,7 +361,7 @@ class SparseGraph(BaseGraph):
                     if eid in edge_weight_dict
                     else default_edge_weight
                 )
-                self.add_edge(node_id1, node_id2, weight)
+                self.add_edge(node_id1, node_id2, weight, reduction=reduction)
 
             except KeyError:
                 print(f"Skipping edge: {edge} due to unkown nodes")
