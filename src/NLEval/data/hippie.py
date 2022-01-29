@@ -13,7 +13,6 @@ class HIPPIE(BaseNdexData):
 
     def __init__(self, root: str):
         """Initialize the HIPPIE network data."""
-        # TODO: edge weights mean reduction when multiple values are available
         super().__init__(
             root,
             weighted=True,
@@ -22,4 +21,5 @@ class HIPPIE(BaseNdexData):
             node_id_prefix="ncbigene",
             default_edge_weight=0.0,
             edge_weight_attr_name="Confidence Value",
+            reduction="max",
         )

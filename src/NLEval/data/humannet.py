@@ -16,4 +16,5 @@ class HumanNet(BaseNdexData):
             node_id_prefix="ncbigene",
             default_edge_weight=0.0,
             edge_weight_attr_name="LLS",
+            reduction=None,
         )
