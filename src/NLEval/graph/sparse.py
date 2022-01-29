@@ -242,7 +242,7 @@ class SparseGraph(BaseGraph):
 
     @classmethod
     def from_cx_stream_file(cls, path: str, undirected: bool = True, **kwargs):
-        """Read from a CX stream file."""
+        """Construct SparseGraph from a CX stream file."""
         graph = cls(weighted=True, directed=not undirected)
         graph.read_cx_stream_file(path, **kwargs)
         return graph
@@ -258,7 +258,7 @@ class SparseGraph(BaseGraph):
         reduction: Optional[str] = "max",
         use_node_alias: bool = False,
     ):
-        """Construct SparseGraph from a CX stream file.
+        """Read from a CX stream file.
 
         Args:
             path (str): Path to the cx file.
@@ -366,6 +366,58 @@ class SparseGraph(BaseGraph):
             except KeyError:
                 print(f"Skipping edge: {edge} due to unkown nodes")
 
+    @classmethod
+    def from_npz(cls, path, weighted, directed, **kwargs):
+        """Construct SparseGraph from a npz file."""
+        graph = cls(weighted=weighted, directed=directed)
+        graph.read_npz(path, weighted=weighted, directed=directed, **kwargs)
+        return graph
+
+    def read_npz(
+        self,
+        path: str,
+        weighted: bool = True,
+        directed: bool = False,
+        cut_threshold: Optional[float] = None,
+    ):
+        """Read from npz file.
+
+        The file contains two fields: "edge_index" and "node_ids", where the
+        first is a 2 x m numpy array encoding the m edges, and the second
+        is a one dimensional numpy array of str type encoding the node IDs.
+        Additionally, "edge_weight" is available if the graph is weighted,
+        which is a one dimensional numpy array (of size m) of edge weights.
+
+        Note:
+            The ``weighted`` and ``directed`` options are for compatibility
+                to the SparseGraph object.
+
+        Args:
+            path (str): path to the .npz file
+            weighted (bool): whether or not the graph should be weighted
+                (default: :obj:`True`)
+            directed (bool): whether or not the graph should be directed
+                (default: :obj:`False`)
+            cut_threshold (float, optional): threshold of edge weights below
+                which the edges are ignored, if not set, consider all edges
+                (default: :obj:`None`).
+
+        """
+        files = np.load(path)
+        node_ids = files["node_ids"].tolist()
+        edge_index = files["edge_index"]
+
+        self.idmap = self.idmap.from_list(node_ids)
+        self._edge_data = [{} for _ in range(len(node_ids))]
+
+        if weighted:
+            edge_weight = files["edge_weight"]
+            for (i, j), w in zip(edge_index.T, edge_weight):
+                self._edge_data[i][j] = w
+        else:
+            for i, j in edge_index.T:
+                self._edge_data[i][j] = 1.0
+
     @staticmethod
     def edglst_writer(outpth, edge_gen, weighted, directed, cut_threshold):
         """Edge list file writer.
@@ -383,9 +435,40 @@ class SparseGraph(BaseGraph):
                 else:
                     f.write(f"{src_node_id}\t{dst_node_id}\n")
 
-    @staticmethod
-    def npy_writer():
-        raise NotImplementedError
+    def save_npz(self, out_path: str, weighted: bool = True):
+        """Save the graph as npz.
+
+        The npz file contains three fields, including "edge_index",
+            "edge_weight", and "node_ids". If the the ``weighted`` option is
+            set to :obj:`False`, then the "edge_weight" would not be saved.
+
+        Args:
+            out_path (str): path to the output file.
+            weighted (bool): whether should save the edge weights
+                (default: :obj:`True`).
+
+        """
+        edge_index = np.zeros((2, self.num_edges), dtype=np.uint32)
+        edge_weight = np.zeros(self.num_edges, dtype=np.float32)
+        node_ids = np.array(self.idmap.lst)
+
+        idx = 0
+        for i, nbrs in enumerate(self._edge_data):
+            for nbr, weight in nbrs.items():
+                edge_index[0, idx] = i
+                edge_index[1, idx] = nbr
+                edge_weight[idx] = weight
+                idx += 1
+
+        if weighted:
+            np.savez(
+                out_path,
+                edge_index=edge_index,
+                edge_weight=edge_weight,
+                node_ids=node_ids,
+            )
+        else:
+            np.savez(out_path, edge_index=edge_index, node_ids=node_ids)
 
     def edge_gen(self):
         edge_data_copy = self._edge_data[:]
