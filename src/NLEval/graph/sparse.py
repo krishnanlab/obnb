@@ -300,7 +300,7 @@ class SparseGraph(BaseGraph):
         raw_edges = cx_stream[entry_map["edges"]]["edges"]
 
         # Load node IDs
-        node_id_to_idx = {}
+        node_idx_to_id = {}
         if not use_node_alias:
             raw_nodes = cx_stream[entry_map["nodes"]]["nodes"]
             for node in raw_nodes:
@@ -313,7 +313,7 @@ class SparseGraph(BaseGraph):
                         )
                         continue
                     node_name = node_name.split(":")[1]
-                node_id_to_idx[node["@id"]] = node_name
+                node_idx_to_id[node["@id"]] = node_name
         else:
             if node_id_prefix is None:
                 raise ValueError(
@@ -325,7 +325,7 @@ class SparseGraph(BaseGraph):
                     values = values if isinstance(values, list) else [values]
                     for value in values:
                         if value.startswith(node_id_prefix):
-                            node_id_to_idx[idx] = value.split(":")[1]
+                            node_idx_to_id[idx] = value.split(":")[1]
                             break
 
         # Load edge weights using the specified edge attribute name
@@ -343,8 +343,8 @@ class SparseGraph(BaseGraph):
         # Write edges
         for edge in raw_edges:
             try:
-                node_id1 = node_id_to_idx[edge["s"]]
-                node_id2 = node_id_to_idx[edge["t"]]
+                node_id1 = node_idx_to_id[edge["s"]]
+                node_id2 = node_idx_to_id[edge["t"]]
                 if (
                     interaction_types is not None
                     and edge["i"] not in interaction_types
