@@ -358,8 +358,8 @@ class SparseGraph(BaseGraph):
                 if ea["n"] == edge_weight_attr_name:
                     try:
                         edge_weight_dict[ea["po"]] = float(ea["v"])
-                    except ValueError as e:
-                        print(f"Skipping edge: {edge} due to value error")
+                    except ValueError:
+                        print(f"Skipping edge attr: {ea} due to value error")
 
         # Write edges
         for edge in raw_edges:
