@@ -288,7 +288,7 @@ class SparseGraph(BaseGraph):
                 the node_id_prefix becomes mandatory.If multiple node ID
                 aliases with matching prefix are available, use the first one.
                 (defaut: :obj:`False`)
-            node_id_converter (Callable[str, str], optional): A functional that
+            node_id_converter (Callable[str, str], optional): A function that
                 maps a given node ID to a new node ID of interest.
 
         """
