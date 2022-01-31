@@ -1,3 +1,4 @@
+from typing import Callable
 from typing import List
 from typing import Optional
 from typing import Union
@@ -257,6 +258,7 @@ class SparseGraph(BaseGraph):
         edge_weight_attr_name: Optional[str] = None,
         reduction: Optional[str] = "max",
         use_node_alias: bool = False,
+        node_id_converter: Optional[Callable[[str], str]] = None,
     ):
         """Read from a CX stream file.
 
@@ -286,6 +288,8 @@ class SparseGraph(BaseGraph):
                 the node_id_prefix becomes mandatory.If multiple node ID
                 aliases with matching prefix are available, use the first one.
                 (defaut: :obj:`False`)
+            node_id_converter (Callable[str, str], optional): A functional that
+                maps a given node ID to a new node ID of interest.
 
         """
         import json  # noreorder
@@ -328,23 +332,40 @@ class SparseGraph(BaseGraph):
                             node_idx_to_id[idx] = value.split(":")[1]
                             break
 
+        # Convert node IDs
+        if node_id_converter is not None:
+            print("Start converting gene IDs.")
+
+            try:
+                node_id_converter.query_bulk(list(node_idx_to_id.values()))
+            except AttributeError:
+                pass
+
+            node_idx_to_id_converted = {}
+            for i, j in node_idx_to_id.items():
+                node_id_converted = node_id_converter(j)
+                if node_id_converted is not None:
+                    node_idx_to_id_converted[i] = node_id_converted
+
+            print("Done converting gene IDs.")
+        else:
+            node_idx_to_id_converted = node_idx_to_id
+
         # Load edge weights using the specified edge attribute name
         edge_weight_dict = {}
         if edge_weight_attr_name is not None:
             for ea in cx_stream[entry_map["edgeAttributes"]]["edgeAttributes"]:
                 if ea["n"] == edge_weight_attr_name:
-                    if not ea["d"] in ["double", "integer", "long"]:
-                        raise TypeError(
-                            "Only allow numeric type edge attribute to be used"
-                            f" as edge weights, got {ea['d']!r}: {ea}",
-                        )
-                    edge_weight_dict[ea["po"]] = float(ea["v"])
+                    try:
+                        edge_weight_dict[ea["po"]] = float(ea["v"])
+                    except ValueError as e:
+                        print(f"Skipping edge: {edge} due to value error")
 
         # Write edges
         for edge in raw_edges:
             try:
-                node_id1 = node_idx_to_id[edge["s"]]
-                node_id2 = node_idx_to_id[edge["t"]]
+                node_id1 = node_idx_to_id_converted[edge["s"]]
+                node_id2 = node_idx_to_id_converted[edge["t"]]
                 if (
                     interaction_types is not None
                     and edge["i"] not in interaction_types
