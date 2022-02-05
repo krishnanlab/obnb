@@ -190,6 +190,33 @@ class TestSparseGraph(unittest.TestCase):
                 self.assertEqual(graph._edge_data, edge_data)
                 self.assertEqual(graph.idmap.lst, self.node_ids1.tolist())
 
+    def test_write_npz(self):
+        for weighted in True, False:
+            with self.subTest(weighted=weighted):
+                graph = SparseGraph(weighted=weighted, directed=False)
+                graph._edge_data = self.edge_data_weighted1
+                graph.idmap = graph.idmap.from_list(self.node_ids1.tolist())
+
+                out_path = osp.join(self.tmp_dir, "test_save.npz")
+                graph.save_npz(out_path, weighted=weighted)
+
+                npz_files = np.load(out_path)
+                self.assertEqual(
+                    npz_files["edge_index"].tolist(),
+                    self.edge_index1.tolist(),
+                )
+                self.assertEqual(
+                    npz_files["node_ids"].tolist(),
+                    self.node_ids1.tolist(),
+                )
+                if weighted:
+                    self.assertEqual(
+                        npz_files["edge_weight"].tolist(),
+                        self.edge_weight1.tolist(),
+                    )
+                else:
+                    self.assertFalse("edge_weight" in npz_files)
+
     def template_test_construct_adj_vec(self, weighted, directed, lst=None):
         graph = SparseGraph.from_npy(
             self.case.data_mat,
