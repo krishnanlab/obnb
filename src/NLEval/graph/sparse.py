@@ -391,14 +391,12 @@ class SparseGraph(BaseGraph):
     def from_npz(cls, path, weighted, directed, **kwargs):
         """Construct SparseGraph from a npz file."""
         graph = cls(weighted=weighted, directed=directed)
-        graph.read_npz(path, weighted=weighted, directed=directed, **kwargs)
+        graph.read_npz(path, **kwargs)
         return graph
 
     def read_npz(
         self,
         path: str,
-        weighted: bool = True,
-        directed: bool = False,
         cut_threshold: Optional[float] = None,
     ):
         """Read from npz file.
@@ -415,10 +413,6 @@ class SparseGraph(BaseGraph):
 
         Args:
             path (str): path to the .npz file
-            weighted (bool): whether or not the graph should be weighted
-                (default: :obj:`True`)
-            directed (bool): whether or not the graph should be directed
-                (default: :obj:`False`)
             cut_threshold (float, optional): threshold of edge weights below
                 which the edges are ignored, if not set, consider all edges
                 (default: :obj:`None`).
@@ -431,7 +425,7 @@ class SparseGraph(BaseGraph):
         self.idmap = self.idmap.from_list(node_ids)
         self._edge_data = [{} for _ in range(len(node_ids))]
 
-        if weighted:
+        if self.weighted:
             edge_weight = files["edge_weight"]
             for (i, j), w in zip(edge_index.T, edge_weight):
                 self._edge_data[i][j] = w
