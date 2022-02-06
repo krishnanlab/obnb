@@ -4,25 +4,20 @@ import subprocess
 import tempfile
 
 import numpy as np
+from load_data import load_data
 from NLEval.graph import FeatureVec
 from NLEval.graph import MultiFeatureVec
-from NLEval.graph import SparseGraph
-from NLEval.label import filters
-from NLEval.label import LabelsetCollection
+from NLEval.label.filters import LabelsetRangeFilterSplit
 from NLEval.label.split import RatioPartition
 from NLEval.model_trainer import MultiSupervisedLearningTrainer
 from NLEval.model_trainer import SupervisedLearningTrainer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
 
-NETWORK = "STRING-EXP"
-LABEL = "KEGGBP"
-DATA_DIR = osp.join(osp.pardir, "data")
-GRAPH_FP = osp.join(DATA_DIR, "networks", f"{NETWORK}.edg")
-LABEL_FP = osp.join(DATA_DIR, "labels", f"{LABEL}.gmt")
-PROPERTY_FP = osp.join(DATA_DIR, "properties", "PubMedCount.txt")
 
 TEMP_DIR = tempfile.mkdtemp()
+NETWORK = "STRING-EXP"
+GRAPH_FP = osp.join(osp.pardir, "data", "networks", f"{NETWORK}.edg")
 PECANPY_ARGS = [
     "pecanpy",
     "--input",
@@ -42,27 +37,13 @@ for q in qs:
     args = PECANPY_ARGS + ["--q", str(q), "--output", fp]
     processes.append(subprocess.Popen(args))
 
-print(f"{NETWORK=}\n{LABEL=}")
-
-# Load data
-g = SparseGraph.from_edglst(GRAPH_FP, weighted=True, directed=False)
-lsc = LabelsetCollection.from_gmt(LABEL_FP)
-
-# Filter labels
-print(f"Number of labelsets before filtering: {len(lsc.label_ids)}")
-lsc.iapply(filters.EntityExistenceFilter(g.idmap.lst))
-lsc.iapply(filters.LabelsetRangeFilterSize(min_val=50))
-lsc.iapply(filters.NegativeGeneratorHypergeom(p_thresh=0.05))
-print(f"Number of labelsets after filtering: {len(lsc.label_ids)}")
-
-# Load gene properties for study-bias holdout
-# Note: wait after filtering is done to reduce time for filtering
-lsc.load_entity_properties(PROPERTY_FP, "PubMed Count", 0, int)
+# Load dataset
+g, lsc = load_data(NETWORK, "KEGGBP", sparse=True)
 
 # 3/2 train/test split using genes with higher PubMed Count for training
 splitter = RatioPartition(0.6, 0.2, 0.2, ascending=False)
 lsc.iapply(
-    filters.LabelsetRangeFilterSplit(
+    LabelsetRangeFilterSplit(
         10,
         splitter,
         property_name="PubMed Count",
@@ -85,7 +66,7 @@ for q in qs:
     fvecs[-1].align_to_idmap(g.idmap)
 
 mats = [fvec.mat for fvec in fvecs]
-mfvec = MultiFeatureVec.from_mats(mats, g.idmap, [f"{q=}" for q in qs])
+mfvec = MultiFeatureVec.from_mats(mats, g.idmap, fset_ids=[f"{q=}" for q in qs])
 
 # Train with hyperparameter selection using validation set
 trainer = MultiSupervisedLearningTrainer(metrics, mfvec, log=True)
