@@ -1,37 +1,13 @@
-import os.path as osp
-
 import torch
-from NLEval.graph import SparseGraph
-from NLEval.label import filters
-from NLEval.label import LabelsetCollection
+from load_data import load_data
 from NLEval.label.split import RatioPartition
 from NLEval.model_trainer.gnn import SimpleGNNTrainer
 from sklearn.metrics import roc_auc_score as auroc
 from torch_geometric.nn import GCN
 
-NETWORK = "STRING-EXP"
-LABEL = "KEGGBP"
-DATA_DIR = osp.join(osp.pardir, "data")
-GRAPH_FP = osp.join(DATA_DIR, "networks", f"{NETWORK}.edg")
-LABEL_FP = osp.join(DATA_DIR, "labels", f"{LABEL}.gmt")
-PROPERTY_FP = osp.join(DATA_DIR, "properties", "PubMedCount.txt")
-
-print(f"{NETWORK=}\n{LABEL=}")
-
-# Load data
-g = SparseGraph.from_edglst(GRAPH_FP, weighted=True, directed=False)
-lsc = LabelsetCollection.from_gmt(LABEL_FP)
-
-# Filter labels
-print(f"Number of labelsets before filtering: {len(lsc.label_ids)}")
-lsc.iapply(filters.EntityExistenceFilter(g.idmap.lst))
-lsc.iapply(filters.LabelsetRangeFilterSize(min_val=50))
-print(f"Number of labelsets after filtering: {len(lsc.label_ids)}")
+# Load dataset (with sparse graph)
+g, lsc = load_data("STRING-EXP", "KEGGBP", sparse=True, filter_negative=False)
 n_tasks = len(lsc.label_ids)
-
-# Load gene properties for study-bias holdout
-# Note: wait after filtering is done to reduce time for filtering
-lsc.load_entity_properties(PROPERTY_FP, "PubMed Count", 0, int)
 
 # 3/2 train/test split using genes with higher PubMed Count for training
 splitter = RatioPartition(0.6, 0.2, 0.2, ascending=False)

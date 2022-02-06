@@ -1,38 +1,16 @@
-import os.path as osp
 from time import perf_counter
 
 import numpy as np
-from NLEval.graph import DenseGraph
-from NLEval.label import filters
-from NLEval.label import LabelsetCollection
+from load_data import load_data
+from NLEval.label.filters import LabelsetRangeFilterSplit
 from NLEval.label.split import RatioPartition
 from NLEval.model.label_propagation import OneHopPropagation
 from NLEval.model_trainer import LabelPropagationTrainer
 from sklearn.metrics import roc_auc_score as auroc
 
-NETWORK = "STRING-EXP"
-LABEL = "KEGGBP"
-DATA_DIR = osp.join(osp.pardir, "data")
-GRAPH_FP = osp.join(DATA_DIR, "networks", f"{NETWORK}.edg")
-LABEL_FP = osp.join(DATA_DIR, "labels", f"{LABEL}.gmt")
-PROPERTY_FP = osp.join(DATA_DIR, "properties", "PubMedCount.txt")
 
-print(f"{NETWORK=}\n{LABEL=}")
-
-# Load data
-g = DenseGraph.from_edglst(GRAPH_FP, weighted=True, directed=False)
-lsc = LabelsetCollection.from_gmt(LABEL_FP)
-
-# Filter labels
-print(f"Number of labelsets before filtering: {len(lsc.label_ids)}")
-lsc.iapply(filters.EntityExistenceFilter(g.idmap.lst))
-lsc.iapply(filters.LabelsetRangeFilterSize(min_val=50))
-lsc.iapply(filters.NegativeGeneratorHypergeom(p_thresh=0.05))
-print(f"Number of labelsets after filtering: {len(lsc.label_ids)}")
-
-# Load gene properties for study-bias holdout
-# Note: wait after filtering is done to reduce time for filtering
-lsc.load_entity_properties(PROPERTY_FP, "PubMed Count", 0, int)
+# Load daatset
+g, lsc = load_data("STRING-EXP", "KEGGBP")
 
 # 3/2 train/test split using genes with higher PubMed Count for training
 splitter = RatioPartition(0.6, 0.4, ascending=False)
@@ -67,7 +45,7 @@ print_split_stats(lsc, "before")
 print(f"{'START FILTERING BY SPLITS':-^80}")
 elapsed = perf_counter()
 lsc.iapply(
-    filters.LabelsetRangeFilterSplit(
+    LabelsetRangeFilterSplit(
         10,  # required minimum number of positives in each split
         splitter,
         property_name="PubMed Count",

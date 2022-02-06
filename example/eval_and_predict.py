@@ -1,41 +1,24 @@
-import os.path as osp
-
 import numpy as np
-from NLEval.graph import DenseGraph
-from NLEval.label import filters
-from NLEval.label.collection import LabelsetCollection
+from load_data import load_data
 from NLEval.label.split import RatioPartition
 from NLEval.model_trainer import SupervisedLearningTrainer
 from NLEval.util.parallel import ParDatMap
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
 
-NETWORK = "STRING-EXP"
-LABEL = "KEGGBP"
-DATA_DIR = osp.join(osp.pardir, "data")
-GRAPH_FP = osp.join(DATA_DIR, "networks", f"{NETWORK}.edg")
-LABEL_FP = osp.join(DATA_DIR, "labels", f"{LABEL}.gmt")
-PROPERTY_FP = osp.join(DATA_DIR, "properties", "PubMedCount.txt")
 
-workers = 8  # number of parallel processes
-n_split = 5  # cross validation split number for evalution
-p_thresh = 0.05  # p-val for hypergeometric test to determin negatives
-min_labelset_size = 50  # minimum number of positive required in a labelset
-score_cutoff = 1.2  # minimum score required for prediction
 progressbar = True
 
-g = DenseGraph.from_edglst(GRAPH_FP, weighted=False, directed=False)
-lsc = LabelsetCollection.from_gmt(LABEL_FP)
+# Load dataset
+g, lsc = load_data("STRING-EXP", "KEGGBP")
 
-lsc.iapply(filters.EntityExistenceFilter(target_lst=g.idmap.lst))
-lsc.iapply(filters.LabelsetRangeFilterSize(min_val=min_labelset_size))
-lsc.iapply(filters.NegativeGeneratorHypergeom(p_thresh=p_thresh))
-print(f"Number of labelsets after filtering = {len(lsc.label_ids)}")
-
-lsc.load_entity_properties(PROPERTY_FP, "PubMed Count", 0, int)
+# 3/2 train/test split using genes with higher PubMed Count for training
 splitter = RatioPartition(0.6, 0.4, ascending=False)
 
+# Select model
 mdl = LogisticRegression(penalty="l2", solver="lbfgs")
+
+# Setup trainer, use auroc as the evaluation metric
 metrics = {"auroc": auroc}
 trainer = SupervisedLearningTrainer(metrics, g)
 
@@ -72,7 +55,7 @@ print(
 
 print(
     """
-Expected outcome
+Expected outcome (TODO: this does not seem correct, check against logreg ex)
 --------------------------------------------------------------------------------
 Average training score = 0.9999, std = 0.0003
 Average testing score = 0.8579, std = 0.0941
