@@ -5,8 +5,9 @@ from typing import List
 from typing import no_type_check
 from typing import Tuple
 
-from NLEval.util import checkers
 from tqdm import tqdm
+
+from . import checkers
 
 mp.set_start_method("fork")
 

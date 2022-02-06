@@ -4,9 +4,11 @@ from copy import deepcopy
 from typing import List
 
 import numpy as np
-from NLEval.util import checkers
-from NLEval.util.exceptions import IDExistsError
-from NLEval.util.exceptions import IDNotExistError
+
+from . import checkers
+from . import types
+from .exceptions import IDExistsError
+from .exceptions import IDNotExistError
 
 __all__ = ["IDlst", "IDmap", "IDprop"]
 
@@ -79,7 +81,7 @@ class IDlst:
         depending on input type"""
         if isinstance(identifier, str):
             return self._getitem_sinlge(identifier)
-        elif isinstance(identifier, checkers.ITERABLE_TYPE):
+        elif isinstance(identifier, types.ITERABLE_TYPE):
             return self._getitem_multiple(identifier)
         else:
             raise TypeError(
