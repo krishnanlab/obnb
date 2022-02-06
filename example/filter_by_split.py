@@ -1,4 +1,3 @@
-import os.path as osp
 from time import perf_counter
 
 import numpy as np

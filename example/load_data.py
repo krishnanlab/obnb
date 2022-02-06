@@ -1,6 +1,5 @@
 import os.path as osp
 
-import numpy as np
 from NLEval.graph import DenseGraph
 from NLEval.graph import SparseGraph
 from NLEval.label import filters

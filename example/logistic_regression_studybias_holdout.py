@@ -1,5 +1,3 @@
-import os.path as osp
-
 import numpy as np
 from load_data import load_data
 from NLEval.label.split import RatioPartition
