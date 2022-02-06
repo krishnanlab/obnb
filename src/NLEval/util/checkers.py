@@ -1,26 +1,14 @@
-"""Type checking functions
-
-This module contains a collection of checkers which could be used to ensure input
-values to function calls or class initializations are valid.
-
-Attributes:
-    INT_TYPE(:obj:`tuple` of :obj:`type`): integer types
-    FLOAT_TYPE(:obj:`tuple` of :obj:`type`): float types
-    NUMERIC_TYPE(:obj:`tuple` of :obj:`type`): numeric types (int or float)
-    NUMSTRING_TYPE(:obj:`tuple` of :obj:`type`): numeric string types (int or float or str)
-    ITERABLE_TYPE(:obj:`tuple` of :obj:`type`): iterable type
-
 """
-from collections.abc import Iterable
+Type checking functions.
 
+This module contains a collection of checkers to ensure that the input value
+to a function call is valid.
+"""
 import numpy as np
 
+from . import types
+
 __all__ = [
-    "INT_TYPE",
-    "FLOAT_TYPE",
-    "NUMERIC_TYPE",
-    "NUMSTRING_TYPE",
-    "ITERABLE_TYPE",
     "checkValuePositive",
     "checkValueNonnegative",
     "checkType",
@@ -34,12 +22,6 @@ __all__ = [
     "checkNumpyArrayNDim",
     "checkNumpyArrayShape",
 ]
-
-INT_TYPE = (int, np.int32, np.int64)
-FLOAT_TYPE = (float, np.float32, np.float64, np.float128)
-NUMERIC_TYPE = INT_TYPE + FLOAT_TYPE
-NUMSTRING_TYPE = INT_TYPE + FLOAT_TYPE + (str,)
-ITERABLE_TYPE = Iterable
 
 
 def checkValuePositive(name, val):
@@ -118,7 +100,7 @@ def checkTypesInIterableErrEmpty(name, targetType, val):
 def checkNumpyArrayIsNumeric(name, ary):
     """Check if numpy array is numeric type."""
     checkType(name, np.ndarray, ary)
-    if not any([ary.dtype == i for i in NUMERIC_TYPE]):
+    if not any([ary.dtype == i for i in types.NUMERIC_TYPE]):
         raise TypeError(f"{name!r} should be numeric, not type {ary.dtype!r}")
 
 
@@ -135,7 +117,7 @@ def checkNumpyArrayNDim(name, targetNDim, ary):
             from the target number of dimensions
 
     """
-    checkType("targetNDim", INT_TYPE, targetNDim)
+    checkType("targetNDim", types.INT_TYPE, targetNDim)
     checkType(name, np.ndarray, ary)
     NDim = len(ary.shape)
     if NDim != targetNDim:
@@ -157,11 +139,11 @@ def checkNumpyArrayShape(name, targetShape, ary):
         ValueError: if the sape of the input array differ from the target shape
 
     """
-    if isinstance(targetShape, ITERABLE_TYPE):
-        checkTypesInIterable("targetShape", INT_TYPE, targetShape)
+    if isinstance(targetShape, types.ITERABLE_TYPE):
+        checkTypesInIterable("targetShape", types.INT_TYPE, targetShape)
         NDim = len(targetShape)
     else:
-        checkType("targetShape", INT_TYPE, targetShape)
+        checkType("targetShape", types.INT_TYPE, targetShape)
         NDim = 1
         targetShape = (targetShape,)
     checkNumpyArrayNDim(name, NDim, ary)

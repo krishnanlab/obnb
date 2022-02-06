@@ -7,6 +7,7 @@ import numpy as np
 from scipy.spatial import distance
 
 from ..util import checkers
+from ..util import types
 from ..util.idhandler import IDmap
 from .dense import DenseGraph
 
@@ -27,7 +28,7 @@ class FeatureVec(DenseGraph):
 
     @dim.setter
     def dim(self, d):
-        checkers.checkNullableType("d", checkers.INT_TYPE, d)
+        checkers.checkNullableType("d", types.INT_TYPE, d)
         if d is not None:
             if d < 1:
                 raise ValueError(
