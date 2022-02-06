@@ -100,10 +100,17 @@ class MultiSupervisedLearningTrainer(SupervisedLearningTrainer):
             self.metric_best = metric_best
 
     def get_x_from_mask(self, mask):
-        """Obtain features of specific nodes from a specific feature set."""
+        """Obtain features of specific nodes from a specific feature set.
+
+        In each iteraction, use one single feature set, indicated by
+        ``self._curr_fset_name``, which updated within the for loop in the
+        ``train`` method below.
+
+        """
         checkNumpyArrayShape("mask", len(self.idmap), mask)
         idx = np.where(mask)[0]
-        return self.features.get_features_from_idx(idx, self._curr_fset_name)
+        fset_idx = self.features.fset_idmap[self._curr_fset_name]
+        return self.features.get_features_from_idx(idx, fset_idx)
 
     def train(self, model, y, masks, split_idx=0):
         """Train a supervised learning mode and select based on validation."""
