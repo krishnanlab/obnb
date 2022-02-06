@@ -1,7 +1,7 @@
 import time
 import typing
 
-from NLEval.util import checkers
+from . import checkers
 
 
 class TimeIt:

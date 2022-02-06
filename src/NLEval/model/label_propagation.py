@@ -1,10 +1,11 @@
 import warnings
 
 import numpy as np
-from NLEval.graph.base import BaseGraph
-from NLEval.util.checkers import checkValueNonnegative
-from NLEval.util.checkers import checkValuePositive
-from NLEval.util.exceptions import NotConvergedWarning
+
+from ..graph.base import BaseGraph
+from ..util.checkers import checkValueNonnegative
+from ..util.checkers import checkValuePositive
+from ..util.exceptions import NotConvergedWarning
 
 
 class IterativePropagation:

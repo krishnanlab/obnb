@@ -8,10 +8,11 @@ from typing import Set
 from typing import Tuple
 
 import numpy as np
-from NLEval.label.filters.base import BaseFilter
-from NLEval.util import checkers
-from NLEval.util import idhandler
-from NLEval.util.exceptions import IDExistsError
+
+from ..util import checkers
+from ..util import idhandler
+from ..util.exceptions import IDExistsError
+from .filters.base import BaseFilter
 
 Splitter = Callable[[np.ndarray, np.ndarray], Iterator[Tuple[np.ndarray, ...]]]
 
