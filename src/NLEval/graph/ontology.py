@@ -1,3 +1,4 @@
+import functools
 import itertools
 from typing import List
 from typing import Optional
@@ -15,6 +16,15 @@ class OntologyGraph(SparseGraph):
         super().__init__(weighted=False, directed=True)
         self.idmap = idhandler.IDprop()
         self.idmap.new_property("node_attr", default_val=None)
+
+    def __hash__(self):
+        """Trivial hash.
+
+        This hash is solely for the sake of enabling LRU cache when calling
+        _aggregate_node_attrs recursion.
+
+        """
+        return 0
 
     def get_node_id(self, node: Union[str, int]) -> str:
         """Return the node ID given the node index.
@@ -49,6 +59,7 @@ class OntologyGraph(SparseGraph):
         """
         return self.idmap.get_property(self.get_node_id(node), "node_attr")
 
+    @functools.lru_cache(maxsize=None)
     def _aggregate_node_attrs(self, node_idx: int) -> List[str]:
         if len(self._edge_data[node_idx]) == 0:  # is leaf node
             node_attr = self.get_node_attr(node_idx) or []
