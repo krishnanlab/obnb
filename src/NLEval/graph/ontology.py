@@ -73,6 +73,14 @@ class OntologyGraph(SparseGraph):
         return sorted(set(node_attr))
 
     def complete_node_attrs(self):
+        """Node attribute completion by propagation upwards.
+
+        Starting from the leaf node, propagate the node attributes to its
+        parent node so that the parent node contains all the node attributes
+        from its children, plus its original node attributes. This is done via
+        recursion _aggregate_node_attrs.
+
+        """
         for node_idx in range(self.size):
             self.set_node_attr(node_idx, self._aggregate_node_attrs(node_idx))
 
