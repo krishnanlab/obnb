@@ -11,6 +11,7 @@ from commonvar import SAMPLE_DATA_DIR
 from NLEval.graph import DenseGraph
 from NLEval.graph import FeatureVec
 from NLEval.graph import MultiFeatureVec
+from NLEval.graph import OntologyGraph
 from NLEval.graph import SparseGraph
 from NLEval.graph.base import BaseGraph
 from NLEval.util import idhandler
@@ -958,6 +959,53 @@ class TestFeatureVecAlign(unittest.TestCase):
                 fvec2.mat.tolist(),
                 [[2, 3], [1, 2], [0, 1], [0, 0], [3, 4], [4, 5]],
             )
+
+
+class TestOntologyGraph(unittest.TestCase):
+    def test_node_attr(self):
+        graph = OntologyGraph()
+
+        graph.add_id("a")
+        self.assertEqual(graph.get_node_attr("a"), None)
+
+        graph.set_node_attr("a", ["x", "y", "z"])
+        self.assertEqual(graph.get_node_attr("a"), ["x", "y", "z"])
+        self.assertEqual(graph.get_node_attr(0), ["x", "y", "z"])
+
+    def test_complete_node_attrs(self):
+        r"""
+                a
+        /       |        \
+        b       c [x, y]  d [x]
+        |       |
+        e [w]   f [z]
+        """
+        graph = OntologyGraph()
+
+        graph.add_edge("a", "b")
+        graph.add_edge("a", "c")
+        graph.add_edge("a", "d")
+        graph.add_edge("b", "e")
+        graph.add_edge("c", "f")
+
+        self.assertEqual(
+            graph._edge_data,
+            [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {}, {}, {}],
+        )
+
+        graph.set_node_attr("d", ["x"])
+        graph.set_node_attr("c", ["x", "y"])
+        graph.set_node_attr("f", ["z"])
+        graph.set_node_attr("e", ["w"])
+
+        graph.complete_node_attrs()
+
+        self.assertEqual(graph.get_node_attr("a"), ["w", "x", "y", "z"])
+        self.assertEqual(graph.get_node_attr("b"), ["w"])
+        self.assertEqual(graph.get_node_attr("c"), ["x", "y", "z"])
+        self.assertEqual(graph.get_node_attr("d"), ["x"])
+        self.assertEqual(graph.get_node_attr("e"), ["w"])
+        self.assertEqual(graph.get_node_attr("f"), ["z"])
 
 
 if __name__ == "__main__":
