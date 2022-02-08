@@ -1,6 +1,6 @@
-import collections
 import functools
 import itertools
+from collections import defaultdict
 from typing import DefaultDict
 from typing import Iterable
 from typing import Iterator
@@ -125,13 +125,8 @@ class OntologyGraph(SparseGraph):
     @staticmethod
     def iter_terms(fp: TextIO) -> Iterator[Term]:
         groups = itertools.groupby(fp, lambda line: line.strip() == "")
-        for is_blank, stanza_lines in groups:
-            if is_blank:
-                continue
-            elif not next(stanza_lines).startswith("[Term]"):
-                continue
-            else:
-                # if next(stanza_lines).startswith("[Term]"):
+        for _, stanza_lines in groups:
+            if next(stanza_lines).startswith("[Term]"):
                 yield OntologyGraph.parse_stanza_simplified(stanza_lines)
 
     @staticmethod
@@ -150,7 +145,6 @@ class OntologyGraph(SparseGraph):
                 term_parents.append(line.strip()[6:].split(" ! ")[0])
 
         if term_id is None or term_name is None:
-            stanza = "\n".join(stanza_lines)
             raise OboTermIncompleteError
 
         return term_id, term_name, term_xrefs, term_parents
@@ -169,7 +163,7 @@ class OntologyGraph(SparseGraph):
                 not capture any xref (default: :obj:`None`).
 
         """
-        xref_to_term_id = collections.defaultdict(set)
+        xref_to_term_id = None if xref_prefix is None else defaultdict(set)
         with open(path, "r") as f:
             for term in self.iter_terms(f):
                 term_id, term_name, term_xrefs, term_parents = term
@@ -180,11 +174,11 @@ class OntologyGraph(SparseGraph):
 
                 if xref_prefix is not None and term_xrefs is not None:
                     for xref in term_xrefs:
-                        if xref.startswith(xref_prefix):
-                            xref_id = xref[len(xref_prefix) :]
-                            xref_to_term_id[xref_id].add(xref_id)
+                        prefix, xref_id = xref.split(":")
+                        if prefix == xref_prefix:
+                            xref_to_term_id[xref_id].add(term_id)
 
-        return None if xref_prefix is None else xref_to_term_id
+        return xref_to_term_id
 
     @classmethod
     def from_obo(cls, path: str):

@@ -1025,13 +1025,41 @@ class TestOntologyGraph(unittest.TestCase):
         |       \      /
         e [z]       f
         """
-        graph = OntologyGraph()
-        graph.read_obo(osp.join(SAMPLE_DATA_DIR, "toy_ontology.obo"))
+        obo_path = osp.join(SAMPLE_DATA_DIR, "toy_ontology.obo")
+        with self.subTest(xref_prefix=None):
+            # Do not capture xref when xref_prefix is unset
+            graph = OntologyGraph()
+            out = graph.read_obo(obo_path)
 
-        self.assertEqual(
-            graph._edge_data,
-            [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {5: 1}, {}, {}],
-        )
+            self.assertEqual(out, None)
+            self.assertEqual(
+                graph._edge_data,
+                [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {5: 1}, {}, {}],
+            )
+
+        with self.subTest(xref_prefix="ALIAS"):
+            graph = OntologyGraph()
+            out = graph.read_obo(obo_path, xref_prefix="ALIAS")
+
+            self.assertEqual(
+                dict(out),
+                {"x": {"ID:2"}, "y": {"ID:2"}, "z": {"ID:4"}},
+            )
+            self.assertEqual(
+                graph._edge_data,
+                [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {5: 1}, {}, {}],
+            )
+
+        with self.subTest(xref_prefix="ALIAS2"):
+            # No matched xref with the defined prefix
+            graph = OntologyGraph()
+            out = graph.read_obo(obo_path, xref_prefix="ALIAS2")
+
+            self.assertEqual(dict(out), {})
+            self.assertEqual(
+                graph._edge_data,
+                [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {5: 1}, {}, {}],
+            )
 
 
 if __name__ == "__main__":
