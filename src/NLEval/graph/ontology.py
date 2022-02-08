@@ -124,6 +124,12 @@ class OntologyGraph(SparseGraph):
 
     @staticmethod
     def iter_terms(fp: TextIO) -> Iterator[Term]:
+        """Iterate over terms from a file pointer and yield OBO terms.
+
+        Args:
+            fp (TextIO): File pointer, can be iterated over the lines.
+
+        """
         groups = itertools.groupby(fp, lambda line: line.strip() == "")
         for _, stanza_lines in groups:
             if next(stanza_lines).startswith("[Term]"):
@@ -131,6 +137,26 @@ class OntologyGraph(SparseGraph):
 
     @staticmethod
     def parse_stanza_simplified(stanza_lines: Iterable[str]) -> Term:
+        """Return an OBO term (id, name, xref, is_a) from the stanza.
+
+        Note:
+            term_xrefs and term_parents can be None if such information is not
+            available. Meanwhile, term_id and term_name will always be
+            available; otherwise an exception will be raised.
+
+        Args:
+            stanza_lines (Iterable[str]): Iterable of strings (lines), and each
+                line contains certain type of information inferred by the line
+                prefix. Here, we are only interested in four such items, namely
+                "id: " (identifier of the term), "name: " (name of the term),
+                "xref: " (cross reference of the term) and "is_a: " (parent(s)
+                of the term).
+
+        Raises:
+            OboTermIncompleteError: If either term_id or term_name is not
+                available.
+
+        """
         term_id = term_name = None
         term_xrefs, term_parents = [], []
 
@@ -174,7 +200,9 @@ class OntologyGraph(SparseGraph):
 
                 if xref_prefix is not None and term_xrefs is not None:
                     for xref in term_xrefs:
-                        prefix, xref_id = xref.split(":")
+                        xref_terms = xref.split(":")
+                        prefix = xref_terms[0]
+                        xref_id = ":".join(xref_terms[1:])
                         if prefix == xref_prefix:
                             xref_to_term_id[xref_id].add(term_id)
 
