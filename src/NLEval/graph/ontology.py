@@ -1,21 +1,39 @@
 import functools
 import itertools
+from collections import defaultdict
+from typing import DefaultDict
+from typing import Iterable
+from typing import Iterator
 from typing import List
 from typing import Optional
+from typing import Set
+from typing import TextIO
+from typing import Tuple
 from typing import Union
 
 from ..util import idhandler
+from ..util.exceptions import OboTermIncompleteError
 from .sparse import SparseGraph
+
+Term = Tuple[str, str, Optional[List[str]], Optional[List[str]]]
 
 
 class OntologyGraph(SparseGraph):
-    """Ontology graph."""
+    """Ontology graph.
+
+    Note:
+        For the ease of node attributes propagation upwards, the direction of
+        an edge is from the parent node to the children node, instead of the
+        other way around, which is the usual setting.
+
+    """
 
     def __init__(self):
         """Initialize the ontology graph."""
         super().__init__(weighted=False, directed=True)
         self.idmap = idhandler.IDprop()
         self.idmap.new_property("node_attr", default_val=None)
+        self.idmap.new_property("node_name", default_val=None)
 
     def __hash__(self):
         """Trivial hash.
@@ -59,8 +77,28 @@ class OntologyGraph(SparseGraph):
         """
         return self.idmap.get_property(self.get_node_id(node), "node_attr")
 
+    def set_node_name(self, node: Union[str, int], node_name: str):
+        """Set the name of a given node.
+
+        Args:
+            node (Union[str, int]): Node index (int) or node ID (str).
+            node_attr (:obj:`list` of :obj:`str`): Node attributes to set.
+
+        """
+        self.idmap.set_property(self.get_node_id(node), "node_name", node_name)
+
+    def get_node_name(self, node: Union[str, int]) -> str:
+        """Get the name of a given node.
+
+        Args:
+            node (Union[str, int]): Node index (int) or node ID (str).
+
+        """
+        return self.idmap.get_property(self.get_node_id(node), "node_name")
+
     @functools.lru_cache(maxsize=None)
     def _aggregate_node_attrs(self, node_idx: int) -> List[str]:
+        node_attr: Iterable[str]
         if len(self._edge_data[node_idx]) == 0:  # is leaf node
             node_attr = self.get_node_attr(node_idx) or []
         else:
@@ -84,14 +122,91 @@ class OntologyGraph(SparseGraph):
         for node_idx in range(self.size):
             self.set_node_attr(node_idx, self._aggregate_node_attrs(node_idx))
 
-    def read_obo(self, path: str):
+    @staticmethod
+    def iter_terms(fp: TextIO) -> Iterator[Term]:
+        """Iterate over terms from a file pointer and yield OBO terms.
+
+        Args:
+            fp (TextIO): File pointer, can be iterated over the lines.
+
+        """
+        groups = itertools.groupby(fp, lambda line: line.strip() == "")
+        for _, stanza_lines in groups:
+            if next(stanza_lines).startswith("[Term]"):
+                yield OntologyGraph.parse_stanza_simplified(stanza_lines)
+
+    @staticmethod
+    def parse_stanza_simplified(stanza_lines: Iterable[str]) -> Term:
+        """Return an OBO term (id, name, xref, is_a) from the stanza.
+
+        Note:
+            term_xrefs and term_parents can be None if such information is not
+            available. Meanwhile, term_id and term_name will always be
+            available; otherwise an exception will be raised.
+
+        Args:
+            stanza_lines (Iterable[str]): Iterable of strings (lines), and each
+                line contains certain type of information inferred by the line
+                prefix. Here, we are only interested in four such items, namely
+                "id: " (identifier of the term), "name: " (name of the term),
+                "xref: " (cross reference of the term) and "is_a: " (parent(s)
+                of the term).
+
+        Raises:
+            OboTermIncompleteError: If either term_id or term_name is not
+                available.
+
+        """
+        term_id = term_name = None
+        term_xrefs, term_parents = [], []
+
+        for line in stanza_lines:
+            if line.startswith("id: "):
+                term_id = line.strip()[4:]
+            elif line.startswith("name: "):
+                term_name = line.strip()[6:]
+            elif line.startswith("xref: "):
+                term_xrefs.append(line.strip()[6:])
+            elif line.startswith("is_a: "):
+                term_parents.append(line.strip()[6:].split(" ! ")[0])
+
+        if term_id is None or term_name is None:
+            raise OboTermIncompleteError
+
+        return term_id, term_name, term_xrefs, term_parents
+
+    def read_obo(
+        self,
+        path: str,
+        xref_prefix: Optional[str] = None,
+    ) -> Optional[DefaultDict[str, Set[str]]]:
         """Read OBO-formatted ontology.
 
         Args:
             path (str): Path to the OBO file.
+            xref_prefix (str, optional): Prefix of xref to be captured and
+                return a dictionary of xref to term_id. If not set, then do
+                not capture any xref (default: :obj:`None`).
 
         """
-        raise NotImplementedError("To be implemented")
+        xref_to_term_id = None if xref_prefix is None else defaultdict(set)
+        with open(path, "r") as f:
+            for term in self.iter_terms(f):
+                term_id, term_name, term_xrefs, term_parents = term
+
+                if term_parents is not None:
+                    for parent_id in term_parents:
+                        self.add_edge(parent_id, term_id)
+
+                if xref_prefix is not None and term_xrefs is not None:
+                    for xref in term_xrefs:
+                        xref_terms = xref.split(":")
+                        prefix = xref_terms[0]
+                        xref_id = ":".join(xref_terms[1:])
+                        if prefix == xref_prefix:
+                            xref_to_term_id[xref_id].add(term_id)
+
+        return xref_to_term_id
 
     @classmethod
     def from_obo(cls, path: str):

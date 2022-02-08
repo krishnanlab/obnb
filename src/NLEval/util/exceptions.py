@@ -8,3 +8,7 @@ class IDExistsError(Exception):
 
 class NotConvergedWarning(RuntimeWarning):
     """Warn when model not converged."""
+
+
+class OboTermIncompleteError(Exception):
+    """Raised when the obo term do not have an ID or a name."""

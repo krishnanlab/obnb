@@ -962,6 +962,16 @@ class TestFeatureVecAlign(unittest.TestCase):
 
 
 class TestOntologyGraph(unittest.TestCase):
+    def test_node_name(self):
+        graph = OntologyGraph()
+
+        graph.add_id("a")
+        self.assertEqual(graph.get_node_name("a"), None)
+
+        graph.set_node_name("a", "A")
+        self.assertEqual(graph.get_node_name("a"), "A")
+        self.assertEqual(graph.get_node_name(0), "A")
+
     def test_node_attr(self):
         graph = OntologyGraph()
 
@@ -1006,6 +1016,50 @@ class TestOntologyGraph(unittest.TestCase):
         self.assertEqual(graph.get_node_attr("d"), ["x"])
         self.assertEqual(graph.get_node_attr("e"), ["w"])
         self.assertEqual(graph.get_node_attr("f"), ["z"])
+
+    def test_read_obo(self):
+        r"""
+               a
+        /      |       \
+        b      c (x, y)  d
+        |       \      /
+        e [z]       f
+        """
+        obo_path = osp.join(SAMPLE_DATA_DIR, "toy_ontology.obo")
+        with self.subTest(xref_prefix=None):
+            # Do not capture xref when xref_prefix is unset
+            graph = OntologyGraph()
+            out = graph.read_obo(obo_path)
+
+            self.assertEqual(out, None)
+            self.assertEqual(
+                graph._edge_data,
+                [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {5: 1}, {}, {}],
+            )
+
+        with self.subTest(xref_prefix="ALIAS"):
+            graph = OntologyGraph()
+            out = graph.read_obo(obo_path, xref_prefix="ALIAS")
+
+            self.assertEqual(
+                dict(out),
+                {"x": {"ID:2"}, "y": {"ID:2"}, "z": {"ID:4"}},
+            )
+            self.assertEqual(
+                graph._edge_data,
+                [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {5: 1}, {}, {}],
+            )
+
+        with self.subTest(xref_prefix="ALIAS2"):
+            # No matched xref with the defined prefix
+            graph = OntologyGraph()
+            out = graph.read_obo(obo_path, xref_prefix="ALIAS2")
+
+            self.assertEqual(dict(out), {})
+            self.assertEqual(
+                graph._edge_data,
+                [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {5: 1}, {}, {}],
+            )
 
 
 if __name__ == "__main__":
