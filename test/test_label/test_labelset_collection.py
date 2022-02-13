@@ -10,8 +10,8 @@ from NLEval.util.exceptions import IDNotExistError
 class TestLabelsetCollection(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        self.toy1_gmt_fp = os.path.join(SAMPLE_DATA_DIR, "toy1.gmt")
-        self.toy1_prop_fp = os.path.join(SAMPLE_DATA_DIR, "toy1_property.tsv")
+        self.toy1_gmt_path = os.path.join(SAMPLE_DATA_DIR, "toy1.gmt")
+        self.toy1_prop_path = os.path.join(SAMPLE_DATA_DIR, "toy1_property.tsv")
         self.toy1_label_ids = ["Group1", "Group2", "Group3", "Group4"]
         self.toy1_InfoLst = [
             "Description1",
@@ -139,7 +139,7 @@ class TestLabelsetCollection(unittest.TestCase):
         self.assertEqual(lsc1, lsc2)
 
     def test_from_gmt(self):
-        lsc = LabelsetCollection.from_gmt(self.toy1_gmt_fp)
+        lsc = LabelsetCollection.from_gmt(self.toy1_gmt_path)
         self.assertEqual(lsc.label_ids, self.toy1_label_ids)
         self.assertEqual(lsc.prop["Info"], self.toy1_InfoLst)
         self.assertEqual(lsc.prop["Labelset"], self.toy1_labelsets)
@@ -318,13 +318,18 @@ class TestLabelsetCollection(unittest.TestCase):
         self.assertEqual(self.lsc.entity.map, {"b": 0, "d": 1})
 
     def test_load_entity_properties(self):
-        self.lsc.load_entity_properties(self.toy1_prop_fp, "toy1_prop", 0, int)
+        self.lsc.load_entity_properties(
+            self.toy1_prop_path,
+            "toy1_prop",
+            0,
+            int,
+        )
         self.assertEqual(self.lsc.entity.prop["toy1_prop"], self.toy1_property)
         # test loading property with existing property name --> IDExistsError
         self.assertRaises(
             IDExistsError,
             self.lsc.load_entity_properties,
-            self.toy1_prop_fp,
+            self.toy1_prop_path,
             "toy1_prop",
             0,
             int,

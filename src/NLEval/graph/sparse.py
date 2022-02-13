@@ -130,14 +130,14 @@ class SparseGraph(BaseGraph):
             return 0
 
     @staticmethod
-    def edglst_reader(edg_fp, weighted, directed, cut_threshold):
+    def edglst_reader(edg_path, weighted, directed, cut_threshold):
         """Edge list file reader.
 
         Read line by line from a edge list file and yield (node_id1, node_id2,
         weight)
 
         """
-        with open(edg_fp, "r") as f:
+        with open(edg_path, "r") as f:
             for line in f:
                 try:
                     node_id1, node_id2, weight = line.split("\t")
