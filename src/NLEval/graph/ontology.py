@@ -77,6 +77,25 @@ class OntologyGraph(SparseGraph):
         """
         return self.idmap.get_property(self.get_node_id(node), "node_attr")
 
+    def update_node_attr(
+        self,
+        node: Union[str, int],
+        new_node_attr: Union[List[str], str],
+    ):
+        """Update node attributes of a given node.
+
+        Can update using a single instance or a lsit of instances.
+
+        Args:
+            node (Union[str, int]): Node index (int) or node ID (str).
+            new_node_attr (Union[List[str], str]): Node attribute(s) to update.
+
+        """
+        if not isinstance(new_node_attr, list):
+            new_node_attr = [new_node_attr]
+        old_node_attr = self.get_node_attr(node) or []
+        self.set_node_attr(node, sorted(set(new_node_attr + old_node_attr)))
+
     def set_node_name(self, node: Union[str, int], node_name: str):
         """Set the name of a given node.
 
