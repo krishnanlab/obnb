@@ -119,8 +119,7 @@ class LabelsetRangeFilterJaccard(BaseRangeFilter):
         Only support filtering with ``max_val``.
 
     Example:
-        >>> labelset_collection.apply(LabelsetRangeFilterSize(max_val=0.7),
-        >>>                           inplace=True)
+        >>> labelset_collection.iapply(LabelsetRangeFilterJaccard(max_val=0.7))
 
     """
 
@@ -139,9 +138,55 @@ class LabelsetRangeFilterJaccard(BaseRangeFilter):
                 if label_id2 == label_id:  # skip self
                     continue
                 labelset2 = lsc.get_labelset(label_id2)
-                jidx = len(labelset & labelset2) / len(labelset | labelset2)
-                if (jidx > val) & (len(labelset) >= len(labelset2)):
-                    val = jidx
+                if len(labelset) >= len(labelset2):
+                    unionsize = len(labelset | labelset2)
+                    jidx = len(labelset & labelset2) / unionsize
+                    val = max(val, jidx)
+            return val
+
+        return val_getter
+
+    @staticmethod
+    def get_ids(lsc):
+        return lsc.label_ids
+
+    @staticmethod
+    def get_mod_fun(lsc):
+        return lsc.pop_labelset
+
+
+class LabelsetRangeFilterOverlap(BaseRangeFilter):
+    """Filter labelsets based on the overlap coefficient.
+
+    Similar to LabelsetRangeFilterJaccard, but using Overlap coefficient, which
+    is computed as the size of the intersection over the minimum size of the
+    two sets.
+
+    Note:
+        Only support filtering with ``max_val``.
+
+    Example:
+        >>> labelset_collection.iapply(LabelsetRangeFilterOverlap(max_val=0.7))
+
+    """
+
+    def __init__(self, max_val: float):
+        """Initialize LabelsetRangeFilterJaccard object."""
+        super().__init__(None, max_val)
+
+    @staticmethod
+    def get_val_getter(lsc):
+        def val_getter(label_id):
+            val = 0
+            labelset = lsc.get_labelset(label_id)
+            for label_id2 in lsc.label_ids:
+                if label_id2 == label_id:  # skip self
+                    continue
+                labelset2 = lsc.get_labelset(label_id2)
+                if len(labelset) >= len(labelset2):
+                    minsize = min(len(labelset), len(labelset2))
+                    ovlpt = len(labelset & labelset2) / minsize
+                    val = max(val, ovlpt)
             return val
 
         return val_getter

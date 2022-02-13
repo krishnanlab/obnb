@@ -9,6 +9,7 @@ from typing import Tuple
 
 import numpy as np
 
+from ..graph import OntologyGraph
 from ..util import checkers
 from ..util import idhandler
 from ..util.exceptions import IDExistsError
@@ -471,7 +472,7 @@ class LabelsetCollection(idhandler.IDprop):
         """
         self.apply(filter_func, inplace=True)
 
-    def export(self, fp):
+    def export(self, path):
         """Export self as a '.lsc' file.
 
         Notes:
@@ -486,7 +487,7 @@ class LabelsetCollection(idhandler.IDprop):
             be part of at least one label.
 
         Input:
-            fp(str): path to file to save, including file name, with/without
+            path(str): path to file to save, including file name, with/without
                 extension.
 
         """
@@ -510,8 +511,8 @@ class LabelsetCollection(idhandler.IDprop):
                     i = entity_idmap[entity_id]
                     mat[i, j] = sign
 
-        fp = fp if fp.endswith(".lsc") else fp + ".lsc"
-        with open(fp, "w") as f:
+        path = path if path.endswith(".lsc") else path + ".lsc"
+        with open(path, "w") as f:
             # headers
             label_ids = "\t".join(label_ids)
             label_info_str = "\t".join(label_info_list)
@@ -523,16 +524,16 @@ class LabelsetCollection(idhandler.IDprop):
                 indicator_string = "\t".join(map(str, mat[i]))
                 f.write(f"{entity_id}\t{indicator_string}\n")
 
-    def export_gmt(self, fp):
+    def export_gmt(self, path):
         """Export self as a '.gmt' (Gene Matrix Transpose) file.
 
         Input:
-            fp(str): path to file to save, including file name, with/without
+            path(str): path to file to save, including file name, with/without
                 extension.
 
         """
-        fp += "" if fp.endswith(".gmt") else ".gmt"
-        with open(fp, "w") as f:
+        path += "" if path.endswith(".gmt") else ".gmt"
+        with open(path, "w") as f:
             for label_id in self.label_ids:
                 label_info = self.get_info(label_id)
                 labelset_str = "\t".join(self.get_labelset(label_id))
@@ -540,7 +541,7 @@ class LabelsetCollection(idhandler.IDprop):
 
     def load_entity_properties(
         self,
-        fp,
+        path,
         prop_name,
         default_val,
         default_type,
@@ -555,7 +556,7 @@ class LabelsetCollection(idhandler.IDprop):
         properties of entities.
 
         Args:
-            fp(str): path to the entity properties file.
+            path(str): path to the entity properties file.
             default_val: default value of property of an entity if not
                 specified.
             default_type(type): default type of the property.
@@ -565,7 +566,7 @@ class LabelsetCollection(idhandler.IDprop):
         """
         # TODO: option to skip non-existing entities
         self.entity.new_property(prop_name, default_val, default_type)
-        with open(fp, "r") as f:
+        with open(path, "r") as f:
             for i, line in enumerate(f):
                 if (i < skiprows) | line.startswith(comment):
                     continue
@@ -574,20 +575,55 @@ class LabelsetCollection(idhandler.IDprop):
                     self.entity.add_id(entity_id)
                 self.entity.set_property(entity_id, prop_name, interpreter(val))
 
-    @classmethod
-    def from_gmt(cls, fp: str, sep: str = "\t"):
+    def read_ontology_graph(
+        self,
+        graph: OntologyGraph,
+        propagate_annotations: bool = True,
+        min_size: int = 10,
+    ):
+        """Load labelset collection from an annotated ontology graph.
+
+        Args:
+            graph (OntologyGraph): The annotated ontology graph to be read.
+            propagate_annotation (bool): If true, propagate the annotations
+                of the ontoloty terms upwards before reading (default:
+                :obj:`True`).
+            min_size (int): Minimum number of positive examples in order to be
+                loaded as a label set (default: 10).
+        """
+        if propagate_annotations:
+            graph.complete_node_attrs()
+
+        for label_id in graph.node_ids:
+            label_info = graph.get_node_name(label_id)
+            label_set = graph.get_node_attr(label_id) or []
+            if len(label_set) >= min_size:
+                self.add_labelset(label_set, label_id, label_info)
+
+    def read_gmt(self, path: str, sep: str = "\t"):
         """Load data from Gene Matrix Transpose `.gmt` file.
 
         Args:
-            fp: path to the `.gmt` file.
+            path: path to the `.gmt` file.
+            sep: seperator used in the GMT file.
+
+        """
+        with open(path, "r") as f:
+            for line in f:
+                label_id, label_info, *lst = line.strip().split(sep)
+                self.add_labelset(lst, label_id, label_info)
+
+    @classmethod
+    def from_gmt(cls, path: str, sep: str = "\t"):
+        """Construct LabelsetCollection object from GMT file.
+
+        Args:
+            path: path to the `.gmt` file.
             sep: seperator used in the GMT file.
 
         """
         lsc = cls()
-        with open(fp, "r") as f:
-            for line in f:
-                label_id, label_info, *lst = line.strip().split(sep)
-                lsc.add_labelset(lst, label_id, label_info)
+        lsc.read_gmt(path, sep=sep)
         return lsc
 
     @classmethod

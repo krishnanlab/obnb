@@ -52,9 +52,9 @@ def shuffle_dense(graph):
 
 class test_case1:
     def __init__(self):
-        self.tw_fp = os.path.join(SAMPLE_DATA_DIR, "toy1_weighted.edg")
-        self.tu_fp = os.path.join(SAMPLE_DATA_DIR, "toy1_unweighted.edg")
-        self.temd_fp = os.path.join(SAMPLE_DATA_DIR, "toy1.emd")
+        self.tw_path = os.path.join(SAMPLE_DATA_DIR, "toy1_weighted.edg")
+        self.tu_path = os.path.join(SAMPLE_DATA_DIR, "toy1_unweighted.edg")
+        self.temd_path = os.path.join(SAMPLE_DATA_DIR, "toy1.emd")
         self.IDlst = ["1", "3", "4", "2", "5"]
         self.data_unweighted = [
             {1: 1, 2: 1},
@@ -145,7 +145,7 @@ class TestSparseGraph(unittest.TestCase):
 
     def test_read_edglst_unweighted(self):
         graph = SparseGraph.from_edglst(
-            self.case.tu_fp,
+            self.case.tu_path,
             weighted=False,
             directed=False,
         )
@@ -154,7 +154,7 @@ class TestSparseGraph(unittest.TestCase):
 
     def test_read_edglst_weighted(self):
         graph = SparseGraph.from_edglst(
-            self.case.tw_fp,
+            self.case.tw_path,
             weighted=True,
             directed=False,
         )
@@ -542,7 +542,7 @@ class TestDenseGraph(unittest.TestCase):
 
     def test_from_edglst(self):
         graph = DenseGraph.from_edglst(
-            self.case.tw_fp,
+            self.case.tw_path,
             weighted=True,
             directed=False,
         )
@@ -581,7 +581,7 @@ class TestDenseGraph(unittest.TestCase):
 
     def test_eq(self):
         graph = DenseGraph.from_edglst(
-            self.case.tw_fp,
+            self.case.tw_path,
             weighted=True,
             directed=False,
         )
@@ -654,7 +654,7 @@ class TestFeatureVec(unittest.TestCase):
         graph.mat = mat3
 
     def test_get_edge(self):
-        graph = FeatureVec.from_emd(self.case.temd_fp)
+        graph = FeatureVec.from_emd(self.case.temd_path)
         temd_data = np.loadtxt(
             os.path.join(SAMPLE_DATA_DIR, "toy1.emd"),
             delimiter=" ",
@@ -691,7 +691,7 @@ class TestFeatureVec(unittest.TestCase):
         self.assertRaises(ValueError, graph.add_vec, "e", self.vec_a)
 
     def test_from_emd(self):
-        graph = FeatureVec.from_emd(self.case.temd_fp)
+        graph = FeatureVec.from_emd(self.case.temd_path)
         temd_data = np.loadtxt(
             os.path.join(SAMPLE_DATA_DIR, "toy1.emd"),
             delimiter=" ",
@@ -976,11 +976,36 @@ class TestOntologyGraph(unittest.TestCase):
         graph = OntologyGraph()
 
         graph.add_id("a")
+        graph.add_id("b")
         self.assertEqual(graph.get_node_attr("a"), None)
+        self.assertEqual(graph.get_node_attr("b"), None)
 
         graph.set_node_attr("a", ["x", "y", "z"])
         self.assertEqual(graph.get_node_attr("a"), ["x", "y", "z"])
         self.assertEqual(graph.get_node_attr(0), ["x", "y", "z"])
+
+        graph.update_node_attr("b", "x")
+        self.assertEqual(graph.get_node_attr("b"), ["x"])
+        graph.update_node_attr("b", "x")
+        self.assertEqual(graph.get_node_attr("b"), ["x"])
+        graph.update_node_attr("b", "z")
+        self.assertEqual(graph.get_node_attr("b"), ["x", "z"])
+        graph.update_node_attr("b", ["a", "y"])
+        self.assertEqual(graph.get_node_attr("b"), ["a", "x", "y", "z"])
+
+        graph._update_node_attr_partial("a", ["a", "x"])
+        self.assertEqual(graph.get_node_attr("a"), ["x", "y", "z", "a", "x"])
+        graph._update_node_attr_partial("b", "x")
+        self.assertEqual(graph.get_node_attr("b"), ["a", "x", "y", "z", "x"])
+
+        graph._update_node_attr_finalize("a")
+        self.assertEqual(graph.get_node_attr("a"), ["a", "x", "y", "z"])
+        self.assertEqual(graph.get_node_attr("b"), ["a", "x", "y", "z", "x"])
+
+        graph._update_node_attr_partial("a", ["a", "x"])
+        graph._update_node_attr_finalize()
+        self.assertEqual(graph.get_node_attr("a"), ["a", "x", "y", "z"])
+        self.assertEqual(graph.get_node_attr("b"), ["a", "x", "y", "z"])
 
     def test_complete_node_attrs(self):
         r"""
@@ -1030,6 +1055,15 @@ class TestOntologyGraph(unittest.TestCase):
             # Do not capture xref when xref_prefix is unset
             graph = OntologyGraph()
             out = graph.read_obo(obo_path)
+
+            self.assertEqual(
+                list(graph.node_ids),
+                ["ID:0", "ID:1", "ID:2", "ID:3", "ID:4", "ID:5"],
+            )
+            self.assertEqual(
+                list(map(graph.get_node_name, graph.node_ids)),
+                ["a", "b", "c", "d", "e", "f"],
+            )
 
             self.assertEqual(out, None)
             self.assertEqual(
