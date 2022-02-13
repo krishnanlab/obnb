@@ -1056,6 +1056,15 @@ class TestOntologyGraph(unittest.TestCase):
             graph = OntologyGraph()
             out = graph.read_obo(obo_path)
 
+            self.assertEqual(
+                list(graph.node_ids),
+                ["ID:0", "ID:1", "ID:2", "ID:3", "ID:4", "ID:5"],
+            )
+            self.assertEqual(
+                list(map(graph.get_node_name, graph.node_ids)),
+                ["a", "b", "c", "d", "e", "f"],
+            )
+
             self.assertEqual(out, None)
             self.assertEqual(
                 graph._edge_data,

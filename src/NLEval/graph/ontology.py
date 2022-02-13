@@ -12,6 +12,7 @@ from typing import Tuple
 from typing import Union
 
 from ..util import idhandler
+from ..util.exceptions import IDNotExistError
 from ..util.exceptions import OboTermIncompleteError
 from .sparse import SparseGraph
 
@@ -239,6 +240,12 @@ class OntologyGraph(SparseGraph):
         with open(path, "r") as f:
             for term in self.iter_terms(f):
                 term_id, term_name, term_xrefs, term_parents = term
+
+                if term_id not in self.idmap:
+                    self.add_id(term_id)
+
+                if self.get_node_name(term_id) is None:
+                    self.set_node_name(term_id, term_name)
 
                 if term_parents is not None:
                     for parent_id in term_parents:
