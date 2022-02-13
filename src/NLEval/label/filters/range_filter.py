@@ -119,8 +119,7 @@ class LabelsetRangeFilterJaccard(BaseRangeFilter):
         Only support filtering with ``max_val``.
 
     Example:
-        >>> labelset_collection.apply(LabelsetRangeFilterSize(max_val=0.7),
-        >>>                           inplace=True)
+        >>> labelset_collection.iapply(LabelsetRangeFilterJaccard(max_val=0.7))
 
     """
 
@@ -139,9 +138,10 @@ class LabelsetRangeFilterJaccard(BaseRangeFilter):
                 if label_id2 == label_id:  # skip self
                     continue
                 labelset2 = lsc.get_labelset(label_id2)
-                jidx = len(labelset & labelset2) / len(labelset | labelset2)
-                if (jidx > val) & (len(labelset) >= len(labelset2)):
-                    val = jidx
+                if len(labelset) >= len(labelset2):
+                    unionsize = len(labelset | labelset2)
+                    jidx = len(labelset & labelset2) / unionsize
+                    val = max(val, jidx)
             return val
 
         return val_getter
