@@ -1,10 +1,14 @@
 import os
 import os.path as osp
+from typing import Dict
 from typing import Optional
 
 import ndex2
+import requests
 
+from ..graph import OntologyGraph
 from ..graph import SparseGraph
+from ..label import LabelsetCollection
 
 
 class BaseNdexData(SparseGraph):
@@ -16,7 +20,7 @@ class BaseNdexData(SparseGraph):
 
     uuid: Optional[str] = None
 
-    def __init__(self, root, weighted, directed, **kwargs):
+    def __init__(self, root: str, weighted: bool, directed: bool, **kwargs):
         """Initialize the BaseNdexData object.
 
         Args:
@@ -38,16 +42,16 @@ class BaseNdexData(SparseGraph):
             self.read_npz(self.processed_data_path, weighted, directed)
 
     @property
+    def name(self) -> str:
+        return self.__class__.__name__
+
+    @property
     def raw_data_path(self) -> str:
         return osp.join(self.raw_dir, "data.cx")
 
     @property
     def processed_data_path(self) -> str:
         return osp.join(self.processed_dir, "data.npz")
-
-    @property
-    def name(self) -> str:
-        return self.__class__.__name__
 
     @property
     def raw_dir(self) -> str:
@@ -75,6 +79,77 @@ class BaseNdexData(SparseGraph):
         os.makedirs(self.processed_dir, exist_ok=True)
 
         if not osp.isfile(self.raw_data_path):
+            print("Downloading...")
+            self.download()
+            return True
+
+        return False
+
+
+class BaseAnnotatedOntologyData(LabelsetCollection):
+
+    ontology_url: Optional[str] = None
+    annotation_url: Optional[str] = None
+
+    def __init__(self, root: str, **kwargs):
+        super().__init__()
+
+        self.root = root
+        if self._download():
+            print("Processing...")
+            self.process()
+            print("Done!")
+        else:
+            self.read_gmt(self.processed_data_path)
+
+    @property
+    def name(self) -> str:
+        return self.__class__.__name__
+
+    @property
+    def data_name_dict(self) -> Dict[str, str]:
+        raise NotImplementedError
+
+    @property
+    def ontology_data_path(self) -> str:
+        return osp.join(self.raw_dir, self.data_name_dict["ontology"])
+
+    @property
+    def annotation_data_path(self) -> str:
+        return osp.join(self.raw_dir, self.data_name_dict["annotation"])
+
+    @property
+    def processed_data_path(self) -> str:
+        return osp.join(self.processed_dir, "data.gmt")
+
+    @property
+    def raw_dir(self) -> str:
+        return cleandir(osp.join(self.root, self.name, "raw"))
+
+    @property
+    def processed_dir(self) -> str:
+        return cleandir(osp.join(self.root, self.name, "processed"))
+
+    def download_ontology(self):
+        resp = requests.get(self.ontology_url)
+        ontology_file_name = self.data_name_dict["ontology"]
+        with open(osp.join(self.raw_dir, ontology_file_name), "wb") as f:
+            f.write(resp.content)
+
+    def download_annotations(self):
+        raise NotImplementedError
+
+    def download(self):
+        self.download_ontology()
+        self.download_annotations()
+
+    def _download(self) -> bool:
+        """Download files if not all raw files are available."""
+        os.makedirs(self.raw_dir, exist_ok=True)
+        os.makedirs(self.processed_dir, exist_ok=True)
+
+        raw_files = [self.ontology_data_path, self.annotation_data_path]
+        if any(not osp.isfile(raw_file) for raw_file in raw_files):
             print("Downloading...")
             self.download()
             return True

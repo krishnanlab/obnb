@@ -27,6 +27,10 @@ class TestData(unittest.TestCase):
         self.assertEqual(graph.size, 8364)
         self.assertEqual(graph.num_edges, 71408)
 
+    @unittest.skip("Long process time")
+    def test_disgenet(self):
+        lsc = NLEval.data.DisGeNet(self.tmp_dir)
+
     @unittest.skip("Large file download")
     def test_funcoup(self):
         graph = NLEval.data.FunCoup(self.tmp_dir)
