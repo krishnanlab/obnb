@@ -77,6 +77,40 @@ class OntologyGraph(SparseGraph):
         """
         return self.idmap.get_property(self.get_node_id(node), "node_attr")
 
+    def _update_node_attr_partial(
+        self,
+        node: Union[str, int],
+        new_node_attr: Union[List[str], str],
+    ):
+        """Partially update the ndoe attributes of a node.
+
+        More specifically, only append or extend the node attribute list but
+        do not perform reduction and sort.
+
+        """
+        if not isinstance(new_node_attr, list):
+            new_node_attr = [new_node_attr]
+        if self.get_node_attr(node) is None:
+            self.set_node_attr(node, [])
+        self.get_node_attr(node).extend(new_node_attr)
+
+    def _update_node_attr_finalize(
+        self,
+        node: Optional[Union[str, int]] = None,
+    ):
+        """Finalize the node attributes update by reduction and sort.
+
+        If ``node`` is not set, finalize attributes for all nodes.
+
+        """
+        if node is not None:
+            node_attr = self.get_node_attr(node)
+            if node_attr is not None:
+                self.set_node_attr(node, sorted(set(node_attr)))
+        else:
+            for node_id in self.node_ids:
+                self._update_node_attr_finalize(node_id)
+
     def update_node_attr(
         self,
         node: Union[str, int],
@@ -91,10 +125,8 @@ class OntologyGraph(SparseGraph):
             new_node_attr (Union[List[str], str]): Node attribute(s) to update.
 
         """
-        if not isinstance(new_node_attr, list):
-            new_node_attr = [new_node_attr]
-        old_node_attr = self.get_node_attr(node) or []
-        self.set_node_attr(node, sorted(set(new_node_attr + old_node_attr)))
+        self._update_node_attr_partial(node, new_node_attr)
+        self._update_node_attr_finalize(node)
 
     def set_node_name(self, node: Union[str, int], node_name: str):
         """Set the name of a given node.

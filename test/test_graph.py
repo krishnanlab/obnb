@@ -993,6 +993,20 @@ class TestOntologyGraph(unittest.TestCase):
         graph.update_node_attr("b", ["a", "y"])
         self.assertEqual(graph.get_node_attr("b"), ["a", "x", "y", "z"])
 
+        graph._update_node_attr_partial("a", ["a", "x"])
+        self.assertEqual(graph.get_node_attr("a"), ["x", "y", "z", "a", "x"])
+        graph._update_node_attr_partial("b", "x")
+        self.assertEqual(graph.get_node_attr("b"), ["a", "x", "y", "z", "x"])
+
+        graph._update_node_attr_finalize("a")
+        self.assertEqual(graph.get_node_attr("a"), ["a", "x", "y", "z"])
+        self.assertEqual(graph.get_node_attr("b"), ["a", "x", "y", "z", "x"])
+
+        graph._update_node_attr_partial("a", ["a", "x"])
+        graph._update_node_attr_finalize()
+        self.assertEqual(graph.get_node_attr("a"), ["a", "x", "y", "z"])
+        self.assertEqual(graph.get_node_attr("b"), ["a", "x", "y", "z"])
+
     def test_complete_node_attrs(self):
         r"""
                 a
