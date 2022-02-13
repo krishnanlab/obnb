@@ -41,6 +41,25 @@ conda install pyg -c pyg -c conda-forge
 
 ## Quick Demonstration
 
+### Load network and labels
+
+Directly load the network and labels from online resouces.
+Once it is processed and saved to the specified root directory, next execution would use the saved processed files directly.
+
+```python
+from NLEval import data
+
+root = "datasets/"
+
+# Load BioGRID and save to datasets/
+g = data.BioGRID(root)
+
+# Load DisGeNet and save to datasets/
+g = data.DisGeNet(root)
+```
+
+Alternatively, could load from local files as shown in the following examplse.
+
 ### Setting up data and splits
 
 ```python
