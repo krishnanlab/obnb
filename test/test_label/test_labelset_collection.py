@@ -2,6 +2,7 @@ import os
 import unittest
 
 from commonvar import SAMPLE_DATA_DIR
+from NLEval.graph import OntologyGraph
 from NLEval.label import LabelsetCollection
 from NLEval.util.exceptions import IDExistsError
 from NLEval.util.exceptions import IDNotExistError
@@ -348,6 +349,28 @@ class TestLabelsetCollection(unittest.TestCase):
 
         y = lsc.get_y(("a", "c", "b", "x", "f", "h"))
         self.assertEqual(y.T.tolist(), [[1, 1, 0, 0, 0, 1], [0, 0, 1, 0, 1, 0]])
+
+    def test_read_ontology_graph(self):
+        graph = OntologyGraph()
+        graph.add_id("a")
+        graph.add_id("b")
+        graph.set_node_name("a", "A")
+        graph.set_node_name("b", "B")
+        graph.set_node_attr("a", ["x", "y"])
+        graph.set_node_attr("b", ["a", "y", "z"])
+
+        lsc = LabelsetCollection()
+        lsc.read_ontology_graph(graph, min_size=1)
+        self.assertEqual(lsc.get_labelset("a"), {"x", "y"})
+        self.assertEqual(lsc.get_labelset("b"), {"a", "y", "z"})
+        self.assertEqual(lsc.get_info("a"), "A")
+        self.assertEqual(lsc.get_info("b"), "B")
+
+        lsc = LabelsetCollection()
+        lsc.read_ontology_graph(graph, min_size=3)
+        self.assertEqual(lsc.get_labelset("b"), {"a", "y", "z"})
+        self.assertEqual(lsc.get_info("b"), "B")
+        self.assertFalse("a" in lsc.label_ids)
 
 
 if __name__ == "__main__":

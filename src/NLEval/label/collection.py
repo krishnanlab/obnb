@@ -9,6 +9,7 @@ from typing import Tuple
 
 import numpy as np
 
+from ..graph import OntologyGraph
 from ..util import checkers
 from ..util import idhandler
 from ..util.exceptions import IDExistsError
@@ -573,6 +574,30 @@ class LabelsetCollection(idhandler.IDprop):
                 if entity_id not in self.entity:
                     self.entity.add_id(entity_id)
                 self.entity.set_property(entity_id, prop_name, interpreter(val))
+
+    def read_ontology_graph(
+        self,
+        graph: OntologyGraph,
+        propagate_annotations: bool = True,
+        min_size: int = 10,
+    ):
+        """Load labelset collection from an annotated ontology graph.
+        Args:
+            graph (OntologyGraph): The annotated ontology graph to be read.
+            propagate_annotation (bool): If true, propagate the annotations
+                of the ontoloty terms upwards before reading (default:
+                :obj:`True`).
+            min_size (int): Minimum number of positive examples in order to be
+                loaded as a label set (default: 10).
+        """
+        if propagate_annotations:
+            graph.complete_node_attrs()
+
+        for label_id in graph.node_ids:
+            label_info = graph.get_node_name(label_id)
+            label_set = graph.get_node_attr(label_id) or []
+            if len(label_set) >= min_size:
+                self.add_labelset(label_set, label_id, label_info)
 
     def read_gmt(self, path: str, sep: str = "\t"):
         """Load data from Gene Matrix Transpose `.gmt` file.
