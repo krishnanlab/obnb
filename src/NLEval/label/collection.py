@@ -574,8 +574,7 @@ class LabelsetCollection(idhandler.IDprop):
                     self.entity.add_id(entity_id)
                 self.entity.set_property(entity_id, prop_name, interpreter(val))
 
-    @classmethod
-    def from_gmt(cls, fp: str, sep: str = "\t"):
+    def read_gmt(self, fp: str, sep: str = "\t"):
         """Load data from Gene Matrix Transpose `.gmt` file.
 
         Args:
@@ -583,11 +582,22 @@ class LabelsetCollection(idhandler.IDprop):
             sep: seperator used in the GMT file.
 
         """
-        lsc = cls()
         with open(fp, "r") as f:
             for line in f:
                 label_id, label_info, *lst = line.strip().split(sep)
-                lsc.add_labelset(lst, label_id, label_info)
+                self.add_labelset(lst, label_id, label_info)
+
+    @classmethod
+    def from_gmt(cls, fp: str, sep: str = "\t"):
+        """Construct LabelsetCollection object from GMT file.
+
+        Args:
+            fp: path to the `.gmt` file.
+            sep: seperator used in the GMT file.
+
+        """
+        lsc = cls()
+        lsc.read_gmt(fp, sep=sep)
         return lsc
 
     @classmethod
