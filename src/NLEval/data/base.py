@@ -6,7 +6,6 @@ from typing import Optional
 import ndex2
 import requests
 
-from ..graph import OntologyGraph
 from ..graph import SparseGraph
 from ..label import LabelsetCollection
 
@@ -87,11 +86,13 @@ class BaseNdexData(SparseGraph):
 
 
 class BaseAnnotatedOntologyData(LabelsetCollection):
+    """General object for labelset collection from annotated ontology."""
 
     ontology_url: Optional[str] = None
     annotation_url: Optional[str] = None
 
     def __init__(self, root: str, **kwargs):
+        """Initialize the BaseAnnotatedOntologyData object."""
         super().__init__()
 
         self.root = root
@@ -131,15 +132,18 @@ class BaseAnnotatedOntologyData(LabelsetCollection):
         return cleandir(osp.join(self.root, self.name, "processed"))
 
     def download_ontology(self):
+        """Download ontology from obo foundary."""
         resp = requests.get(self.ontology_url)
         ontology_file_name = self.data_name_dict["ontology"]
         with open(osp.join(self.raw_dir, ontology_file_name), "wb") as f:
             f.write(resp.content)
 
     def download_annotations(self):
+        """Download annotations."""
         raise NotImplementedError
 
     def download(self):
+        """Download the ontology and annotations."""
         self.download_ontology()
         self.download_annotations()
 
@@ -158,4 +162,5 @@ class BaseAnnotatedOntologyData(LabelsetCollection):
 
 
 def cleandir(rawdir: str) -> str:
+    """Expand user and truncate relative paths."""
     return osp.expanduser(osp.normpath(rawdir))

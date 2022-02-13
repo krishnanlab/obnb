@@ -15,6 +15,19 @@ from .base import BaseAnnotatedOntologyData
 
 
 class DisGeNet(BaseAnnotatedOntologyData):
+    """DisGeNet disease gene annotations.
+
+    Disease gene associations are retreived from disgenet.org and then mapped
+    to the disease ontology from obofoundry.org. The annotations are propagated
+    upwards the ontology. Then, several filters are applied to reduce the
+    redundancies between labelsets (disease genes):
+    - Disease specificity index (DSI) filter
+    - Max size filter
+    - Min size filter
+    - Jaccard index filter
+    - Overlap coefficient filter
+
+    """
 
     ontology_url = "http://purl.obolibrary.org/obo/doid.obo"
     annotation_url = "https://www.disgenet.org/static/disgenet_ap1/files/downloads/all_gene_disease_associations.tsv.gz"
@@ -28,6 +41,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
         jaccard: float = 0.5,
         overlap: float = 0.7,
     ):
+        """Initialize the DisGeNet object."""
         self.dsi_threshold = dsi_threshold
         self.min_size = min_size
         self.max_size = max_size
@@ -59,10 +73,10 @@ class DisGeNet(BaseAnnotatedOntologyData):
         sub_df = annot_df[annot_df["DSI"] <= self.dsi_threshold]
         pbar = tqdm(sub_df[["geneId", "diseaseId"]].values)
         pbar.set_description("Annotating DOIDs")
-        for geneId, diseaseId in pbar:
-            for doid in umls_to_doid[diseaseId]:
+        for gene_id, disease_id in pbar:
+            for doid in umls_to_doid[disease_id]:
                 try:
-                    g._update_node_attr_partial(doid, str(geneId))
+                    g._update_node_attr_partial(doid, str(gene_id))
                 except IDNotExistError:
                     pass
         g._update_node_attr_finalize()

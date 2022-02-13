@@ -582,6 +582,7 @@ class LabelsetCollection(idhandler.IDprop):
         min_size: int = 10,
     ):
         """Load labelset collection from an annotated ontology graph.
+
         Args:
             graph (OntologyGraph): The annotated ontology graph to be read.
             propagate_annotation (bool): If true, propagate the annotations

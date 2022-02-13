@@ -12,7 +12,6 @@ from typing import Tuple
 from typing import Union
 
 from ..util import idhandler
-from ..util.exceptions import IDNotExistError
 from ..util.exceptions import OboTermIncompleteError
 from .sparse import SparseGraph
 
