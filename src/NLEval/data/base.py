@@ -1,9 +1,10 @@
 import os
 import os.path as osp
+from typing import Optional
 
 import ndex2
 
-from ..graph.sparse import SparseGraph
+from ..graph import SparseGraph
 
 
 class BaseNdexData(SparseGraph):
@@ -12,6 +13,8 @@ class BaseNdexData(SparseGraph):
     www.ndexbio.org
 
     """
+
+    uuid: Optional[str] = None
 
     def __init__(self, root, weighted, directed, **kwargs):
         """Initialize the BaseNdexData object.
@@ -43,12 +46,16 @@ class BaseNdexData(SparseGraph):
         return osp.join(self.processed_dir, "data.npz")
 
     @property
+    def name(self) -> str:
+        return self.__class__.__name__
+
+    @property
     def raw_dir(self) -> str:
-        return osp.join(self.root, self.__class__.__name__, "raw")
+        return cleandir(osp.join(self.root, self.name, "raw"))
 
     @property
     def processed_dir(self) -> str:
-        return osp.join(self.root, self.__class__.__name__, "processed")
+        return cleandir(osp.join(self.root, self.name, "processed"))
 
     def download(self):
         """Download data from NDEX via ndex2 client."""
@@ -64,9 +71,8 @@ class BaseNdexData(SparseGraph):
             bool: False if already downloaded, otherwise True.
 
         """
-        if not osp.isdir(self.raw_dir):
-            os.makedirs(osp.expanduser(osp.normpath(self.raw_dir)))
-            os.makedirs(osp.expanduser(osp.normpath(self.processed_dir)))
+        os.makedirs(self.raw_dir, exist_ok=True)
+        os.makedirs(self.processed_dir, exist_ok=True)
 
         if not osp.isfile(self.raw_data_path):
             print("Downloading...")
@@ -74,3 +80,7 @@ class BaseNdexData(SparseGraph):
             return True
 
         return False
+
+
+def cleandir(rawdir: str) -> str:
+    return osp.expanduser(osp.normpath(rawdir))
