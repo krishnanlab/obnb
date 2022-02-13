@@ -82,12 +82,7 @@ class OntologyGraph(SparseGraph):
         node: Union[str, int],
         new_node_attr: Union[List[str], str],
     ):
-        """Partially update the ndoe attributes of a node.
-
-        More specifically, only append or extend the node attribute list but
-        do not perform reduction and sort.
-
-        """
+        """Update the ndoe attributes of a node without reduction and sort."""
         if not isinstance(new_node_attr, list):
             new_node_attr = [new_node_attr]
         if self.get_node_attr(node) is None:
