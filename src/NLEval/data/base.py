@@ -147,6 +147,10 @@ class BaseAnnotatedOntologyData(LabelsetCollection):
         self.download_ontology()
         self.download_annotations()
 
+    def process(self):
+        """Process raw data and save as gmt for future usage."""
+        raise NotImplementedError
+
     def _download(self) -> bool:
         """Download files if not all raw files are available."""
         os.makedirs(self.raw_dir, exist_ok=True)
