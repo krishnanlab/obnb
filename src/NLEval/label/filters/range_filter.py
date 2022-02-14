@@ -31,6 +31,10 @@ class BaseRangeFilter(BaseFilter):
         self.min_val = min_val
         self.max_val = max_val
 
+    def __repr__(self):
+        min_val, max_val = self.min_val, self.max_val
+        return f"{super().__repr__()}({min_val=}, {max_val=})"
+
     def criterion(self, val):
         if self.min_val is not None:
             if val < self.min_val:

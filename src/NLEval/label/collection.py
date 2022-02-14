@@ -439,16 +439,23 @@ class LabelsetCollection(idhandler.IDprop):
 
         return y_out, masks
 
-    def apply(self, filter_func, inplace=False):
+    def apply(
+        self,
+        filter_func,
+        inplace: bool = False,
+        progress_bar: bool = False,
+    ):
         """Apply filter to labelsets.
 
         See `NLEval.label.filters` for more info.
 
         Args:
             filter_func
-            inplace(bool): whether or not to modify original object
+            inplace (bool): whether or not to modify original object
                 - `True`: apply filter directly on the original object
                 - `False`: apply filter on a copy of the original object
+            progress_bar (bool): whether or not to display progress bar for
+                filtering (default: :obj:`False`)
 
         Returns:
             Labelset coolection object after filtering.
@@ -461,16 +468,16 @@ class LabelsetCollection(idhandler.IDprop):
         )
         checkers.checkType("inplace", bool, inplace)
         obj = self if inplace else self.copy()
-        filter_func(obj)
+        filter_func(obj, progress_bar)
         return obj
 
-    def iapply(self, filter_func):
+    def iapply(self, filter_func, progress_bar: bool = False):
         """Apply filter to labelsets inplace.
 
         This is a shortcut for calling self.apply(filter_func, inplace=True).
 
         """
-        self.apply(filter_func, inplace=True)
+        self.apply(filter_func, inplace=True, progress_bar=progress_bar)
 
     def export(self, path):
         """Export self as a '.lsc' file.

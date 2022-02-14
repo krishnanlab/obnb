@@ -30,6 +30,10 @@ class NegativeGeneratorHypergeom(BaseFilter):
         """
         self.p_thresh = p_thresh
 
+    def __repr__(self):
+        p_thresh = self.p_thresh
+        return f"{super().__repr__}({p_thresh=})"
+
     def __call__(self, lsc):
         label_ids = lsc.label_ids
         num_labelsets = len(label_ids)

@@ -17,5 +17,9 @@ class BaseValueFilter(BaseFilter):
         self.val = val
         self.remove = remove
 
+    def __repr__(self):
+        val, remove = self.val, self.remove
+        return f"{super().__repr__()}({val=}, {remove=})"
+
     def criterion(self, val):
         return True if (val == self.val) is self.remove else False
