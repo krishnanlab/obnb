@@ -451,11 +451,12 @@ class LabelsetCollection(idhandler.IDprop):
 
         Args:
             filter_func
-            inplace (bool): whether or not to modify original object
-                - `True`: apply filter directly on the original object
-                - `False`: apply filter on a copy of the original object
+            inplace (bool): whether or not to modify original object, if True,
+                then apply the filter directly on the original object;
+                otherwise, apply the filter on a copy of the original object
+                and return that object (default: :obj:`False`).
             progress_bar (bool): whether or not to display progress bar for
-                filtering (default: :obj:`False`)
+                filtering (default: :obj:`False`).
 
         Returns:
             Labelset coolection object after filtering.
