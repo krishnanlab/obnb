@@ -31,6 +31,7 @@ class NegativeGeneratorHypergeom(BaseFilter):
         self.p_thresh = p_thresh
 
     def __repr__(self):
+        """Return name of the NegativeGeneratorHypergeom and its parameters."""
         p_thresh = self.p_thresh
         return f"{super().__repr__}({p_thresh=})"
 

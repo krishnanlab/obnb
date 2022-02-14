@@ -18,6 +18,7 @@ class BaseValueFilter(BaseFilter):
         self.remove = remove
 
     def __repr__(self):
+        """Return name of the ValueFilter and its parameters."""
         val, remove = self.val, self.remove
         return f"{super().__repr__()}({val=}, {remove=})"
 

@@ -24,6 +24,7 @@ class BaseExistenceFilter(BaseFilter):
         self.remove_specified = remove_specified
 
     def __repr__(self):
+        """Return name of the ExistenceFilter and its parameters."""
         remove_specified = self.remove_specified
         return f"{super().__repr__()}({remove_specified=})"
 

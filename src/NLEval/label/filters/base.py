@@ -22,9 +22,10 @@ class BaseFilter:
     """
 
     def __repr__(self):
+        """Return name of the filer."""
         return self.__class__.__name__
 
-    def __call__(self, lsc, progress_bar: bool = False):
+    def __call__(self, lsc, progress_bar):
         entity_ids = self.get_ids(lsc)
         val_getter = self.get_val_getter(lsc)
         mod_fun = self.get_mod_fun(lsc)

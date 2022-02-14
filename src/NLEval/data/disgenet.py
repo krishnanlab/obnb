@@ -56,6 +56,15 @@ class DisGeNet(BaseAnnotatedOntologyData):
             "annotation": "all_gene_disease_associations.tsv",
         }
 
+    @property
+    def filters(self):
+        return [
+            LabelsetRangeFilterSize(max_val=self.max_size),
+            LabelsetRangeFilterJaccard(self.jaccard),
+            LabelsetRangeFilterOverlap(self.overlap),
+            LabelsetRangeFilterSize(min_val=self.min_size),
+        ]
+
     def download_annotations(self):
         resp = requests.get(self.annotation_url)
         annotation_file_name = self.data_name_dict["annotation"]
@@ -87,21 +96,9 @@ class DisGeNet(BaseAnnotatedOntologyData):
         self.read_ontology_graph(g, min_size=self.min_size)
         print(self.stats())
 
-        self.iapply(LabelsetRangeFilterSize(max_val=self.max_size))
-        print(f"\nFilter based on max size ({self.max_size})")
-        print(self.stats())
-
-        self.iapply(LabelsetRangeFilterJaccard(self.jaccard))
-        print(f"\nFilter based on Jaccard ({self.jaccard})")
-        print(self.stats())
-
-        self.iapply(LabelsetRangeFilterOverlap(self.overlap))
-        print(f"\nFilter based on Overlap ({self.overlap})")
-        print(self.stats())
-
-        self.iapply(LabelsetRangeFilterSize(min_val=self.min_size))
-        print(f"\nFilter based on min size ({self.min_size})")
-        print(self.stats())
+        for filter_ in self.filters:
+            self.iapply(filter_, progress_bar=True)
+            print(self.stats())
 
         print("Saving processed gmt...")
         self.export_gmt(self.processed_data_path)

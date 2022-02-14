@@ -32,6 +32,7 @@ class BaseRangeFilter(BaseFilter):
         self.max_val = max_val
 
     def __repr__(self):
+        """Return name of the RangeFilter and its parameters."""
         min_val, max_val = self.min_val, self.max_val
         return f"{super().__repr__()}({min_val=}, {max_val=})"
 
