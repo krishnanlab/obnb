@@ -79,7 +79,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
         )
         annot_df = pd.read_csv(self.annotation_data_path, sep="\t")
 
-        sub_df = annot_df[annot_df["DSI"] <= self.dsi_threshold]
+        sub_df = annot_df[annot_df["DSI"] >= self.dsi_threshold]
         pbar = tqdm(sub_df[["geneId", "diseaseId"]].values)
         pbar.set_description("Annotating DOIDs")
         for gene_id, disease_id in pbar:
