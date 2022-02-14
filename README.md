@@ -55,7 +55,7 @@ root = "datasets/"
 g = data.BioGRID(root)
 
 # Load DisGeNet and save to datasets/
-g = data.DisGeNet(root)
+lsc = data.DisGeNet(root)
 ```
 
 Alternatively, could load from local files as shown in the following examplse.
