@@ -184,8 +184,7 @@ class LabelsetRangeFilterOverlap(BaseRangeFilter):
                     continue
                 labelset2 = lsc.get_labelset(label_id2)
                 if len(labelset) >= len(labelset2):
-                    minsize = min(len(labelset), len(labelset2))
-                    ovlpt = len(labelset & labelset2) / minsize
+                    ovlpt = len(labelset & labelset2) / len(labelset2)
                     val = max(val, ovlpt)
             return val
 
