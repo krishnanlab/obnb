@@ -1,3 +1,6 @@
+from tqdm import tqdm
+
+
 class BaseFilter:
     """Base Filter object containing basic filter operations.
 
@@ -18,11 +21,17 @@ class BaseFilter:
 
     """
 
-    def __call__(self, lsc):
+    def __repr__(self):
+        """Return name of the filer."""
+        return self.__class__.__name__
+
+    def __call__(self, lsc, progress_bar):
         entity_ids = self.get_ids(lsc)
         val_getter = self.get_val_getter(lsc)
         mod_fun = self.get_mod_fun(lsc)
 
-        for entity_id in entity_ids:
+        pbar = tqdm(entity_ids, disable=not progress_bar)
+        pbar.set_description(f"{self!r}")
+        for entity_id in pbar:
             if self.criterion(val_getter(entity_id)):
                 mod_fun(entity_id)

@@ -31,6 +31,11 @@ class BaseRangeFilter(BaseFilter):
         self.min_val = min_val
         self.max_val = max_val
 
+    def __repr__(self):
+        """Return name of the RangeFilter and its parameters."""
+        min_val, max_val = self.min_val, self.max_val
+        return f"{super().__repr__()}({min_val=}, {max_val=})"
+
     def criterion(self, val):
         if self.min_val is not None:
             if val < self.min_val:
@@ -184,8 +189,7 @@ class LabelsetRangeFilterOverlap(BaseRangeFilter):
                     continue
                 labelset2 = lsc.get_labelset(label_id2)
                 if len(labelset) >= len(labelset2):
-                    minsize = min(len(labelset), len(labelset2))
-                    ovlpt = len(labelset & labelset2) / minsize
+                    ovlpt = len(labelset & labelset2) / len(labelset2)
                     val = max(val, ovlpt)
             return val
 

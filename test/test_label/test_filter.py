@@ -359,6 +359,37 @@ class TestFilter(unittest.TestCase):
                 ["Group2", "Group5"],
             )
 
+    def test_LabelsetRangeFilterOverlap(self):
+        with self.subTest(min_val=0.9):
+            lsc = self.lsc.apply(
+                filters.LabelsetRangeFilterOverlap(max_val=0.9),
+                inplace=False,
+            )
+            self.assertEqual(
+                lsc.label_ids,
+                ["Group1", "Group2", "Group3", "Group4", "Group5"],
+            )
+
+        with self.subTest(min_val=0.6):
+            lsc = self.lsc.apply(
+                filters.LabelsetRangeFilterOverlap(max_val=0.6),
+                inplace=False,
+            )
+            self.assertEqual(
+                lsc.label_ids,
+                ["Group2", "Group3", "Group4", "Group5"],
+            )
+
+        with self.subTest(min_val=0.3):
+            lsc = self.lsc.apply(
+                filters.LabelsetRangeFilterOverlap(max_val=0.3),
+                inplace=False,
+            )
+            self.assertEqual(
+                lsc.label_ids,
+                ["Group2", "Group5"],
+            )
+
     def test_LabelsetRangeFilterSplit(self):
         # Setup mock properties for generating splits
         self.lsc.entity.new_property("test_property", 0, int)

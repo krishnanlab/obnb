@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.stats import hypergeom
+from tqdm import tqdm
 
 from .base import BaseFilter
 
@@ -30,7 +31,12 @@ class NegativeGeneratorHypergeom(BaseFilter):
         """
         self.p_thresh = p_thresh
 
-    def __call__(self, lsc):
+    def __repr__(self):
+        """Return name of the NegativeGeneratorHypergeom and its parameters."""
+        p_thresh = self.p_thresh
+        return f"{self.__class__.__name__}({p_thresh=})"
+
+    def __call__(self, lsc, progress_bar):
         label_ids = lsc.label_ids
         num_labelsets = len(label_ids)
         # set of all entities in the labelset collection
@@ -69,7 +75,9 @@ class NegativeGeneratorHypergeom(BaseFilter):
 
         pval_mat = get_pval_mat()
 
-        for i, label_id1 in enumerate(label_ids):
+        pbar = tqdm(label_ids, disable=not progress_bar)
+        pbar.set_description(f"{self!r}")
+        for i, label_id1 in enumerate(pbar):
             exclude_set = lsc.get_labelset(label_id1).copy()
 
             for j, label_id2 in enumerate(label_ids):

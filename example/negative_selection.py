@@ -13,7 +13,10 @@ p_thresh = 0.05
 lsc_orig = LabelsetCollection.from_gmt(LABEL_FP)
 
 # apply negative selection filter
-lsc = lsc_orig.apply(filters.NegativeGeneratorHypergeom(p_thresh))
+lsc = lsc_orig.apply(
+    filters.NegativeGeneratorHypergeom(p_thresh),
+    progress_bar=True,
+)
 
 print(f"p-val threshold = {p_thresh:.2f}")
 print("Compring the number of negatives before and after filtering")
