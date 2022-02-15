@@ -55,7 +55,7 @@ class BaseLabelsetPairwiseFilter(BaseRangeFilter):
     def size_constraint(self, size_constraint):
         if size_constraint not in ["larger", "smaller", "none"]:
             raise ValueError(
-                f"Unknown value for size_constraint: {size_constrint!r}, "
+                f"Unknown value for size_constraint: {size_constraint!r}, "
                 "accepted values are 'larger' or 'smaller'.",
             )
         self._size_constraint = size_constraint
