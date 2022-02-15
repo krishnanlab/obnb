@@ -7,8 +7,8 @@ import requests
 from tqdm import tqdm
 
 from ..graph import OntologyGraph
-from ..label.filters import LabelsetRangeFilterJaccard
-from ..label.filters import LabelsetRangeFilterOverlap
+from ..label.filters import LabelsetPairwiseFilterJaccard
+from ..label.filters import LabelsetPairwiseFilterOverlap
 from ..label.filters import LabelsetRangeFilterSize
 from ..util.exceptions import IDNotExistError
 from .base import BaseAnnotatedOntologyData
@@ -60,8 +60,16 @@ class DisGeNet(BaseAnnotatedOntologyData):
     def filters(self):
         return [
             LabelsetRangeFilterSize(max_val=self.max_size),
-            LabelsetRangeFilterJaccard(self.jaccard),
-            LabelsetRangeFilterOverlap(self.overlap),
+            LabelsetPairwiseFilterJaccard(
+                self.jaccard,
+                size_constraint="smaller",
+                inclusive=True,
+            ),
+            LabelsetPairwiseFilterOverlap(
+                self.overlap,
+                size_constraint="smaller",
+                inclusive=True,
+            ),
             LabelsetRangeFilterSize(min_val=self.min_size),
         ]
 
