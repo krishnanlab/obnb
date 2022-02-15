@@ -1,5 +1,7 @@
 from typing import Set
 
+import numpy as np
+
 from .range_filter import BaseRangeFilter
 
 
@@ -77,7 +79,6 @@ class BaseLabelsetPairwiseFilter(BaseRangeFilter):
 
     def get_val_getter(self, lsc):
         def val_getter(label_id):
-            max_score = 0
             labelset = lsc.get_labelset(label_id)
             for label_id2 in lsc.label_ids:
                 if label_id2 == label_id:  # skip self
@@ -85,8 +86,10 @@ class BaseLabelsetPairwiseFilter(BaseRangeFilter):
                 labelset2 = lsc.get_labelset(label_id2)
                 if self.comparable(labelset, labelset2):
                     score = self.compute_pairwise_score(labelset, labelset2)
-                    max_score = max(max_score, score)
-            return max_score
+                    # Immediately return if the score exists the threshold
+                    if score > self.max_val:
+                        return score
+            return -np.inf
 
         return val_getter
 
