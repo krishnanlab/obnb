@@ -321,10 +321,13 @@ class TestFilter(unittest.TestCase):
             self.assertEqual(lsc.prop["Labelset"], [])
             self.assertEqual(lsc.entity.map, {})
 
-    def test_LabelsetRangeFilterJaccard(self):
+    def test_LabelsetPairwiseFilterJaccard(self):
         with self.subTest(min_val=0.9):
             lsc = self.lsc.apply(
-                filters.LabelsetRangeFilterJaccard(max_val=0.9),
+                filters.LabelsetPairwiseFilterJaccard(
+                    max_val=0.9,
+                    size_constraint="larger",
+                ),
                 inplace=False,
             )
             self.assertEqual(
@@ -333,7 +336,10 @@ class TestFilter(unittest.TestCase):
             )
         with self.subTest(min_val=0.4):
             lsc = self.lsc.apply(
-                filters.LabelsetRangeFilterJaccard(max_val=0.4),
+                filters.LabelsetPairwiseFilterJaccard(
+                    max_val=0.4,
+                    size_constraint="larger",
+                ),
                 inplace=False,
             )
             self.assertEqual(
@@ -342,7 +348,10 @@ class TestFilter(unittest.TestCase):
             )
         with self.subTest(min_val=0.2):
             lsc = self.lsc.apply(
-                filters.LabelsetRangeFilterJaccard(max_val=0.2),
+                filters.LabelsetPairwiseFilterJaccard(
+                    max_val=0.2,
+                    size_constraint="larger",
+                ),
                 inplace=False,
             )
             self.assertEqual(
@@ -351,7 +360,10 @@ class TestFilter(unittest.TestCase):
             )
         with self.subTest(min_val=0):
             lsc = self.lsc.apply(
-                filters.LabelsetRangeFilterJaccard(max_val=0),
+                filters.LabelsetPairwiseFilterJaccard(
+                    max_val=0,
+                    size_constraint="larger",
+                ),
                 inplace=False,
             )
             self.assertEqual(
@@ -359,10 +371,13 @@ class TestFilter(unittest.TestCase):
                 ["Group2", "Group5"],
             )
 
-    def test_LabelsetRangeFilterOverlap(self):
+    def test_LabelsetPairwiseFilterOverlap(self):
         with self.subTest(min_val=0.9):
             lsc = self.lsc.apply(
-                filters.LabelsetRangeFilterOverlap(max_val=0.9),
+                filters.LabelsetPairwiseFilterOverlap(
+                    max_val=0.9,
+                    size_constraint="larger",
+                ),
                 inplace=False,
             )
             self.assertEqual(
@@ -372,7 +387,10 @@ class TestFilter(unittest.TestCase):
 
         with self.subTest(min_val=0.6):
             lsc = self.lsc.apply(
-                filters.LabelsetRangeFilterOverlap(max_val=0.6),
+                filters.LabelsetPairwiseFilterOverlap(
+                    max_val=0.6,
+                    size_constraint="larger",
+                ),
                 inplace=False,
             )
             self.assertEqual(
@@ -382,7 +400,10 @@ class TestFilter(unittest.TestCase):
 
         with self.subTest(min_val=0.3):
             lsc = self.lsc.apply(
-                filters.LabelsetRangeFilterOverlap(max_val=0.3),
+                filters.LabelsetPairwiseFilterOverlap(
+                    max_val=0.3,
+                    size_constraint="larger",
+                ),
                 inplace=False,
             )
             self.assertEqual(
