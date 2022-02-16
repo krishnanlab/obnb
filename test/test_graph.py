@@ -1124,15 +1124,22 @@ class TestOntologyGraph(unittest.TestCase):
         """
         graph = OntologyGraph()
 
-        graph.add_edge("a", "b")
-        graph.add_edge("a", "c")
-        graph.add_edge("a", "d")
-        graph.add_edge("b", "e")
-        graph.add_edge("c", "f")
+        graph.add_id(["a", "b", "c", "d", "e", "f"])
+
+        graph.add_edge("b", "a")
+        graph.add_edge("c", "a")
+        graph.add_edge("d", "a")
+        graph.add_edge("e", "b")
+        graph.add_edge("f", "c")
+
+        self.assertEqual(
+            graph._rev_edge_data,
+            [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {}, {}, {}],
+        )
 
         self.assertEqual(
             graph._edge_data,
-            [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {}, {}, {}],
+            [{}, {0: 1}, {0: 1}, {0: 1}, {1: 1}, {2: 1}],
         )
 
         graph.set_node_attr("d", ["x"])
@@ -1174,7 +1181,7 @@ class TestOntologyGraph(unittest.TestCase):
 
             self.assertEqual(out, None)
             self.assertEqual(
-                graph._edge_data,
+                graph._rev_edge_data,
                 [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {5: 1}, {}, {}],
             )
 
@@ -1187,7 +1194,7 @@ class TestOntologyGraph(unittest.TestCase):
                 {"x": {"ID:2"}, "y": {"ID:2"}, "z": {"ID:4"}},
             )
             self.assertEqual(
-                graph._edge_data,
+                graph._rev_edge_data,
                 [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {5: 1}, {}, {}],
             )
 
@@ -1198,7 +1205,7 @@ class TestOntologyGraph(unittest.TestCase):
 
             self.assertEqual(dict(out), {})
             self.assertEqual(
-                graph._edge_data,
+                graph._rev_edge_data,
                 [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {5: 1}, {}, {}],
             )
 

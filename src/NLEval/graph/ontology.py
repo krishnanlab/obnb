@@ -13,24 +13,29 @@ from typing import Union
 
 from ..util import idhandler
 from ..util.exceptions import OboTermIncompleteError
-from .sparse import SparseGraph
+from .sparse import DirectedSparseGraph
 
 Term = Tuple[str, str, Optional[List[str]], Optional[List[str]]]
 
 
-class OntologyGraph(SparseGraph):
+class OntologyGraph(DirectedSparseGraph):
     """Ontology graph.
 
-    Note:
-        For the ease of node attributes propagation upwards, the direction of
-        an edge is from the parent node to the children node, instead of the
-        other way around, which is the usual setting.
+    An ontology graph is a directed acyclic graph (DAG). Here, we represent
+    this data type using DirectedSparseGraph, which keeps track of both the
+    forward direction of edges (``_edge_data``) and the reversed direction of
+    edges (``_rev_edge_data``). This bidirectional awareness is useful in the
+    context of propagating information "upwards" or "downloads".
+
+    The ``idmap`` attribute is swapped with a more functional ``IDProp``
+    object that allows the storing of node informations such as name and
+    node attributes.
 
     """
 
     def __init__(self):
         """Initialize the ontology graph."""
-        super().__init__(weighted=False, directed=True)
+        super().__init__()
         self.idmap = idhandler.IDprop()
         self.idmap.new_property("node_attr", default_val=None)
         self.idmap.new_property("node_name", default_val=None)
@@ -145,12 +150,12 @@ class OntologyGraph(SparseGraph):
     @functools.lru_cache(maxsize=None)
     def _aggregate_node_attrs(self, node_idx: int) -> List[str]:
         node_attr: Iterable[str]
-        if len(self._edge_data[node_idx]) == 0:  # is leaf node
+        if len(self._rev_edge_data[node_idx]) == 0:  # is leaf node
             node_attr = self.get_node_attr(node_idx) or []
         else:
             children_attrs = [
                 self._aggregate_node_attrs(nbr_idx)
-                for nbr_idx in self._edge_data[node_idx]
+                for nbr_idx in self._rev_edge_data[node_idx]
             ]
             self_attrs = self.get_node_attr(node_idx) or []
             node_attr = itertools.chain(*children_attrs, self_attrs)
@@ -240,15 +245,14 @@ class OntologyGraph(SparseGraph):
             for term in self.iter_terms(f):
                 term_id, term_name, term_xrefs, term_parents = term
 
-                if term_id not in self.idmap:
-                    self.add_id(term_id)
+                self._default_add_id(term_id)
 
                 if self.get_node_name(term_id) is None:
                     self.set_node_name(term_id, term_name)
 
                 if term_parents is not None:
                     for parent_id in term_parents:
-                        self.add_edge(parent_id, term_id)
+                        self.add_edge(term_id, parent_id)
 
                 if xref_prefix is not None and term_xrefs is not None:
                     for xref in term_xrefs:
