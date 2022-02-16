@@ -1168,6 +1168,32 @@ class TestOntologyGraph(unittest.TestCase):
         self.assertEqual(graph.get_node_attr("f"), ["z"])
         self.assertEqual(graph.get_node_attr("g"), ["z"])
 
+    def test_ancestors(self):
+        r"""
+           a
+        /  |  \
+        b  c   d
+        |  |  /
+        e  f
+        """
+        graph = OntologyGraph()
+
+        graph.add_id(["a", "b", "c", "d", "e", "f"])
+
+        graph.add_edge("b", "a")
+        graph.add_edge("c", "a")
+        graph.add_edge("d", "a")
+        graph.add_edge("e", "b")
+        graph.add_edge("f", "c")
+        graph.add_edge("f", "d")
+
+        self.assertEqual(graph.ancestors("a"), set())
+        self.assertEqual(graph.ancestors("b"), {"a"})
+        self.assertEqual(graph.ancestors("c"), {"a"})
+        self.assertEqual(graph.ancestors("d"), {"a"})
+        self.assertEqual(graph.ancestors("e"), {"a", "b"})
+        self.assertEqual(graph.ancestors("f"), {"a", "c", "d"})
+
     def test_read_obo(self):
         r"""
                a

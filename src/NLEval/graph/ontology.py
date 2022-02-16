@@ -46,6 +46,20 @@ class OntologyGraph(DirectedSparseGraph):
         """Hash the ontology graph based on edge statistics."""
         return hash(tuple(len(i) for i in self._edge_data))
 
+    @functools.lru_cache
+    def ancestors(self, node: Union[str, int]) -> Set[str]:
+        """Return the ancestor nodes of a given node."""
+        node_idx = self.get_node_idx(node)
+        if len(self._edge_data[node_idx]) == 0:  # root node
+            ancestors_set = set()
+        else:
+            parents_idx = self._edge_data[node_idx]
+            ancestors_set = set.union(
+                {self.get_node_id(i) for i in parents_idx},
+                *(self.ancestors(i) for i in parents_idx),
+            )
+        return ancestors_set
+
     def get_node_id(self, node: Union[str, int]) -> str:
         """Return the node ID given the node index.
 
@@ -59,6 +73,20 @@ class OntologyGraph(DirectedSparseGraph):
 
         """
         return node if isinstance(node, str) else self.idmap.lst[node]
+
+    def get_node_idx(self, node: Union[str, int]) -> int:
+        """Return the node index given the node ID.
+
+        Args:
+            node (Union[str, int]): Node index (int) or node ID (str). If input
+                is already node index, return directly. If input is node index,
+                then return the node index of the corresponding node ID.
+
+        Return:
+            int: Node index.
+
+        """
+        return node if isinstance(node, int) else self.idmap[node]
 
     def set_node_attr(self, node: Union[str, int], node_attr: List[str]):
         """Set node attribute of a given node.
