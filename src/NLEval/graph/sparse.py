@@ -617,3 +617,53 @@ class SparseGraph(BaseGraph):
             edge_weight = None
 
         return edge_index, edge_weight
+
+
+class DirectedSparseGraph(SparseGraph):
+    """Directed sparse graph that also keeps track of reversed edge data.
+
+    The reversed edge data is captured for more efficient "propagation upwards"
+    in addition to the more natural "propagation downwards" operation.
+
+    """
+
+    def __init__(self, weighted=True):
+        """Initialize the directed sparse graoh."""
+        super().__init__(weighted=weighted, directed=True)
+        self._rev_edge_data = []
+
+    @property
+    def rev_edg_data(self):
+        """Adjacency list of reversed edge direction."""
+        return self._rev_edge_data
+
+    def add_id(self, node_id: Union[str, List[str]]):
+        """Create new nodes and initialize its edge data."""
+        if isinstance(node_id, list):
+            for single_node_id in node_id:
+                self.add_id(single_node_id)
+        else:
+            self.idmap.add_id(node_id)
+            self._edge_data.append({})
+            self._rev_edge_data.append({})
+
+    def add_edge(
+        self,
+        node_id1: str,
+        node_id2: str,
+        weight: float = 1.0,
+        reduction: Optional[str] = None,
+    ):
+        """Add a directed edge and record in the reversed adjacency list."""
+        super().add_edge(node_id1, node_id2, weight, reduction)
+
+        self._add_edge(
+            node_id2,
+            node_id1,
+            self.idmap[node_id2],
+            self.idmap[node_id1],
+            True,
+            weight,
+            reduction,
+            self._rev_edge_data,
+        )

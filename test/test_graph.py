@@ -9,6 +9,7 @@ import ndex2
 import numpy as np
 from commonvar import SAMPLE_DATA_DIR
 from NLEval.graph import DenseGraph
+from NLEval.graph import DirectedSparseGraph
 from NLEval.graph import FeatureVec
 from NLEval.graph import MultiFeatureVec
 from NLEval.graph import OntologyGraph
@@ -170,7 +171,7 @@ class TestSparseGraph(unittest.TestCase):
             self.assertRaises(IDExistsError, graph.add_id, ["c", "b"])
 
     def test_add_edge(self):
-        graph = SparseGraph(weighted=False, directed=False)
+        graph = SparseGraph()
 
         with self.subTest("Edge and node creations"):
             graph.add_edge("a", "b")
@@ -325,6 +326,52 @@ class TestSparseGraph(unittest.TestCase):
         graph2 = deepcopy(graph)
         graph2.add_id("x")
         self.assertFalse(graph == graph2)
+
+
+class TestDirectedSparseGraph(unittest.TestCase):
+    def test_add_edge(self):
+        graph = DirectedSparseGraph()
+
+        with self.subTest("Edge and node creations"):
+            graph.add_edge("a", "b")
+            self.assertEqual(sorted(graph.node_ids), ["a", "b"])
+            self.assertEqual(graph._edge_data, [{1: 1.0}, {}])
+            self.assertEqual(graph._rev_edge_data, [{}, {0: 1.0}])
+
+        with self.subTest("Overwritting edge value (no edge reduction)"):
+            graph.add_edge("a", "b", 0.8)
+            self.assertEqual(graph._edge_data, [{1: 0.8}, {}])
+            self.assertEqual(graph._rev_edge_data, [{}, {0: 0.8}])
+
+        with self.subTest("Edge reduction with min"):
+            graph.add_edge("a", "b", 1.0, reduction="min")
+            self.assertEqual(graph._edge_data, [{1: 0.8}, {}])
+            self.assertEqual(graph._rev_edge_data, [{}, {0: 0.8}])
+
+            graph.add_edge("a", "b", 0.5, reduction="min")
+            self.assertEqual(graph._edge_data, [{1: 0.5}, {}])
+            self.assertEqual(graph._rev_edge_data, [{}, {0: 0.5}])
+
+        with self.subTest("Edge reduction with max"):
+            graph.add_edge("a", "b", 0.1, reduction="max")
+            self.assertEqual(graph._edge_data, [{1: 0.5}, {}])
+            self.assertEqual(graph._rev_edge_data, [{}, {0: 0.5}])
+
+            graph.add_edge("a", "b", 1.0, reduction="max")
+            self.assertEqual(graph._edge_data, [{1: 1.0}, {}])
+            self.assertEqual(graph._rev_edge_data, [{}, {0: 1.0}])
+
+        with self.subTest("More edges"):
+            graph.add_edge("b", "a", 1.0)
+            self.assertEqual(graph._edge_data, [{1: 1.0}, {0: 1.0}])
+            self.assertEqual(graph._rev_edge_data, [{1: 1.0}, {0: 1.0}])
+
+            graph.add_edge("a", "c", 0.5)
+            self.assertEqual(sorted(graph.node_ids), ["a", "b", "c"])
+            self.assertEqual(
+                graph._edge_data,
+                [{1: 1.0, 2: 0.5}, {0: 1.0}, {}],
+            )
 
 
 class TestCX(unittest.TestCase):
