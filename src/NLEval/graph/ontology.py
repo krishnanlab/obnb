@@ -11,6 +11,8 @@ from typing import TextIO
 from typing import Tuple
 from typing import Union
 
+from tqdm import trange
+
 from ..util import idhandler
 from ..util.exceptions import OboTermIncompleteError
 from .sparse import DirectedSparseGraph
@@ -161,7 +163,7 @@ class OntologyGraph(DirectedSparseGraph):
             node_attr = itertools.chain(*children_attrs, self_attrs)
         return sorted(set(node_attr))
 
-    def complete_node_attrs(self):
+    def complete_node_attrs(self, pbar: bool = False):
         """Node attribute completion by propagation upwards.
 
         Starting from the leaf node, propagate the node attributes to its
@@ -169,8 +171,14 @@ class OntologyGraph(DirectedSparseGraph):
         from its children, plus its original node attributes. This is done via
         recursion _aggregate_node_attrs.
 
+        Args:
+            pbar (bool): If set to True, display a progress bar showing the
+                progress of annotation propagation (default: :obj:`False`).
+
         """
-        for node_idx in range(self.size):
+        pbar = trange(self.size, disable=not pbar)
+        pbar.set_description("Propagating annotations")
+        for node_idx in pbar:
             self.set_node_attr(node_idx, self._aggregate_node_attrs(node_idx))
 
     @staticmethod

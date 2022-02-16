@@ -586,22 +586,15 @@ class LabelsetCollection(idhandler.IDprop):
     def read_ontology_graph(
         self,
         graph: OntologyGraph,
-        propagate_annotations: bool = True,
         min_size: int = 10,
     ):
         """Load labelset collection from an annotated ontology graph.
 
         Args:
             graph (OntologyGraph): The annotated ontology graph to be read.
-            propagate_annotation (bool): If true, propagate the annotations
-                of the ontoloty terms upwards before reading (default:
-                :obj:`True`).
             min_size (int): Minimum number of positive examples in order to be
                 loaded as a label set (default: 10).
         """
-        if propagate_annotations:
-            graph.complete_node_attrs()
-
         for label_id in graph.node_ids:
             label_info = graph.get_node_name(label_id)
             label_set = graph.get_node_attr(label_id) or []
