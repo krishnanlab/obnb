@@ -1,4 +1,5 @@
 from typing import Callable
+from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Union
@@ -80,7 +81,7 @@ class SparseGraph(BaseGraph):
             fvec[nbr_idx] = weight
         return fvec
 
-    def _default_add_id(self, node_id):
+    def _default_add_id(self, node_id: str) -> int:
         """Add a new node ID if not existed yet."""
         if node_id not in self.idmap:
             self.add_id(node_id)
@@ -94,6 +95,53 @@ class SparseGraph(BaseGraph):
             self.idmap.add_id(node_id)
             self._edge_data.append({})
 
+    @staticmethod
+    def _add_edge(
+        node_id1: str,
+        node_id2: str,
+        node_idx1: int,
+        node_idx2: int,
+        directed: bool,
+        weight: float,
+        reduction: Optional[str],
+        edge_data: List[Dict[int, float]],
+    ):
+        """Update edge data.
+
+        Args:
+            node_id1 (str): ID of node 1.
+            node_id2 (str): ID of node 2.
+            node_idx1 (int): Index of node 1.
+            node_idx2 (str): Index of node 2.
+            directed (bool): If set to False, then fill in the edge for the
+                reverse direction also.
+            weight (float): Edge weight to use.
+            reduction (str): Type of edge reduction to use if edge already
+                existsed, if not set, warn if old edge exists with different
+                values and overwrite it with the new avlue.
+            edge_data: The edge data of the sparse graph, in the form of an
+                adjacency list with edge weights.
+
+        """
+        # Check duplicated edge weights and apply reduction
+        if node_idx2 in edge_data[node_idx1]:
+            old_weight = edge_data[node_idx1][node_idx2]
+            if old_weight != weight:  # check if edge weight is modified
+                if reduction is None:
+                    print(
+                        f"WARNING: edge between {node_id1} and {node_id2} "
+                        f"exists with weight {old_weight:.2f}, overwriting "
+                        f"with {weight:.2f}",
+                    )
+                elif reduction == "max":
+                    weight = max(old_weight, weight)
+                elif reduction == "min":
+                    weight = min(old_weight, weight)
+
+        edge_data[node_idx1][node_idx2] = weight
+        if not directed:
+            edge_data[node_idx2][node_idx1] = weight
+
     def add_edge(
         self,
         node_id1: str,
@@ -101,35 +149,37 @@ class SparseGraph(BaseGraph):
         weight: float = 1.0,
         reduction: Optional[str] = None,
     ):
+        """Add or update an edge in the sparse graph.
+
+        Args:
+            node_id1 (str): ID of node 1.
+            node_id2 (str): ID of node 2.
+            weight (float): Edge weight to use.
+            reduction (str, optional): Type of edge reduction to use if edge
+                already existsed. If it is not set, warn if old edge exists
+                with different values and overwrite it with the new avlue.
+                Possible options are 'min', 'max', and :obj:`None` (default:
+                :obj:`None`).
+
+        """
         # Check reduction type
         if reduction not in [None, "max", "min"]:
             raise ValueError(f"Unknown reduction type {reduction!r}")
 
-        # Check if node_id exists, add new if not
+        # Check if node_id exists, add new if not, and return node index
         self._default_add_id(node_id1)
         self._default_add_id(node_id2)
 
-        node_idx1 = self.idmap[node_id1]
-        node_idx2 = self.idmap[node_id2]
-
-        # Check duplicated edge weights and apply reduction
-        if node_idx2 in self._edge_data[node_idx1]:
-            old_weight = self._edge_data[node_idx1][node_idx2]
-            if old_weight != weight:  # check if edge weight is modified
-                if reduction is None:
-                    print(
-                        f"WARNING: edge between {self.idmap[node_id1]} and "
-                        f"{self.idmap[node_id2]} exists with weight "
-                        f"{old_weight:.2f}, overwriting with {weight:.2f}",
-                    )
-                elif reduction == "max":
-                    weight = max(old_weight, weight)
-                elif reduction == "min":
-                    weight = min(old_weight, weight)
-
-        self._edge_data[node_idx1][node_idx2] = weight
-        if not self.directed:
-            self._edge_data[node_idx2][node_idx1] = weight
+        self._add_edge(
+            node_id1,
+            node_id2,
+            self.idmap[node_id1],
+            self.idmap[node_id2],
+            self.directed,
+            weight,
+            reduction,
+            self._edge_data,
+        )
 
     def get_edge(self, node_id1, node_id2):
         try:
