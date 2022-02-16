@@ -169,6 +169,40 @@ class TestSparseGraph(unittest.TestCase):
             self.assertRaises(IDExistsError, graph.add_id, "a")
             self.assertRaises(IDExistsError, graph.add_id, ["c", "b"])
 
+    def test_add_edge(self):
+        graph = SparseGraph(weighted=False, directed=False)
+
+        with self.subTest("Edge and node creations"):
+            graph.add_edge("a", "b")
+            self.assertEqual(sorted(graph.node_ids), ["a", "b"])
+            self.assertEqual(graph._edge_data, [{1: 1.0}, {0: 1.0}])
+
+        with self.subTest("Overwritting edge value (no edge reduction)"):
+            graph.add_edge("a", "b", 0.8)
+            self.assertEqual(graph._edge_data, [{1: 0.8}, {0: 0.8}])
+
+        with self.subTest("Edge reduction with min"):
+            graph.add_edge("a", "b", 1.0, reduction="min")
+            self.assertEqual(graph._edge_data, [{1: 0.8}, {0: 0.8}])
+
+            graph.add_edge("a", "b", 0.5, reduction="min")
+            self.assertEqual(graph._edge_data, [{1: 0.5}, {0: 0.5}])
+
+        with self.subTest("Edge reduction with max"):
+            graph.add_edge("a", "b", 0.1, reduction="max")
+            self.assertEqual(graph._edge_data, [{1: 0.5}, {0: 0.5}])
+
+            graph.add_edge("a", "b", 1.0, reduction="max")
+            self.assertEqual(graph._edge_data, [{1: 1.0}, {0: 1.0}])
+
+        with self.subTest("More edges"):
+            graph.add_edge("a", "c", 0.5)
+            self.assertEqual(sorted(graph.node_ids), ["a", "b", "c"])
+            self.assertEqual(
+                graph._edge_data,
+                [{1: 1.0, 2: 0.5}, {0: 1.0}, {0: 0.5}],
+            )
+
     def test_read_edglst_unweighted(self):
         graph = SparseGraph.from_edglst(
             self.case.tu_path,
