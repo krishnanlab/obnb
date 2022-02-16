@@ -1156,6 +1156,18 @@ class TestOntologyGraph(unittest.TestCase):
         self.assertEqual(graph.get_node_attr("e"), ["w"])
         self.assertEqual(graph.get_node_attr("f"), ["z"])
 
+        # Test post complete_node_attrs after introducing new changes
+        graph.add_edge("g", "e")
+        graph.set_node_attr("g", ["z"])
+        graph.complete_node_attrs()
+        self.assertEqual(graph.get_node_attr("a"), ["w", "x", "y", "z"])
+        self.assertEqual(graph.get_node_attr("b"), ["w", "z"])
+        self.assertEqual(graph.get_node_attr("c"), ["x", "y", "z"])
+        self.assertEqual(graph.get_node_attr("d"), ["x"])
+        self.assertEqual(graph.get_node_attr("e"), ["w", "z"])
+        self.assertEqual(graph.get_node_attr("f"), ["z"])
+        self.assertEqual(graph.get_node_attr("g"), ["z"])
+
     def test_read_obo(self):
         r"""
                a

@@ -43,13 +43,8 @@ class OntologyGraph(DirectedSparseGraph):
         self.idmap.new_property("node_name", default_val=None)
 
     def __hash__(self):
-        """Trivial hash.
-
-        This hash is solely for the sake of enabling LRU cache when calling
-        _aggregate_node_attrs recursion.
-
-        """
-        return 0
+        """Hash the ontology graph based on edge statistics."""
+        return hash(tuple(len(i) for i in self._edge_data))
 
     def get_node_id(self, node: Union[str, int]) -> str:
         """Return the node ID given the node index.
