@@ -15,6 +15,7 @@ from NLEval.graph import OntologyGraph
 from NLEval.graph import SparseGraph
 from NLEval.graph.base import BaseGraph
 from NLEval.util import idhandler
+from NLEval.util.exceptions import IDExistsError
 from scipy.spatial import distance
 
 
@@ -142,6 +143,31 @@ class TestSparseGraph(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(cls.tmp_dir)
+
+    def test_add_id(self):
+        with self.subTest("Add single node"):
+            graph = SparseGraph(weighted=False, directed=False)
+
+            graph.add_id("a")
+            self.assertEqual(sorted(graph.node_ids), ["a"])
+            self.assertEqual(graph._edge_data, [{}])
+
+            graph.add_id("b")
+            self.assertEqual(sorted(graph.node_ids), ["a", "b"])
+            self.assertEqual(graph._edge_data, [{}, {}])
+
+            self.assertRaises(IDExistsError, graph.add_id, "a")
+            self.assertRaises(IDExistsError, graph.add_id, "b")
+
+        with self.subTest("Add multiple nodes"):
+            graph = SparseGraph(weighted=False, directed=False)
+
+            graph.add_id(["a", "b"])
+            self.assertEqual(sorted(graph.node_ids), ["a", "b"])
+            self.assertEqual(graph._edge_data, [{}, {}])
+
+            self.assertRaises(IDExistsError, graph.add_id, "a")
+            self.assertRaises(IDExistsError, graph.add_id, ["c", "b"])
 
     def test_read_edglst_unweighted(self):
         graph = SparseGraph.from_edglst(

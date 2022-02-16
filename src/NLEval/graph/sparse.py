@@ -85,11 +85,14 @@ class SparseGraph(BaseGraph):
         if node_id not in self.idmap:
             self.add_id(node_id)
 
-    def add_id(self, node_id: str):
-        """Create a new node and initialize its edge data."""
-        # TODO: add_ids
-        self.idmap.add_id(node_id)
-        self._edge_data.append({})
+    def add_id(self, node_id: Union[str, List[str]]):
+        """Create new nodes and initialize its edge data."""
+        if isinstance(node_id, list):
+            for single_node_id in node_id:
+                self.add_id(single_node_id)
+        else:
+            self.idmap.add_id(node_id)
+            self._edge_data.append({})
 
     def add_edge(
         self,
@@ -103,8 +106,8 @@ class SparseGraph(BaseGraph):
             raise ValueError(f"Unknown reduction type {reduction!r}")
 
         # Check if node_id exists, add new if not
-        for node_id in [node_id1, node_id2]:
-            self._default_add_id(node_id)
+        self._default_add_id(node_id1)
+        self._default_add_id(node_id2)
 
         node_idx1 = self.idmap[node_id1]
         node_idx2 = self.idmap[node_id2]
