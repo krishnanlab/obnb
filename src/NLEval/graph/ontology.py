@@ -42,10 +42,11 @@ class OntologyGraph(DirectedSparseGraph):
         self.idmap.new_property("node_attr", default_val=None)
         self.idmap.new_property("node_name", default_val=None)
         self._edge_stats = []
+        self._trivial_hash = False
 
     def __hash__(self):
         """Hash the ontology graph based on edge statistics."""
-        return hash(tuple(self._edge_stats))
+        return 0 if self._trivial_hash else hash(tuple(self._edge_stats))
 
     @functools.lru_cache
     def ancestors(self, node: Union[str, int]) -> Set[str]:
