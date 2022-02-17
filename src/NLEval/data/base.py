@@ -38,7 +38,7 @@ class BaseNdexData(SparseGraph):
             print("Done!")
             self.save_npz(self.processed_data_path, weighted)
         else:
-            self.read_npz(self.processed_data_path, weighted, directed)
+            self.read_npz(self.processed_data_path)
 
     @property
     def name(self) -> str:
