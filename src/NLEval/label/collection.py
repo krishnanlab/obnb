@@ -587,6 +587,7 @@ class LabelsetCollection(idhandler.IDprop):
         self,
         graph: OntologyGraph,
         min_size: int = 10,
+        namespace: Optional[str] = None,
     ):
         """Load labelset collection from an annotated ontology graph.
 
@@ -594,12 +595,17 @@ class LabelsetCollection(idhandler.IDprop):
             graph (OntologyGraph): The annotated ontology graph to be read.
             min_size (int): Minimum number of positive examples in order to be
                 loaded as a label set (default: 10).
+            namespace (str, optional): If set, only load terms that are
+                inherited from the term specified in as namespace, otherwise
+                load all terms (default: :obj:`None`).
+
         """
         for label_id in graph.node_ids:
-            label_info = graph.get_node_name(label_id)
-            label_set = graph.get_node_attr(label_id) or []
-            if len(label_set) >= min_size:
-                self.add_labelset(label_set, label_id, label_info)
+            if namespace is None or namespace in graph.ancestors(label_id):
+                label_info = graph.get_node_name(label_id)
+                label_set = graph.get_node_attr(label_id) or []
+                if len(label_set) >= min_size:
+                    self.add_labelset(label_set, label_id, label_info)
 
     def read_gmt(self, path: str, sep: str = "\t"):
         """Load data from Gene Matrix Transpose `.gmt` file.
