@@ -9,12 +9,14 @@ import ndex2
 import numpy as np
 from commonvar import SAMPLE_DATA_DIR
 from NLEval.graph import DenseGraph
+from NLEval.graph import DirectedSparseGraph
 from NLEval.graph import FeatureVec
 from NLEval.graph import MultiFeatureVec
 from NLEval.graph import OntologyGraph
 from NLEval.graph import SparseGraph
 from NLEval.graph.base import BaseGraph
 from NLEval.util import idhandler
+from NLEval.util.exceptions import IDExistsError
 from scipy.spatial import distance
 
 
@@ -143,6 +145,65 @@ class TestSparseGraph(unittest.TestCase):
     def tearDownClass(cls):
         shutil.rmtree(cls.tmp_dir)
 
+    def test_add_id(self):
+        with self.subTest("Add single node"):
+            graph = SparseGraph(weighted=False, directed=False)
+
+            graph.add_id("a")
+            self.assertEqual(sorted(graph.node_ids), ["a"])
+            self.assertEqual(graph._edge_data, [{}])
+
+            graph.add_id("b")
+            self.assertEqual(sorted(graph.node_ids), ["a", "b"])
+            self.assertEqual(graph._edge_data, [{}, {}])
+
+            self.assertRaises(IDExistsError, graph.add_id, "a")
+            self.assertRaises(IDExistsError, graph.add_id, "b")
+
+        with self.subTest("Add multiple nodes"):
+            graph = SparseGraph(weighted=False, directed=False)
+
+            graph.add_id(["a", "b"])
+            self.assertEqual(sorted(graph.node_ids), ["a", "b"])
+            self.assertEqual(graph._edge_data, [{}, {}])
+
+            self.assertRaises(IDExistsError, graph.add_id, "a")
+            self.assertRaises(IDExistsError, graph.add_id, ["c", "b"])
+
+    def test_add_edge(self):
+        graph = SparseGraph()
+
+        with self.subTest("Edge and node creations"):
+            graph.add_edge("a", "b")
+            self.assertEqual(sorted(graph.node_ids), ["a", "b"])
+            self.assertEqual(graph._edge_data, [{1: 1.0}, {0: 1.0}])
+
+        with self.subTest("Overwritting edge value (no edge reduction)"):
+            graph.add_edge("a", "b", 0.8)
+            self.assertEqual(graph._edge_data, [{1: 0.8}, {0: 0.8}])
+
+        with self.subTest("Edge reduction with min"):
+            graph.add_edge("a", "b", 1.0, reduction="min")
+            self.assertEqual(graph._edge_data, [{1: 0.8}, {0: 0.8}])
+
+            graph.add_edge("a", "b", 0.5, reduction="min")
+            self.assertEqual(graph._edge_data, [{1: 0.5}, {0: 0.5}])
+
+        with self.subTest("Edge reduction with max"):
+            graph.add_edge("a", "b", 0.1, reduction="max")
+            self.assertEqual(graph._edge_data, [{1: 0.5}, {0: 0.5}])
+
+            graph.add_edge("a", "b", 1.0, reduction="max")
+            self.assertEqual(graph._edge_data, [{1: 1.0}, {0: 1.0}])
+
+        with self.subTest("More edges"):
+            graph.add_edge("a", "c", 0.5)
+            self.assertEqual(sorted(graph.node_ids), ["a", "b", "c"])
+            self.assertEqual(
+                graph._edge_data,
+                [{1: 1.0, 2: 0.5}, {0: 1.0}, {0: 0.5}],
+            )
+
     def test_read_edglst_unweighted(self):
         graph = SparseGraph.from_edglst(
             self.case.tu_path,
@@ -265,6 +326,52 @@ class TestSparseGraph(unittest.TestCase):
         graph2 = deepcopy(graph)
         graph2.add_id("x")
         self.assertFalse(graph == graph2)
+
+
+class TestDirectedSparseGraph(unittest.TestCase):
+    def test_add_edge(self):
+        graph = DirectedSparseGraph()
+
+        with self.subTest("Edge and node creations"):
+            graph.add_edge("a", "b")
+            self.assertEqual(sorted(graph.node_ids), ["a", "b"])
+            self.assertEqual(graph._edge_data, [{1: 1.0}, {}])
+            self.assertEqual(graph._rev_edge_data, [{}, {0: 1.0}])
+
+        with self.subTest("Overwritting edge value (no edge reduction)"):
+            graph.add_edge("a", "b", 0.8)
+            self.assertEqual(graph._edge_data, [{1: 0.8}, {}])
+            self.assertEqual(graph._rev_edge_data, [{}, {0: 0.8}])
+
+        with self.subTest("Edge reduction with min"):
+            graph.add_edge("a", "b", 1.0, reduction="min")
+            self.assertEqual(graph._edge_data, [{1: 0.8}, {}])
+            self.assertEqual(graph._rev_edge_data, [{}, {0: 0.8}])
+
+            graph.add_edge("a", "b", 0.5, reduction="min")
+            self.assertEqual(graph._edge_data, [{1: 0.5}, {}])
+            self.assertEqual(graph._rev_edge_data, [{}, {0: 0.5}])
+
+        with self.subTest("Edge reduction with max"):
+            graph.add_edge("a", "b", 0.1, reduction="max")
+            self.assertEqual(graph._edge_data, [{1: 0.5}, {}])
+            self.assertEqual(graph._rev_edge_data, [{}, {0: 0.5}])
+
+            graph.add_edge("a", "b", 1.0, reduction="max")
+            self.assertEqual(graph._edge_data, [{1: 1.0}, {}])
+            self.assertEqual(graph._rev_edge_data, [{}, {0: 1.0}])
+
+        with self.subTest("More edges"):
+            graph.add_edge("b", "a", 1.0)
+            self.assertEqual(graph._edge_data, [{1: 1.0}, {0: 1.0}])
+            self.assertEqual(graph._rev_edge_data, [{1: 1.0}, {0: 1.0}])
+
+            graph.add_edge("a", "c", 0.5)
+            self.assertEqual(sorted(graph.node_ids), ["a", "b", "c"])
+            self.assertEqual(
+                graph._edge_data,
+                [{1: 1.0, 2: 0.5}, {0: 1.0}, {}],
+            )
 
 
 class TestCX(unittest.TestCase):
@@ -962,6 +1069,22 @@ class TestFeatureVecAlign(unittest.TestCase):
 
 
 class TestOntologyGraph(unittest.TestCase):
+    def test_edge_stats(self):
+        graph = OntologyGraph()
+        self.assertEqual(graph._edge_stats, [])
+
+        graph.add_id("a")
+        self.assertEqual(graph._edge_stats, [0])
+
+        graph.add_id("b")
+        self.assertEqual(graph._edge_stats, [0, 0])
+
+        graph.add_edge("b", "a")
+        self.assertEqual(graph._edge_stats, [1, 0])
+
+        graph.add_edge("c", "a")
+        self.assertEqual(graph._edge_stats, [2, 0, 0])
+
     def test_node_name(self):
         graph = OntologyGraph()
 
@@ -1017,15 +1140,22 @@ class TestOntologyGraph(unittest.TestCase):
         """
         graph = OntologyGraph()
 
-        graph.add_edge("a", "b")
-        graph.add_edge("a", "c")
-        graph.add_edge("a", "d")
-        graph.add_edge("b", "e")
-        graph.add_edge("c", "f")
+        graph.add_id(["a", "b", "c", "d", "e", "f"])
+
+        graph.add_edge("b", "a")
+        graph.add_edge("c", "a")
+        graph.add_edge("d", "a")
+        graph.add_edge("e", "b")
+        graph.add_edge("f", "c")
+
+        self.assertEqual(
+            graph._rev_edge_data,
+            [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {}, {}, {}],
+        )
 
         self.assertEqual(
             graph._edge_data,
-            [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {}, {}, {}],
+            [{}, {0: 1}, {0: 1}, {0: 1}, {1: 1}, {2: 1}],
         )
 
         graph.set_node_attr("d", ["x"])
@@ -1041,6 +1171,44 @@ class TestOntologyGraph(unittest.TestCase):
         self.assertEqual(graph.get_node_attr("d"), ["x"])
         self.assertEqual(graph.get_node_attr("e"), ["w"])
         self.assertEqual(graph.get_node_attr("f"), ["z"])
+
+        # Test post complete_node_attrs after introducing new changes
+        graph.add_edge("g", "e")
+        graph.set_node_attr("g", ["z"])
+        graph.complete_node_attrs()
+        self.assertEqual(graph.get_node_attr("a"), ["w", "x", "y", "z"])
+        self.assertEqual(graph.get_node_attr("b"), ["w", "z"])
+        self.assertEqual(graph.get_node_attr("c"), ["x", "y", "z"])
+        self.assertEqual(graph.get_node_attr("d"), ["x"])
+        self.assertEqual(graph.get_node_attr("e"), ["w", "z"])
+        self.assertEqual(graph.get_node_attr("f"), ["z"])
+        self.assertEqual(graph.get_node_attr("g"), ["z"])
+
+    def test_ancestors(self):
+        r"""
+           a
+        /  |  \
+        b  c   d
+        |  |  /
+        e  f
+        """
+        graph = OntologyGraph()
+
+        graph.add_id(["a", "b", "c", "d", "e", "f"])
+
+        graph.add_edge("b", "a")
+        graph.add_edge("c", "a")
+        graph.add_edge("d", "a")
+        graph.add_edge("e", "b")
+        graph.add_edge("f", "c")
+        graph.add_edge("f", "d")
+
+        self.assertEqual(graph.ancestors("a"), set())
+        self.assertEqual(graph.ancestors("b"), {"a"})
+        self.assertEqual(graph.ancestors("c"), {"a"})
+        self.assertEqual(graph.ancestors("d"), {"a"})
+        self.assertEqual(graph.ancestors("e"), {"a", "b"})
+        self.assertEqual(graph.ancestors("f"), {"a", "c", "d"})
 
     def test_read_obo(self):
         r"""
@@ -1067,7 +1235,7 @@ class TestOntologyGraph(unittest.TestCase):
 
             self.assertEqual(out, None)
             self.assertEqual(
-                graph._edge_data,
+                graph._rev_edge_data,
                 [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {5: 1}, {}, {}],
             )
 
@@ -1080,7 +1248,7 @@ class TestOntologyGraph(unittest.TestCase):
                 {"x": {"ID:2"}, "y": {"ID:2"}, "z": {"ID:4"}},
             )
             self.assertEqual(
-                graph._edge_data,
+                graph._rev_edge_data,
                 [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {5: 1}, {}, {}],
             )
 
@@ -1091,7 +1259,7 @@ class TestOntologyGraph(unittest.TestCase):
 
             self.assertEqual(dict(out), {})
             self.assertEqual(
-                graph._edge_data,
+                graph._rev_edge_data,
                 [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {5: 1}, {}, {}],
             )
 

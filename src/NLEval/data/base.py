@@ -156,7 +156,8 @@ class BaseAnnotatedOntologyData(LabelsetCollection):
         os.makedirs(self.raw_dir, exist_ok=True)
         os.makedirs(self.processed_dir, exist_ok=True)
 
-        raw_files = [self.ontology_data_path, self.annotation_data_path]
+        raw_file_names = list(self.data_name_dict.values())
+        raw_files = [osp.join(self.raw_dir, i) for i in raw_file_names]
         if any(not osp.isfile(raw_file) for raw_file in raw_files):
             print("Downloading...")
             self.download()

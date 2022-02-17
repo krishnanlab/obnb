@@ -372,6 +372,22 @@ class TestLabelsetCollection(unittest.TestCase):
         self.assertEqual(lsc.get_info("b"), "B")
         self.assertFalse("a" in lsc.label_ids)
 
+        with self.subTest("Namespace"):
+            graph.add_edge("c", "b")
+            graph.set_node_attr("c", ["a", "b"])
+
+            lsc = LabelsetCollection()
+            lsc.read_ontology_graph(graph, min_size=0, namespace="a")
+            self.assertEqual(sorted(lsc.label_ids), [])
+
+            lsc = LabelsetCollection()
+            lsc.read_ontology_graph(graph, min_size=0, namespace="b")
+            self.assertEqual(sorted(lsc.label_ids), ["c"])
+
+            lsc = LabelsetCollection()
+            lsc.read_ontology_graph(graph, min_size=0, namespace="c")
+            self.assertEqual(sorted(lsc.label_ids), [])
+
 
 if __name__ == "__main__":
     unittest.main()

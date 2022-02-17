@@ -11,38 +11,71 @@ from typing import TextIO
 from typing import Tuple
 from typing import Union
 
+from tqdm import trange
+
 from ..util import idhandler
 from ..util.exceptions import OboTermIncompleteError
-from .sparse import SparseGraph
+from .sparse import DirectedSparseGraph
 
 Term = Tuple[str, str, Optional[List[str]], Optional[List[str]]]
 
 
-class OntologyGraph(SparseGraph):
+class OntologyGraph(DirectedSparseGraph):
     """Ontology graph.
 
-    Note:
-        For the ease of node attributes propagation upwards, the direction of
-        an edge is from the parent node to the children node, instead of the
-        other way around, which is the usual setting.
+    An ontology graph is a directed acyclic graph (DAG). Here, we represent
+    this data type using DirectedSparseGraph, which keeps track of both the
+    forward direction of edges (``_edge_data``) and the reversed direction of
+    edges (``_rev_edge_data``). This bidirectional awareness is useful in the
+    context of propagating information "upwards" or "downloads".
+
+    The ``idmap`` attribute is swapped with a more functional ``IDProp``
+    object that allows the storing of node informations such as name and
+    node attributes.
 
     """
 
     def __init__(self):
         """Initialize the ontology graph."""
-        super().__init__(weighted=False, directed=True)
+        super().__init__()
         self.idmap = idhandler.IDprop()
         self.idmap.new_property("node_attr", default_val=None)
         self.idmap.new_property("node_name", default_val=None)
+        self._edge_stats = []
+        self._trivial_hash = False
 
     def __hash__(self):
-        """Trivial hash.
+        """Hash the ontology graph based on edge statistics."""
+        return 0 if self._trivial_hash else hash(tuple(self._edge_stats))
 
-        This hash is solely for the sake of enabling LRU cache when calling
-        _aggregate_node_attrs recursion.
+    @functools.lru_cache
+    def ancestors(self, node: Union[str, int]) -> Set[str]:
+        """Return the ancestor nodes of a given node."""
+        node_idx = self.get_node_idx(node)
+        if len(self._edge_data[node_idx]) == 0:  # root node
+            ancestors_set = set()
+        else:
+            parents_idx = self._edge_data[node_idx]
+            ancestors_set = set.union(
+                {self.get_node_id(i) for i in parents_idx},
+                *(self.ancestors(i) for i in parents_idx),
+            )
+        return ancestors_set
 
-        """
-        return 0
+    def add_id(self, node_id: Union[str, List[str]]):
+        super().add_id(node_id)
+        for _ in range(len(node_id) if isinstance(node_id, list) else 1):
+            self._edge_stats.append(0)
+
+    def add_edge(
+        self,
+        node_id1: str,
+        node_id2: str,
+        weight: float = 1.0,
+        reduction: Optional[str] = None,
+    ):
+        super().add_edge(node_id1, node_id2, weight, reduction)
+        self._edge_stats[self.idmap[node_id2]] += 1
 
     def get_node_id(self, node: Union[str, int]) -> str:
         """Return the node ID given the node index.
@@ -57,6 +90,20 @@ class OntologyGraph(SparseGraph):
 
         """
         return node if isinstance(node, str) else self.idmap.lst[node]
+
+    def get_node_idx(self, node: Union[str, int]) -> int:
+        """Return the node index given the node ID.
+
+        Args:
+            node (Union[str, int]): Node index (int) or node ID (str). If input
+                is already node index, return directly. If input is node index,
+                then return the node index of the corresponding node ID.
+
+        Return:
+            int: Node index.
+
+        """
+        return node if isinstance(node, int) else self.idmap[node]
 
     def set_node_attr(self, node: Union[str, int], node_attr: List[str]):
         """Set node attribute of a given node.
@@ -145,18 +192,18 @@ class OntologyGraph(SparseGraph):
     @functools.lru_cache(maxsize=None)
     def _aggregate_node_attrs(self, node_idx: int) -> List[str]:
         node_attr: Iterable[str]
-        if len(self._edge_data[node_idx]) == 0:  # is leaf node
+        if len(self._rev_edge_data[node_idx]) == 0:  # is leaf node
             node_attr = self.get_node_attr(node_idx) or []
         else:
             children_attrs = [
                 self._aggregate_node_attrs(nbr_idx)
-                for nbr_idx in self._edge_data[node_idx]
+                for nbr_idx in self._rev_edge_data[node_idx]
             ]
             self_attrs = self.get_node_attr(node_idx) or []
             node_attr = itertools.chain(*children_attrs, self_attrs)
         return sorted(set(node_attr))
 
-    def complete_node_attrs(self):
+    def complete_node_attrs(self, pbar: bool = False):
         """Node attribute completion by propagation upwards.
 
         Starting from the leaf node, propagate the node attributes to its
@@ -164,8 +211,14 @@ class OntologyGraph(SparseGraph):
         from its children, plus its original node attributes. This is done via
         recursion _aggregate_node_attrs.
 
+        Args:
+            pbar (bool): If set to True, display a progress bar showing the
+                progress of annotation propagation (default: :obj:`False`).
+
         """
-        for node_idx in range(self.size):
+        pbar = trange(self.size, disable=not pbar)
+        pbar.set_description("Propagating annotations")
+        for node_idx in pbar:
             self.set_node_attr(node_idx, self._aggregate_node_attrs(node_idx))
 
     @staticmethod
@@ -240,15 +293,14 @@ class OntologyGraph(SparseGraph):
             for term in self.iter_terms(f):
                 term_id, term_name, term_xrefs, term_parents = term
 
-                if term_id not in self.idmap:
-                    self.add_id(term_id)
+                self._default_add_id(term_id)
 
                 if self.get_node_name(term_id) is None:
                     self.set_node_name(term_id, term_name)
 
                 if term_parents is not None:
                     for parent_id in term_parents:
-                        self.add_edge(parent_id, term_id)
+                        self.add_edge(term_id, parent_id)
 
                 if xref_prefix is not None and term_xrefs is not None:
                     for xref in term_xrefs:

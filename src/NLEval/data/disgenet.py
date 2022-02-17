@@ -41,7 +41,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
         jaccard: float = 0.5,
         overlap: float = 0.7,
     ):
-        """Initialize the DisGeNet object."""
+        """Initialize the DisGeNet data object."""
         self.dsi_threshold = dsi_threshold
         self.min_size = min_size
         self.max_size = max_size
@@ -95,11 +95,11 @@ class DisGeNet(BaseAnnotatedOntologyData):
                 try:
                     g._update_node_attr_partial(doid, str(gene_id))
                 except IDNotExistError:
-                    pass
+                    continue
         g._update_node_attr_finalize()
 
-        print("Propagating annotations...")
-        g.complete_node_attrs()
+        # Propagate annotations and show progress
+        g.complete_node_attrs(pbar=True)
 
         self.read_ontology_graph(g, min_size=self.min_size)
         print(self.stats())
