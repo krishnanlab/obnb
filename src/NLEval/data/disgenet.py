@@ -95,7 +95,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
                 try:
                     g._update_node_attr_partial(doid, str(gene_id))
                 except IDNotExistError:
-                    pass
+                    continue
         g._update_node_attr_finalize()
 
         # Propagate annotations and show progress

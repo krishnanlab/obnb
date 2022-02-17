@@ -37,6 +37,17 @@ class TestData(unittest.TestCase):
         self.assertEqual(graph.size, 17783)
         self.assertEqual(graph.num_edges, 10027589)
 
+    @unittest.skip("Long process time")
+    def test_go(self):
+        with self.subTest("GOBP"):
+            lsc = NLEval.data.GOBP(self.tmp_dir)
+
+        with self.subTest("GOCC"):
+            lsc = NLEval.data.GOCC(self.tmp_dir)
+
+        with self.subTest("GOMF"):
+            lsc = NLEval.data.GOMF(self.tmp_dir)
+
     @unittest.skip("Large file download")
     def test_hippie(self):
         graph = NLEval.data.HIPPIE(self.tmp_dir)
