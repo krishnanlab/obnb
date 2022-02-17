@@ -113,4 +113,4 @@ class GOCC(GeneOntology):
 class GOMF(GeneOntology):
     """Gene Ontology Molecular Function gene annotations."""
 
-    namespace = "GO:0005554"  # molecular_function
+    namespace = "GO:0003674"  # molecular_function
