@@ -32,7 +32,7 @@ class GeneOntology(BaseAnnotatedOntologyData):
 
     @property
     def data_name_dict(self) -> Dict[str, str]:
-        return {"ontology": "go.obo", "annotation": "na"}
+        return {"ontology": "go.obo"}
 
     @property
     def filters(self):
