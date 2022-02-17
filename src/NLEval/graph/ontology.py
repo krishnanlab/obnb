@@ -41,10 +41,11 @@ class OntologyGraph(DirectedSparseGraph):
         self.idmap = idhandler.IDprop()
         self.idmap.new_property("node_attr", default_val=None)
         self.idmap.new_property("node_name", default_val=None)
+        self._edge_stats = []
 
     def __hash__(self):
         """Hash the ontology graph based on edge statistics."""
-        return hash(tuple(len(i) for i in self._edge_data))
+        return hash(tuple(self._edge_stats))
 
     @functools.lru_cache
     def ancestors(self, node: Union[str, int]) -> Set[str]:
@@ -59,6 +60,21 @@ class OntologyGraph(DirectedSparseGraph):
                 *(self.ancestors(i) for i in parents_idx),
             )
         return ancestors_set
+
+    def add_id(self, node_id: Union[str, List[str]]):
+        super().add_id(node_id)
+        for _ in range(len(node_id) if isinstance(node_id, list) else 1):
+            self._edge_stats.append(0)
+
+    def add_edge(
+        self,
+        node_id1: str,
+        node_id2: str,
+        weight: float = 1.0,
+        reduction: Optional[str] = None,
+    ):
+        super().add_edge(node_id1, node_id2, weight, reduction)
+        self._edge_stats[self.idmap[node_id2]] += 1
 
     def get_node_id(self, node: Union[str, int]) -> str:
         """Return the node ID given the node index.

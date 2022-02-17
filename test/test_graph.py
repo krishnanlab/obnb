@@ -1069,6 +1069,22 @@ class TestFeatureVecAlign(unittest.TestCase):
 
 
 class TestOntologyGraph(unittest.TestCase):
+    def test_edge_stats(self):
+        graph = OntologyGraph()
+        self.assertEqual(graph._edge_stats, [])
+
+        graph.add_id("a")
+        self.assertEqual(graph._edge_stats, [0])
+
+        graph.add_id("b")
+        self.assertEqual(graph._edge_stats, [0, 0])
+
+        graph.add_edge("b", "a")
+        self.assertEqual(graph._edge_stats, [1, 0])
+
+        graph.add_edge("c", "a")
+        self.assertEqual(graph._edge_stats, [2, 0, 0])
+
     def test_node_name(self):
         graph = OntologyGraph()
 
