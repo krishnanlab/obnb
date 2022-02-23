@@ -1,3 +1,4 @@
+import itertools
 import os
 import os.path as osp
 import shutil
@@ -17,6 +18,7 @@ from NLEval.graph import SparseGraph
 from NLEval.graph.base import BaseGraph
 from NLEval.util import idhandler
 from NLEval.util.exceptions import IDExistsError
+from parameterized import parameterized
 from scipy.spatial import distance
 
 
@@ -203,6 +205,22 @@ class TestSparseGraph(unittest.TestCase):
                 graph._edge_data,
                 [{1: 1.0, 2: 0.5}, {0: 1.0}, {0: 0.5}],
             )
+
+    @parameterized.expand(itertools.product((True, False), (True, False)))
+    def test_add_edge_self_loops(self, directed, self_loops):
+        with self.subTest(directed=directed, self_loops=self_loops):
+            graph = SparseGraph(directed=directed, self_loops=self_loops)
+
+            graph.add_edge("a", "a")
+            edge_data = [{0: 1}] if self_loops else [{}]
+            self.assertEqual(sorted(graph.node_ids), ["a"])
+            self.assertEqual(graph._edge_data, edge_data)
+
+            graph.add_edge("a", "b")
+            edge_data[0][1] = 1
+            edge_data.append({} if directed else {0: 1})
+            self.assertEqual(sorted(graph.node_ids), ["a", "b"])
+            self.assertEqual(graph._edge_data, edge_data)
 
     def test_read_edglst_unweighted(self):
         graph = SparseGraph.from_edglst(
