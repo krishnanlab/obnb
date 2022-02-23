@@ -500,7 +500,7 @@ class TestCX(unittest.TestCase):
                     node_id_prefix = "uniprot" if use_node_alias else None
                     graph = DenseGraph.from_cx_stream_file(
                         self.anfkb_data_path,
-                        undirected=False,
+                        directed=True,
                         interaction_types=interaction_types,
                         node_id_entry="n",
                         node_id_prefix=node_id_prefix,
@@ -533,7 +533,7 @@ class TestCX(unittest.TestCase):
             with self.subTest(interaction_types=interaction_types):
                 graph = DenseGraph.from_cx_stream_file(
                     self.hcmrh_data_path,
-                    undirected=False,
+                    directed=True,
                     interaction_types=interaction_types,
                     node_id_entry="n",
                     node_id_prefix=None,
@@ -573,7 +573,7 @@ class TestCX(unittest.TestCase):
             with self.subTest(interaction_types=interaction_types):
                 graph = SparseGraph.from_cx_stream_file(
                     self.anfkb_data_path,
-                    undirected=False,
+                    directed=True,
                     interaction_types=interaction_types,
                     node_id_entry="n",
                     node_id_prefix=None,
@@ -600,7 +600,7 @@ class TestCX(unittest.TestCase):
             with self.subTest(interaction_types=interaction_types):
                 graph = SparseGraph.from_cx_stream_file(
                     self.hcmrh_data_path,
-                    undirected=False,
+                    directed=True,
                     interaction_types=interaction_types,
                     node_id_entry="n",
                     node_id_prefix=None,

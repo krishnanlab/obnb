@@ -317,14 +317,14 @@ class SparseGraph(BaseGraph):
     def from_cx_stream_file(
         cls,
         path: str,
-        undirected: bool = True,
+        directed: bool = False,
         self_loops: bool = False,
         **kwargs,
     ):
         """Construct SparseGraph from a CX stream file."""
         graph = cls(
             weighted=True,
-            directed=not undirected,
+            directed=directed,
             self_loops=self_loops,
         )
         graph.read_cx_stream_file(path, **kwargs)
@@ -470,7 +470,7 @@ class SparseGraph(BaseGraph):
                 print(f"Skipping edge: {edge} due to unkown nodes")
 
     @classmethod
-    def from_npz(cls, path, weighted, directed, **kwargs):
+    def from_npz(cls, path, weighted, directed=False, **kwargs):
         """Construct SparseGraph from a npz file."""
         graph = cls(weighted=weighted, directed=directed)
         graph.read_npz(path, **kwargs)
