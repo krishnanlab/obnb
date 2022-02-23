@@ -455,7 +455,10 @@ class TestCX(unittest.TestCase):
         shutil.rmtree(cls.tmp_dir)
 
     def test_dense_from_cx_stream_file_biogridzm(self):
-        graph = DenseGraph.from_cx_stream_file(self.biogridzm_data_path)
+        graph = DenseGraph.from_cx_stream_file(
+            self.biogridzm_data_path,
+            self_loops=True,
+        )
 
         for node1, node2 in self.biogridzm_expected_edges:
             idx1 = graph.idmap[node1]
@@ -530,7 +533,10 @@ class TestCX(unittest.TestCase):
                             self.assertEqual(graph.mat[idx2, idx1], 0)
 
     def test_sparse_from_cx_stream_file_biogridzm(self):
-        graph = SparseGraph.from_cx_stream_file(self.biogridzm_data_path)
+        graph = SparseGraph.from_cx_stream_file(
+            self.biogridzm_data_path,
+            self_loops=True,
+        )
 
         for node1, node2 in self.biogridzm_expected_edges:
             idx1 = graph.idmap[node1]
