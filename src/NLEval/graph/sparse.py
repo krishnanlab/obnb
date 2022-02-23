@@ -14,12 +14,18 @@ from .base import BaseGraph
 class SparseGraph(BaseGraph):
     """SparseGraph object sotring data as adjacency list."""
 
-    def __init__(self, weighted=True, directed=False):
+    def __init__(
+        self,
+        weighted: bool = True,
+        directed: bool = False,
+        self_loops: bool = False,
+    ):
         """Initialize SparseGraph object."""
         super().__init__()
         self._edge_data = []
         self.weighted = weighted
         self.directed = directed
+        self.self_loops = self_loops
 
     @property
     def edge_data(self):
@@ -102,6 +108,7 @@ class SparseGraph(BaseGraph):
         node_idx1: int,
         node_idx2: int,
         directed: bool,
+        self_loops: bool,
         weight: float,
         reduction: Optional[str],
         edge_data: List[Dict[int, float]],
@@ -115,6 +122,8 @@ class SparseGraph(BaseGraph):
             node_idx2 (str): Index of node 2.
             directed (bool): If set to False, then fill in the edge for the
                 reverse direction also.
+            self_loops (bool): If set to False, then ignore edge where the
+                source and the destination nodes are identical.
             weight (float): Edge weight to use.
             reduction (str): Type of edge reduction to use if edge already
                 existsed, if not set, warn if old edge exists with different
@@ -123,6 +132,10 @@ class SparseGraph(BaseGraph):
                 adjacency list with edge weights.
 
         """
+        # Check self loops
+        if not self_loops and node_idx1 == node_idx2:
+            return
+
         # Check duplicated edge weights and apply reduction
         if node_idx2 in edge_data[node_idx1]:
             old_weight = edge_data[node_idx1][node_idx2]
@@ -176,6 +189,7 @@ class SparseGraph(BaseGraph):
             self.idmap[node_id1],
             self.idmap[node_id2],
             self.directed,
+            self.self_loops,
             weight,
             reduction,
             self._edge_data,
@@ -300,9 +314,19 @@ class SparseGraph(BaseGraph):
         return graph
 
     @classmethod
-    def from_cx_stream_file(cls, path: str, undirected: bool = True, **kwargs):
+    def from_cx_stream_file(
+        cls,
+        path: str,
+        directed: bool = False,
+        self_loops: bool = False,
+        **kwargs,
+    ):
         """Construct SparseGraph from a CX stream file."""
-        graph = cls(weighted=True, directed=not undirected)
+        graph = cls(
+            weighted=True,
+            directed=directed,
+            self_loops=self_loops,
+        )
         graph.read_cx_stream_file(path, **kwargs)
         return graph
 
@@ -446,7 +470,7 @@ class SparseGraph(BaseGraph):
                 print(f"Skipping edge: {edge} due to unkown nodes")
 
     @classmethod
-    def from_npz(cls, path, weighted, directed, **kwargs):
+    def from_npz(cls, path, weighted, directed=False, **kwargs):
         """Construct SparseGraph from a npz file."""
         graph = cls(weighted=weighted, directed=directed)
         graph.read_npz(path, **kwargs)
@@ -663,6 +687,7 @@ class DirectedSparseGraph(SparseGraph):
             self.idmap[node_id2],
             self.idmap[node_id1],
             True,
+            False,
             weight,
             reduction,
             self._rev_edge_data,

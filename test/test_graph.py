@@ -1,3 +1,4 @@
+import itertools
 import os
 import os.path as osp
 import shutil
@@ -17,6 +18,7 @@ from NLEval.graph import SparseGraph
 from NLEval.graph.base import BaseGraph
 from NLEval.util import idhandler
 from NLEval.util.exceptions import IDExistsError
+from parameterized import parameterized
 from scipy.spatial import distance
 
 
@@ -203,6 +205,22 @@ class TestSparseGraph(unittest.TestCase):
                 graph._edge_data,
                 [{1: 1.0, 2: 0.5}, {0: 1.0}, {0: 0.5}],
             )
+
+    @parameterized.expand(itertools.product((True, False), (True, False)))
+    def test_add_edge_self_loops(self, directed, self_loops):
+        with self.subTest(directed=directed, self_loops=self_loops):
+            graph = SparseGraph(directed=directed, self_loops=self_loops)
+
+            graph.add_edge("a", "a")
+            edge_data = [{0: 1}] if self_loops else [{}]
+            self.assertEqual(sorted(graph.node_ids), ["a"])
+            self.assertEqual(graph._edge_data, edge_data)
+
+            graph.add_edge("a", "b")
+            edge_data[0][1] = 1
+            edge_data.append({} if directed else {0: 1})
+            self.assertEqual(sorted(graph.node_ids), ["a", "b"])
+            self.assertEqual(graph._edge_data, edge_data)
 
     def test_read_edglst_unweighted(self):
         graph = SparseGraph.from_edglst(
@@ -455,7 +473,10 @@ class TestCX(unittest.TestCase):
         shutil.rmtree(cls.tmp_dir)
 
     def test_dense_from_cx_stream_file_biogridzm(self):
-        graph = DenseGraph.from_cx_stream_file(self.biogridzm_data_path)
+        graph = DenseGraph.from_cx_stream_file(
+            self.biogridzm_data_path,
+            self_loops=True,
+        )
 
         for node1, node2 in self.biogridzm_expected_edges:
             idx1 = graph.idmap[node1]
@@ -479,7 +500,7 @@ class TestCX(unittest.TestCase):
                     node_id_prefix = "uniprot" if use_node_alias else None
                     graph = DenseGraph.from_cx_stream_file(
                         self.anfkb_data_path,
-                        undirected=False,
+                        directed=True,
                         interaction_types=interaction_types,
                         node_id_entry="n",
                         node_id_prefix=node_id_prefix,
@@ -512,7 +533,7 @@ class TestCX(unittest.TestCase):
             with self.subTest(interaction_types=interaction_types):
                 graph = DenseGraph.from_cx_stream_file(
                     self.hcmrh_data_path,
-                    undirected=False,
+                    directed=True,
                     interaction_types=interaction_types,
                     node_id_entry="n",
                     node_id_prefix=None,
@@ -530,7 +551,10 @@ class TestCX(unittest.TestCase):
                             self.assertEqual(graph.mat[idx2, idx1], 0)
 
     def test_sparse_from_cx_stream_file_biogridzm(self):
-        graph = SparseGraph.from_cx_stream_file(self.biogridzm_data_path)
+        graph = SparseGraph.from_cx_stream_file(
+            self.biogridzm_data_path,
+            self_loops=True,
+        )
 
         for node1, node2 in self.biogridzm_expected_edges:
             idx1 = graph.idmap[node1]
@@ -549,7 +573,7 @@ class TestCX(unittest.TestCase):
             with self.subTest(interaction_types=interaction_types):
                 graph = SparseGraph.from_cx_stream_file(
                     self.anfkb_data_path,
-                    undirected=False,
+                    directed=True,
                     interaction_types=interaction_types,
                     node_id_entry="n",
                     node_id_prefix=None,
@@ -576,7 +600,7 @@ class TestCX(unittest.TestCase):
             with self.subTest(interaction_types=interaction_types):
                 graph = SparseGraph.from_cx_stream_file(
                     self.hcmrh_data_path,
-                    undirected=False,
+                    directed=True,
                     interaction_types=interaction_types,
                     node_id_entry="n",
                     node_id_prefix=None,
