@@ -19,26 +19,38 @@ class BaseNdexData(SparseGraph):
 
     uuid: Optional[str] = None
 
-    def __init__(self, root: str, weighted: bool, directed: bool, **kwargs):
+    def __init__(
+        self,
+        root: str,
+        weighted: bool,
+        directed: bool,
+        redownload: bool = False,
+        reprocess: bool = False,
+        **kwargs,
+    ):
         """Initialize the BaseNdexData object.
 
         Args:
             root (str): The root directory of the data.
             weighted (bool): Whether the network is weighted or not.
             undirected (bool): Whether the network is undirected or not.
+            redownload (bool): If set to True, always download the data
+                even if the raw data file already exists in the corresponding
+                data folder (default: :obj:`False`).
+            reprocess (bool): If set to True, always process the data
+                even if the processed data file already exists in the
+                corresponding data folder (default: obj:`False`).
             **kwargs: Other keyword arguments used for reading the cx file.
 
         """
         super().__init__(weighted=weighted, directed=directed)
 
         self.root = root
-        if self._download():
-            print("Processing...")
-            self.read_cx_stream_file(self.raw_data_path, **kwargs)
-            print("Done!")
-            self.save_npz(self.processed_data_path, weighted)
-        else:
-            self.read_npz(self.processed_data_path)
+        self.redownload = redownload
+        self.reprocess = reprocess
+
+        self._download()
+        self._process(**kwargs)
 
     @property
     def name(self) -> str:
@@ -67,22 +79,28 @@ class BaseNdexData(SparseGraph):
         with open(self.raw_data_path, "wb") as f:
             f.write(client_resp.content)
 
-    def _download(self) -> bool:
-        """Check to see if files downloaded first before downloading.
-
-        Returns:
-            bool: False if already downloaded, otherwise True.
-
-        """
+    def _download(self):
+        """Check to see if files downloaded first before downloading."""
         os.makedirs(self.raw_dir, exist_ok=True)
         os.makedirs(self.processed_dir, exist_ok=True)
 
-        if not osp.isfile(self.raw_data_path):
+        if self.redownload or not osp.isfile(self.raw_data_path):
             print("Downloading...")
             self.download()
-            return True
 
-        return False
+    def _process(self, **kwargs):
+        """Check to see if processed file exist and process if not."""
+        if (
+            self.reprocess
+            or self.redownload
+            or not osp.isfile(self.processed_data_path)
+        ):
+            print("Processing...")
+            self.read_cx_stream_file(self.raw_data_path, **kwargs)
+            self.save_npz(self.processed_data_path, self.weighted)
+            print("Done!")
+        else:
+            self.read_npz(self.processed_data_path)
 
 
 class BaseAnnotatedOntologyData(LabelsetCollection):
@@ -91,17 +109,22 @@ class BaseAnnotatedOntologyData(LabelsetCollection):
     ontology_url: Optional[str] = None
     annotation_url: Optional[str] = None
 
-    def __init__(self, root: str, **kwargs):
+    def __init__(
+        self,
+        root: str,
+        redownload: bool = False,
+        reprocess: bool = False,
+        **kwargs,
+    ):
         """Initialize the BaseAnnotatedOntologyData object."""
         super().__init__()
 
         self.root = root
-        if self._download():
-            print("Processing...")
-            self.process()
-            print("Done!")
-        else:
-            self.read_gmt(self.processed_data_path)
+        self.redownload = redownload
+        self.reprocess = reprocess
+
+        self._download()
+        self._process()
 
     @property
     def name(self) -> str:
@@ -151,19 +174,31 @@ class BaseAnnotatedOntologyData(LabelsetCollection):
         """Process raw data and save as gmt for future usage."""
         raise NotImplementedError
 
-    def _download(self) -> bool:
+    def _download(self):
         """Download files if not all raw files are available."""
         os.makedirs(self.raw_dir, exist_ok=True)
         os.makedirs(self.processed_dir, exist_ok=True)
 
         raw_file_names = list(self.data_name_dict.values())
         raw_files = [osp.join(self.raw_dir, i) for i in raw_file_names]
-        if any(not osp.isfile(raw_file) for raw_file in raw_files):
+        if self.redownload or any(
+            not osp.isfile(raw_file) for raw_file in raw_files
+        ):
             print("Downloading...")
             self.download()
-            return True
 
-        return False
+    def _process(self):
+        """Check to see if processed file exist and process if not."""
+        if (
+            self.redownload
+            or self.reprocess
+            or not osp.isfile(self.processed_data_path)
+        ):
+            print("Processing...")
+            self.process()
+            print("Done!")
+        else:
+            self.read_gmt(self.processed_data_path)
 
 
 def cleandir(rawdir: str) -> str:

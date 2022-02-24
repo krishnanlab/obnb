@@ -6,7 +6,7 @@ class HumanNet(BaseNdexData):
 
     cx_uuid = "0d05756c-3553-11e9-9f06-0ac135e8bacf"
 
-    def __init__(self, root: str):
+    def __init__(self, root: str, **kwargs):
         """Initialize the HumanNet network data."""
         super().__init__(
             root,
@@ -17,4 +17,5 @@ class HumanNet(BaseNdexData):
             default_edge_weight=0.0,
             edge_weight_attr_name="LLS",
             reduction=None,
+            **kwargs,
         )

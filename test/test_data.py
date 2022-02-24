@@ -1,3 +1,4 @@
+import io
 import shutil
 import tempfile
 import unittest
@@ -26,6 +27,9 @@ class TestData(unittest.TestCase):
         graph = NLEval.data.BioPlex(self.tmp_dir)
         self.assertEqual(graph.size, 8364)
         self.assertEqual(graph.num_edges, 71408)
+
+        NLEval.data.BioPlex(self.tmp_dir, reprocess=True)
+        NLEval.data.BioPlex(self.tmp_dir, redownload=True)
 
     @unittest.skip("Long process time")
     def test_disgenet(self):

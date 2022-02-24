@@ -6,7 +6,7 @@ class STRING(BaseNdexData):
 
     cx_uuid = "d14db454-3d18-11e8-a935-0ac135e8bacf"
 
-    def __init__(self, root: str):
+    def __init__(self, root: str, **kwargs):
         """Initialize the STRING network data."""
         super().__init__(
             root,
@@ -18,4 +18,5 @@ class STRING(BaseNdexData):
             edge_weight_attr_name="combined_score",
             reduction="max",
             use_node_alias=True,
+            **kwargs,
         )

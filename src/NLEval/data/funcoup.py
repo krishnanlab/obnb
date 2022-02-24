@@ -14,7 +14,7 @@ class FunCoup(BaseNdexData):
 
     cx_uuid = "172990f7-102f-11ec-b666-0ac135e8bacf"
 
-    def __init__(self, root: str):
+    def __init__(self, root: str, **kwargs):
         """Initialize the FunCoup network data."""
         super().__init__(
             root,
@@ -26,4 +26,5 @@ class FunCoup(BaseNdexData):
             default_edge_weight=0.0,
             edge_weight_attr_name="#0:PFC",
             reduction="max",
+            **kwargs,
         )

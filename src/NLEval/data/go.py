@@ -22,13 +22,14 @@ class GeneOntology(BaseAnnotatedOntologyData):
         max_size: int = 500,
         jaccard: float = 0.5,
         overlap: float = 0.7,
+        **kwargs,
     ):
         """Initialize the GOBP data object."""
         self.min_size = min_size
         self.max_size = max_size
         self.jaccard = jaccard
         self.overlap = overlap
-        super().__init__(root)
+        super().__init__(root, **kwargs)
 
     @property
     def data_name_dict(self) -> Dict[str, str]:
