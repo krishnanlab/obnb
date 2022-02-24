@@ -105,6 +105,22 @@ class TestBaseGraph(unittest.TestCase):
         self.graph.idmap.add_id("a")
         self.assertFalse(self.graph.isempty())
 
+    def test_get_node_id(self):
+        self.graph.idmap.add_id("a")
+        self.graph.idmap.add_id("b")
+        self.assertEqual(self.graph.get_node_id("a"), "a")
+        self.assertEqual(self.graph.get_node_id(0), "a")
+        self.assertEqual(self.graph.get_node_id("b"), "b")
+        self.assertEqual(self.graph.get_node_id(1), "b")
+
+    def test_get_node_idx(self):
+        self.graph.idmap.add_id("a")
+        self.graph.idmap.add_id("b")
+        self.assertEqual(self.graph.get_node_idx("a"), 0)
+        self.assertEqual(self.graph.get_node_idx(0), 0)
+        self.assertEqual(self.graph.get_node_idx("b"), 1)
+        self.assertEqual(self.graph.get_node_idx(1), 1)
+
 
 class TestSparseGraph(unittest.TestCase):
     @classmethod
