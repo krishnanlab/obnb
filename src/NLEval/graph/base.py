@@ -86,9 +86,14 @@ class BaseGraph:
         return False
 
     @property
+    def num_nodes(self) -> int:
+        """Return the number of nodes in the graph indicated by the ID map."""
+        return self.idmap.size
+
+    @property
     def size(self):
         """int: number of nodes in graph."""
-        return self.idmap.size
+        return self.num_nodes
 
     def isempty(self):
         """bool: true if graph is empty, indicated by empty idmap."""

@@ -57,7 +57,7 @@ class SparseGraph(BaseGraph):
         """int: Number of edges."""
         return sum(len(nbrs) for nbrs in self.edge_data)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: Union[str, List[str]]):
         """Return slices of constructed adjacency matrix.
 
         Args:
@@ -74,7 +74,7 @@ class SparseGraph(BaseGraph):
             fvec = np.asarray(fvec_lst)
         return fvec
 
-    def construct_adj_vec(self, src_idx):
+    def construct_adj_vec(self, src_idx: int):
         """Construct and return a specific row vector of the adjacency matrix.
 
         Args:
@@ -612,8 +612,7 @@ class SparseGraph(BaseGraph):
             default_val(float): default value for missing edges
 
         """
-        num_nodes = self.idmap.size
-        mat = np.ones((num_nodes, num_nodes)) * default_val
+        mat = np.ones((self.num_nodes, self.num_nodes)) * default_val
         for src_node, src_nbrs in enumerate(self._edge_data):
             for dst_node in src_nbrs:
                 mat[src_node, dst_node] = src_nbrs[dst_node]

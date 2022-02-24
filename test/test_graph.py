@@ -95,10 +95,12 @@ class TestBaseGraph(unittest.TestCase):
 
     def test_size(self):
         self.assertEqual(self.graph.size, 0)
+        self.assertEqual(self.graph.num_nodes, 0)
         for i in range(5):
             with self.subTest(i=i):
                 self.graph.idmap.add_id(str(i))
                 self.assertEqual(self.graph.size, i + 1)
+                self.assertEqual(self.graph.num_nodes, i + 1)
 
     def test_isempty(self):
         self.assertTrue(self.graph.isempty())
