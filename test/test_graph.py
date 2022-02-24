@@ -83,6 +83,7 @@ class test_case1:
                 [5, 0, 0, 0.1, 0, 0],
             ],
         )
+        self.data_mat.setflags(write=False)
 
 
 class TestBaseGraph(unittest.TestCase):
@@ -362,6 +363,23 @@ class TestSparseGraph(unittest.TestCase):
         graph2 = deepcopy(graph)
         graph2.add_id("x")
         self.assertFalse(graph == graph2)
+
+    def test_to_dense_graph(self):
+        mat = np.array(
+            [
+                [0, 1, 0, 1],
+                [1, 0, 1, 0],
+                [0, 1, 0, 1],
+                [1, 0, 1, 0],
+            ],
+        )
+        print("???", mat, type(mat), mat.shape)
+        ids = ["a", "b", "c", "d"]
+        graph = SparseGraph.from_mat(mat, ids)
+        graph = graph.to_dense_graph()
+        self.assertIsInstance(graph, DenseGraph)
+        self.assertEqual(list(graph.node_ids), ids)
+        self.assertEqual(graph.mat.tolist(), mat.tolist())
 
 
 class TestDirectedSparseGraph(unittest.TestCase):
@@ -741,6 +759,17 @@ class TestDenseGraph(unittest.TestCase):
         graph2 = deepcopy(graph)
         graph2.mat[2, 2] = 1
         self.assertFalse(graph == graph2)
+
+    def test_to_sparse_graph(self):
+        graph = DenseGraph.from_mat(
+            self.case.data_mat[:, 1:],
+            self.case.data_mat[:, 0].astype(int).astype(str).tolist(),
+        ).to_sparse_graph()
+        self.assertIsInstance(graph, SparseGraph)
+        self.assertEqual(
+            graph._edge_data,
+            [{2: 0.4}, {3: 0.3}, {0: 0.4, 4: 0.1}, {1: 0.3}, {2: 0.1}],
+        )
 
 
 class TestFeatureVec(unittest.TestCase):

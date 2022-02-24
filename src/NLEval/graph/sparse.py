@@ -641,6 +641,12 @@ class SparseGraph(BaseGraph):
 
         return edge_index, edge_weight
 
+    def to_dense_graph(self):
+        """Convert SparseGraph to a DenseGraph."""
+        from .dense import DenseGraph  # noreorder
+
+        return DenseGraph.from_mat(self.to_adjmat(), self.idmap)
+
 
 class DirectedSparseGraph(SparseGraph):
     """Directed sparse graph that also keeps track of reversed edge data.
