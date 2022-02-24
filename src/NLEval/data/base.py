@@ -11,6 +11,76 @@ from ..typing import Dict
 from ..typing import Optional
 
 
+class BaseData:
+    def __init__(
+        self,
+        root: str,
+        redownload: bool = False,
+        reprocess: bool = False,
+    ):
+        self.root = root
+        self.redownload = redownload
+        self.reprocess = reprocess
+
+        self._download()
+        self._process()
+
+    @property
+    def classname(self) -> str:
+        return self.__class__.__name__
+
+    @property
+    def raw_dir(self) -> str:
+        return cleandir(osp.join(self.root, self.classname, "raw"))
+
+    @property
+    def processed_dir(self) -> str:
+        return cleandir(osp.join(self.root, self.classname, "processed"))
+
+    @property
+    def processed_data_path(self) -> str:
+        raise NotImplementedError
+
+    @property
+    def all_raw_data_available(self) -> bool:
+        raise NotImplementedError  # maybe just loop over all raw file names?
+
+    @property
+    def processed_data_available(self) -> bool:
+        return osp.isfile(self.processed_data_path)
+
+    def load_processed_data(self):
+        raise NotImplementedError
+
+    def download(self):
+        raise NotImplementedError
+
+    def _download(self):
+        """Check to see if files downloaded first before downloading."""
+        os.makedirs(self.raw_dir, exist_ok=True)
+        os.makedirs(self.processed_dir, exist_ok=True)
+
+        if self.redownload or not self.all_raw_data_available:
+            print("Downloading...")
+            self.download()
+
+    def process(self):
+        raise NotImplementedError
+
+    def _process(self):
+        """Check to see if processed file exist and process if not."""
+        if (
+            self.redownload
+            or self.reprocess
+            or not self.processed_data_available
+        ):
+            print("Processing...")
+            self.process()
+            print("Done!")
+        else:
+            self.load_processed_data()
+
+
 class BaseNdexData(SparseGraph):
     """The BaseNdexData object for retrieving networks from NDEX.
 
@@ -89,6 +159,11 @@ class BaseNdexData(SparseGraph):
             logger.info("Downloading...")
             self.download()
 
+    def process(self, **kwargs):
+        """Process data and save for later useage."""
+        self.read_cx_stream_file(self.raw_data_path, **kwargs)
+        self.save_npz(self.processed_data_path, self.weighted)
+
     def _process(self, **kwargs):
         """Check to see if processed file exist and process if not."""
         if (
@@ -97,8 +172,7 @@ class BaseNdexData(SparseGraph):
             or not osp.isfile(self.processed_data_path)
         ):
             logger.info("Processing...")
-            self.read_cx_stream_file(self.raw_data_path, **kwargs)
-            self.save_npz(self.processed_data_path, self.weighted)
+            self.process(**kwargs)
             logger.info("Done!")
         else:
             self.read_npz(self.processed_data_path)
