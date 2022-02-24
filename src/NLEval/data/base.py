@@ -49,13 +49,9 @@ class BaseNdexData(SparseGraph):
         self.redownload = redownload
         self.reprocess = reprocess
 
-        if reprocess or self._download():
-            print("Processing...")
-            self.read_cx_stream_file(self.raw_data_path, **kwargs)
-            print("Done!")
-            self.save_npz(self.processed_data_path, weighted)
-        else:
-            self.read_npz(self.processed_data_path)
+        self._download()
+        self._process(**kwargs)
+        print("Done!")
 
     @property
     def name(self) -> str:
@@ -84,22 +80,27 @@ class BaseNdexData(SparseGraph):
         with open(self.raw_data_path, "wb") as f:
             f.write(client_resp.content)
 
-    def _download(self) -> bool:
-        """Check to see if files downloaded first before downloading.
-
-        Returns:
-            bool: False if already downloaded, otherwise True.
-
-        """
+    def _download(self):
+        """Check to see if files downloaded first before downloading."""
         os.makedirs(self.raw_dir, exist_ok=True)
         os.makedirs(self.processed_dir, exist_ok=True)
 
         if self.redownload or not osp.isfile(self.raw_data_path):
             print("Downloading...")
             self.download()
-            return True
 
-        return False
+    def _process(self, **kwargs):
+        """Check to see if processed file exist and process if not."""
+        if (
+            self.reprocess
+            or self.redownload
+            or not osp.isfile(self.processed_data_path)
+        ):
+            print("Processing...")
+            self.read_cx_stream_file(self.raw_data_path, **kwargs)
+            self.save_npz(self.processed_data_path, self.weighted)
+        else:
+            self.read_npz(self.processed_data_path)
 
 
 class BaseAnnotatedOntologyData(LabelsetCollection):
