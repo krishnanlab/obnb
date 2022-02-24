@@ -83,6 +83,7 @@ class test_case1:
                 [5, 0, 0, 0.1, 0, 0],
             ],
         )
+        self.data_mat.setflags(write=False)
 
 
 class TestBaseGraph(unittest.TestCase):
@@ -95,15 +96,33 @@ class TestBaseGraph(unittest.TestCase):
 
     def test_size(self):
         self.assertEqual(self.graph.size, 0)
+        self.assertEqual(self.graph.num_nodes, 0)
         for i in range(5):
             with self.subTest(i=i):
                 self.graph.idmap.add_id(str(i))
                 self.assertEqual(self.graph.size, i + 1)
+                self.assertEqual(self.graph.num_nodes, i + 1)
 
     def test_isempty(self):
         self.assertTrue(self.graph.isempty())
         self.graph.idmap.add_id("a")
         self.assertFalse(self.graph.isempty())
+
+    def test_get_node_id(self):
+        self.graph.idmap.add_id("a")
+        self.graph.idmap.add_id("b")
+        self.assertEqual(self.graph.get_node_id("a"), "a")
+        self.assertEqual(self.graph.get_node_id(0), "a")
+        self.assertEqual(self.graph.get_node_id("b"), "b")
+        self.assertEqual(self.graph.get_node_id(1), "b")
+
+    def test_get_node_idx(self):
+        self.graph.idmap.add_id("a")
+        self.graph.idmap.add_id("b")
+        self.assertEqual(self.graph.get_node_idx("a"), 0)
+        self.assertEqual(self.graph.get_node_idx(0), 0)
+        self.assertEqual(self.graph.get_node_idx("b"), 1)
+        self.assertEqual(self.graph.get_node_idx(1), 1)
 
 
 class TestSparseGraph(unittest.TestCase):
@@ -344,6 +363,23 @@ class TestSparseGraph(unittest.TestCase):
         graph2 = deepcopy(graph)
         graph2.add_id("x")
         self.assertFalse(graph == graph2)
+
+    def test_to_dense_graph(self):
+        mat = np.array(
+            [
+                [0, 1, 0, 1],
+                [1, 0, 1, 0],
+                [0, 1, 0, 1],
+                [1, 0, 1, 0],
+            ],
+        )
+        print("???", mat, type(mat), mat.shape)
+        ids = ["a", "b", "c", "d"]
+        graph = SparseGraph.from_mat(mat, ids)
+        graph = graph.to_dense_graph()
+        self.assertIsInstance(graph, DenseGraph)
+        self.assertEqual(list(graph.node_ids), ids)
+        self.assertEqual(graph.mat.tolist(), mat.tolist())
 
 
 class TestDirectedSparseGraph(unittest.TestCase):
@@ -723,6 +759,17 @@ class TestDenseGraph(unittest.TestCase):
         graph2 = deepcopy(graph)
         graph2.mat[2, 2] = 1
         self.assertFalse(graph == graph2)
+
+    def test_to_sparse_graph(self):
+        graph = DenseGraph.from_mat(
+            self.case.data_mat[:, 1:],
+            self.case.data_mat[:, 0].astype(int).astype(str).tolist(),
+        ).to_sparse_graph()
+        self.assertIsInstance(graph, SparseGraph)
+        self.assertEqual(
+            graph._edge_data,
+            [{2: 0.4}, {3: 0.3}, {0: 0.4, 4: 0.1}, {1: 0.3}, {2: 0.1}],
+        )
 
 
 class TestFeatureVec(unittest.TestCase):
