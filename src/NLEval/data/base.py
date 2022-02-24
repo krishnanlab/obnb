@@ -19,20 +19,37 @@ class BaseNdexData(SparseGraph):
 
     uuid: Optional[str] = None
 
-    def __init__(self, root: str, weighted: bool, directed: bool, **kwargs):
+    def __init__(
+        self,
+        root: str,
+        weighted: bool,
+        directed: bool,
+        redownload: bool = False,
+        reprocess: bool = False,
+        **kwargs,
+    ):
         """Initialize the BaseNdexData object.
 
         Args:
             root (str): The root directory of the data.
             weighted (bool): Whether the network is weighted or not.
             undirected (bool): Whether the network is undirected or not.
+            redownload (bool): If set to True, always download the data
+                even if the raw data file already exists in the corresponding
+                data folder (default: :obj:`False`).
+            reprocess (bool): If set to True, always process the data
+                even if the processed data file already exists in the
+                corresponding data folder (default: obj:`False`).
             **kwargs: Other keyword arguments used for reading the cx file.
 
         """
         super().__init__(weighted=weighted, directed=directed)
 
         self.root = root
-        if self._download():
+        self.redownload = redownload
+        self.reprocess = reprocess
+
+        if reprocess or self._download():
             print("Processing...")
             self.read_cx_stream_file(self.raw_data_path, **kwargs)
             print("Done!")
@@ -77,7 +94,7 @@ class BaseNdexData(SparseGraph):
         os.makedirs(self.raw_dir, exist_ok=True)
         os.makedirs(self.processed_dir, exist_ok=True)
 
-        if not osp.isfile(self.raw_data_path):
+        if self.redownload or not osp.isfile(self.raw_data_path):
             print("Downloading...")
             self.download()
             return True
