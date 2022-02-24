@@ -40,6 +40,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
         max_size: int = 600,
         jaccard: float = 0.5,
         overlap: float = 0.7,
+        **kwargs,
     ):
         """Initialize the DisGeNet data object."""
         self.dsi_threshold = dsi_threshold
@@ -47,7 +48,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
         self.max_size = max_size
         self.jaccard = jaccard
         self.overlap = overlap
-        super().__init__(root)
+        super().__init__(root, **kwargs)
 
     @property
     def data_name_dict(self) -> Dict[str, str]:

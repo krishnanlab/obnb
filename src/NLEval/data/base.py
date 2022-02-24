@@ -109,17 +109,23 @@ class BaseAnnotatedOntologyData(LabelsetCollection):
     ontology_url: Optional[str] = None
     annotation_url: Optional[str] = None
 
-    def __init__(self, root: str, **kwargs):
+    def __init__(
+        self,
+        root: str,
+        redownload: bool = False,
+        reprocess: bool = False,
+        **kwargs,
+    ):
         """Initialize the BaseAnnotatedOntologyData object."""
         super().__init__()
 
         self.root = root
-        if self._download():
-            print("Processing...")
-            self.process()
-            print("Done!")
-        else:
-            self.read_gmt(self.processed_data_path)
+        self.redownload = redownload
+        self.reprocess = reprocess
+
+        self._download()
+        self._process()
+        print("Done!")
 
     @property
     def name(self) -> str:
@@ -169,19 +175,30 @@ class BaseAnnotatedOntologyData(LabelsetCollection):
         """Process raw data and save as gmt for future usage."""
         raise NotImplementedError
 
-    def _download(self) -> bool:
+    def _download(self):
         """Download files if not all raw files are available."""
         os.makedirs(self.raw_dir, exist_ok=True)
         os.makedirs(self.processed_dir, exist_ok=True)
 
         raw_file_names = list(self.data_name_dict.values())
         raw_files = [osp.join(self.raw_dir, i) for i in raw_file_names]
-        if any(not osp.isfile(raw_file) for raw_file in raw_files):
+        if self.redownload or any(
+            not osp.isfile(raw_file) for raw_file in raw_files
+        ):
             print("Downloading...")
             self.download()
-            return True
 
-        return False
+    def _process(self):
+        """Check to see if processed file exist and process if not."""
+        if (
+            self.redownload
+            or self.reprocess
+            or not osp.isfile(self.processed_data_path)
+        ):
+            print("Processing...")
+            self.process()
+        else:
+            self.read_gmt(self.processed_data_path)
 
 
 def cleandir(rawdir: str) -> str:
