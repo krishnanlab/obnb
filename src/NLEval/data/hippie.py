@@ -11,7 +11,7 @@ class HIPPIE(BaseNdexData):
 
     cx_uuid = "89dd3925-3718-11e9-9f06-0ac135e8bacf"
 
-    def __init__(self, root: str):
+    def __init__(self, root: str, **kwargs):
         """Initialize the HIPPIE network data."""
         super().__init__(
             root,
@@ -22,4 +22,5 @@ class HIPPIE(BaseNdexData):
             default_edge_weight=0.0,
             edge_weight_attr_name="Confidence Value",
             reduction="max",
+            **kwargs,
         )
