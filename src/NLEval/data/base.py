@@ -51,7 +51,6 @@ class BaseNdexData(SparseGraph):
 
         self._download()
         self._process(**kwargs)
-        print("Done!")
 
     @property
     def name(self) -> str:
@@ -99,6 +98,7 @@ class BaseNdexData(SparseGraph):
             print("Processing...")
             self.read_cx_stream_file(self.raw_data_path, **kwargs)
             self.save_npz(self.processed_data_path, self.weighted)
+            print("Done!")
         else:
             self.read_npz(self.processed_data_path)
 
@@ -125,7 +125,6 @@ class BaseAnnotatedOntologyData(LabelsetCollection):
 
         self._download()
         self._process()
-        print("Done!")
 
     @property
     def name(self) -> str:
@@ -197,6 +196,7 @@ class BaseAnnotatedOntologyData(LabelsetCollection):
         ):
             print("Processing...")
             self.process()
+            print("Done!")
         else:
             self.read_gmt(self.processed_data_path)
 
