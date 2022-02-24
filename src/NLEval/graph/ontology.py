@@ -77,34 +77,6 @@ class OntologyGraph(DirectedSparseGraph):
         super().add_edge(node_id1, node_id2, weight, reduction)
         self._edge_stats[self.idmap[node_id2]] += 1
 
-    def get_node_id(self, node: Union[str, int]) -> str:
-        """Return the node ID given the node index.
-
-        Args:
-            node (Union[str, int]): Node index (int) or node ID (str). If input
-                is already node ID, return directly. If input is node index,
-                then return the node ID of the corresponding node index.
-
-        Return:
-            str: Node ID.
-
-        """
-        return node if isinstance(node, str) else self.idmap.lst[node]
-
-    def get_node_idx(self, node: Union[str, int]) -> int:
-        """Return the node index given the node ID.
-
-        Args:
-            node (Union[str, int]): Node index (int) or node ID (str). If input
-                is already node index, return directly. If input is node index,
-                then return the node index of the corresponding node ID.
-
-        Return:
-            int: Node index.
-
-        """
-        return node if isinstance(node, int) else self.idmap[node]
-
     def set_node_attr(self, node: Union[str, int], node_attr: List[str]):
         """Set node attribute of a given node.
 
