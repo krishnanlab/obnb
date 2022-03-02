@@ -93,7 +93,7 @@ from NLEval.model.label_propagation import OneHopPropagation
 from NLEval.model_trainer import SupervisedLearningTrainer, LabelPropagationTrainer
 
 # Prepare study-bias holdout split on a specific geneset, taking into account of defined negatives
-y, masks = lsc.split(splitter, target_ids=g.idmap.lst, labelset_name=label_id, property_name="PubMedCount", consider_negative=True)
+y, masks = lsc.split(splitter, target_ids=g.node_ids, labelset_name=label_id, property_name="PubMedCount", consider_negative=True)
 
 # Specify model(s) and metrics
 sl_mdl = LogisticRegression(penalty="l2", solver="lbfgs")
@@ -110,7 +110,7 @@ from torch_geometric.nn import GCN
 from NLEval.model_trainer.gnn import SimpleGNNTrainer
 
 # Prepare study-bias holdout split on the whole geneset collection, do not consider defined negatives
-y, masks = lsc.split(splitter, target_ids=g.idmap.lst, property_name="PubMedCount")
+y, masks = lsc.split(splitter, target_ids=g.node_ids, property_name="PubMedCount")
 
 # Evaluate GCN on the whole geneset collection
 gcn_mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=n_tasks)
