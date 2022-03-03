@@ -28,6 +28,11 @@ conda install pytorch=1.9 torchvision torchaudio cudatoolkit=10.2 -c pytorch
 conda install pyg -c pyg -c conda-forge
 ```
 
+Note: To support some new features in PyG that are not yet released, need to install from the repo directly:
+```bash
+pip install git+https://github.com/pyg-team/pytorch_geometric
+```
+
 ### Full dev installation
 
 With Python3.8 or above and CUDA10.2:
