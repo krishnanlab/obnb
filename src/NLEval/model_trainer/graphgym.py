@@ -11,7 +11,6 @@ from torch_geometric.graphgym import cfg as cfg_gg
 from torch_geometric.graphgym import logger as logger_gg
 from torch_geometric.graphgym.config import assert_cfg
 from torch_geometric.graphgym.config import dump_cfg
-from torch_geometric.graphgym.config import load_cfg
 from torch_geometric.graphgym.loader import get_loader
 from torch_geometric.graphgym.model_builder import create_model
 from torch_geometric.graphgym.register import register_loss
@@ -23,6 +22,14 @@ from .gnn import GNNTrainer
 
 
 class GraphGymTrainer(GNNTrainer):
+    """Trainer built upon GraphGym.
+
+    Specify configurations either as file, or as kwargs. Then GrphGymTrainer
+    will use those configurations to set up GraphGym. One can then create the
+    model as specified in the configurations using the ``create_model`` method.
+
+    """
+
     def __init__(
         self,
         metrics,
@@ -33,6 +40,13 @@ class GraphGymTrainer(GNNTrainer):
         cfg_file: Optional[str] = None,
         **kwargs,
     ):
+        """Initialize GraphGymTrainer.
+
+        Args:
+            cfg_file (str): Configuration file to use for setting up GraphGym.
+            kwargs: Remaining configuration options for graphgym.
+
+        """
         if cfg_file is None:
             cfg_file = "configs/graphgym/default_config.yaml"
             logging.warn(
@@ -64,6 +78,7 @@ class GraphGymTrainer(GNNTrainer):
 
     @staticmethod
     def register_metrics(metrics, metric_best):
+        """Register custom metrics to be used by GraphGym."""
         for metric_name, metric in metrics.items():
             register_metric(metric_name, metric)
             logging.info(f"Registered metric {metric_name!r}")
@@ -71,15 +86,18 @@ class GraphGymTrainer(GNNTrainer):
         cfg_gg.metric_best = metric_best
 
     def create_model(self, dim_in: int, dim_out: int, to_device: bool = True):
+        """Create model based on the GraphGym configuration."""
         mdl = create_model(dim_in=dim_in, dim_out=dim_out, to_device=to_device)
         logging.info(mdl)
         cfg_gg.params = params_count(mdl)
         return mdl
 
     def get_loggers(self, masks) -> List[logger_gg.Logger]:
+        """Obtain GraphGym loggers."""
         return [logger_gg.Logger(name=name) for name in masks]
 
     def get_loaders(self, y, masks, split_idx) -> List[DataLoader]:
+        """Obtain GraphGym data loader."""
         # Create a copy of the data used for evaluation
         data = self.data.clone().detach().cpu()
         data.y = torch.Tensor(y).float()
@@ -103,6 +121,7 @@ class GraphGymTrainer(GNNTrainer):
         masks,
         split_idx=0,
     ):
+        """Train model using GraphGym."""
         loggers = self.get_loggers(masks)
         loaders = self.get_loaders(y, masks, split_idx)
 
@@ -115,6 +134,7 @@ class GraphGymTrainer(GNNTrainer):
 
 @register_loss("multilabel_cross_entropy")
 def multilabel_cross_entropy(pred, true):
+    """Binary Cross Entropy as loss for multilabel classification tasks."""
     if cfg_gg.dataset.task_type == "classification_multilabel":
         bce_loss = torch.nn.BCEWithLogitsLoss()
         return bce_loss(pred, true), torch.sigmoid(pred)
