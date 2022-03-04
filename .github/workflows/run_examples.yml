@@ -37,7 +37,7 @@ jobs:
         pip install torch-sparse -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
         pip install torch-cluster -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
         pip install torch-spline-conv -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
-        pip install class-resolver
+        pip install class-resolver yacs
 
     - name: Install latest PyG from github
       run: |
@@ -52,5 +52,6 @@ jobs:
       run: |
         cd example
         for script in $(ls *.py); do
+          echo Start runing example script: $script
           python $script
         done
