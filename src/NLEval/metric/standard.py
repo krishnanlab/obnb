@@ -43,12 +43,3 @@ def skip(y_true, y_predict):
     if y_true is None and y_predict is None:
         return True
     return False
-
-
-def graphgym_auroc(y_true, y_pred, *args):
-    """AUROC metric compatible with GraphGym logger."""
-    import torch
-
-    y_true = torch.cat(y_true).detach().cpu().numpy()
-    y_pred = torch.cat(y_pred).detach().cpu().numpy()
-    return auroc(y_true, y_pred)
