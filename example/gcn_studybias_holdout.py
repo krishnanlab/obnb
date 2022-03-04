@@ -32,7 +32,7 @@ y, masks = lsc.split(
     property_name="PubMed Count",
 )
 
-results = trainer.train(mdl, y, masks, epochs=200, lr=0.1)
+results = trainer.train(mdl, y, masks, epochs=50, lr=0.1)
 print(f"\nBest results:\n{results}\n")
 
 # Check to see if the model is rewinded back to the best model correctly

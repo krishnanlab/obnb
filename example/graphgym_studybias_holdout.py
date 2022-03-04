@@ -27,7 +27,7 @@ trainer = GraphGymTrainer(
     cfg_file="example_config.yaml",
     cfg_opts=[
         "optim.max_epoch",
-        200,
+        50,
         "gnn.layers_pre_mp",
         0,
     ],
