@@ -12,6 +12,10 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: [3.8, 3.9]
+        torch-version: [1.9.0]
+        include:
+          - torch-version: 1.9.0
+            torchvision-version: 0.10.0
 
     steps:
     - uses: actions/checkout@v2
@@ -28,11 +32,11 @@ jobs:
 
     - name: Install PyG dependencies
       run: |
-        pip install torch==1.9.0+cpu torchvision==1.9.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
-        pip install torch-scatter -f https://data.pyg.org/whl/torch-1.9.0+cpu.html
-        pip install torch-sparse -f https://data.pyg.org/whl/torch-1.9.0+cpu.html
-        pip install torch-cluster -f https://data.pyg.org/whl/torch-1.9.0+cpu.html
-        pip install torch-spline-conv -f https://data.pyg.org/whl/torch-1.9.0+cpu.html
+        pip install torch==${{ matrix.torch-version }}+cpu torchvision==${{ matrix.torchvision-version }}cpu -f https://download.pytorch.org/whl/torch_stable.html
+        pip install torch-scatter -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
+        pip install torch-sparse -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
+        pip install torch-cluster -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
+        pip install torch-spline-conv -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
 
     - name: Install latest PyG from github
       run: |
