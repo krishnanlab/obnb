@@ -1,5 +1,4 @@
-from typing import no_type_check
-
+"""Standard metric extending those available in sklearn."""
 import numpy as np
 import sklearn.metrics
 
@@ -39,7 +38,6 @@ def auroc(y_true: np.ndarray, y_predict: np.ndarray) -> float:
     return sklearn.metrics.roc_auc_score(y_true, y_predict)
 
 
-@no_type_check
 def skip(y_true, y_predict):
     """Wehter to skip the metric computation or not."""
     if y_true is None and y_predict is None:

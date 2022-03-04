@@ -80,7 +80,7 @@ class GNNTrainer(BaseTrainer):
             KeyError: metric_best did not match any of the spcified metrics.
 
         """
-        if metric_best is None:
+        if metric_best is None or metric_best == "auto":
             if len(self.metrics) != 1:
                 raise ValueError(
                     "Multiple metrics found but did not specify metric_best",
