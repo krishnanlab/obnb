@@ -1,5 +1,6 @@
 ![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)
 ![Tests](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/tests.yml/badge.svg)
+![Example Executions](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/run_examples.yml/badge.svg)
 
 # NetworkLearningEval
 
