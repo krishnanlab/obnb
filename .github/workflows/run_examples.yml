@@ -42,10 +42,6 @@ jobs:
       run: |
         pip install git+https://github.com/pyg-team/pytorch_geometric.git#egg=torch-geometric[full]
 
-    - name: Install latest PecanPy from github
-      run: |
-        pip install git+https://github.com/krishnanlab/PecanPy
-
     - name: Install NLEval
       run: |
         pip install -e .
@@ -55,6 +51,9 @@ jobs:
       run: |
         cd example
         for script in $(ls *.py); do
+          if [[ $script == n2v_hypertune_studybias_holdout.py ]]; then
+            continue
+          fi
           echo Start runing example script: $script
           python $script
         done
