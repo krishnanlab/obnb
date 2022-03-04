@@ -1,0 +1,50 @@
+name: Check Example Executions
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  run_examples:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.8, 3.9]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install nle dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Install PyG dependencies
+      run: |
+        pip install torch-scatter -f https://data.pyg.org/whl/torch-1.9.0+cpu.html
+        pip install torch-sparse -f https://data.pyg.org/whl/torch-1.9.0+cpu.html
+        pip install torch-cluster -f https://data.pyg.org/whl/torch-1.9.0+cpu.html
+        pip install torch-spline-conv -f https://data.pyg.org/whl/torch-1.9.0+cpu.html
+
+    - name: Install latest PyG from github
+      run: |
+        pip install git+https://github.com/pyg-team/pytorch_geometric
+
+    - name: Install NLEval
+      run: |
+        pip install -e .
+
+    - name: Execute example scripts
+      shell: bash
+      run: |
+        cd example
+        for script in $(ls *.py); do
+          python $script
+        done
