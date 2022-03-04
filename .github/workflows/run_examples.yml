@@ -37,6 +37,7 @@ jobs:
         pip install torch-sparse -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
         pip install torch-cluster -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
         pip install torch-spline-conv -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
+        pip install class-resolver
 
     - name: Install latest PyG from github
       run: |
