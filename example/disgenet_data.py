@@ -1,14 +1,18 @@
 import os.path as osp
 
 import pandas as pd
+from NLEval.data import DisGeNet
 from NLEval.graph import OntologyGraph
 from NLEval.util.exceptions import IDNotExistError
 from tqdm import tqdm
 
 
-data_dir = osp.join(osp.pardir, "data")
-do_path = osp.join(data_dir, "ontologies", "doid.obo")
-ga_path = osp.join(data_dir, "annotations", "all_gene_disease_associations.tsv")
+data_root_dir = osp.join(osp.pardir, "datasets")
+DisGeNet(data_root_dir)  # download DisGeNet data
+
+data_dir = osp.join(data_root_dir, "DisGeNet", "raw")
+do_path = osp.join(data_dir, "doid.obo")
+ga_path = osp.join(data_dir, "all_gene_disease_associations.tsv")
 
 g = OntologyGraph()
 umls_to_doid = g.read_obo(do_path, xref_prefix="UMLS_CUI")
@@ -35,8 +39,8 @@ print(
     """
 Expected outcome
 --------------------------------------------------------------------------------
-Average node attribute size (raw) = 43.42
-Average node attribute size (propagated) = 131.49
+Average node attribute size (raw) = 35.44
+Average node attribute size (propagated) = 107.31
 --------------------------------------------------------------------------------
 """,
 )
