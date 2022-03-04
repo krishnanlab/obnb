@@ -51,7 +51,7 @@ jobs:
       run: |
         cd example
         for script in $(ls *.py); do
-          if [[ $script == n2v_hypertune_studybias_holdout.py ]]; then
+          if [[ $script == n2v_hypertune_studybias_holdout.py ]] | [[ $script == sample_classification.py ]]; then
             continue
           fi
           echo Start runing example script: $script
