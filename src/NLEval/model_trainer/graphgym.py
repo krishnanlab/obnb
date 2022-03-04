@@ -1,5 +1,6 @@
 import logging
 from itertools import chain
+from typing import Any
 from typing import List
 from typing import Optional
 
@@ -38,7 +39,7 @@ class GraphGymTrainer(GNNTrainer):
         device: str = "auto",
         metric_best: str = "auto",
         cfg_file: Optional[str] = None,
-        **kwargs,
+        cfg_opts: List[Any] = None,
     ):
         """Initialize GraphGymTrainer.
 
@@ -56,8 +57,10 @@ class GraphGymTrainer(GNNTrainer):
         cfg_gg.merge_from_file(cfg_file)
 
         args = ["device", device, "metric_best", metric_best]
+        if cfg_opts is not None:
+            args += cfg_opts
         cfg_gg.merge_from_list(args)
-        cfg_gg.merge_from_list(list(chain.from_iterable(kwargs.items())))
+
         assert_cfg(cfg_gg)
         # Only support multilabel classification
         cfg_gg.dataset.task_type = "classification_multilabel"
@@ -114,13 +117,7 @@ class GraphGymTrainer(GNNTrainer):
 
         return loaders
 
-    def train(
-        self,
-        model,
-        y,
-        masks,
-        split_idx=0,
-    ):
+    def train(self, model, y, masks, split_idx=0):
         """Train model using GraphGym."""
         loggers = self.get_loggers(masks)
         loaders = self.get_loaders(y, masks, split_idx)
