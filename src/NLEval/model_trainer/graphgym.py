@@ -1,5 +1,4 @@
 import logging
-from itertools import chain
 from typing import Any
 from typing import List
 from typing import Optional

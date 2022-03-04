@@ -3,7 +3,7 @@ import torch
 from load_data import load_data
 from NLEval.label.filters import LabelsetRangeFilterSplit
 from NLEval.label.split import RatioPartition
-from NLEval.metrics import graphgym_auroc
+from NLEval.metric import graphgym_auroc
 from NLEval.model_trainer.graphgym import GraphGymTrainer
 
 # Load dataset (with sparse graph)

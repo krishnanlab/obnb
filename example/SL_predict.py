@@ -6,7 +6,7 @@ from NLEval.label.collection import LabelsetCollection
 from NLEval.label.split import AllHoldout
 from NLEval.model_trainer import SupervisedLearningTrainer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import roc_auc_score as auroc
+from sklearn.metric import roc_auc_score as auroc
 
 DATA_DIR = osp.join(osp.pardir, "data")
 GRAPH_FP = osp.join(DATA_DIR, "networks", "STRING-EXP.edg")

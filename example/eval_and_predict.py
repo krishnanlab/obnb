@@ -4,7 +4,7 @@ from NLEval.label.split import RatioPartition
 from NLEval.model_trainer import SupervisedLearningTrainer
 from NLEval.util.parallel import ParDatMap
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import roc_auc_score as auroc
+from sklearn.metric import roc_auc_score as auroc
 
 
 progressbar = True
