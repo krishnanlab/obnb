@@ -26,7 +26,12 @@ class BaseFilter:
 
     """
 
-    def __init__(self, log_level: LogLevel = "WARNING", verbose: bool = False):
+    def __init__(
+        self,
+        log_level: LogLevel = "WARNING",
+        verbose: bool = False,
+        **kwargs,
+    ):
         """Initialize BaseFilter with logger.
 
         Args:

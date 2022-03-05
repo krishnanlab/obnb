@@ -121,11 +121,10 @@ class LabelsetRangeFilterSplit(BaseRangeFilter):
         self,
         min_val: float,
         splitter: Splitter,
-        verbose: bool = False,
         **kwargs,
     ):
         """Initialize LabelsetRangeFilterTrainTestPos object."""
-        super().__init__(min_val=min_val, verbose=verbose)
+        super().__init__(min_val=min_val, **kwargs)
         self.splitter = splitter
         self.kwargs = kwargs
 

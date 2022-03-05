@@ -309,6 +309,7 @@ class LabelsetCollection(idhandler.IDprop):
         property_name: Optional[str] = None,
         mask_names: Optional[Tuple[str, ...]] = None,
         consider_negative: bool = False,
+        **kwargs,
     ) -> Tuple[np.ndarray, Dict[str, np.ndarray]]:
         """Split the entities based on the labelsets.
 
