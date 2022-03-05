@@ -64,9 +64,10 @@ class EntityRangeFilterNoccur(BaseRangeFilter):
         self,
         min_val: Optional[float] = None,
         max_val: Optional[float] = None,
+        **kwargs,
     ):
         """Initialize EntityRangeFilterNoccur object."""
-        super().__init__(min_val, max_val)
+        super().__init__(min_val, max_val, **kwargs)
 
     @staticmethod
     def get_val_getter(lsc):
@@ -97,9 +98,10 @@ class LabelsetRangeFilterSize(BaseRangeFilter):
         self,
         min_val: Optional[float] = None,
         max_val: Optional[float] = None,
+        **kwargs,
     ):
         """Initialize LabelsetRangeFilterSize object."""
-        super().__init__(min_val, max_val)
+        super().__init__(min_val, max_val, **kwargs)
 
     @staticmethod
     def get_val_getter(lsc):

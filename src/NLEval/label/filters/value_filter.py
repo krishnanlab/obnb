@@ -11,9 +11,9 @@ class BaseValueFilter(BaseFilter):
 
     """
 
-    def __init__(self, val, remove=True):
+    def __init__(self, val, remove=True, **kwargs):
         """Initialize BaseValueFilter object."""
-        super().__init__()
+        super().__init__(**kwargs)
         self.val = val
         self.remove = remove
 
