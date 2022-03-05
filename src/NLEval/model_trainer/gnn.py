@@ -154,8 +154,8 @@ class GNNTrainer(BaseTrainer):
             mask_suffix (str): Mask name suffix.
 
         """
-        data = deepcopy(self.data).to("cpu")
-        data.y = torch.from_numpy(y.astype(float))
+        data = self.data.clone().detach().cpu()
+        data.y = torch.Tensor(y).float()
         for mask_name, mask in masks.items():
             setattr(data, mask_name + mask_suffix, torch.from_numpy(mask))
         return data
