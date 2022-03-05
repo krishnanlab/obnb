@@ -99,7 +99,16 @@ class GraphGymTrainer(GNNTrainer):
         return mdl
 
     def get_loaders(self, y, masks, split_idx) -> List[DataLoader]:
-        """Obtain GraphGym data loader."""
+        """Obtain GraphGym data loaders.
+
+        Two loaders are set, one is for training and the other is for 'all'.
+        The reason for using the 'all' loader is that in the transductive
+        node classification setting, the predictions between training stage and
+        inference stage are exactly the same. So there is no need to recompute
+        the predictions just for the sake the obtaining different masked
+        values. Instead, we can directly mask on the full predction values.
+
+        """
         # Create a copy of the data used for evaluation
         data = self.data.clone().detach().cpu()
         data.y = torch.Tensor(y).float()
@@ -124,6 +133,12 @@ class GraphGymTrainer(GNNTrainer):
 
     @torch.no_grad()
     def evaluate(self, loaders, model, masks):
+        """Evaluate the model performance at a specific epoch.
+
+        First obtain the prediction values using the 'all_mask'. Then compute
+        evaluation metric using a specific mask on the full predictions.
+
+        """
         model.eval()
 
         # Full batch used in the transduction node classification setting.
@@ -144,7 +159,13 @@ class GraphGymTrainer(GNNTrainer):
         return results
 
     def train(self, model, y, masks, split_idx=0):
-        """Train model using GraphGym."""
+        """Train model using GraphGym.
+
+        Note that becuase NLEval only concerns transductive node classification
+        (for now), the training procedure is reduced to this specific setting
+        for the sake of runtime performance.
+
+        """
         logger_gg = Logger_gg(name="train")
         loaders = self.get_loaders(y, masks, split_idx)
 
