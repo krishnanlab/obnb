@@ -17,12 +17,10 @@ from torch_geometric.graphgym.logger import Logger as Logger_gg
 from torch_geometric.graphgym.model_builder import create_model
 from torch_geometric.graphgym.register import register_loss
 from torch_geometric.graphgym.register import register_metric
-from torch_geometric.graphgym.train import eval_epoch
 from torch_geometric.graphgym.train import train_epoch
 from torch_geometric.graphgym.utils.comp_budget import params_count
 from torch_geometric.graphgym.utils.device import auto_select_device
 from torch_geometric.graphgym.utils.epoch import is_eval_epoch
-from torch_geometric.graphgym.utils.epoch import is_train_eval_epoch
 
 from .gnn import GNNTrainer
 
@@ -108,11 +106,11 @@ class GraphGymTrainer(GNNTrainer):
 
         # Set training mask
         train_mask = self.get_mask(masks, "train", split_idx)
-        setattr(data, "train_mask", torch.Tensor(train_mask).bool())
+        data.train_mask = torch.Tensor(train_mask).bool()
 
         # Add 'all_mask' to eliminate redundant model executions during the
         # evaluation setp in the transductive node classification setting.
-        setattr(data, "all_mask", torch.ones(train_mask.shape, dtype=bool))
+        data.all_mask = torch.ones(train_mask.shape, dtype=bool)
         logging.info(data)
 
         # Two loaders, one for train and one for all. Note that the shuffle
@@ -172,7 +170,7 @@ class GraphGymTrainer(GNNTrainer):
                 logging.info(new_results)
 
         logger_gg.close()
-        logging.info("Task done, results saved in {}".format(cfg_gg.run_dir))
+        logging.info(f"Task done, results saved in {cfg_gg.run_dir}")
 
         # Rewind back to best model
         model.load_state_dict(best_model_state)
