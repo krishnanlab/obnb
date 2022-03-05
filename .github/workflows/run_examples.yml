@@ -1,7 +1,6 @@
 name: Example Executions
 
 on:
-  - push
   - pull_request
 
 jobs:

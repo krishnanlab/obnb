@@ -1,22 +1,28 @@
 import logging
+from functools import wraps
+from itertools import chain
 from typing import Any
+from typing import Dict
 from typing import List
 from typing import Optional
 
 import torch
 from torch_geometric import graphgym as pyg_gg
 from torch_geometric import seed_everything
+from torch_geometric.data import Batch
 from torch_geometric.data import DataLoader
 from torch_geometric.graphgym import cfg as cfg_gg
-from torch_geometric.graphgym import logger as logger_gg
 from torch_geometric.graphgym.config import assert_cfg
 from torch_geometric.graphgym.config import dump_cfg
 from torch_geometric.graphgym.loader import get_loader
+from torch_geometric.graphgym.logger import Logger as Logger_gg
 from torch_geometric.graphgym.model_builder import create_model
 from torch_geometric.graphgym.register import register_loss
 from torch_geometric.graphgym.register import register_metric
+from torch_geometric.graphgym.train import train_epoch
 from torch_geometric.graphgym.utils.comp_budget import params_count
 from torch_geometric.graphgym.utils.device import auto_select_device
+from torch_geometric.graphgym.utils.epoch import is_eval_epoch
 
 from .gnn import GNNTrainer
 
@@ -38,13 +44,13 @@ class GraphGymTrainer(GNNTrainer):
         device: str = "auto",
         metric_best: str = "auto",
         cfg_file: Optional[str] = None,
-        cfg_opts: List[Any] = None,
+        cfg_opts: Dict[str, Any] = None,
     ):
         """Initialize GraphGymTrainer.
 
         Args:
             cfg_file (str): Configuration file to use for setting up GraphGym.
-            kwargs: Remaining configuration options for graphgym.
+            cfg_opts: Remaining configuration options for graphgym.
 
         """
         if cfg_file is None:
@@ -57,7 +63,7 @@ class GraphGymTrainer(GNNTrainer):
 
         args = ["device", device, "metric_best", metric_best]
         if cfg_opts is not None:
-            args += cfg_opts
+            args += list(chain.from_iterable(cfg_opts.items()))
         cfg_gg.merge_from_list(args)
 
         assert_cfg(cfg_gg)
@@ -94,38 +100,105 @@ class GraphGymTrainer(GNNTrainer):
         cfg_gg.params = params_count(mdl)
         return mdl
 
-    def get_loggers(self, masks) -> List[logger_gg.Logger]:
-        """Obtain GraphGym loggers."""
-        return [logger_gg.Logger(name=name) for name in masks]
-
     def get_loaders(self, y, masks, split_idx) -> List[DataLoader]:
-        """Obtain GraphGym data loader."""
+        """Obtain GraphGym data loaders.
+
+        Two loaders are set, one is for training and the other is for 'all'.
+        The reason for using the 'all' loader is that in the transductive
+        node classification setting, the predictions between training stage and
+        inference stage are exactly the same. So there is no need to recompute
+        the predictions just for the sake the obtaining different masked
+        values. Instead, we can directly mask on the full predction values.
+
+        """
         # Create a copy of the data used for evaluation
         data = self.data.clone().detach().cpu()
         data.y = torch.Tensor(y).float()
 
-        for mask_name in masks:
-            mask = self.get_mask(masks, mask_name, split_idx)
-            torch_mask = torch.Tensor(mask).bool()
-            setattr(data, f"{mask_name}_mask", torch_mask)
+        # Set training mask
+        train_mask = self.get_mask(masks, "train", split_idx)
+        data.train_mask = torch.Tensor(train_mask).bool()
+
+        # Add 'all_mask' to eliminate redundant model executions during the
+        # evaluation setp in the transductive node classification setting.
+        data.all_mask = torch.ones(train_mask.shape, dtype=bool)
         logging.info(data)
 
-        loaders = [get_loader([data], "full_batch", 1, True)]
-        for _ in range(len(masks) - 1):
-            loaders.append(get_loader([data], "full_batch", 1, False))
+        # Two loaders, one for train and one for all. Note that the shuffle
+        # option does nothing in the full batch setting.
+        loaders = [
+            get_loader([data], "full_batch", 1, shuffle=True),
+            get_loader([data], "full_batch", 1, shuffle=False),
+        ]
 
         return loaders
 
+    @torch.no_grad()
+    def evaluate(self, loaders, model, masks):
+        """Evaluate the model performance at a specific epoch.
+
+        First obtain the prediction values using the 'all_mask'. Then compute
+        evaluation metric using a specific mask on the full predictions.
+
+        """
+        model.eval()
+
+        # Full batch used in the transduction node classification setting.
+        full_loader = loaders[1]
+        batch = list(full_loader)[0]
+        batch.split = "all"
+        batch.to(torch.device(cfg_gg.device))
+        pred, true = model(batch)
+        pred, true = pred.detach().cpu().numpy(), true.detach().cpu().numpy()
+
+        results = {}
+        for metric_name, metric_func in self.metrics.items():
+            for mask_name in masks:
+                mask = self.get_mask(masks, mask_name, split_idx=0)
+                score = metric_func(true[mask], pred[mask])
+                results[f"{mask_name}_{metric_name}"] = score
+
+        return results
+
     def train(self, model, y, masks, split_idx=0):
-        """Train model using GraphGym."""
-        loggers = self.get_loggers(masks)
+        """Train model using GraphGym.
+
+        Note that becuase NLEval only concerns transductive node classification
+        (for now), the training procedure is reduced to this specific setting
+        for the sake of runtime performance.
+
+        """
+        logger_gg = Logger_gg(name="train")
         loaders = self.get_loaders(y, masks, split_idx)
 
         optimizer = pyg_gg.create_optimizer(model.parameters(), cfg_gg.optim)
         scheduler = pyg_gg.create_scheduler(optimizer, cfg_gg.optim)
 
-        # TODO: find out a way to rewind the model back to optimal state.
-        pyg_gg.train(loggers, loaders, model, optimizer, scheduler)
+        stats, best_stats, best_model_state = self.new_stats(masks)
+        for cur_epoch in range(cfg_gg.optim.max_epoch):
+            train_epoch(logger_gg, loaders[0], model, optimizer, scheduler)
+
+            if is_eval_epoch(cur_epoch):
+                new_results = self.evaluate(loaders, model, masks)
+                self.update_stats(
+                    model,
+                    stats,
+                    best_stats,
+                    best_model_state,
+                    new_results,
+                    cur_epoch,
+                    logger_gg.basic()["loss"],
+                )
+                logger_gg.reset()
+                logging.info(new_results)
+
+        logger_gg.close()
+        logging.info(f"Task done, results saved in {cfg_gg.run_dir}")
+
+        # Rewind back to best model
+        model.load_state_dict(best_model_state)
+
+        return best_stats
 
 
 @register_loss("multilabel_cross_entropy")
@@ -134,3 +207,18 @@ def multilabel_cross_entropy(pred, true):
     if cfg_gg.dataset.task_type == "classification_multilabel":
         bce_loss = torch.nn.BCEWithLogitsLoss()
         return bce_loss(pred, true), torch.sigmoid(pred)
+
+
+def graphgym_model_wrapper(model):
+    """Wrap a GraphGym model to take data and y as input."""
+
+    @wraps(model)
+    def wrapped_model(data, y):
+        batch = Batch.from_data_list([data])
+        batch.y = torch.Tensor(y)
+        batch.all_mask = torch.ones(y.shape[0], dtype=bool)
+        batch.split = "all"
+        pred, true = model(batch)
+        return pred.detach().cpu().numpy(), true.detach().cpu().numpy()
+
+    return wrapped_model
