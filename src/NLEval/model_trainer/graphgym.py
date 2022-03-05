@@ -106,15 +106,21 @@ class GraphGymTrainer(GNNTrainer):
         data = self.data.clone().detach().cpu()
         data.y = torch.Tensor(y).float()
 
-        for mask_name in masks:
-            mask = self.get_mask(masks, mask_name, split_idx)
-            torch_mask = torch.Tensor(mask).bool()
-            setattr(data, f"{mask_name}_mask", torch_mask)
+        # Set training mask
+        train_mask = self.get_mask(masks, "train", split_idx)
+        setattr(data, "train_mask", torch.Tensor(train_mask).bool())
+
+        # Add 'all_mask' to eliminate redundant model executions during the
+        # evaluation setp in the transductive node classification setting.
+        setattr(data, "all_mask", torch.ones(train_mask.shape, dtype=bool))
         logging.info(data)
 
-        loaders = [get_loader([data], "full_batch", 1, True)]
-        for _ in range(len(masks) - 1):
-            loaders.append(get_loader([data], "full_batch", 1, False))
+        # Two loaders, one for train and one for all. Note that the shuffle
+        # option does nothing in the full batch setting.
+        loaders = [
+            get_loader([data], "full_batch", 1, shuffle=True),
+            get_loader([data], "full_batch", 1, shuffle=False),
+        ]
 
         return loaders
 
@@ -122,18 +128,20 @@ class GraphGymTrainer(GNNTrainer):
     def evaluate(self, loaders, model, masks):
         model.eval()
 
-        results = {}
-        for split, loader in zip(masks, loaders):
-            batch = list(loader)[0]
-            batch.split = split  # TODO: make 'all'
-            batch.to(torch.device(cfg_gg.device))
-            pred, true = model(batch)
+        # Full batch used in the transduction node classification setting.
+        full_loader = loaders[1]
+        batch = list(full_loader)[0]
+        batch.split = "all"
+        batch.to(torch.device(cfg_gg.device))
+        pred, true = model(batch)
+        pred, true = pred.detach().cpu().numpy(), true.detach().cpu().numpy()
 
-            for metric_name, metric_func in self.metrics.items():
-                results[f"{split}_{metric_name}"] = metric_func(
-                    true.detach().cpu().numpy(),
-                    pred.detach().cpu().numpy(),
-                )
+        results = {}
+        for metric_name, metric_func in self.metrics.items():
+            for mask_name in masks:
+                mask = self.get_mask(masks, mask_name, split_idx=0)
+                score = metric_func(true[mask], pred[mask])
+                results[f"{mask_name}_{metric_name}"] = score
 
         return results
 
@@ -145,8 +153,6 @@ class GraphGymTrainer(GNNTrainer):
         optimizer = pyg_gg.create_optimizer(model.parameters(), cfg_gg.optim)
         scheduler = pyg_gg.create_scheduler(optimizer, cfg_gg.optim)
 
-        # TODO: find out a way to rewind the model back to optimal state.
-        split_names = [i for i in masks if i != "train"]
         stats, best_stats, best_model_state = self.new_stats(masks)
         for cur_epoch in range(cfg_gg.optim.max_epoch):
             train_epoch(logger_gg, loaders[0], model, optimizer, scheduler)

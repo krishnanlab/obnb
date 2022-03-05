@@ -48,27 +48,19 @@ y, masks = lsc.split(
 results = trainer.train(mdl, y, masks)
 print(f"\nBest results:\n{results}\n")
 
+# Obtain predictions from the final model.
+# TODO: simplify this format of executing the model using batch..
+batch = Batch(
+    x=trainer.data.x,
+    edge_index=trainer.data.edge_index,
+    y=torch.Tensor(y),
+    all_mask=torch.ones(y.shape[0], dtype=bool),
+    split="all",
+)
+y_pred, y_true = mdl(batch)
+y_pred, y_true = y_pred.detach().cpu().numpy(), y_true.detach().cpu().numpy()
+
 # Check to see if the model is rewinded back to the best model correctly
 for split in "train", "val", "test":
-    # TODO: simplify this format of executing the model using batch..
-    batch = Batch(
-        x=trainer.data.x,
-        edge_index=trainer.data.edge_index,
-        y=torch.Tensor(y),
-        train_mask=masks["train"][:, 0],
-        val_mask=masks["val"][:, 0],
-        test_mask=masks["test"][:, 0],
-        split=split,
-    )
-    y_pred, y_true = mdl(batch)
-    y_pred = y_pred.detach().cpu().numpy()
-    y_true = y_true.detach().cpu().numpy()
     mask = masks[split][:, 0]
-    print(f"{split:>5}: {auroc(y_true, y_pred)}")
-
-# # Check to see if the model is rewinded back to the best model correctly
-# args = (trainer.data.x, trainer.data.edge_index, trainer.data.edge_weight)
-# y_pred = mdl(*args).detach().cpu().numpy()
-# for mask_name in "train", "val", "test":
-#    mask = masks[mask_name][:, 0]
-#    print(f"{mask_name:>5}: {auroc(y[mask], y_pred[mask])}")
+    print(f"{split:>5}: {auroc(y_true[mask], y_pred[mask])}")
