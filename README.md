@@ -1,6 +1,6 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Tests](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/tests.yml/badge.svg)](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/tests.yml)
-[![Example Executions](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/run_examples.yml/badge.svg)](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/run_examples.yml)     
+[![Example Executions](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/run_examples.yml/badge.svg)](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/run_examples.yml)
 
 # NetworkLearningEval
 
@@ -31,7 +31,7 @@ conda install pyg -c pyg -c conda-forge
 
 Note: To support some new features in PyG that are not yet released, need to install from the repo directly:
 ```bash
-pip install git+https://github.com/pyg-team/pytorch_geometric
+pip install git+https://github.com/pyg-team/pytorch_geometric.git#egg=torch-geometric[full]
 ```
 
 ### Full dev installation
