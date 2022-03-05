@@ -2,7 +2,7 @@ import torch
 from load_data import load_data
 from NLEval.label.split import RatioPartition
 from NLEval.model_trainer.gnn import SimpleGNNTrainer
-from sklearn.metric import roc_auc_score as auroc
+from sklearn.metrics import roc_auc_score as auroc
 from torch_geometric.nn import GCN
 
 # Load dataset (with sparse graph)
@@ -32,7 +32,7 @@ y, masks = lsc.split(
     property_name="PubMed Count",
 )
 
-results = trainer.train(mdl, y, masks, epochs=200, lr=0.1)
+results = trainer.train(mdl, y, masks, epochs=50, lr=0.1)
 print(f"\nBest results:\n{results}\n")
 
 # Check to see if the model is rewinded back to the best model correctly

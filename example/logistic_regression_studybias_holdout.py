@@ -3,7 +3,7 @@ from load_data import load_data
 from NLEval.label.split import RatioPartition
 from NLEval.model_trainer import SupervisedLearningTrainer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metric import roc_auc_score as auroc
+from sklearn.metrics import roc_auc_score as auroc
 
 
 # Load dataset
