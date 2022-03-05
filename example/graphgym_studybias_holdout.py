@@ -3,7 +3,7 @@ import torch
 from load_data import load_data
 from NLEval.label.filters import LabelsetRangeFilterSplit
 from NLEval.label.split import RatioPartition
-from NLEval.metric.graphgym_metric import graphgym_auroc
+from NLEval.metric import auroc
 from NLEval.model_trainer.graphgym import GraphGymTrainer
 
 # Load dataset (with sparse graph)
@@ -19,7 +19,7 @@ print(f"{n_tasks=}\n")
 
 # Set up trainer first, which then is used to construct model from the config
 # file; use auroc as the evaluation metric
-metrics = {"auroc": graphgym_auroc}
+metrics = {"auroc": auroc}
 trainer = GraphGymTrainer(
     metrics,
     g,

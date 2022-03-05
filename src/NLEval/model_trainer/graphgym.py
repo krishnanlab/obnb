@@ -122,9 +122,28 @@ class GraphGymTrainer(GNNTrainer):
 
         return loaders
 
+    @torch.no_grad()
+    def evaluate(self, loaders, model, masks):
+        model.eval()
+
+        results = {}
+        for split, loader in zip(masks, loaders):
+            batch = list(loader)[0]
+            batch.split = split  # TODO: make 'all'
+            batch.to(torch.device(cfg_gg.device))
+            pred, true = model(batch)
+
+            for metric_name, metric_func in self.metrics.items():
+                results[f"{split}_{metric_name}"] = metric_func(
+                    true.detach().cpu().numpy(),
+                    pred.detach().cpu().numpy(),
+                )
+
+        return results
+
     def train(self, model, y, masks, split_idx=0):
         """Train model using GraphGym."""
-        loggers = self.get_loggers(masks)
+        loggers = self.get_loggers(masks)  # TODO: remove 'val' and 'test' lgrs
         loaders = self.get_loaders(y, masks, split_idx)
 
         optimizer = pyg_gg.create_optimizer(model.parameters(), cfg_gg.optim)
@@ -132,16 +151,25 @@ class GraphGymTrainer(GNNTrainer):
 
         # TODO: find out a way to rewind the model back to optimal state.
         split_names = [i for i in masks if i != "train"]
+        stats, best_stats, best_model_state = self.new_stats(masks)
         for cur_epoch in range(cfg_gg.optim.max_epoch):
             train_epoch(loggers[0], loaders[0], model, optimizer, scheduler)
-            if is_train_eval_epoch(cur_epoch):
-                loggers[0].write_epoch(cur_epoch)
+
             if is_eval_epoch(cur_epoch):
-                for i, split_name in enumerate(split_names, 1):
-                    eval_epoch(loggers[i], loaders[i], model, split=split_name)
-                    loggers[i].write_epoch(cur_epoch)
-            for logger in loggers:
-                logger.close()
+                new_results = self.evaluate(loaders, model, masks)
+                self.update_stats(
+                    model,
+                    stats,
+                    best_stats,
+                    best_model_state,
+                    new_results,
+                    cur_epoch,
+                    loggers[0].basic()["loss"],
+                )
+                logging.info(new_results)
+
+        for logger in loggers:
+            logger.close()
 
         logging.info("Task done, results saved in {}".format(cfg_gg.run_dir))
 
