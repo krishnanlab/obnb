@@ -1,4 +1,5 @@
 import logging
+from functools import wraps
 from itertools import chain
 from typing import Any
 from typing import Dict
@@ -8,6 +9,7 @@ from typing import Optional
 import torch
 from torch_geometric import graphgym as pyg_gg
 from torch_geometric import seed_everything
+from torch_geometric.data import Batch
 from torch_geometric.data import DataLoader
 from torch_geometric.graphgym import cfg as cfg_gg
 from torch_geometric.graphgym.config import assert_cfg
@@ -205,3 +207,18 @@ def multilabel_cross_entropy(pred, true):
     if cfg_gg.dataset.task_type == "classification_multilabel":
         bce_loss = torch.nn.BCEWithLogitsLoss()
         return bce_loss(pred, true), torch.sigmoid(pred)
+
+
+def graphgym_model_wrapper(model):
+    """Wrap a GraphGym model to take data and y as input."""
+
+    @wraps(model)
+    def wrapped_model(data, y):
+        batch = Batch.from_data_list([data])
+        batch.y = torch.Tensor(y)
+        batch.all_mask = torch.ones(y.shape[0], dtype=bool)
+        batch.split = "all"
+        pred, true = model(batch)
+        return pred.detach().cpu().numpy(), true.detach().cpu().numpy()
+
+    return wrapped_model
