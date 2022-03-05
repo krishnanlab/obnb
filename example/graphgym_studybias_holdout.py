@@ -25,12 +25,12 @@ trainer = GraphGymTrainer(
     device="auto",
     metric_best="auroc",
     cfg_file="example_config.yaml",
-    cfg_opts=[
-        "optim.max_epoch",
-        50,
-        "gnn.layers_pre_mp",
-        0,
-    ],
+    cfg_opts={
+        "optim.max_epoch": 50,
+        "gnn.layers_pre_mp": 0,
+        "train.ckpt_clean": False,
+        "train.ckpt_period": 10,
+    },
 )
 
 mdl = trainer.create_model(dim_in=1, dim_out=n_tasks)

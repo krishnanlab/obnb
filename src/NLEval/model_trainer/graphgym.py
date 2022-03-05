@@ -1,5 +1,7 @@
 import logging
+from itertools import chain
 from typing import Any
+from typing import Dict
 from typing import List
 from typing import Optional
 
@@ -38,13 +40,13 @@ class GraphGymTrainer(GNNTrainer):
         device: str = "auto",
         metric_best: str = "auto",
         cfg_file: Optional[str] = None,
-        cfg_opts: List[Any] = None,
+        cfg_opts: Dict[str, Any] = None,
     ):
         """Initialize GraphGymTrainer.
 
         Args:
             cfg_file (str): Configuration file to use for setting up GraphGym.
-            kwargs: Remaining configuration options for graphgym.
+            cfg_opts: Remaining configuration options for graphgym.
 
         """
         if cfg_file is None:
@@ -57,7 +59,7 @@ class GraphGymTrainer(GNNTrainer):
 
         args = ["device", device, "metric_best", metric_best]
         if cfg_opts is not None:
-            args += cfg_opts
+            args += list(chain.from_iterable(cfg_opts.items()))
         cfg_gg.merge_from_list(args)
 
         assert_cfg(cfg_gg)
