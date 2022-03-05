@@ -10,10 +10,10 @@ from torch_geometric import graphgym as pyg_gg
 from torch_geometric import seed_everything
 from torch_geometric.data import DataLoader
 from torch_geometric.graphgym import cfg as cfg_gg
-from torch_geometric.graphgym import logger as logger_gg
 from torch_geometric.graphgym.config import assert_cfg
 from torch_geometric.graphgym.config import dump_cfg
 from torch_geometric.graphgym.loader import get_loader
+from torch_geometric.graphgym.logger import Logger as Logger_gg
 from torch_geometric.graphgym.model_builder import create_model
 from torch_geometric.graphgym.register import register_loss
 from torch_geometric.graphgym.register import register_metric
@@ -100,10 +100,6 @@ class GraphGymTrainer(GNNTrainer):
         cfg_gg.params = params_count(mdl)
         return mdl
 
-    def get_loggers(self, masks) -> List[logger_gg.Logger]:
-        """Obtain GraphGym loggers."""
-        return [logger_gg.Logger(name=name) for name in masks]
-
     def get_loaders(self, y, masks, split_idx) -> List[DataLoader]:
         """Obtain GraphGym data loader."""
         # Create a copy of the data used for evaluation
@@ -143,7 +139,7 @@ class GraphGymTrainer(GNNTrainer):
 
     def train(self, model, y, masks, split_idx=0):
         """Train model using GraphGym."""
-        loggers = self.get_loggers(masks)  # TODO: remove 'val' and 'test' lgrs
+        logger_gg = Logger_gg(name="train")
         loaders = self.get_loaders(y, masks, split_idx)
 
         optimizer = pyg_gg.create_optimizer(model.parameters(), cfg_gg.optim)
@@ -153,7 +149,7 @@ class GraphGymTrainer(GNNTrainer):
         split_names = [i for i in masks if i != "train"]
         stats, best_stats, best_model_state = self.new_stats(masks)
         for cur_epoch in range(cfg_gg.optim.max_epoch):
-            train_epoch(loggers[0], loaders[0], model, optimizer, scheduler)
+            train_epoch(logger_gg, loaders[0], model, optimizer, scheduler)
 
             if is_eval_epoch(cur_epoch):
                 new_results = self.evaluate(loaders, model, masks)
@@ -164,14 +160,18 @@ class GraphGymTrainer(GNNTrainer):
                     best_model_state,
                     new_results,
                     cur_epoch,
-                    loggers[0].basic()["loss"],
+                    logger_gg.basic()["loss"],
                 )
+                logger_gg.reset()
                 logging.info(new_results)
 
-        for logger in loggers:
-            logger.close()
-
+        logger_gg.close()
         logging.info("Task done, results saved in {}".format(cfg_gg.run_dir))
+
+        # Rewind back to best model
+        model.load_state_dict(best_model_state)
+
+        return best_stats
 
 
 @register_loss("multilabel_cross_entropy")

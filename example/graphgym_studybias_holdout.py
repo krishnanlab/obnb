@@ -5,6 +5,7 @@ from NLEval.label.filters import LabelsetRangeFilterSplit
 from NLEval.label.split import RatioPartition
 from NLEval.metric import auroc
 from NLEval.model_trainer.graphgym import GraphGymTrainer
+from torch_geometric.data import Batch
 
 # Load dataset (with sparse graph)
 g, lsc = load_data("STRING-EXP", "KEGGBP", sparse=True, filter_negative=False)
@@ -44,12 +45,28 @@ y, masks = lsc.split(
     property_name="PubMed Count",
 )
 
-trainer.train(mdl, y, masks)
+results = trainer.train(mdl, y, masks)
+print(f"\nBest results:\n{results}\n")
 
-# results = trainer.train(mdl, y, masks)
-# print(f"\nBest results:\n{results}\n")
-#
-## Check to see if the model is rewinded back to the best model correctly
+# Check to see if the model is rewinded back to the best model correctly
+for split in "train", "val", "test":
+    # TODO: simplify this format of executing the model using batch..
+    batch = Batch(
+        x=trainer.data.x,
+        edge_index=trainer.data.edge_index,
+        y=torch.Tensor(y),
+        train_mask=masks["train"][:, 0],
+        val_mask=masks["val"][:, 0],
+        test_mask=masks["test"][:, 0],
+        split=split,
+    )
+    y_pred, y_true = mdl(batch)
+    y_pred = y_pred.detach().cpu().numpy()
+    y_true = y_true.detach().cpu().numpy()
+    mask = masks[split][:, 0]
+    print(f"{split:>5}: {auroc(y_true, y_pred)}")
+
+# # Check to see if the model is rewinded back to the best model correctly
 # args = (trainer.data.x, trainer.data.edge_index, trainer.data.edge_weight)
 # y_pred = mdl(*args).detach().cpu().numpy()
 # for mask_name in "train", "val", "test":
