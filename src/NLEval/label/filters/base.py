@@ -1,4 +1,9 @@
+import logging
+from typing import Literal
+
 from tqdm import tqdm
+
+LogLevel = Literal["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG", "NOTSET"]
 
 
 class BaseFilter:
@@ -20,6 +25,23 @@ class BaseFilter:
     All three 'get' methods above take a `LabelsetCollection` object as input
 
     """
+
+    def __init__(self, log_level: LogLevel = "WARNING", verbose: bool = False):
+        """Initialize BaseFilter with logger.
+
+        Args:
+            log_level (LogLevel): Level of logging, see more in the Logging
+                library documentation.
+            verbose (bool): Shortcut for setting log_level to INFO. If the
+                specified level is more specific to INFO, then do nothing,
+                instead of rolling back to INFO level (default: :obj:`False`).
+
+        """
+        logger_name = f"defaultLogger.{self.__class__.__name__}"
+        self.logger = logging.getLogger(logger_name)
+        self.logger.setLevel(getattr(logging, log_level))
+        if verbose and self.logger.getEffectiveLevel() > 20:
+            self.logger.setLevel(logging.INFO)
 
     def __repr__(self):
         """Return name of the filer."""

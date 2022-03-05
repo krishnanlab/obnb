@@ -22,7 +22,7 @@ class NegativeGeneratorHypergeom(BaseFilter):
 
     """
 
-    def __init__(self, p_thresh: float) -> None:
+    def __init__(self, p_thresh: float, **kwargs) -> None:
         """Initialize NegativeFilterHypergeom object.
 
         Args:
@@ -30,6 +30,7 @@ class NegativeGeneratorHypergeom(BaseFilter):
 
         """
         self.p_thresh = p_thresh
+        super().__init__(**kwargs)
 
     def __repr__(self):
         """Return name of the NegativeGeneratorHypergeom and its parameters."""
@@ -65,11 +66,11 @@ class NegativeGeneratorHypergeom(BaseFilter):
                         num_entities,
                     )
 
-                    # if k >= 1: # for debugging
-                    #     print(
-                    #         f"{k=:>3d}, {tot_num_entities=:>5d}, {n=:>5d}, "
-                    #         f"{num_entities=:>5d}, {pval=:>.4f}"
-                    #     )
+                    if k >= 1:
+                        self.logger.debug(
+                            f"{k=:>3d}, {tot_num_entities=:>5d}, {n=:>5d}, "
+                            f"{num_entities=:>5d}, {pval_mat[i, j]=:>.4f}",
+                        )
 
             return pval_mat
 

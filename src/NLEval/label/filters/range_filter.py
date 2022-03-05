@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 import numpy as np
@@ -19,6 +20,7 @@ class BaseRangeFilter(BaseFilter):
         self,
         min_val: Optional[float] = None,
         max_val: Optional[float] = None,
+        **kwargs,
     ) -> None:
         """Initialize BaseRangeFilter object.
 
@@ -27,7 +29,7 @@ class BaseRangeFilter(BaseFilter):
             max_val: maximum beyound which entiteis are removed
 
         """
-        super().__init__()
+        super().__init__(**kwargs)
         self.min_val = min_val
         self.max_val = max_val
 
@@ -122,17 +124,10 @@ class LabelsetRangeFilterSplit(BaseRangeFilter):
         verbose: bool = False,
         **kwargs,
     ):
-        """Initialize LabelsetRangeFilterTrainTestPos object.
-
-        Args:
-            verbose (bool): If set to True, print the relevant information at
-                the end of each iteration.
-
-        """
-        super().__init__(min_val=min_val)
+        """Initialize LabelsetRangeFilterTrainTestPos object."""
+        super().__init__(min_val=min_val, verbose=verbose)
         self.splitter = splitter
         self.kwargs = kwargs
-        self.verbose = verbose
 
     def get_val_getter(self, lsc):
         """Return the value getter.
@@ -150,8 +145,7 @@ class LabelsetRangeFilterSplit(BaseRangeFilter):
                 for i in range(mask.shape[1]):
                     num_pos = y[mask[:, i]].sum()
                     min_num_pos = min(min_num_pos, num_pos)
-            if self.verbose:
-                print(f"{label_id}, {min_num_pos=}")
+            self.logger.info(f"{label_id}, {min_num_pos=}")
             return min_num_pos
 
         return val_getter
