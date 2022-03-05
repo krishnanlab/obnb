@@ -12,9 +12,10 @@ g, lsc = load_data("STRING-EXP", "KEGGBP", sparse=True, filter_negative=False)
 # 3/2 train/test split using genes with higher PubMed Count for training
 splitter = RatioPartition(0.6, 0.2, 0.2, ascending=False)
 lsc.iapply(
-    LabelsetRangeFilterSplit(10, splitter, True, property_name="PubMed Count"),
+    LabelsetRangeFilterSplit(20, splitter, True, property_name="PubMed Count"),
 )
 n_tasks = len(lsc.label_ids)
+print(f"{n_tasks=}\n")
 
 # Set up trainer first, which then is used to construct model from the config
 # file; use auroc as the evaluation metric
@@ -26,10 +27,12 @@ trainer = GraphGymTrainer(
     metric_best="auroc",
     cfg_file="example_config.yaml",
     cfg_opts={
-        "optim.max_epoch": 50,
+        "optim.max_epoch": 100,
         "gnn.layers_pre_mp": 0,
-        "train.ckpt_clean": False,
-        "train.ckpt_period": 10,
+        "gnn.layers_mp": 3,
+        "gnn.dim_inner": 32,
+        "train.eval_period": 10,
+        "train.skip_train_eval": True,
     },
 )
 
