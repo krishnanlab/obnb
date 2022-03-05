@@ -17,8 +17,12 @@ from torch_geometric.graphgym.loader import get_loader
 from torch_geometric.graphgym.model_builder import create_model
 from torch_geometric.graphgym.register import register_loss
 from torch_geometric.graphgym.register import register_metric
+from torch_geometric.graphgym.train import eval_epoch
+from torch_geometric.graphgym.train import train_epoch
 from torch_geometric.graphgym.utils.comp_budget import params_count
 from torch_geometric.graphgym.utils.device import auto_select_device
+from torch_geometric.graphgym.utils.epoch import is_eval_epoch
+from torch_geometric.graphgym.utils.epoch import is_train_eval_epoch
 
 from .gnn import GNNTrainer
 
@@ -127,7 +131,19 @@ class GraphGymTrainer(GNNTrainer):
         scheduler = pyg_gg.create_scheduler(optimizer, cfg_gg.optim)
 
         # TODO: find out a way to rewind the model back to optimal state.
-        pyg_gg.train(loggers, loaders, model, optimizer, scheduler)
+        split_names = [i for i in masks if i != "train"]
+        for cur_epoch in range(cfg_gg.optim.max_epoch):
+            train_epoch(loggers[0], loaders[0], model, optimizer, scheduler)
+            if is_train_eval_epoch(cur_epoch):
+                loggers[0].write_epoch(cur_epoch)
+            if is_eval_epoch(cur_epoch):
+                for i, split_name in enumerate(split_names, 1):
+                    eval_epoch(loggers[i], loaders[i], model, split=split_name)
+                    loggers[i].write_epoch(cur_epoch)
+            for logger in loggers:
+                logger.close()
+
+        logging.info("Task done, results saved in {}".format(cfg_gg.run_dir))
 
 
 @register_loss("multilabel_cross_entropy")
