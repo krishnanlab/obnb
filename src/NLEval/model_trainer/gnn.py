@@ -160,6 +160,10 @@ class GNNTrainer(BaseTrainer):
             setattr(data, mask_name + mask_suffix, torch.from_numpy(mask))
         return data
 
+    def is_eval_epoch(self, cur_epoch: int) -> bool:
+        """Return true if current epoch is eval epoch."""
+        return cur_epoch % self.eval_steps == 0
+
 
 class SimpleGNNTrainer(GNNTrainer):
     """Simple GNN trainer using Adam with fixed learning rate."""
@@ -225,10 +229,10 @@ class SimpleGNNTrainer(GNNTrainer):
         y_torch = torch.from_numpy(y.astype(float)).to(self.device)
 
         stats, best_stats, best_model_state = self.new_stats(masks)
-        for epoch in range(self.epochs):
+        for cur_epoch in range(self.epochs):
             loss = self.train_epoch(model, data, y_torch, train_mask, optimizer)
 
-            if epoch % self.eval_steps == 0:
+            if self.is_eval_epoch(cur_epoch):
                 new_results = self.evaluate(model, y, masks, split_idx)
                 self.update_stats(
                     model,
@@ -236,7 +240,7 @@ class SimpleGNNTrainer(GNNTrainer):
                     best_stats,
                     best_model_state,
                     new_results,
-                    epoch,
+                    cur_epoch,
                     loss,
                 )
                 self.logger.info(new_results)
