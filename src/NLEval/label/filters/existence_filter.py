@@ -60,6 +60,10 @@ class EntityExistenceFilter(BaseExistenceFilter):
         """Initialize EntityExistenceFilter object."""
         super().__init__(target_lst, remove_specified, **kwargs)
 
+    @property
+    def mod_name(self):
+        return "DROP ENTITY"
+
     @staticmethod
     def get_val_getter(lsc):
         return lambda x: x  # return entity ID itself
@@ -96,6 +100,10 @@ class LabelsetExistenceFilter(BaseExistenceFilter):
     ):
         """Initialize LabelsetExistenceFilter object."""
         super().__init__(target_lst, remove_specified, **kwargs)
+
+    @property
+    def mod_name(self):
+        return "DROP LABELSET"
 
     @staticmethod
     def get_val_getter(lsc):

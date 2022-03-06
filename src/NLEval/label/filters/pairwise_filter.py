@@ -40,6 +40,10 @@ class BaseLabelsetPairwiseFilter(BaseRangeFilter):
         self.size_constraint = size_constraint
         self.inclusive = inclusive
 
+    @property
+    def mod_name(self):
+        return "DROP LABELSET"
+
     @staticmethod
     def get_ids(lsc):
         return lsc.label_ids

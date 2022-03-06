@@ -69,7 +69,7 @@ mats = [fvec.mat for fvec in fvecs]
 mfvec = MultiFeatureVec.from_mats(mats, g.idmap, fset_ids=[f"{q=}" for q in qs])
 
 # Train with hyperparameter selection using validation set
-trainer = MultiSupervisedLearningTrainer(metrics, mfvec, log=True)
+trainer = MultiSupervisedLearningTrainer(metrics, mfvec, log_level="INFO")
 scores = []
 for label_id in lsc.label_ids:
     y, masks = lsc.split(

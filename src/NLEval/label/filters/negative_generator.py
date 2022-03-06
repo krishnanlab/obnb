@@ -1,3 +1,5 @@
+from itertools import combinations
+
 import numpy as np
 from scipy.stats import hypergeom
 from tqdm import tqdm
@@ -37,53 +39,54 @@ class NegativeGeneratorHypergeom(BaseFilter):
         p_thresh = self.p_thresh
         return f"{self.__class__.__name__}({p_thresh=})"
 
-    def __call__(self, lsc, progress_bar):
-        label_ids = lsc.label_ids
-        num_labelsets = len(label_ids)
-        # set of all entities in the labelset collection
+    def compute_pval_mat(self, lsc):
+        """Compute labelset pairwise hyppergeometric p-val."""
         all_entities = set(lsc.entity_ids)
+        tot_num_entities = len(all_entities)
+        num_labelsets = len(lsc.label_ids)
 
-        def get_pval_mat():
-            tot_num_entities = len(all_entities)
-            pval_mat = np.zeros((num_labelsets, num_labelsets))
+        pval_mat = np.zeros((num_labelsets, num_labelsets))
+        for i, j in combinations(range(num_labelsets), 2):
+            label_id1 = lsc.label_ids[i]
+            label_id2 = lsc.label_ids[j]
+            labelset1 = lsc.get_labelset(label_id1)
+            labelset2 = lsc.get_labelset(label_id2)
 
-            for i in range(num_labelsets):
-                label_id1 = label_ids[i]
-                labelset1 = lsc.get_labelset(label_id1)
-                num_entities = len(labelset1)  # size of first labelset
+            num_entities1 = len(labelset1)
+            num_entities2 = len(labelset2)
+            num_intersect = len(labelset1 & labelset2)
 
-                for j in range(i + 1, num_labelsets):
-                    label_id2 = label_ids[j]
-                    labelset2 = lsc.get_labelset(label_id2)
+            pval = pval_mat[i, j] = pval_mat[j, i] = hypergeom.sf(
+                num_intersect - 1,
+                tot_num_entities,
+                num_entities2,
+                num_entities1,
+            )
 
-                    k = len(labelset1 & labelset2)  # size of intersection
-                    n = len(labelset2)  # size of second labelset
+            if num_intersect > 0:
+                self.logger.debug(
+                    f"{label_id1}({num_entities1}) vs {label_id2}"
+                    f"({num_entities2}) -> {num_intersect=}, "
+                    f"{tot_num_entities=}, {pval=:>.4f}",
+                )
 
-                    pval_mat[i, j] = pval_mat[j, i] = hypergeom.sf(
-                        k - 1,
-                        tot_num_entities,
-                        n,
-                        num_entities,
-                    )
+        return pval_mat, all_entities
 
-                    if k >= 1:
-                        self.logger.debug(
-                            f"{k=:>3d}, {tot_num_entities=:>5d}, {n=:>5d}, "
-                            f"{num_entities=:>5d}, {pval_mat[i, j]=:>.4f}",
-                        )
+    def __call__(self, lsc, progress_bar):
+        pval_mat, all_entities = self.compute_pval_mat(lsc)
 
-            return pval_mat
-
-        pval_mat = get_pval_mat()
-
-        pbar = tqdm(label_ids, disable=not progress_bar)
+        pbar = tqdm(lsc.label_ids, disable=not progress_bar)
         pbar.set_description(f"{self!r}")
         for i, label_id1 in enumerate(pbar):
             exclude_set = lsc.get_labelset(label_id1).copy()
 
-            for j, label_id2 in enumerate(label_ids):
+            for j, label_id2 in enumerate(lsc.label_ids):
                 if pval_mat[i, j] < self.p_thresh:
                     exclude_set.update(lsc.get_labelset(label_id2))
 
             negative = list(all_entities - exclude_set)
             lsc.set_negative(list(negative), label_id1)
+            self.logger.info(
+                f"Setting negatives for {label_id1} (num negatives = "
+                f"{len(negative)} out of {len(all_entities)})",
+            )

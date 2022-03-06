@@ -5,6 +5,7 @@ from typing import Optional
 import numpy as np
 
 from ..util.checkers import checkNumpyArrayShape
+from ..util.types import LogLevel
 from .base import BaseTrainer
 
 
@@ -25,7 +26,14 @@ class SupervisedLearningTrainer(BaseTrainer):
 
     """
 
-    def __init__(self, metrics, features, train_on="train", dual=False):
+    def __init__(
+        self,
+        metrics,
+        features,
+        train_on="train",
+        dual=False,
+        log_level: LogLevel = "WARNING",
+    ):
         """Initialize SupervisedLearningTrainer.
 
         Note:
@@ -39,6 +47,7 @@ class SupervisedLearningTrainer(BaseTrainer):
             features=features,
             train_on=train_on,
             dual=dual,
+            log_level=log_level,
         )
 
     def train(
@@ -58,7 +67,7 @@ class SupervisedLearningTrainer(BaseTrainer):
         """
         # Train model using the training set
         train_mask = self.get_mask(masks, self.train_on, split_idx)
-        # TODO: log time and other useful stats
+        # TODO: log time and other useful stats (maybe use the decorator?)
         model.fit(self.get_x_from_mask(train_mask), y[train_mask])
 
         # Evaluate the trained model using the specified metrics
@@ -87,12 +96,16 @@ class MultiSupervisedLearningTrainer(SupervisedLearningTrainer):
         train_on="train",
         val_on: str = "val",
         metric_best: Optional[str] = None,
-        log: bool = False,
+        log_level: LogLevel = "WARNING",
     ):
         """Initialize MultiSupervisedLearningTrainer."""
-        super().__init__(metrics, features=features, train_on=train_on)
+        super().__init__(
+            metrics,
+            features=features,
+            train_on=train_on,
+            log_level=log_level,
+        )
 
-        self.log = log
         self.val_on = val_on
         if metric_best is None:
             self.metric_best = list(metrics)[0]
@@ -130,11 +143,10 @@ class MultiSupervisedLearningTrainer(SupervisedLearningTrainer):
                 best_val_score = val_score
                 best_fset_name = self._curr_fset_name
 
-        if self.log:
-            score_str = ", ".join([f"{i:.3f}" for i in val_scores])
-            print(
-                f"Best val score: {best_val_score:.3f} (via "
-                f"{best_fset_name}) Other val scores: [{score_str}]",
-            )
+        score_str = ", ".join([f"{i:.3f}" for i in val_scores])
+        self.logger.info(
+            f"Best val score: {best_val_score:.3f} (via {best_fset_name}) "
+            f"Other val scores: [{score_str}]",
+        )
 
         return best_results

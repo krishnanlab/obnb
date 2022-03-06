@@ -2,8 +2,11 @@ import os.path as osp
 
 from NLEval.graph import DenseGraph
 from NLEval.graph import SparseGraph
-from NLEval.label import filters
 from NLEval.label import LabelsetCollection
+from NLEval.label.filters import EntityExistenceFilter
+from NLEval.label.filters import LabelsetRangeFilterSize
+from NLEval.label.filters import NegativeGeneratorHypergeom
+from NLEval.util.types import LogLevel
 
 
 def load_data(
@@ -11,6 +14,7 @@ def load_data(
     label: str = "KEGGBP",
     sparse: bool = False,
     filter_negative: bool = True,
+    log_level: LogLevel = "WARNING",
 ):
     """Load graph and node labels.
 
@@ -37,10 +41,12 @@ def load_data(
 
     # Filter labels
     print(f"Number of labelsets before filtering: {len(lsc.label_ids)}")
-    lsc.iapply(filters.EntityExistenceFilter(g.idmap.lst))
-    lsc.iapply(filters.LabelsetRangeFilterSize(min_val=50))
+    lsc.iapply(EntityExistenceFilter(g.idmap.lst, log_level=log_level))
+    lsc.iapply(LabelsetRangeFilterSize(min_val=50, log_level=log_level))
     if filter_negative:
-        lsc.iapply(filters.NegativeGeneratorHypergeom(p_thresh=0.05))
+        lsc.iapply(
+            NegativeGeneratorHypergeom(p_thresh=0.05, log_level=log_level),
+        )
     print(f"Number of labelsets after filtering: {len(lsc.label_ids)}")
 
     # Load gene properties for study-bias holdout
@@ -48,3 +54,7 @@ def load_data(
     lsc.load_entity_properties(property_path, "PubMed Count", 0, int)
 
     return g, lsc
+
+
+if __name__ == "__main__":
+    load_data(log_level="DEBUG")
