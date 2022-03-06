@@ -1,21 +1,19 @@
 from functools import lru_cache
-from typing import Callable
-from typing import Dict
-from typing import Iterator
-from typing import List
-from typing import Optional
-from typing import Set
-from typing import Tuple
 
 import numpy as np
 
 from ..graph import OntologyGraph
+from ..typing import Dict
+from ..typing import Iterator
+from ..typing import List
+from ..typing import Optional
+from ..typing import Set
+from ..typing import Splitter
+from ..typing import Tuple
 from ..util import checkers
 from ..util import idhandler
 from ..util.exceptions import IDExistsError
 from .filters.base import BaseFilter
-
-Splitter = Callable[[np.ndarray, np.ndarray], Iterator[Tuple[np.ndarray, ...]]]
 
 
 class LabelsetCollection(idhandler.IDprop):

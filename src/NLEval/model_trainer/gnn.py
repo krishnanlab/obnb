@@ -1,16 +1,16 @@
 from copy import deepcopy
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Tuple
 
 import numpy as np
 import torch
 from torch_geometric.data import Data
 from torch_geometric.transforms import Constant
 
-from ..util.types import LogLevel
+from ..typing import Any
+from ..typing import Dict
+from ..typing import List
+from ..typing import LogLevel
+from ..typing import Optional
+from ..typing import Tuple
 from .base import BaseTrainer
 
 

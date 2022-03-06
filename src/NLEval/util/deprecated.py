@@ -1,6 +1,7 @@
 import warnings
 from functools import wraps
-from typing import Optional
+
+from ..typing import Optional
 
 
 class Deprecated:

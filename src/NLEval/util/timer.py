@@ -1,7 +1,6 @@
 import time
-import typing
 
-from . import checkers
+from .checkers import checkType
 
 
 class TimeIt:
@@ -15,7 +14,6 @@ class TimeIt:
         """
         self.verbose = verbose
 
-    @typing.no_type_check
     def __call__(self, func):
         """Return function wrapped with timer."""
 
@@ -33,5 +31,5 @@ class TimeIt:
 
     @verbose.setter
     def verbose(self, val: bool) -> None:
-        checkers.checkType("verbose", bool, val)
+        checkType("verbose", bool, val)
         self._verbose = val

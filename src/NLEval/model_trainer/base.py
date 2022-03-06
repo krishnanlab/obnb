@@ -1,16 +1,15 @@
-from typing import Any
-from typing import Callable
-from typing import Dict
-from typing import Optional
-from typing import Sequence
-
 import numpy as np
 
 from ..graph.base import BaseGraph
 from ..graph.featurevec import MultiFeatureVec
+from ..typing import Any
+from ..typing import Callable
+from ..typing import Dict
+from ..typing import LogLevel
+from ..typing import Optional
+from ..typing import Sequence
 from ..util.checkers import checkNumpyArrayShape
 from ..util.logger import get_logger
-from ..util.types import LogLevel
 
 
 class BaseTrainer:

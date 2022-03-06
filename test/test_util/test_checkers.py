@@ -1,8 +1,10 @@
 import unittest
 
 import numpy as np
+from NLEval.typing import FLOAT_TYPE
+from NLEval.typing import INT_TYPE
+from NLEval.typing import ITERABLE_TYPE
 from NLEval.util import checkers
-from NLEval.util import types
 
 
 class TestCheckers(unittest.TestCase):
@@ -25,28 +27,28 @@ class TestCheckers(unittest.TestCase):
         self.n_float_npary = np.array([n, n, n], dtype=float)
 
     def test_INT_TYPE(self):
-        self.assertIsInstance(self.n_int, types.INT_TYPE)
-        self.assertIsInstance(self.n_npint, types.INT_TYPE)
-        self.assertIsInstance(self.n_npint64, types.INT_TYPE)
-        self.assertNotIsInstance(self.n_float, types.INT_TYPE)
-        self.assertNotIsInstance(self.n_npfloat, types.INT_TYPE)
-        self.assertNotIsInstance(self.n_npfloat128, types.INT_TYPE)
+        self.assertIsInstance(self.n_int, INT_TYPE)
+        self.assertIsInstance(self.n_npint, INT_TYPE)
+        self.assertIsInstance(self.n_npint64, INT_TYPE)
+        self.assertNotIsInstance(self.n_float, INT_TYPE)
+        self.assertNotIsInstance(self.n_npfloat, INT_TYPE)
+        self.assertNotIsInstance(self.n_npfloat128, INT_TYPE)
 
     def test_FLOAT_TYPE(self):
-        self.assertNotIsInstance(self.n_int, types.FLOAT_TYPE)
-        self.assertNotIsInstance(self.n_npint, types.FLOAT_TYPE)
-        self.assertNotIsInstance(self.n_npint64, types.FLOAT_TYPE)
-        self.assertIsInstance(self.n_float, types.FLOAT_TYPE)
-        self.assertIsInstance(self.n_npfloat, types.FLOAT_TYPE)
-        self.assertIsInstance(self.n_npfloat128, types.FLOAT_TYPE)
+        self.assertNotIsInstance(self.n_int, FLOAT_TYPE)
+        self.assertNotIsInstance(self.n_npint, FLOAT_TYPE)
+        self.assertNotIsInstance(self.n_npint64, FLOAT_TYPE)
+        self.assertIsInstance(self.n_float, FLOAT_TYPE)
+        self.assertIsInstance(self.n_npfloat, FLOAT_TYPE)
+        self.assertIsInstance(self.n_npfloat128, FLOAT_TYPE)
 
     def test_ITERABLE_TYPE(self):
         n_int_tuple = (1, 2, 3)
         n_int_lst = [1, 2, 3]
         n_int_ary = np.array([1, 2, 3])
-        self.assertIsInstance(n_int_tuple, types.ITERABLE_TYPE)
-        self.assertIsInstance(n_int_lst, types.ITERABLE_TYPE)
-        self.assertIsInstance(n_int_ary, types.ITERABLE_TYPE)
+        self.assertIsInstance(n_int_tuple, ITERABLE_TYPE)
+        self.assertIsInstance(n_int_lst, ITERABLE_TYPE)
+        self.assertIsInstance(n_int_ary, ITERABLE_TYPE)
 
     def test_checkType(self):
         checkers.checkType("n_int", int, self.n_int)
@@ -79,76 +81,64 @@ class TestCheckers(unittest.TestCase):
         self.assertRaises(ValueError, checkers.checkType, "n", str, None)
 
     def test_checkTypeInIterable(self):
-        checkers.checkTypesInIterable(
-            "n_int_tuple",
-            types.INT_TYPE,
-            self.n_int_tuple,
-        )
-        checkers.checkTypesInIterable(
-            "n_int_lst",
-            types.INT_TYPE,
-            self.n_int_lst,
-        )
-        checkers.checkTypesInIterable(
-            "n_int_npary",
-            types.INT_TYPE,
-            self.n_int_npary,
-        )
+        checkers.checkTypesInIterable("n_int_tuple", INT_TYPE, self.n_int_tuple)
+        checkers.checkTypesInIterable("n_int_lst", INT_TYPE, self.n_int_lst)
+        checkers.checkTypesInIterable("n_int_npary", INT_TYPE, self.n_int_npary)
         self.assertRaises(
             TypeError,
             checkers.checkTypesInIterable,
             "n_int_tuple",
-            types.FLOAT_TYPE,
+            FLOAT_TYPE,
             self.n_int_tuple,
         )
         self.assertRaises(
             TypeError,
             checkers.checkTypesInIterable,
             "n_int_lst",
-            types.FLOAT_TYPE,
+            FLOAT_TYPE,
             self.n_int_lst,
         )
         self.assertRaises(
             TypeError,
             checkers.checkTypesInIterable,
             "n_int_npary",
-            types.FLOAT_TYPE,
+            FLOAT_TYPE,
             self.n_int_npary,
         )
         checkers.checkTypesInIterable(
             "n_float_tuple",
-            types.FLOAT_TYPE,
+            FLOAT_TYPE,
             self.n_float_tuple,
         )
         checkers.checkTypesInIterable(
             "n_float_lst",
-            types.FLOAT_TYPE,
+            FLOAT_TYPE,
             self.n_float_lst,
         )
         checkers.checkTypesInIterable(
             "n_float_npary",
-            types.FLOAT_TYPE,
+            FLOAT_TYPE,
             self.n_float_npary,
         )
         self.assertRaises(
             TypeError,
             checkers.checkTypesInIterable,
             "n_float_tuple",
-            types.INT_TYPE,
+            INT_TYPE,
             self.n_float_tuple,
         )
         self.assertRaises(
             TypeError,
             checkers.checkTypesInIterable,
             "n_float_lst",
-            types.INT_TYPE,
+            INT_TYPE,
             self.n_float_lst,
         )
         self.assertRaises(
             TypeError,
             checkers.checkTypesInIterable,
             "n_float_npary",
-            types.INT_TYPE,
+            INT_TYPE,
             self.n_float_npary,
         )
 

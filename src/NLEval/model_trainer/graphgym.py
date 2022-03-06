@@ -1,10 +1,6 @@
 import logging
 from functools import wraps
 from itertools import chain
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
 
 import torch
 from torch_geometric import graphgym as pyg_gg
@@ -23,6 +19,10 @@ from torch_geometric.graphgym.train import train_epoch
 from torch_geometric.graphgym.utils.comp_budget import params_count
 from torch_geometric.graphgym.utils.device import auto_select_device
 
+from ..typing import Any
+from ..typing import Dict
+from ..typing import List
+from ..typing import Optional
 from .gnn import GNNTrainer
 
 

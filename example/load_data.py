@@ -6,7 +6,7 @@ from NLEval.label import LabelsetCollection
 from NLEval.label.filters import EntityExistenceFilter
 from NLEval.label.filters import LabelsetRangeFilterSize
 from NLEval.label.filters import NegativeGeneratorHypergeom
-from NLEval.util.types import LogLevel
+from NLEval.typing import LogLevel
 
 
 def load_data(

@@ -1,13 +1,12 @@
 import multiprocessing as mp
-from typing import Any
-from typing import Iterator
-from typing import List
-from typing import no_type_check
-from typing import Tuple
 
 from tqdm import tqdm
 
 from . import checkers
+from ..typing import Any
+from ..typing import Iterator
+from ..typing import List
+from ..typing import Tuple
 
 mp.set_start_method("fork")
 
@@ -80,7 +79,6 @@ class ParDat:
         self._p: List = []
         self._parent_conn: List = []
 
-    @no_type_check
     def __call__(self, func):
         """Return the parallelized function over the input arguments."""
 
@@ -107,7 +105,6 @@ class ParDat:
 
         return wrapper
 
-    @no_type_check
     @staticmethod
     def worker(worker_id, conn, job_list, q, func, func_args, func_kwargs):
         """Worker instance.
@@ -171,7 +168,6 @@ class ParDat:
         checkers.checkType("verbose", bool, val)
         self._verbose = val
 
-    @no_type_check
     def spawn(self, func, func_args, func_kwargs):
         """Spawn new child process.
 
@@ -234,7 +230,6 @@ class ParDatMap(ParDat):
         >>> results = ParDatMap(job_list=mylist)(func)(*args, **kwargs):
     """
 
-    @no_type_check
     def __call__(self, func):
         """Return the parallelized function over the input arguments."""
 
@@ -281,7 +276,6 @@ class ParDatExe(ParDat):
         >>> ParDatExe(job_list=mylist)(func)(*args, **kwargs):
     """
 
-    @no_type_check
     def __call__(self, func):
         """Return the parallelized function over the input arguments."""
 

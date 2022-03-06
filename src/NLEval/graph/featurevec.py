@@ -1,15 +1,15 @@
 from __future__ import annotations
 
 from itertools import chain
-from typing import Sequence
 
 import numpy as np
 from scipy.spatial import distance
 
+from ..typing import INT_TYPE
+from ..typing import LogLevel
+from ..typing import Sequence
 from ..util import checkers
-from ..util import types
 from ..util.idhandler import IDmap
-from ..util.types import LogLevel
 from .dense import DenseGraph
 
 
@@ -34,7 +34,7 @@ class FeatureVec(DenseGraph):
 
     @dim.setter
     def dim(self, d):
-        checkers.checkNullableType("d", types.INT_TYPE, d)
+        checkers.checkNullableType("d", INT_TYPE, d)
         if d is not None:
             if d < 1:
                 raise ValueError(

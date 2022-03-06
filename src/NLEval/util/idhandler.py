@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from typing import List
 
 import numpy as np
 
 from . import checkers
-from . import types
+from ..typing import ITERABLE_TYPE
+from ..typing import List
 from .exceptions import IDExistsError
 from .exceptions import IDNotExistError
 
@@ -81,7 +81,7 @@ class IDlst:
         depending on input type"""
         if isinstance(identifier, str):
             return self._getitem_sinlge(identifier)
-        elif isinstance(identifier, types.ITERABLE_TYPE):
+        elif isinstance(identifier, ITERABLE_TYPE):
             return self._getitem_multiple(identifier)
         else:
             raise TypeError(

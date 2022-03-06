@@ -1,7 +1,6 @@
-from typing import Optional
-
 import numpy as np
 
+from ...typing import Optional
 from ..collection import Splitter
 from .base import BaseFilter
 
