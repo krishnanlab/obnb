@@ -1,7 +1,7 @@
 import numpy as np
 
 from ..typing import Callable
-from ..typing import Dict
+from ..typing import EdgeData
 from ..typing import List
 from ..typing import LogLevel
 from ..typing import Optional
@@ -24,13 +24,13 @@ class SparseGraph(BaseGraph):
     ):
         """Initialize SparseGraph object."""
         super().__init__(log_level=log_level, verbose=verbose)
-        self._edge_data = []
+        self._edge_data: EdgeData = []
         self.weighted = weighted
         self.directed = directed
         self.self_loops = self_loops
 
     @property
-    def edge_data(self):
+    def edge_data(self) -> EdgeData:
         """:obj:`list` of :obj:`dict`: adjacency list data."""
         return self._edge_data
 
@@ -109,7 +109,7 @@ class SparseGraph(BaseGraph):
         node_id2: str,
         weight: float,
         reduction: Optional[str],
-        edge_data: List[Dict[int, float]],
+        edge_data: EdgeData,
     ):
         """Update edge data.
 
@@ -670,10 +670,10 @@ class DirectedSparseGraph(SparseGraph):
             log_level=log_level,
             verbose=verbose,
         )
-        self._rev_edge_data = []
+        self._rev_edge_data: EdgeData = []
 
     @property
-    def rev_edg_data(self):
+    def rev_edge_data(self) -> EdgeData:
         """Adjacency list of reversed edge direction."""
         return self._rev_edge_data
 
