@@ -18,13 +18,7 @@ mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=n_tasks)
 # Setup trainer, use auroc as the evaluation metric
 metrics = {"auroc": auroc}
 device = "cuda" if torch.cuda.is_available() else "cpu"
-trainer = SimpleGNNTrainer(
-    metrics,
-    g,
-    device=device,
-    metric_best="auroc",
-    log=True,
-)
+trainer = SimpleGNNTrainer(metrics, g, device=device, metric_best="auroc")
 
 y, masks = lsc.split(
     splitter,

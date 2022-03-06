@@ -10,6 +10,7 @@ import torch
 from torch_geometric.data import Data
 from torch_geometric.transforms import Constant
 
+from ..util.types import LogLevel
 from .base import BaseTrainer
 
 
@@ -25,7 +26,7 @@ class GNNTrainer(BaseTrainer):
         val_on: str = "val",
         device: str = "cpu",
         metric_best: Optional[str] = None,
-        log: bool = False,
+        log_level: LogLevel = "INFO",
     ):
         """Initialize GNNTrainer.
 
@@ -34,7 +35,6 @@ class GNNTrainer(BaseTrainer):
             device (str): Training device (default: :obj:`"cpu"`).
             metric_best (str): Metric used for determining the best model
                 (default: :obj:`None`).
-            log (bool): Print evaluation results at each evaluation epoch
                 if set to True (default: :obj:`False`)
 
         """
@@ -43,11 +43,11 @@ class GNNTrainer(BaseTrainer):
             graph=graph,
             features=features,
             train_on=train_on,
+            log_level=log_level,
         )
 
         self.val_on = val_on
         self.metric_best = metric_best
-        self.log = log
 
         edge_index, edge_weight = graph.to_pyg_edges()
         self.data = Data(
@@ -233,9 +233,7 @@ class SimpleGNNTrainer(GNNTrainer):
                     epoch,
                     loss,
                 )
-
-                if self.log:
-                    print(new_results)
+                self.logger.info(new_results)
 
         # Rewind back to best model
         model.load_state_dict(best_model_state)
