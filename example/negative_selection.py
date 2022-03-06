@@ -14,7 +14,7 @@ lsc_orig = LabelsetCollection.from_gmt(LABEL_FP)
 
 # apply negative selection filter
 lsc = lsc_orig.apply(
-    filters.NegativeGeneratorHypergeom(p_thresh),
+    filters.NegativeGeneratorHypergeom(p_thresh, log_level="DEBUG"),
     progress_bar=True,
 )
 
