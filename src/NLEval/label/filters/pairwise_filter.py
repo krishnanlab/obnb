@@ -1,7 +1,6 @@
-from typing import Set
-
 import numpy as np
 
+from ...typing import Set
 from .range_filter import BaseRangeFilter
 
 

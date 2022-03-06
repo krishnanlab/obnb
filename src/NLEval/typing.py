@@ -35,3 +35,4 @@ LogLevel = Literal[
 Metric = Callable[[np.ndarray, np.ndarray], float]
 GraphGymMetric = Callable[[List[Tensor], List[Tensor], str], float]
 Term = Tuple[str, str, Optional[List[str]], Optional[List[str]]]
+Splitter = Callable[[np.ndarray, np.ndarray], Iterator[Tuple[np.ndarray, ...]]]

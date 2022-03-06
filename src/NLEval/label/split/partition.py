@@ -1,9 +1,9 @@
 from collections import Counter
-from typing import List
-from typing import Tuple
 
 import numpy as np
 
+from ...typing import List
+from ...typing import Tuple
 from ...util.checkers import checkTypesInIterableErrEmpty
 from .base import BaseRandomSplit
 from .base import BaseSortedSplit
@@ -129,6 +129,8 @@ class ThresholdPartition(BasePartition):
 
         """
         checkTypesInIterableErrEmpty("thresholds", (int, float), vals)
+        item: float
+        count: int
         for item, count in Counter(vals).items():
             if count > 1:
                 raise ValueError(
