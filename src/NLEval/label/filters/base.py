@@ -1,9 +1,7 @@
-import logging
-from typing import Literal
-
 from tqdm import tqdm
 
-LogLevel = Literal["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG", "NOTSET"]
+from ...util.logger import get_logger
+from ...util.types import LogLevel
 
 
 class BaseFilter:
@@ -42,11 +40,11 @@ class BaseFilter:
                 instead of rolling back to INFO level (default: :obj:`False`).
 
         """
-        logger_name = f"defaultLogger.{self.__class__.__name__}"
-        self.logger = logging.getLogger(logger_name)
-        self.logger.setLevel(getattr(logging, log_level))
-        if verbose and self.logger.getEffectiveLevel() > 20:
-            self.logger.setLevel(logging.INFO)
+        self.logger = get_logger(
+            self.__class__.__name__,
+            log_level=log_level,
+            verbose=verbose,
+        )
 
     def __repr__(self):
         """Return name of the filer."""
