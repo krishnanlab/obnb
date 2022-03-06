@@ -19,6 +19,7 @@ class TestSplit(unittest.TestCase):
             self.lsc.split,
             KFold(n_splits=2).split,
             mask_names=("train", "val", "test"),
+            property_name=None,
         )
 
     def test_raise_label_name(self):
@@ -27,6 +28,7 @@ class TestSplit(unittest.TestCase):
             self.lsc.split,
             KFold(n_splits=2).split,
             labelset_name="Labelset3",
+            property_name=None,
         )
 
     def test_raise_property_name(self):
@@ -38,18 +40,20 @@ class TestSplit(unittest.TestCase):
         )
 
     def test_reorder(self):
-        y, _ = self.lsc.split(KFold(n_splits=2).split)
+        y, _ = self.lsc.split(KFold(n_splits=2).split, property_name=None)
         self.assertEqual(y.T.tolist(), [[1, 1, 1, 0], [0, 1, 0, 1]])
 
         y, _ = self.lsc.split(
             KFold(n_splits=2).split,
             target_ids=("a", "c", "b", "d"),
+            property_name=None,
         )
         self.assertEqual(y.T.tolist(), [[1, 1, 1, 0], [0, 0, 1, 1]])
 
         y, _ = self.lsc.split(
             KFold(n_splits=2).split,
             target_ids=("a", "e", "c", "b", "d", "f"),
+            property_name=None,
         )
         self.assertEqual(y.T.tolist(), [[1, 0, 1, 1, 0, 0], [0, 0, 0, 1, 1, 0]])
 
@@ -57,7 +61,7 @@ class TestSplit(unittest.TestCase):
         train_mask = [[False, False, True, True], [True, True, False, False]]
         test_mask = [[True, True, False, False], [False, False, True, True]]
 
-        y, masks = self.lsc.split(KFold(n_splits=2).split)
+        y, masks = self.lsc.split(KFold(n_splits=2).split, property_name=None)
         self.assertEqual(y.T.tolist(), [[1, 1, 1, 0], [0, 1, 0, 1]])
         self.assertEqual(list(masks), ["train", "test"])
         self.assertEqual(masks["train"].T.tolist(), train_mask)
@@ -66,6 +70,7 @@ class TestSplit(unittest.TestCase):
         y, masks = self.lsc.split(
             KFold(n_splits=2).split,
             labelset_name="Labelset1",
+            property_name=None,
         )
         self.assertEqual(y.T.tolist(), [1, 1, 1, 0])
         self.assertEqual(list(masks), ["train", "test"])
@@ -76,6 +81,7 @@ class TestSplit(unittest.TestCase):
             KFold(n_splits=2).split,
             labelset_name="Labelset1",
             target_ids=("a", "e", "c", "b", "d", "f"),
+            property_name=None,
         )
         self.assertEqual(y.T.tolist(), [1, 0, 1, 1, 0, 0])
         self.assertEqual(list(masks), ["train", "test"])
@@ -106,7 +112,7 @@ class TestSplit(unittest.TestCase):
             [False, False, False, True],
         ]
 
-        y, masks = self.lsc.split(KFold(n_splits=3).split)
+        y, masks = self.lsc.split(KFold(n_splits=3).split, property_name=None)
         self.assertEqual(y.T.tolist(), [[1, 1, 1, 0], [0, 1, 0, 1]])
         self.assertEqual(list(masks), ["train", "test"])
         self.assertEqual(masks["train"].T.tolist(), train_mask)
@@ -115,6 +121,7 @@ class TestSplit(unittest.TestCase):
         y, masks = self.lsc.split(
             KFold(n_splits=3).split,
             labelset_name="Labelset1",
+            property_name=None,
         )
         self.assertEqual(y.T.tolist(), [1, 1, 1, 0])
         self.assertEqual(list(masks), ["train", "test"])
@@ -592,6 +599,7 @@ class TestLabelsetSplit(unittest.TestCase):
         with self.subTest(ratios=(0.5, 0.5), shuffle=False):
             y, masks = self.lsc.split(
                 split.RandomRatioPartition(0.5, 0.5, shuffle=False),
+                property_name=None,
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(list(masks), ["train", "test"])
@@ -612,6 +620,7 @@ class TestLabelsetSplit(unittest.TestCase):
                         0.5,
                         random_state=random_state,
                     ),
+                    property_name=None,
                 )
 
                 # Manually compute expected random mask
@@ -629,6 +638,7 @@ class TestLabelsetSplit(unittest.TestCase):
         with self.subTest(ratio=0.5, shuffle=False):
             y, masks = self.lsc.split(
                 split.RandomRatioHoldout(0.5, shuffle=False),
+                property_name=None,
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(list(masks), ["test"])
@@ -644,6 +654,7 @@ class TestLabelsetSplit(unittest.TestCase):
                         0.5,
                         random_state=random_state,
                     ),
+                    property_name=None,
                 )
 
                 # Manually compute expected random mask
@@ -656,7 +667,7 @@ class TestLabelsetSplit(unittest.TestCase):
                 self.assertEqual(masks["test"].T.tolist(), [mask.tolist()])
 
     def test_all_holdout(self):
-        y, masks = self.lsc.split(split.AllHoldout())
+        y, masks = self.lsc.split(split.AllHoldout(), property_name=None)
         self.assertEqual(y.T.tolist(), self.y_t_list)
         self.assertEqual(list(masks), ["test"])
         self.assertEqual(
