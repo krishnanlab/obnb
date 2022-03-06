@@ -1,13 +1,13 @@
 import os
 import os.path as osp
-from typing import Dict
-from typing import Optional
 
 import ndex2
 import requests
 
 from ..graph import SparseGraph
 from ..label import LabelsetCollection
+from ..typing import Dict
+from ..typing import Optional
 
 
 class BaseNdexData(SparseGraph):

@@ -1,6 +1,5 @@
 import gzip
 import os.path as osp
-from typing import Dict
 
 import pandas as pd
 import requests
@@ -10,6 +9,7 @@ from ..graph import OntologyGraph
 from ..label.filters import LabelsetPairwiseFilterJaccard
 from ..label.filters import LabelsetPairwiseFilterOverlap
 from ..label.filters import LabelsetRangeFilterSize
+from ..typing import Dict
 from ..util.exceptions import IDNotExistError
 from .base import BaseAnnotatedOntologyData
 

@@ -1,5 +1,3 @@
-from typing import Dict
-
 import mygene
 from tqdm import tqdm
 
@@ -7,6 +5,7 @@ from ..graph import OntologyGraph
 from ..label.filters import LabelsetPairwiseFilterJaccard
 from ..label.filters import LabelsetPairwiseFilterOverlap
 from ..label.filters import LabelsetRangeFilterSize
+from ..typing import Dict
 from .base import BaseAnnotatedOntologyData
 
 
