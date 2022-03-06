@@ -29,6 +29,8 @@ FLOAT_TYPE = (float, np.float32, np.float64, np.float128)
 NUMERIC_TYPE = INT_TYPE + FLOAT_TYPE
 ITERABLE_TYPE = Iterable
 
+EdgeData = List[Dict[int, float]]
+
 LogLevel = Literal["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG", "NOTSET"]
 
 Metric = Callable[[np.ndarray, np.ndarray], float]
