@@ -1,5 +1,8 @@
 from tqdm import tqdm
 
+from ...util.logger import get_logger
+from ...util.types import LogLevel
+
 
 class BaseFilter:
     """Base Filter object containing basic filter operations.
@@ -20,6 +23,28 @@ class BaseFilter:
     All three 'get' methods above take a `LabelsetCollection` object as input
 
     """
+
+    def __init__(
+        self,
+        log_level: LogLevel = "WARNING",
+        verbose: bool = False,
+        **kwargs,
+    ):
+        """Initialize BaseFilter with logger.
+
+        Args:
+            log_level (LogLevel): Level of logging, see more in the Logging
+                library documentation.
+            verbose (bool): Shortcut for setting log_level to INFO. If the
+                specified level is more specific to INFO, then do nothing,
+                instead of rolling back to INFO level (default: :obj:`False`).
+
+        """
+        self.logger = get_logger(
+            self.__class__.__name__,
+            log_level=log_level,
+            verbose=verbose,
+        )
 
     def __repr__(self):
         """Return name of the filer."""

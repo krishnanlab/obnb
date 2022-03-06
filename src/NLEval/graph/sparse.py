@@ -1,3 +1,4 @@
+import logging
 from typing import Callable
 from typing import Dict
 from typing import List
@@ -8,6 +9,7 @@ import numpy as np
 
 from ..util import checkers
 from ..util.idhandler import IDmap
+from ..util.types import LogLevel
 from .base import BaseGraph
 
 
@@ -19,9 +21,11 @@ class SparseGraph(BaseGraph):
         weighted: bool = True,
         directed: bool = False,
         self_loops: bool = False,
+        log_level: LogLevel = "WARNING",
+        verbose: bool = False,
     ):
         """Initialize SparseGraph object."""
-        super().__init__()
+        super().__init__(log_level=log_level, verbose=verbose)
         self._edge_data = []
         self.weighted = weighted
         self.directed = directed
@@ -112,6 +116,7 @@ class SparseGraph(BaseGraph):
         weight: float,
         reduction: Optional[str],
         edge_data: List[Dict[int, float]],
+        logger: logging.Logger,
     ):
         """Update edge data.
 
@@ -130,6 +135,7 @@ class SparseGraph(BaseGraph):
                 values and overwrite it with the new avlue.
             edge_data: The edge data of the sparse graph, in the form of an
                 adjacency list with edge weights.
+            logger: Logger used for printing warning messages.
 
         """
         # Check self loops
@@ -141,10 +147,10 @@ class SparseGraph(BaseGraph):
             old_weight = edge_data[node_idx1][node_idx2]
             if old_weight != weight:  # check if edge weight is modified
                 if reduction is None:
-                    print(
-                        f"WARNING: edge between {node_id1} and {node_id2} "
-                        f"exists with weight {old_weight:.2f}, overwriting "
-                        f"with {weight:.2f}",
+                    logger.warn(
+                        f"edge between {node_id1} and {node_id2} exists with "
+                        f"weight {old_weight:.2f}, overwriting with it with "
+                        f"{weight:.2f}",
                     )
                 elif reduction == "max":
                     weight = max(old_weight, weight)
@@ -193,6 +199,7 @@ class SparseGraph(BaseGraph):
             weight,
             reduction,
             self._edge_data,
+            self.logger,
         )
 
     def get_edge(self, node_id1, node_id2):
@@ -393,9 +400,9 @@ class SparseGraph(BaseGraph):
                 node_name = node[node_id_entry]
                 if node_id_prefix is not None:
                     if not node_name.startswith(node_id_prefix):
-                        print(
-                            f"Skipping node: {node_name!r} due to mismatch "
-                            f"node_id_prefix. {node}",
+                        self.logger.warn(
+                            f"Skipping node {node_name!r} due to mismatch "
+                            f"node_id_prefix {node}",
                         )
                         continue
                     node_name = node_name.split(":")[1]
@@ -416,7 +423,7 @@ class SparseGraph(BaseGraph):
 
         # Convert node IDs
         if node_id_converter is not None:
-            print("Start converting gene IDs.")
+            self.logger.info("Start converting gene IDs.")
 
             try:
                 node_id_converter.query_bulk(list(node_idx_to_id.values()))
@@ -429,7 +436,7 @@ class SparseGraph(BaseGraph):
                 if node_id_converted is not None:
                     node_idx_to_id_converted[i] = node_id_converted
 
-            print("Done converting gene IDs.")
+            self.logger.info("Done converting gene IDs.")
         else:
             node_idx_to_id_converted = node_idx_to_id
 
@@ -441,7 +448,9 @@ class SparseGraph(BaseGraph):
                     try:
                         edge_weight_dict[ea["po"]] = float(ea["v"])
                     except ValueError:
-                        print(f"Skipping edge attr: {ea} due to value error")
+                        self.logger.warn(
+                            f"Skipping edge attr: {ea} due to value error",
+                        )
 
         # Write edges
         for edge in raw_edges:
@@ -452,8 +461,8 @@ class SparseGraph(BaseGraph):
                     interaction_types is not None
                     and edge["i"] not in interaction_types
                 ):
-                    print(
-                        f"Skipping edge: {edge} due to mismatched interaction "
+                    self.logger.warn(
+                        f"Skipping edge {edge} due to mismatched interaction "
                         f"type with the specified {interaction_types}",
                     )
                     continue
@@ -467,7 +476,7 @@ class SparseGraph(BaseGraph):
                 self.add_edge(node_id1, node_id2, weight, reduction=reduction)
 
             except KeyError:
-                print(f"Skipping edge: {edge} due to unkown nodes")
+                self.logger.warn(f"Skipping edge: {edge} due to unkown nodes")
 
     @classmethod
     def from_npz(cls, path, weighted, directed=False, **kwargs):
@@ -656,9 +665,19 @@ class DirectedSparseGraph(SparseGraph):
 
     """
 
-    def __init__(self, weighted=True):
+    def __init__(
+        self,
+        weighted: bool = True,
+        log_level: LogLevel = "WARNING",
+        verbose: bool = False,
+    ):
         """Initialize the directed sparse graoh."""
-        super().__init__(weighted=weighted, directed=True)
+        super().__init__(
+            weighted=weighted,
+            directed=True,
+            log_level=log_level,
+            verbose=verbose,
+        )
         self._rev_edge_data = []
 
     @property
@@ -696,4 +715,5 @@ class DirectedSparseGraph(SparseGraph):
             weight,
             reduction,
             self._rev_edge_data,
+            self.logger,
         )

@@ -6,6 +6,7 @@ import numpy as np
 
 from ..util import checkers
 from ..util.idhandler import IDmap
+from ..util.types import LogLevel
 from .base import BaseGraph
 from .sparse import SparseGraph
 
@@ -13,9 +14,9 @@ from .sparse import SparseGraph
 class DenseGraph(BaseGraph):
     """DenseGraph object storing data using numpy array."""
 
-    def __init__(self):
+    def __init__(self, log_level: LogLevel = "WARNING", verbose: bool = False):
         """Initialize DenseGraph object."""
-        super().__init__()
+        super().__init__(log_level=log_level, verbose=verbose)
         self._mat = np.array([])
 
     def __getitem__(self, key):

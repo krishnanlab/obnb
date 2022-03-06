@@ -10,6 +10,7 @@ class BaseExistenceFilter(BaseFilter):
         self,
         target_lst: List[str],
         remove_specified: bool = False,
+        **kwargs,
     ) -> None:
         """Initialize BaseExistenceFilter object.
 
@@ -19,7 +20,7 @@ class BaseExistenceFilter(BaseFilter):
                 preserve the specified targets and remove the unspecified ones.
 
         """
-        super().__init__()
+        super().__init__(**kwargs)
         self.target_lst = target_lst
         self.remove_specified = remove_specified
 
@@ -54,9 +55,10 @@ class EntityExistenceFilter(BaseExistenceFilter):
         self,
         target_lst: List[str],
         remove_specified: bool = False,
+        **kwargs,
     ) -> None:
         """Initialize EntityExistenceFilter object."""
-        super().__init__(target_lst, remove_specified)
+        super().__init__(target_lst, remove_specified, **kwargs)
 
     @staticmethod
     def get_val_getter(lsc):
@@ -90,9 +92,10 @@ class LabelsetExistenceFilter(BaseExistenceFilter):
         self,
         target_lst: List[str],
         remove_specified: bool = False,
+        **kwargs,
     ):
         """Initialize LabelsetExistenceFilter object."""
-        super().__init__(target_lst, remove_specified)
+        super().__init__(target_lst, remove_specified, **kwargs)
 
     @staticmethod
     def get_val_getter(lsc):

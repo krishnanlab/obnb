@@ -21,6 +21,7 @@ class BaseLabelsetPairwiseFilter(BaseRangeFilter):
         max_val: float,
         size_constraint: str = "smaller",
         inclusive: bool = True,
+        **kwargs,
     ):
         """Initialize the pairwise labelset filter.
 
@@ -35,7 +36,7 @@ class BaseLabelsetPairwiseFilter(BaseRangeFilter):
                 labelsets have the same size (default: :obj:`True`)
 
         """
-        super().__init__(None, max_val)
+        super().__init__(None, max_val, **kwargs)
         self.size_constraint = size_constraint
         self.inclusive = inclusive
 
