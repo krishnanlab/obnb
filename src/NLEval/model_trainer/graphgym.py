@@ -22,7 +22,6 @@ from torch_geometric.graphgym.register import register_metric
 from torch_geometric.graphgym.train import train_epoch
 from torch_geometric.graphgym.utils.comp_budget import params_count
 from torch_geometric.graphgym.utils.device import auto_select_device
-from torch_geometric.graphgym.utils.epoch import is_eval_epoch
 
 from .gnn import GNNTrainer
 
@@ -81,6 +80,9 @@ class GraphGymTrainer(GNNTrainer):
         logging.info(cfg_gg)
 
         self.register_metrics(metrics, metric_best)
+
+        self.epochs = cfg_gg.optim.max_epoch
+        self.eval_steps = cfg_gg.train.eval_period
 
         super().__init__(metrics, graph, features, device=selected_device)
 
@@ -178,7 +180,7 @@ class GraphGymTrainer(GNNTrainer):
         for cur_epoch in range(cfg_gg.optim.max_epoch):
             train_epoch(logger_gg, loaders[0], model, optimizer, scheduler)
 
-            if is_eval_epoch(cur_epoch):
+            if self.is_eval_epoch(cur_epoch):
                 new_results = self.evaluate(loaders, model, masks)
                 self.update_stats(
                     model,
