@@ -673,7 +673,7 @@ class DirectedSparseGraph(SparseGraph):
         self._rev_edge_data: EdgeData = []
 
     @property
-    def rev_edg_data(self):
+    def rev_edge_data(self) -> EdgeData:
         """Adjacency list of reversed edge direction."""
         return self._rev_edge_data
 
