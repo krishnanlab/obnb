@@ -1,11 +1,10 @@
-from typing import Any
-from typing import Dict
-from typing import Optional
-
 import numpy as np
 
+from ..typing import Any
+from ..typing import Dict
+from ..typing import LogLevel
+from ..typing import Optional
 from ..util.checkers import checkNumpyArrayShape
-from ..util.types import LogLevel
 from .base import BaseTrainer
 
 

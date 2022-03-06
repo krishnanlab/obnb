@@ -1,8 +1,7 @@
-from typing import Any
-from typing import Dict
-
 import numpy as np
 
+from ..typing import Any
+from ..typing import Dict
 from .base import BaseTrainer
 
 
