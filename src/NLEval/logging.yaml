@@ -2,16 +2,26 @@ version: 1
 formatters:
   defaultFormatter:
     format: '%(name)s:%(funcName)s:%(levelname)s:%(message)s'
+  briefFormatter:
+    format: '%(message)s'
 handlers:
-  consoleHandler:
+  defaultConsoleHandler:
     class: logging.StreamHandler
     level: DEBUG
     formatter: defaultFormatter
+  briefConsoleHandler:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: briefFormatter
 loggers:
   defaultLogger:
     level: INFO
-    handlers: [consoleHandler]
+    handlers: [defaultConsoleHandler]
+    propagate: no
+  briefLogger:
+    level: INFO
+    handlers: [briefConsoleHandler]
     propagate: no
 root:
   level: DEBUG
-  handlers: [consoleHandler]
+  handlers: [defaultConsoleHandler]
