@@ -9,13 +9,19 @@ from scipy.spatial import distance
 from ..util import checkers
 from ..util import types
 from ..util.idhandler import IDmap
+from ..util.types import LogLevel
 from .dense import DenseGraph
 
 
 class FeatureVec(DenseGraph):
     """Feature vectors object."""
 
-    def __init__(self, dim=None):
+    def __init__(
+        self,
+        dim=None,
+        log_level: LogLevel = "WARNING",
+        verbose: bool = True,
+    ):
         """Initialize FeatureVec object."""
         # TODO: create from dict
         super().__init__()
@@ -38,7 +44,9 @@ class FeatureVec(DenseGraph):
             if d != self.mat.shape[1]:
                 # self.dim should always in sync with actual dim of feature vec
                 if self.dim != self.mat.shape[1]:
-                    print("CRITICAL: This should never happen!")
+                    self.logger.critical(
+                        "Mismatching dimensions. This should never happen!",
+                    )
                 raise ValueError(
                     f"Inconsistent dimension between input ({d}) and data "
                     f"({self.mat.shape[1]})",
@@ -181,9 +189,13 @@ class FeatureVec(DenseGraph):
 class MultiFeatureVec(FeatureVec):
     """Multiple feature vectors."""
 
-    def __init__(self):
+    def __init__(
+        self,
+        log_level: LogLevel = "WARNING",
+        verbose: bool = True,
+    ):
         """Initialize MultiFeatureVec."""
-        super().__init__()
+        super().__init__(log_level=log_level, verbose=verbose)
         self.indptr = None
         self.fset_idmap = IDmap()
 

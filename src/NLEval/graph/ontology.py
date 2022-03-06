@@ -15,6 +15,7 @@ from tqdm import trange
 
 from ..util import idhandler
 from ..util.exceptions import OboTermIncompleteError
+from ..util.types import LogLevel
 from .sparse import DirectedSparseGraph
 
 Term = Tuple[str, str, Optional[List[str]], Optional[List[str]]]
@@ -35,9 +36,9 @@ class OntologyGraph(DirectedSparseGraph):
 
     """
 
-    def __init__(self):
+    def __init__(self, log_level: LogLevel = "WARNING", verbose: bool = False):
         """Initialize the ontology graph."""
-        super().__init__()
+        super().__init__(log_level=log_level, verbose=verbose)
         self.idmap = idhandler.IDprop()
         self.idmap.new_property("node_attr", default_val=None)
         self.idmap.new_property("node_name", default_val=None)

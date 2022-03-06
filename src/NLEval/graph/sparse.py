@@ -665,9 +665,19 @@ class DirectedSparseGraph(SparseGraph):
 
     """
 
-    def __init__(self, weighted=True):
+    def __init__(
+        self,
+        weighted: bool = True,
+        log_level: LogLevel = "WARNING",
+        verbose: bool = False,
+    ):
         """Initialize the directed sparse graoh."""
-        super().__init__(weighted=weighted, directed=True)
+        super().__init__(
+            weighted=weighted,
+            directed=True,
+            log_level=log_level,
+            verbose=verbose,
+        )
         self._rev_edge_data = []
 
     @property
