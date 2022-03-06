@@ -26,6 +26,9 @@ class GNNTrainer(BaseTrainer):
         val_on: str = "val",
         device: str = "cpu",
         metric_best: Optional[str] = None,
+        lr: float = 0.01,
+        epochs: int = 100,
+        eval_steps: int = 10,
         log_level: LogLevel = "INFO",
     ):
         """Initialize GNNTrainer.
@@ -36,6 +39,9 @@ class GNNTrainer(BaseTrainer):
             metric_best (str): Metric used for determining the best model
                 (default: :obj:`None`).
                 if set to True (default: :obj:`False`)
+            lr (float): Learning rate (default: :obj:`0.01`)
+            epochs (int): Total epochs (default: :obj:`100`)
+            eval_steps (int): Interval for evaluation (default: :obj:`10`)
 
         """
         super().__init__(
@@ -48,6 +54,9 @@ class GNNTrainer(BaseTrainer):
 
         self.val_on = val_on
         self.metric_best = metric_best
+        self.lr = lr
+        self.epochs = epochs
+        self.eval_steps = eval_steps
 
         edge_index, edge_weight = graph.to_pyg_edges()
         self.data = Data(
@@ -167,28 +176,6 @@ class GNNTrainer(BaseTrainer):
 
 class SimpleGNNTrainer(GNNTrainer):
     """Simple GNN trainer using Adam with fixed learning rate."""
-
-    def __init__(
-        self,
-        metrics,
-        graph,
-        lr: float = 0.01,
-        epochs: int = 100,
-        eval_steps: int = 10,
-        **kwargs,
-    ):
-        """Initialize SimpleGNNTrainer.
-
-        Args:
-            lr (float): Learning rate (default: :obj:`0.01`)
-            epochs (int): Total epochs (default: :obj:`100`)
-            eval_steps (int): Interval for evaluation (default: :obj:`10`)
-
-        """
-        super().__init__(metrics, graph, **kwargs)
-        self.lr = lr
-        self.epochs = epochs
-        self.eval_steps = eval_steps
 
     @staticmethod
     def train_epoch(model, data, y, train_mask, optimizer):
