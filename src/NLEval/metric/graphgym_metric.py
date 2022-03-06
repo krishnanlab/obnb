@@ -1,11 +1,9 @@
 """Custom metrics comparible with GraphGym logger."""
 from functools import wraps
 
-import numpy as np
 import torch
 from torch import Tensor
 
-from ..typing import Callable
 from ..typing import List
 from ..typing import Metric
 from .standard import auroc

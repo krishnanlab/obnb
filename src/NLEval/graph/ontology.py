@@ -13,7 +13,6 @@ from ..typing import Optional
 from ..typing import Set
 from ..typing import Term
 from ..typing import TextIO
-from ..typing import Tuple
 from ..typing import Union
 from ..util import idhandler
 from ..util.exceptions import OboTermIncompleteError
