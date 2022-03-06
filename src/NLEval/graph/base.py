@@ -1,11 +1,11 @@
 from copy import deepcopy
-from typing import Tuple
-from typing import Union
 
+from ..typing import LogLevel
+from ..typing import Tuple
+from ..typing import Union
 from ..util import checkers
 from ..util import idhandler
 from ..util.logger import get_logger
-from ..util.types import LogLevel
 
 
 class BaseGraph:

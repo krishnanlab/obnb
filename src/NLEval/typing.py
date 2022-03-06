@@ -2,11 +2,18 @@
 from collections.abc import Iterable
 from typing import Any
 from typing import Callable
+from typing import DefaultDict
+from typing import Dict
+from typing import Iterable
 from typing import Iterator
 from typing import List
 from typing import Literal
 from typing import Optional
+from typing import Sequence
+from typing import Set
+from typing import TextIO
 from typing import Tuple
+from typing import Union
 
 import numpy as np
 
@@ -27,3 +34,4 @@ LogLevel = Literal[
 
 Metric = Callable[[np.ndarray, np.ndarray], float]
 GraphGymMetric = Callable[[List[Tensor], List[Tensor], str], float]
+Term = Tuple[str, str, Optional[List[str]], Optional[List[str]]]

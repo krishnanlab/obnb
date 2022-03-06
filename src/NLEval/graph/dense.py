@@ -1,12 +1,11 @@
-from typing import List
-from typing import Optional
-from typing import Union
-
 import numpy as np
 
+from ..typing import List
+from ..typing import LogLevel
+from ..typing import Optional
+from ..typing import Union
 from ..util import checkers
 from ..util.idhandler import IDmap
-from ..util.types import LogLevel
 from .base import BaseGraph
 from .sparse import SparseGraph
 

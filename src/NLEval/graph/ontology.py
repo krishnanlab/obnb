@@ -1,24 +1,23 @@
 import functools
 import itertools
 from collections import defaultdict
-from typing import DefaultDict
-from typing import Iterable
-from typing import Iterator
-from typing import List
-from typing import Optional
-from typing import Set
-from typing import TextIO
-from typing import Tuple
-from typing import Union
 
 from tqdm import trange
 
+from ..typing import DefaultDict
+from ..typing import Iterable
+from ..typing import Iterator
+from ..typing import List
+from ..typing import LogLevel
+from ..typing import Optional
+from ..typing import Set
+from ..typing import Term
+from ..typing import TextIO
+from ..typing import Tuple
+from ..typing import Union
 from ..util import idhandler
 from ..util.exceptions import OboTermIncompleteError
-from ..util.types import LogLevel
 from .sparse import DirectedSparseGraph
-
-Term = Tuple[str, str, Optional[List[str]], Optional[List[str]]]
 
 
 class OntologyGraph(DirectedSparseGraph):
