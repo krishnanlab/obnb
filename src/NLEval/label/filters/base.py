@@ -60,3 +60,12 @@ class BaseFilter:
         for entity_id in pbar:
             if self.criterion(val_getter(entity_id)):
                 mod_fun(entity_id)
+                self.logger.debug(
+                    f"Modification ({self.mod_name}) criterion met for "
+                    f"{entity_id!r}",
+                )
+
+    @property
+    def mod_name(self):
+        """Name of modification to entity."""
+        return "UNKNOWN"

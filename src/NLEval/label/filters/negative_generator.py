@@ -86,3 +86,7 @@ class NegativeGeneratorHypergeom(BaseFilter):
 
             negative = list(all_entities - exclude_set)
             lsc.set_negative(list(negative), label_id1)
+            self.logger.info(
+                f"Setting negatives for {label_id1} (num negatives = "
+                f"{len(negative)} out of {len(all_entities)})",
+            )

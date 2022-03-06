@@ -68,6 +68,10 @@ class EntityRangeFilterNoccur(BaseRangeFilter):
         """Initialize EntityRangeFilterNoccur object."""
         super().__init__(min_val, max_val, **kwargs)
 
+    @property
+    def mod_name(self):
+        return "DROP ENTITY"
+
     @staticmethod
     def get_val_getter(lsc):
         return lsc.get_noccur
@@ -102,6 +106,10 @@ class LabelsetRangeFilterSize(BaseRangeFilter):
         """Initialize LabelsetRangeFilterSize object."""
         super().__init__(min_val, max_val, **kwargs)
 
+    @property
+    def mod_name(self):
+        return "DROP LABELSET"
+
     @staticmethod
     def get_val_getter(lsc):
         return lambda entity_id: len(lsc.get_labelset(entity_id))
@@ -128,6 +136,10 @@ class LabelsetRangeFilterSplit(BaseRangeFilter):
         super().__init__(min_val=min_val, **kwargs)
         self.splitter = splitter
         self.kwargs = kwargs
+
+    @property
+    def mod_name(self):
+        return "DROP LABELSET"
 
     def get_val_getter(self, lsc):
         """Return the value getter.
