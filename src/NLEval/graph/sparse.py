@@ -147,7 +147,7 @@ class SparseGraph(BaseGraph):
             old_weight = edge_data[node_idx1][node_idx2]
             if old_weight != weight:  # check if edge weight is modified
                 if reduction is None:
-                    logger.warn(
+                    logger.warning(
                         f"edge between {node_id1} and {node_id2} exists with "
                         f"weight {old_weight:.2f}, overwriting with it with "
                         f"{weight:.2f}",
@@ -400,7 +400,7 @@ class SparseGraph(BaseGraph):
                 node_name = node[node_id_entry]
                 if node_id_prefix is not None:
                     if not node_name.startswith(node_id_prefix):
-                        self.logger.warn(
+                        self.logger.warning(
                             f"Skipping node {node_name!r} due to mismatch "
                             f"node_id_prefix {node}",
                         )
@@ -448,7 +448,7 @@ class SparseGraph(BaseGraph):
                     try:
                         edge_weight_dict[ea["po"]] = float(ea["v"])
                     except ValueError:
-                        self.logger.warn(
+                        self.logger.warning(
                             f"Skipping edge attr: {ea} due to value error",
                         )
 
@@ -461,7 +461,7 @@ class SparseGraph(BaseGraph):
                     interaction_types is not None
                     and edge["i"] not in interaction_types
                 ):
-                    self.logger.warn(
+                    self.logger.warning(
                         f"Skipping edge {edge} due to mismatched interaction "
                         f"type with the specified {interaction_types}",
                     )
@@ -476,7 +476,9 @@ class SparseGraph(BaseGraph):
                 self.add_edge(node_id1, node_id2, weight, reduction=reduction)
 
             except KeyError:
-                self.logger.warn(f"Skipping edge: {edge} due to unkown nodes")
+                self.logger.warning(
+                    f"Skipping edge: {edge} due to unkown nodes",
+                )
 
     @classmethod
     def from_npz(cls, path, weighted, directed=False, **kwargs):
