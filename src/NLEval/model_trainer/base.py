@@ -9,6 +9,8 @@ import numpy as np
 from ..graph.base import BaseGraph
 from ..graph.featurevec import MultiFeatureVec
 from ..util.checkers import checkNumpyArrayShape
+from ..util.logger import get_logger
+from ..util.types import LogLevel
 
 
 class BaseTrainer:
@@ -26,6 +28,7 @@ class BaseTrainer:
         features: Optional[BaseGraph] = None,
         train_on: str = "train",
         dual: bool = False,
+        log_level: LogLevel = "INFO",
     ):
         """Initialize BaseTraining.
 
@@ -46,6 +49,11 @@ class BaseTrainer:
         self.features = features
         self.train_on = train_on
         self.dual = dual
+        self.logger = get_logger(
+            self.__class__.__name__,
+            log_level=log_level,
+            logger_name="briefLogger",
+        )
 
     @property
     def idmap(self):

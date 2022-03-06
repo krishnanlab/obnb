@@ -10,6 +10,7 @@ import torch
 from torch_geometric.data import Data
 from torch_geometric.transforms import Constant
 
+from ..util.types import LogLevel
 from .base import BaseTrainer
 
 
@@ -25,7 +26,10 @@ class GNNTrainer(BaseTrainer):
         val_on: str = "val",
         device: str = "cpu",
         metric_best: Optional[str] = None,
-        log: bool = False,
+        lr: float = 0.01,
+        epochs: int = 100,
+        eval_steps: int = 10,
+        log_level: LogLevel = "INFO",
     ):
         """Initialize GNNTrainer.
 
@@ -34,8 +38,10 @@ class GNNTrainer(BaseTrainer):
             device (str): Training device (default: :obj:`"cpu"`).
             metric_best (str): Metric used for determining the best model
                 (default: :obj:`None`).
-            log (bool): Print evaluation results at each evaluation epoch
                 if set to True (default: :obj:`False`)
+            lr (float): Learning rate (default: :obj:`0.01`)
+            epochs (int): Total epochs (default: :obj:`100`)
+            eval_steps (int): Interval for evaluation (default: :obj:`10`)
 
         """
         super().__init__(
@@ -43,11 +49,14 @@ class GNNTrainer(BaseTrainer):
             graph=graph,
             features=features,
             train_on=train_on,
+            log_level=log_level,
         )
 
         self.val_on = val_on
         self.metric_best = metric_best
-        self.log = log
+        self.lr = lr
+        self.epochs = epochs
+        self.eval_steps = eval_steps
 
         edge_index, edge_weight = graph.to_pyg_edges()
         self.data = Data(
@@ -160,6 +169,10 @@ class GNNTrainer(BaseTrainer):
             setattr(data, mask_name + mask_suffix, torch.from_numpy(mask))
         return data
 
+    def is_eval_epoch(self, cur_epoch: int) -> bool:
+        """Return true if current epoch is eval epoch."""
+        return cur_epoch % self.eval_steps == 0
+
 
 class SimpleGNNTrainer(GNNTrainer):
     """Simple GNN trainer using Adam with fixed learning rate."""
@@ -194,35 +207,19 @@ class SimpleGNNTrainer(GNNTrainer):
 
         return results
 
-    def train(
-        self,
-        model,
-        y,
-        masks,
-        split_idx=0,
-        lr: float = 0.01,
-        epochs: int = 100,
-        eval_steps: int = 10,
-    ):
-        """Train the GNN model.
-
-        Args:
-            lr (float): Learning rate (default: :obj:`0.01`)
-            epochs (int): Total epochs (default: :obj:`100`)
-            eval_steps (int): Interval for evaluation (default: :obj:`10`)
-
-        """
+    def train(self, model, y, masks, split_idx=0):
+        """Train the GNN model."""
         model.to(self.device)
         data = self.data
-        optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+        optimizer = torch.optim.Adam(model.parameters(), lr=self.lr)
         train_mask = self.get_mask(masks, self.train_on, split_idx)
         y_torch = torch.from_numpy(y.astype(float)).to(self.device)
 
         stats, best_stats, best_model_state = self.new_stats(masks)
-        for epoch in range(epochs):
+        for cur_epoch in range(self.epochs):
             loss = self.train_epoch(model, data, y_torch, train_mask, optimizer)
 
-            if epoch % eval_steps == 0:
+            if self.is_eval_epoch(cur_epoch):
                 new_results = self.evaluate(model, y, masks, split_idx)
                 self.update_stats(
                     model,
@@ -230,12 +227,10 @@ class SimpleGNNTrainer(GNNTrainer):
                     best_stats,
                     best_model_state,
                     new_results,
-                    epoch,
+                    cur_epoch,
                     loss,
                 )
-
-                if self.log:
-                    print(new_results)
+                self.logger.info(new_results)
 
         # Rewind back to best model
         model.load_state_dict(best_model_state)
