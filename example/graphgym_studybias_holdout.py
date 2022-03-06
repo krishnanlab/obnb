@@ -13,7 +13,12 @@ g, lsc = load_data("STRING-EXP", "KEGGBP", sparse=True, filter_negative=False)
 # 3/2 train/test split using genes with higher PubMed Count for training
 splitter = RatioPartition(0.6, 0.2, 0.2, ascending=False)
 lsc.iapply(
-    LabelsetRangeFilterSplit(20, splitter, True, property_name="PubMed Count"),
+    LabelsetRangeFilterSplit(
+        20,
+        splitter,
+        verbose=True,
+        property_name="PubMed Count",
+    ),
 )
 n_tasks = len(lsc.label_ids)
 print(f"{n_tasks=}\n")
