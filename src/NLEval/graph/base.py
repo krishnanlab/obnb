@@ -4,14 +4,21 @@ from typing import Union
 
 from ..util import checkers
 from ..util import idhandler
+from ..util.logger import get_logger
+from ..util.types import LogLevel
 
 
 class BaseGraph:
     """Base Graph object that contains basic graph operations."""
 
-    def __init__(self):
+    def __init__(self, log_level: LogLevel = "WARNING", verbose: bool = False):
         """Initialize BaseGraph object."""
         self.idmap = idhandler.IDmap()
+        self.logger = get_logger(
+            self.__class__.__name__,
+            log_level=log_level,
+            verbose=verbose,
+        )
 
     @property
     def node_ids(self) -> Tuple[str, ...]:
