@@ -1,8 +1,12 @@
-"""
-A collection of predefined types used for type checking in NLEval.
-"""
+"""Collection of types used in NLEval."""
 from collections.abc import Iterable
+from typing import Any
+from typing import Callable
+from typing import Iterator
+from typing import List
 from typing import Literal
+from typing import Optional
+from typing import Tuple
 
 import numpy as np
 
@@ -20,3 +24,6 @@ LogLevel = Literal[
     "DEBUG",
     "NOTSET",
 ]
+
+Metric = Callable[[np.ndarray, np.ndarray], float]
+GraphGymMetric = Callable[[List[Tensor], List[Tensor], str], float]

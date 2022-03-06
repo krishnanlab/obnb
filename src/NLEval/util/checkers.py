@@ -6,7 +6,9 @@ to a function call is valid.
 """
 import numpy as np
 
-from . import types
+from ..typing import INT_TYPE
+from ..typing import ITERABLE_TYPE
+from ..typing import NUMERIC_TYPE
 
 __all__ = [
     "checkValuePositive",
@@ -100,7 +102,7 @@ def checkTypesInIterableErrEmpty(name, targetType, val):
 def checkNumpyArrayIsNumeric(name, ary):
     """Check if numpy array is numeric type."""
     checkType(name, np.ndarray, ary)
-    if not any([ary.dtype == i for i in types.NUMERIC_TYPE]):
+    if not any([ary.dtype == i for i in NUMERIC_TYPE]):
         raise TypeError(f"{name!r} should be numeric, not type {ary.dtype!r}")
 
 
@@ -117,7 +119,7 @@ def checkNumpyArrayNDim(name, targetNDim, ary):
             from the target number of dimensions
 
     """
-    checkType("targetNDim", types.INT_TYPE, targetNDim)
+    checkType("targetNDim", INT_TYPE, targetNDim)
     checkType(name, np.ndarray, ary)
     NDim = len(ary.shape)
     if NDim != targetNDim:
@@ -139,11 +141,11 @@ def checkNumpyArrayShape(name, targetShape, ary):
         ValueError: if the sape of the input array differ from the target shape
 
     """
-    if isinstance(targetShape, types.ITERABLE_TYPE):
-        checkTypesInIterable("targetShape", types.INT_TYPE, targetShape)
+    if isinstance(targetShape, ITERABLE_TYPE):
+        checkTypesInIterable("targetShape", INT_TYPE, targetShape)
         NDim = len(targetShape)
     else:
-        checkType("targetShape", types.INT_TYPE, targetShape)
+        checkType("targetShape", INT_TYPE, targetShape)
         NDim = 1
         targetShape = (targetShape,)
     checkNumpyArrayNDim(name, NDim, ary)

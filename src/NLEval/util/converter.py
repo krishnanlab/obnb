@@ -1,6 +1,6 @@
-from typing import List
-
 import mygene
+
+from ..typing import List
 
 
 class MyGeneInfoConverter:

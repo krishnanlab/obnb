@@ -1,12 +1,13 @@
 """Custom metrics comparible with GraphGym logger."""
 from functools import wraps
-from typing import Callable
-from typing import List
 
 import numpy as np
 import torch
 from torch import Tensor
 
+from ..typing import Callable
+from ..typing import List
+from ..typing import Metric
 from .standard import auroc
 from .standard import log2_auprc_prior
 from .standard import precision_at_topk
@@ -16,9 +17,6 @@ __all__ = [
     "graphgym_log2_auprc_prior",
     "graphgym_precision_at_topk",
 ]
-
-Metric = Callable[[np.ndarray, np.ndarray], float]
-GraphGymMetric = Callable[[List[Tensor], List[Tensor], str], float]
 
 
 def graphgym_metric_wrapper(metric_func: Metric):

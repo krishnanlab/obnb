@@ -5,7 +5,7 @@ import pathlib
 
 import yaml
 
-from .types import LogLevel
+from ..typing import LogLevel
 
 
 def config_logger():
