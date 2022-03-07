@@ -67,7 +67,7 @@ class GraphGymTrainer(GNNTrainer):
 
         assert_cfg(cfg_gg)
         # Only support multilabel classification
-        cfg_gg.dataset.task_type = "classification_multilabel"
+        cfg_gg.dataset.task_type = "classification"
         dump_cfg(cfg_gg)
 
         pyg_gg.set_run_dir(cfg_gg.out_dir, cfg_file)
@@ -201,14 +201,6 @@ class GraphGymTrainer(GNNTrainer):
         model.load_state_dict(best_model_state)
 
         return best_stats
-
-
-@register_loss("multilabel_cross_entropy")
-def multilabel_cross_entropy(pred, true):
-    """Binary Cross Entropy as loss for multilabel classification tasks."""
-    if cfg_gg.dataset.task_type == "classification_multilabel":
-        bce_loss = torch.nn.BCEWithLogitsLoss()
-        return bce_loss(pred, true), torch.sigmoid(pred)
 
 
 def graphgym_model_wrapper(model):
