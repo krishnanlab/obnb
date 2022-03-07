@@ -13,7 +13,6 @@ from torch_geometric.graphgym.config import dump_cfg
 from torch_geometric.graphgym.loader import get_loader
 from torch_geometric.graphgym.logger import Logger as Logger_gg
 from torch_geometric.graphgym.model_builder import create_model
-from torch_geometric.graphgym.register import register_loss
 from torch_geometric.graphgym.register import register_metric
 from torch_geometric.graphgym.train import train_epoch
 from torch_geometric.graphgym.utils.comp_budget import params_count
