@@ -1,6 +1,8 @@
 import ndex2
 
 from ...graph import SparseGraph
+from ...typing import Any
+from ...typing import Dict
 from ...typing import List
 from ...typing import Optional
 from ..base import BaseData
@@ -22,7 +24,7 @@ class BaseNdexData(BaseData, SparseGraph):
         directed: bool,
         redownload: bool = False,
         reprocess: bool = False,
-        **kwargs,
+        cx_kwargs: Optional[Dict[str, Any]] = None,
     ):
         """Initialize the BaseNdexData object.
 
@@ -36,9 +38,10 @@ class BaseNdexData(BaseData, SparseGraph):
             reprocess (bool): If set to True, always process the data
                 even if the processed data file already exists in the
                 corresponding data folder (default: obj:`False`).
-            **kwargs: Other keyword arguments used for reading the cx file.
+            cx_kwargs: Keyword arguments used for reading the cx file.
 
         """
+        self.cx_kwargs: Dict[str, Any] = cx_kwargs or {}
         super().__init__(
             root,
             redownload=redownload,
@@ -62,9 +65,9 @@ class BaseNdexData(BaseData, SparseGraph):
         with open(self.raw_file_path(0), "wb") as f:
             f.write(client_resp.content)
 
-    def process(self, **kwargs):
+    def process(self):
         """Process data and save for later useage."""
-        self.read_cx_stream_file(self.raw_file_path(0), **kwargs)
+        self.read_cx_stream_file(self.raw_file_path(0), **self.cx_kwargs)
         self.save_npz(self.processed_file_path(0), self.weighted)
 
     def load_processed_data(self):

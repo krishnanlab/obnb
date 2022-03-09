@@ -12,8 +12,10 @@ class BioPlex(BaseNdexData):
             root,
             weighted=False,
             directed=False,
-            interaction_types=["interacts-with"],
-            node_id_prefix="ncbigene",
-            node_id_entry="r",
+            cx_kwargs={
+                "interaction_types": ["interacts-with"],
+                "node_id_prefix": "ncbigene",
+                "node_id_entry": "r",
+            },
             **kwargs,
         )
