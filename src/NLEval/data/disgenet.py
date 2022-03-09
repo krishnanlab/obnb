@@ -10,7 +10,6 @@ from ..graph import OntologyGraph
 from ..label.filters import LabelsetPairwiseFilterJaccard
 from ..label.filters import LabelsetPairwiseFilterOverlap
 from ..label.filters import LabelsetRangeFilterSize
-from ..typing import Dict
 from ..util.exceptions import IDNotExistError
 from .base import BaseAnnotatedOntologyData
 
@@ -32,6 +31,8 @@ class DisGeNet(BaseAnnotatedOntologyData):
 
     ontology_url = "http://purl.obolibrary.org/obo/doid.obo"
     annotation_url = "https://www.disgenet.org/static/disgenet_ap1/files/downloads/all_gene_disease_associations.tsv.gz"
+    ontology_file_name = "dodi.obo"
+    annotation_file_name = "all_gene_disease_associations.tsv"
 
     def __init__(
         self,
@@ -52,13 +53,6 @@ class DisGeNet(BaseAnnotatedOntologyData):
         super().__init__(root, **kwargs)
 
     @property
-    def data_name_dict(self) -> Dict[str, str]:
-        return {
-            "ontology": "doid.obo",
-            "annotation": "all_gene_disease_associations.tsv",
-        }
-
-    @property
     def filters(self):
         return [
             LabelsetRangeFilterSize(max_val=self.max_size),
@@ -77,17 +71,17 @@ class DisGeNet(BaseAnnotatedOntologyData):
 
     def download_annotations(self):
         resp = requests.get(self.annotation_url)
-        annotation_file_name = self.data_name_dict["annotation"]
+        annotation_file_name = self.annotation_file_name
         with open(osp.join(self.raw_dir, annotation_file_name), "wb") as f:
             f.write(gzip.decompress(resp.content))
 
     def process(self):
         g = OntologyGraph()
         umls_to_doid = g.read_obo(
-            self.ontology_data_path,
+            self.ontology_file_path,
             xref_prefix="UMLS_CUI",
         )
-        annot_df = pd.read_csv(self.annotation_data_path, sep="\t")
+        annot_df = pd.read_csv(self.annotation_file_path, sep="\t")
 
         sub_df = annot_df[annot_df["DSI"] >= self.dsi_threshold]
         pbar = tqdm(sub_df[["geneId", "diseaseId"]].values)
@@ -111,4 +105,4 @@ class DisGeNet(BaseAnnotatedOntologyData):
             logger.info(self.stats())
 
         logger.info("Saving processed gmt...")
-        self.export_gmt(self.processed_data_path)
+        self.export_gmt(self.processed_file_path(0))

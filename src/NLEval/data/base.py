@@ -7,17 +7,39 @@ import requests
 from .. import logger
 from ..graph import SparseGraph
 from ..label import LabelsetCollection
-from ..typing import Dict
+from ..typing import List
 from ..typing import Optional
 
 
 class BaseData:
+    """BaseData object.
+
+    This is an abstract class for constructing data objects. The main methods
+    are _download and _process, which are wrappers that download the raw files
+    and process the files into the final processed file if they are not yet
+    available. Otherwise, directly load the previously processed file.
+
+    """
+
     def __init__(
         self,
         root: str,
         redownload: bool = False,
         reprocess: bool = False,
+        **kwargs,
     ):
+        """Initialize BaseData object.
+
+        Args:
+            root (str): Root directory of the data files.
+            redownload (bool): If set to True, redownload the data even if all
+                raw files are downloaded (default: False).
+            reprocess (bool): If set to True, reprocess the data even if the
+                processed data is available (default: False).
+
+        """
+        super().__init__(**kwargs)
+
         self.root = root
         self.redownload = redownload
         self.reprocess = reprocess
@@ -27,61 +49,82 @@ class BaseData:
 
     @property
     def classname(self) -> str:
+        """Return data object name."""
         return self.__class__.__name__
 
     @property
     def raw_dir(self) -> str:
+        """Return raw file directory."""
         return cleandir(osp.join(self.root, self.classname, "raw"))
 
     @property
     def processed_dir(self) -> str:
+        """Return raw file directory."""
         return cleandir(osp.join(self.root, self.classname, "processed"))
 
     @property
-    def processed_data_path(self) -> str:
+    def raw_files(self) -> List[str]:
+        """Return a list of raw file names."""
         raise NotImplementedError
 
     @property
-    def all_raw_data_available(self) -> bool:
-        raise NotImplementedError  # maybe just loop over all raw file names?
+    def processed_files(self) -> List[str]:
+        """Return a list of processed file names."""
+        raise NotImplementedError
 
-    @property
-    def processed_data_available(self) -> bool:
-        return osp.isfile(self.processed_data_path)
+    def raw_file_path(self, idx: int) -> str:
+        """Return path to a raw file given its index."""
+        return osp.join(self.raw_dir, self.raw_files[idx])
+
+    def processed_file_path(self, idx) -> str:
+        """Return path to a processed file given its index."""
+        return osp.join(self.processed_dir, self.processed_files[idx])
+
+    def download_completed(self) -> bool:
+        """Check if all raw files are downloaded."""
+        return all(
+            osp.isfile(osp.join(self.raw_dir, raw_file))
+            for raw_file in self.raw_files
+        )
+
+    def process_completed(self) -> bool:
+        """Check if all processed files are available.."""
+        return all(
+            osp.isfile(osp.join(self.processed_dir, processed_file))
+            for processed_file in self.processed_files
+        )
 
     def load_processed_data(self):
+        """Load processed data into the data object."""
         raise NotImplementedError
 
     def download(self):
+        """Download raw files."""
         raise NotImplementedError
 
     def _download(self):
         """Check to see if files downloaded first before downloading."""
         os.makedirs(self.raw_dir, exist_ok=True)
-        os.makedirs(self.processed_dir, exist_ok=True)
-
-        if self.redownload or not self.all_raw_data_available:
-            print("Downloading...")
+        if self.redownload or not self.download_completed():
+            logger.info("Downloading...")
             self.download()
 
     def process(self):
+        """Process raw files."""
         raise NotImplementedError
 
     def _process(self):
         """Check to see if processed file exist and process if not."""
-        if (
-            self.redownload
-            or self.reprocess
-            or not self.processed_data_available
-        ):
-            print("Processing...")
+        os.makedirs(self.processed_dir, exist_ok=True)
+        if self.redownload or self.reprocess or not self.process_completed():
+            logger.info("Processing...")
             self.process()
-            print("Done!")
+            logger.info("Done!")
         else:
             self.load_processed_data()
 
 
-class BaseNdexData(SparseGraph):
+class BaseNdexData(BaseData, SparseGraph):
     """The BaseNdexData object for retrieving networks from NDEX.
 
     www.ndexbio.org
@@ -114,75 +157,45 @@ class BaseNdexData(SparseGraph):
             **kwargs: Other keyword arguments used for reading the cx file.
 
         """
-        super().__init__(weighted=weighted, directed=directed)
-
-        self.root = root
-        self.redownload = redownload
-        self.reprocess = reprocess
-
-        self._download()
-        self._process(**kwargs)
-
-    @property
-    def name(self) -> str:
-        return self.__class__.__name__
+        super().__init__(
+            root,
+            redownload=redownload,
+            reprocess=reprocess,
+            weighted=weighted,
+            directed=directed,
+        )
 
     @property
-    def raw_data_path(self) -> str:
-        return osp.join(self.raw_dir, "data.cx")
+    def raw_files(self) -> List[str]:
+        return ["data.cx"]
 
     @property
-    def processed_data_path(self) -> str:
-        return osp.join(self.processed_dir, "data.npz")
-
-    @property
-    def raw_dir(self) -> str:
-        return cleandir(osp.join(self.root, self.name, "raw"))
-
-    @property
-    def processed_dir(self) -> str:
-        return cleandir(osp.join(self.root, self.name, "processed"))
+    def processed_files(self) -> List[str]:
+        return ["data.npz"]
 
     def download(self):
         """Download data from NDEX via ndex2 client."""
         client = ndex2.client.Ndex2()
         client_resp = client.get_network_as_cx_stream(self.cx_uuid)
-        with open(self.raw_data_path, "wb") as f:
+        with open(self.raw_file_path(0), "wb") as f:
             f.write(client_resp.content)
-
-    def _download(self):
-        """Check to see if files downloaded first before downloading."""
-        os.makedirs(self.raw_dir, exist_ok=True)
-        os.makedirs(self.processed_dir, exist_ok=True)
-
-        if self.redownload or not osp.isfile(self.raw_data_path):
-            logger.info("Downloading...")
-            self.download()
 
     def process(self, **kwargs):
         """Process data and save for later useage."""
-        self.read_cx_stream_file(self.raw_data_path, **kwargs)
-        self.save_npz(self.processed_data_path, self.weighted)
+        self.read_cx_stream_file(self.raw_file_path(0), **kwargs)
+        self.save_npz(self.processed_file_path(0), self.weighted)
 
-    def _process(self, **kwargs):
-        """Check to see if processed file exist and process if not."""
-        if (
-            self.reprocess
-            or self.redownload
-            or not osp.isfile(self.processed_data_path)
-        ):
-            logger.info("Processing...")
-            self.process(**kwargs)
-            logger.info("Done!")
-        else:
-            self.read_npz(self.processed_data_path)
+    def load_processed_data(self):
+        raise NotImplementedError
 
 
-class BaseAnnotatedOntologyData(LabelsetCollection):
+class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
     """General object for labelset collection from annotated ontology."""
 
     ontology_url: Optional[str] = None
     annotation_url: Optional[str] = None
+    ontology_file_name: Optional[str] = None
+    annotation_file_name: Optional[str] = None
 
     def __init__(
         self,
@@ -192,48 +205,42 @@ class BaseAnnotatedOntologyData(LabelsetCollection):
         **kwargs,
     ):
         """Initialize the BaseAnnotatedOntologyData object."""
-        super().__init__()
-
-        self.root = root
-        self.redownload = redownload
-        self.reprocess = reprocess
-
-        self._download()
-        self._process()
+        super().__init__(root, redownload=redownload, reprocess=reprocess)
 
     @property
-    def name(self) -> str:
-        return self.__class__.__name__
+    def raw_files(self) -> List[str]:
+        """List of available raw files."""
+        files = [self.ontology_file_name, self.annotation_file_name]
+        return list(filter(None, files))
 
     @property
-    def data_name_dict(self) -> Dict[str, str]:
-        raise NotImplementedError
+    def processed_files(self) -> List[str]:
+        return ["data.gmt"]
 
     @property
-    def ontology_data_path(self) -> str:
-        return osp.join(self.raw_dir, self.data_name_dict["ontology"])
+    def ontology_file_path(self) -> str:
+        """Path to onlogy file."""
+        if self.ontology_file_name is not None:
+            return osp.join(self.raw_dir, self.ontology_file_name)
+        else:
+            raise ValueError(
+                f"Ontology file name not available for {self.classname!r}",
+            )
 
     @property
-    def annotation_data_path(self) -> str:
-        return osp.join(self.raw_dir, self.data_name_dict["annotation"])
-
-    @property
-    def processed_data_path(self) -> str:
-        return osp.join(self.processed_dir, "data.gmt")
-
-    @property
-    def raw_dir(self) -> str:
-        return cleandir(osp.join(self.root, self.name, "raw"))
-
-    @property
-    def processed_dir(self) -> str:
-        return cleandir(osp.join(self.root, self.name, "processed"))
+    def annotation_file_path(self) -> str:
+        """Path to annotation fil."""
+        if self.annotation_file_name is not None:
+            return osp.join(self.raw_dir, self.annotation_file_name)
+        else:
+            raise ValueError(
+                f"Annotation file name not available for {self.classname!r}",
+            )
 
     def download_ontology(self):
         """Download ontology from obo foundary."""
         resp = requests.get(self.ontology_url)
-        ontology_file_name = self.data_name_dict["ontology"]
-        with open(osp.join(self.raw_dir, ontology_file_name), "wb") as f:
+        with open(osp.join(self.raw_dir, self.ontology_file_name), "wb") as f:
             f.write(resp.content)
 
     def download_annotations(self):
@@ -249,31 +256,8 @@ class BaseAnnotatedOntologyData(LabelsetCollection):
         """Process raw data and save as gmt for future usage."""
         raise NotImplementedError
 
-    def _download(self):
-        """Download files if not all raw files are available."""
-        os.makedirs(self.raw_dir, exist_ok=True)
-        os.makedirs(self.processed_dir, exist_ok=True)
-
-        raw_file_names = list(self.data_name_dict.values())
-        raw_files = [osp.join(self.raw_dir, i) for i in raw_file_names]
-        if self.redownload or any(
-            not osp.isfile(raw_file) for raw_file in raw_files
-        ):
-            logger.info("Downloading...")
-            self.download()
-
-    def _process(self):
-        """Check to see if processed file exist and process if not."""
-        if (
-            self.redownload
-            or self.reprocess
-            or not osp.isfile(self.processed_data_path)
-        ):
-            logger.info("Processing...")
-            self.process()
-            logger.info("Done!")
-        else:
-            self.read_gmt(self.processed_data_path)
+    def load_processed_data(self):
+        raise NotImplementedError
 
 
 def cleandir(rawdir: str) -> str:
