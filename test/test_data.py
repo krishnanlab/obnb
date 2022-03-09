@@ -21,7 +21,7 @@ class TestData(unittest.TestCase):
     def test_biogrid(self):
         graph = NLEval.data.BioGRID(self.tmp_dir)
         self.assertEqual(graph.size, 25711)
-        self.assertEqual(graph.num_edges, 1203620)
+        self.assertEqual(graph.num_edges, 1200394)
 
     def test_bioplex(self):
         graph = NLEval.data.BioPlex(self.tmp_dir)
@@ -56,7 +56,7 @@ class TestData(unittest.TestCase):
     def test_hippie(self):
         graph = NLEval.data.HIPPIE(self.tmp_dir)
         self.assertEqual(graph.size, 17955)
-        self.assertEqual(graph.num_edges, 775084)
+        self.assertEqual(graph.num_edges, 770754)
 
     @unittest.skip("Large file download")
     def test_humannet(self):
