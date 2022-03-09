@@ -4,6 +4,7 @@ import os.path as osp
 import ndex2
 import requests
 
+from .. import logger
 from ..graph import SparseGraph
 from ..label import LabelsetCollection
 from ..typing import Dict
@@ -85,7 +86,7 @@ class BaseNdexData(SparseGraph):
         os.makedirs(self.processed_dir, exist_ok=True)
 
         if self.redownload or not osp.isfile(self.raw_data_path):
-            print("Downloading...")
+            logger.info("Downloading...")
             self.download()
 
     def _process(self, **kwargs):
@@ -95,10 +96,10 @@ class BaseNdexData(SparseGraph):
             or self.redownload
             or not osp.isfile(self.processed_data_path)
         ):
-            print("Processing...")
+            logger.info("Processing...")
             self.read_cx_stream_file(self.raw_data_path, **kwargs)
             self.save_npz(self.processed_data_path, self.weighted)
-            print("Done!")
+            logger.info("Done!")
         else:
             self.read_npz(self.processed_data_path)
 
@@ -184,7 +185,7 @@ class BaseAnnotatedOntologyData(LabelsetCollection):
         if self.redownload or any(
             not osp.isfile(raw_file) for raw_file in raw_files
         ):
-            print("Downloading...")
+            logger.info("Downloading...")
             self.download()
 
     def _process(self):
@@ -194,9 +195,9 @@ class BaseAnnotatedOntologyData(LabelsetCollection):
             or self.reprocess
             or not osp.isfile(self.processed_data_path)
         ):
-            print("Processing...")
+            logger.info("Processing...")
             self.process()
-            print("Done!")
+            logger.info("Done!")
         else:
             self.read_gmt(self.processed_data_path)
 

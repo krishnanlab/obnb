@@ -1,6 +1,7 @@
 import mygene
 from tqdm import tqdm
 
+from .. import logger
 from ..graph import OntologyGraph
 from ..label.filters import LabelsetPairwiseFilterJaccard
 from ..label.filters import LabelsetPairwiseFilterOverlap
@@ -88,13 +89,13 @@ class GeneOntology(BaseAnnotatedOntologyData):
             min_size=self.min_size,
             namespace=self.namespace,
         )
-        print(self.stats())
+        logger.info(self.stats())
 
         for filter_ in self.filters:
             self.iapply(filter_, progress_bar=True)
-            print(self.stats())
+            logger.info(self.stats())
 
-        print("Saving processed gmt...")
+        logger.info("Saving processed gmt...")
         self.export_gmt(self.processed_data_path)
 
 
