@@ -14,14 +14,11 @@ handlers:
     level: DEBUG
     formatter: briefFormatter
 loggers:
-  defaultLogger:
+  NLEval:
     level: INFO
     handlers: [defaultConsoleHandler]
     propagate: no
-  briefLogger:
+  NLEval_brief:
     level: INFO
     handlers: [briefConsoleHandler]
     propagate: no
-root:
-  level: DEBUG
-  handlers: [defaultConsoleHandler]

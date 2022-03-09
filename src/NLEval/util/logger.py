@@ -11,13 +11,13 @@ from ..typing import LogLevel
 def config_logger():
     """Configure logger used by NLEval."""
     homedir = pathlib.Path(__file__).parent.parent.absolute()
-    with open(osp.join(homedir, "logging.yaml"), "r") as f:
+    with open(osp.join(homedir, "_config", "logging.yaml"), "r") as f:
         logging.config.dictConfig(yaml.safe_load(f.read()))
 
 
 def get_logger(
     name: str,
-    logger_name: str = "defaultLogger",
+    logger_name: str = "NLEval",
     log_level: LogLevel = "WARNING",
     verbose: bool = False,
 ) -> logging.Logger:

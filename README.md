@@ -39,8 +39,7 @@ pip install git+https://github.com/pyg-team/pytorch_geometric.git#egg=torch-geom
 With Python3.8 or above and CUDA10.2:
 
 ```bash
-pip install -e .
-pip install -r requirements-dev.txt
+pip install -e .[dev]
 conda install pytorch=1.9 torchvision torchaudio cudatoolkit=10.2 -c pytorch
 conda install pyg -c pyg -c conda-forge
 ```
