@@ -14,3 +14,19 @@ exclude = [
 [[tool.mypy.overrides]]
 module = "requests"
 ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+required_plugins = [
+    "pytest-cov",
+    "pytest-subtests",
+]
+
+addopts = [
+    "--strict-markers",
+    "-m",
+    "not longruns",
+]
+markers = [
+    "longruns",
+]

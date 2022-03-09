@@ -1,12 +1,11 @@
 import mygene
 from tqdm import tqdm
 
-from .. import logger
-from ..graph import OntologyGraph
-from ..label.filters import LabelsetPairwiseFilterJaccard
-from ..label.filters import LabelsetPairwiseFilterOverlap
-from ..label.filters import LabelsetRangeFilterSize
-from ..typing import Dict
+from ... import logger
+from ...graph import OntologyGraph
+from ...label.filters import LabelsetPairwiseFilterJaccard
+from ...label.filters import LabelsetPairwiseFilterOverlap
+from ...label.filters import LabelsetRangeFilterSize
 from .base import BaseAnnotatedOntologyData
 
 
@@ -14,6 +13,7 @@ class GeneOntology(BaseAnnotatedOntologyData):
     """Gene Ontology gene annotations."""
 
     ontology_url = "http://purl.obolibrary.org/obo/go.obo"
+    ontology_file_name = "go.obo"
 
     def __init__(
         self,
@@ -30,10 +30,6 @@ class GeneOntology(BaseAnnotatedOntologyData):
         self.jaccard = jaccard
         self.overlap = overlap
         super().__init__(root, **kwargs)
-
-    @property
-    def data_name_dict(self) -> Dict[str, str]:
-        return {"ontology": "go.obo"}
 
     @property
     def filters(self):
@@ -56,7 +52,7 @@ class GeneOntology(BaseAnnotatedOntologyData):
         pass
 
     def process(self):
-        g = OntologyGraph.from_obo(self.ontology_data_path)
+        g = OntologyGraph.from_obo(self.ontology_file_path)
         g._trivial_hash = True
 
         # Query of GO terms in specific namespace (BP, CC, MF)
@@ -96,7 +92,7 @@ class GeneOntology(BaseAnnotatedOntologyData):
             logger.info(self.stats())
 
         logger.info("Saving processed gmt...")
-        self.export_gmt(self.processed_data_path)
+        self.export_gmt(self.processed_file_path(0))
 
 
 class GOBP(GeneOntology):
