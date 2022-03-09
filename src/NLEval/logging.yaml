@@ -22,6 +22,3 @@ loggers:
     level: INFO
     handlers: [briefConsoleHandler]
     propagate: no
-root:
-  level: DEBUG
-  handlers: [defaultConsoleHandler]
