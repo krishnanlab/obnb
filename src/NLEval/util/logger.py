@@ -17,7 +17,7 @@ def config_logger():
 
 def get_logger(
     name: str,
-    logger_name: str = "defaultLogger",
+    logger_name: str = "NLEval",
     log_level: LogLevel = "WARNING",
     verbose: bool = False,
 ) -> logging.Logger:

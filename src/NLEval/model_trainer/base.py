@@ -51,7 +51,7 @@ class BaseTrainer:
         self.logger = get_logger(
             self.__class__.__name__,
             log_level=log_level,
-            logger_name="briefLogger",
+            logger_name="NLEval_brief",
         )
 
     @property
