@@ -1,4 +1,4 @@
-from ..util.converter import MyGeneInfoConverter
+from ...util.converter import MyGeneInfoConverter
 from .base import BaseNdexData
 
 

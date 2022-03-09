@@ -1,11 +1,11 @@
 import mygene
 from tqdm import tqdm
 
-from .. import logger
-from ..graph import OntologyGraph
-from ..label.filters import LabelsetPairwiseFilterJaccard
-from ..label.filters import LabelsetPairwiseFilterOverlap
-from ..label.filters import LabelsetRangeFilterSize
+from ... import logger
+from ...graph import OntologyGraph
+from ...label.filters import LabelsetPairwiseFilterJaccard
+from ...label.filters import LabelsetPairwiseFilterOverlap
+from ...label.filters import LabelsetRangeFilterSize
 from .base import BaseAnnotatedOntologyData
 
 

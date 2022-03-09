@@ -5,12 +5,12 @@ import pandas as pd
 import requests
 from tqdm import tqdm
 
-from .. import logger
-from ..graph import OntologyGraph
-from ..label.filters import LabelsetPairwiseFilterJaccard
-from ..label.filters import LabelsetPairwiseFilterOverlap
-from ..label.filters import LabelsetRangeFilterSize
-from ..util.exceptions import IDNotExistError
+from ... import logger
+from ...graph import OntologyGraph
+from ...label.filters import LabelsetPairwiseFilterJaccard
+from ...label.filters import LabelsetPairwiseFilterOverlap
+from ...label.filters import LabelsetRangeFilterSize
+from ...util.exceptions import IDNotExistError
 from .base import BaseAnnotatedOntologyData
 
 
