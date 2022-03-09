@@ -1,14 +1,14 @@
 """Interface with various databases to retrieve data."""
-from .biogrid import BioGRID
-from .bioplex import BioPlex
-from .disgenet import DisGeNet
-from .funcoup import FunCoup
-from .go import GOBP
-from .go import GOCC
-from .go import GOMF
-from .hippie import HIPPIE
-from .humannet import HumanNet
-from .string import STRING
+from .annotated_ontology import DisGeNet
+from .annotated_ontology import GOBP
+from .annotated_ontology import GOCC
+from .annotated_ontology import GOMF
+from .network import BioGRID
+from .network import BioPlex
+from .network import FunCoup
+from .network import HIPPIE
+from .network import HumanNet
+from .network import STRING
 
 __all__ = [
     "BioGRID",
