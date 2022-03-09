@@ -1,1 +1,1 @@
-include src/NLEval/logging.yaml
+include src/NLEval/_config/logging.yaml
