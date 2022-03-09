@@ -21,3 +21,12 @@ required_plugins = [
     "pytest-cov",
     "pytest-subtests",
 ]
+
+addopts = [
+    "--strict-markers",
+    "-m",
+    "not longruns",
+]
+markers = [
+    "longruns",
+]

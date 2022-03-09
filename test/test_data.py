@@ -4,6 +4,7 @@ import tempfile
 import unittest
 
 import NLEval.data
+import pytest
 
 
 class TestData(unittest.TestCase):
@@ -17,7 +18,7 @@ class TestData(unittest.TestCase):
         shutil.rmtree(cls.tmp_dir)
         print(f"Removed temporary directory: {cls.tmp_dir}")
 
-    @unittest.skip("Large file download")
+    @pytest.mark.longruns
     def test_biogrid(self):
         graph = NLEval.data.BioGRID(self.tmp_dir)
         self.assertEqual(graph.size, 25711)
@@ -31,17 +32,17 @@ class TestData(unittest.TestCase):
         NLEval.data.BioPlex(self.tmp_dir, reprocess=True)
         NLEval.data.BioPlex(self.tmp_dir, redownload=True)
 
-    @unittest.skip("Long process time")
+    @pytest.mark.longruns
     def test_disgenet(self):
         lsc = NLEval.data.DisGeNet(self.tmp_dir)
 
-    @unittest.skip("Large file download")
+    @pytest.mark.longruns
     def test_funcoup(self):
         graph = NLEval.data.FunCoup(self.tmp_dir)
         self.assertEqual(graph.size, 17783)
         self.assertEqual(graph.num_edges, 10027589)
 
-    @unittest.skip("Long process time")
+    @pytest.mark.longruns
     def test_go(self):
         with self.subTest("GOBP"):
             lsc = NLEval.data.GOBP(self.tmp_dir)
@@ -52,19 +53,19 @@ class TestData(unittest.TestCase):
         with self.subTest("GOMF"):
             lsc = NLEval.data.GOMF(self.tmp_dir)
 
-    @unittest.skip("Large file download")
+    @pytest.mark.longruns
     def test_hippie(self):
         graph = NLEval.data.HIPPIE(self.tmp_dir)
         self.assertEqual(graph.size, 17955)
         self.assertEqual(graph.num_edges, 770754)
 
-    @unittest.skip("Large file download")
+    @pytest.mark.longruns
     def test_humannet(self):
         graph = NLEval.data.HumanNet(self.tmp_dir)
         self.assertEqual(graph.size, 17787)
         self.assertEqual(graph.num_edges, 849002)
 
-    @unittest.skip("Large file download")
+    @pytest.mark.longruns
     def test_string(self):
         graph = NLEval.data.STRING(self.tmp_dir)
         self.assertEqual(graph.size, 18513)
