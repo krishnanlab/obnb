@@ -1,6 +1,7 @@
 import functools
 import itertools
 from collections import defaultdict
+from contextlib import contextmanager
 
 from tqdm import trange
 
@@ -41,15 +42,50 @@ class OntologyGraph(DirectedSparseGraph):
         self.idmap.new_property("node_attr", default_val=None)
         self.idmap.new_property("node_name", default_val=None)
         self._edge_stats = []
-        self._trivial_hash = False
 
     def __hash__(self):
         """Hash the ontology graph based on edge statistics."""
-        return 0 if self._trivial_hash else hash(tuple(self._edge_stats))
+        return 0 if self._use_cache else hash(tuple(self._edge_stats))
 
-    @functools.lru_cache
+    def release_cache(self):
+        """Release cache."""
+        self._aggregate_node_attrs.cache_clear()
+        self._ancestors.cache_clear()
+
+    @contextmanager
+    def cache_on_static(self):
+        """Use cached values to speed up computation on static ontology.
+
+        Note:
+            This should only be used when the ontology graph is stable, meaning
+            that no further changes including edge and node addition/removal
+            will be introduced. However, node attribute manipulation is ok.
+
+        """
+        self._use_cache = True
+        try:
+            yield
+        finally:
+            self._use_cache = False
+            self.release_cache()
+
     def ancestors(self, node: Union[str, int]) -> Set[str]:
-        """Return the ancestor nodes of a given node."""
+        """Return the ancestor nodes of a given node.
+
+        Note:
+            To enable cache utilization to optimize dynamic programing, execute
+            this with the cach_on_static context. Note that this would only be
+            done when not more structural changes (node and edge modifications)
+            will be introduced throughout the span of this context.
+
+        """
+        if self._use_cache:
+            return self._ancestors(node)
+        else:
+            return self._ancestors.__wrapped__(node)
+
+    @functools.lru_cache(maxsize=None)
+    def _ancestors(self, node: Union[str, int]) -> Set[str]:
         node_idx = self.get_node_idx(node)
         if len(self._edge_data[node_idx]) == 0:  # root node
             ancestors_set = set()
@@ -182,6 +218,12 @@ class OntologyGraph(DirectedSparseGraph):
         from its children, plus its original node attributes. This is done via
         recursion _aggregate_node_attrs.
 
+        Note:
+            To enable effective dynamic programing of propagating attributes,
+            lru_cache is used to decorate _aggregate_node_attrs. By the end of
+            this function run, the cache is cleared to prevent overhead of
+            calling __eq__ in the next execution.
+
         Args:
             pbar (bool): If set to True, display a progress bar showing the
                 progress of annotation propagation (default: :obj:`False`).
@@ -189,8 +231,12 @@ class OntologyGraph(DirectedSparseGraph):
         """
         pbar = trange(self.size, disable=not pbar)
         pbar.set_description("Propagating annotations")
-        for node_idx in pbar:
-            self.set_node_attr(node_idx, self._aggregate_node_attrs(node_idx))
+        with self.cache_on_static():
+            for node_idx in pbar:
+                self.set_node_attr(
+                    node_idx,
+                    self._aggregate_node_attrs(node_idx),
+                )
 
     @staticmethod
     def iter_terms(fp: TextIO) -> Iterator[Term]:

@@ -53,18 +53,21 @@ class GeneOntology(BaseAnnotatedOntologyData):
 
     def process(self):
         g = OntologyGraph.from_obo(self.ontology_file_path)
-        g._trivial_hash = True
 
         # Query of GO terms in specific namespace (BP, CC, MF)
         mg = mygene.MyGeneInfo()
-        goids = filter(lambda i: self.namespace in g.ancestors(i), g.node_ids)
-        queries = mg.querymany(
-            goids,
-            scopes="go",
-            species="human",
-            fields="entrezgene",
-            entrezonly=True,
-        )
+        with g.cache_on_static():
+            goids = filter(
+                lambda goid: self.namespace in g.ancestors(goid),
+                g.node_ids,
+            )
+            queries = mg.querymany(
+                goids,
+                scopes="go",
+                species="human",
+                fields="entrezgene",
+                entrezonly=True,
+            )
 
         pbar = tqdm(queries)
         pbar.set_description("Annotating GO terms")

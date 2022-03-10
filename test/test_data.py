@@ -54,7 +54,7 @@ class TestData(unittest.TestCase):
         self.assertEqual(graph.size, 17783)
         self.assertEqual(graph.num_edges, 10027588)
 
-    @unittest.skip("Need to fix issue with multiple annotated ontology.")
+    @pytest.mark.longruns
     def test_go(self):
         with self.subTest("GOBP"):
             lsc = NLEval.data.GOBP(self.tmp_dir)
