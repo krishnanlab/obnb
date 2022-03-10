@@ -71,4 +71,5 @@ class BaseNdexData(BaseData, SparseGraph):
         self.save_npz(self.processed_file_path(0), self.weighted)
 
     def load_processed_data(self):
-        raise NotImplementedError
+        """Load processed network."""
+        self.read_npz(self.processed_file_path(0))

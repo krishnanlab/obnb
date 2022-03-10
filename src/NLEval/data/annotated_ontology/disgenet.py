@@ -31,7 +31,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
 
     ontology_url = "http://purl.obolibrary.org/obo/doid.obo"
     annotation_url = "https://www.disgenet.org/static/disgenet_ap1/files/downloads/all_gene_disease_associations.tsv.gz"
-    ontology_file_name = "dodi.obo"
+    ontology_file_name = "doid.obo"
     annotation_file_name = "all_gene_disease_associations.tsv"
 
     def __init__(

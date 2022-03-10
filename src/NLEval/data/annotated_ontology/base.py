@@ -76,4 +76,5 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
         raise NotImplementedError
 
     def load_processed_data(self):
-        raise NotImplementedError
+        """Load processed labels from GMT."""
+        self.read_gmt(self.processed_file_path(0))

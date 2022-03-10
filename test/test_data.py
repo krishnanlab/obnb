@@ -5,6 +5,15 @@ import unittest
 
 import NLEval.data
 import pytest
+from parameterized import parameterized
+
+# Name, reprocess, redownload
+full_data_test_param = [
+    ("Download", False, False),
+    ("Reuse", False, False),
+    ("Reprocess", True, False),
+    ("Redownload", True, True),
+]
 
 
 class TestData(unittest.TestCase):
@@ -24,13 +33,16 @@ class TestData(unittest.TestCase):
         self.assertEqual(graph.size, 25711)
         self.assertEqual(graph.num_edges, 1200394)
 
-    def test_bioplex(self):
-        graph = NLEval.data.BioPlex(self.tmp_dir)
-        self.assertEqual(graph.size, 8364)
-        self.assertEqual(graph.num_edges, 71408)
-
-        NLEval.data.BioPlex(self.tmp_dir, reprocess=True)
-        NLEval.data.BioPlex(self.tmp_dir, redownload=True)
+    @parameterized.expand(full_data_test_param)
+    def test_bioplex(self, name, reprocess, redownload):
+        with self.subTest(name):
+            graph = NLEval.data.BioPlex(
+                self.tmp_dir,
+                reprocess=reprocess,
+                redownload=redownload,
+            )
+            self.assertEqual(graph.size, 8364)
+            self.assertEqual(graph.num_edges, 71408)
 
     @unittest.skip("Sometimes DisGeNet is just not working...")
     def test_disgenet(self):
@@ -42,16 +54,11 @@ class TestData(unittest.TestCase):
         self.assertEqual(graph.size, 17783)
         self.assertEqual(graph.num_edges, 10027588)
 
-    @unittest.skip("Need to fix issue with multiple annotated ontology.")
-    def test_go(self):
-        with self.subTest("GOBP"):
-            lsc = NLEval.data.GOBP(self.tmp_dir)
-
-        with self.subTest("GOCC"):
-            lsc = NLEval.data.GOCC(self.tmp_dir)
-
-        with self.subTest("GOMF"):
-            lsc = NLEval.data.GOMF(self.tmp_dir)
+    @parameterized.expand([("GOBP",), ("GOCC",), ("GOMF",)])
+    @pytest.mark.longruns
+    def test_go(self, name):
+        with self.subTest(name):
+            lsc = getattr(NLEval.data, name)(self.tmp_dir)
 
     @pytest.mark.longruns
     def test_hippie(self):

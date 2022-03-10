@@ -299,7 +299,7 @@ class LabelsetCollection(idhandler.IDprop):
         return y_out
 
     @lru_cache
-    def split(
+    def split(  # TODO: Reduce cylic complexity..
         self,
         splitter: Splitter,
         property_name: Optional[str],
@@ -581,7 +581,11 @@ class LabelsetCollection(idhandler.IDprop):
                 entity_id, val = line.strip().split()
                 if entity_id not in self.entity:
                     self.entity.add_id(entity_id)
-                self.entity.set_property(entity_id, prop_name, interpreter(val))
+                self.entity.set_property(
+                    entity_id,
+                    prop_name,
+                    interpreter(val),
+                )
 
     def read_ontology_graph(
         self,
@@ -600,12 +604,13 @@ class LabelsetCollection(idhandler.IDprop):
                 load all terms (default: :obj:`None`).
 
         """
-        for label_id in graph.node_ids:
-            if namespace is None or namespace in graph.ancestors(label_id):
-                label_info = graph.get_node_name(label_id)
-                label_set = graph.get_node_attr(label_id) or []
-                if len(label_set) >= min_size:
-                    self.add_labelset(label_set, label_id, label_info)
+        with graph.cache_on_static():
+            for label_id in graph.node_ids:
+                if namespace is None or namespace in graph.ancestors(label_id):
+                    label_info = graph.get_node_name(label_id)
+                    label_set = graph.get_node_attr(label_id) or []
+                    if len(label_set) >= min_size:
+                        self.add_labelset(label_set, label_id, label_info)
 
     def read_gmt(self, path: str, sep: str = "\t"):
         """Load data from Gene Matrix Transpose `.gmt` file.
