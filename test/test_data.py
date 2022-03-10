@@ -54,8 +54,8 @@ class TestData(unittest.TestCase):
         self.assertEqual(graph.size, 17783)
         self.assertEqual(graph.num_edges, 10027588)
 
-    @pytest.mark.longruns
     @parameterized.expand([("GOBP",), ("GOCC",), ("GOMF",)])
+    @pytest.mark.longruns
     def test_go(self, name):
         with self.subTest(name):
             lsc = getattr(NLEval.data, name)(self.tmp_dir)
