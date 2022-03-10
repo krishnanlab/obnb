@@ -55,15 +55,10 @@ class TestData(unittest.TestCase):
         self.assertEqual(graph.num_edges, 10027588)
 
     @pytest.mark.longruns
-    def test_go(self):
-        with self.subTest("GOBP"):
-            lsc = NLEval.data.GOBP(self.tmp_dir)
-
-        with self.subTest("GOCC"):
-            lsc = NLEval.data.GOCC(self.tmp_dir)
-
-        with self.subTest("GOMF"):
-            lsc = NLEval.data.GOMF(self.tmp_dir)
+    @parameterized.expand([("GOBP",), ("GOCC",), ("GOMF",)])
+    def test_go(self, name):
+        with self.subTest(name):
+            lsc = getattr(NLEval.data, name)(self.tmp_dir)
 
     @pytest.mark.longruns
     def test_hippie(self):
