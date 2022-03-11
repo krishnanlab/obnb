@@ -9,7 +9,7 @@ class HIPPIE(BaseNdexData):
 
     """
 
-    cx_uuid = "89dd3925-3718-11e9-9f06-0ac135e8bacf"
+    cx_uuid = "f123ed2a-a17d-11ec-b3be-0ac135e8bacf"
 
     def __init__(self, root: str, **kwargs):
         """Initialize the HIPPIE network data."""

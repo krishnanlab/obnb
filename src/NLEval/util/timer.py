@@ -1,9 +1,10 @@
+import signal
 import time
 
 from .checkers import checkType
 
 
-class TimeIt:
+class Timeit:
     """Timing function call."""
 
     def __init__(self, verbose: bool = True) -> None:
@@ -33,3 +34,35 @@ class TimeIt:
     def verbose(self, val: bool) -> None:
         checkType("verbose", bool, val)
         self._verbose = val
+
+
+class Timeout:
+    """Timeout decorator.
+
+    https://stackoverflow.com/a/22348885/12519564
+
+    """
+
+    def __init__(self, seconds: int = 10, error_message: str = "Timeout"):
+        """Initialize timeout decorator.
+
+        Args:
+            seconds (int): Maximum allowed time in seconds.
+            error_message (str): Error message.
+
+        """
+        self.seconds = seconds
+        self.error_message = error_message
+
+    def handle_timeout(self, signum, frame):
+        """Raising timeout error."""
+        raise TimeoutError(f"({self.seconds} secs) {self.error_message}")
+
+    def __enter__(self):
+        """Entering context."""
+        signal.signal(signal.SIGALRM, self.handle_timeout)
+        signal.alarm(self.seconds)
+
+    def __exit__(self, type, value, traceback):
+        """Leaving context."""
+        signal.alarm(0)

@@ -4,7 +4,7 @@ from .base import BaseNdexData
 class BioGRID(BaseNdexData):
     """The BioGRID Protein Protein Interaction network."""
 
-    cx_uuid = "36f7d8fd-23dc-11e8-b939-0ac135e8bacf"
+    cx_uuid = "ca656884-a17d-11ec-b3be-0ac135e8bacf"
 
     def __init__(self, root: str, **kwargs):
         """Initialize the BioGRID network data."""

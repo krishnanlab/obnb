@@ -4,7 +4,7 @@ from .base import BaseNdexData
 class HumanNet(BaseNdexData):
     """The HumanNet-FN functional interaction network."""
 
-    cx_uuid = "0d05756c-3553-11e9-9f06-0ac135e8bacf"
+    cx_uuid = "fbc750ac-a17d-11ec-b3be-0ac135e8bacf"
 
     def __init__(self, root: str, **kwargs):
         """Initialize the HumanNet network data."""
