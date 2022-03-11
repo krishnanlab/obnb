@@ -5,6 +5,7 @@ import unittest
 
 import NLEval.data
 import pytest
+from NLEval.util.timer import Timeout
 from parameterized import parameterized
 
 # Name, reprocess, redownload
@@ -44,9 +45,13 @@ class TestData(unittest.TestCase):
             self.assertEqual(graph.size, 8364)
             self.assertEqual(graph.num_edges, 71408)
 
-    @unittest.skip("Sometimes DisGeNet is just not working...")
+    @pytest.mark.xfail(
+        raises=TimeoutError,
+        reason="Sometimes DisGeNet is just not working...",
+    )
     def test_disgenet(self):
-        lsc = NLEval.data.DisGeNet(self.tmp_dir)
+        with Timeout(600):
+            lsc = NLEval.data.DisGeNet(self.tmp_dir)
 
     @pytest.mark.longruns
     def test_funcoup(self):
