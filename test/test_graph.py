@@ -373,7 +373,6 @@ class TestSparseGraph(unittest.TestCase):
                 [1, 0, 1, 0],
             ],
         )
-        print("???", mat, type(mat), mat.shape)
         ids = ["a", "b", "c", "d"]
         graph = SparseGraph.from_mat(mat, ids)
         graph = graph.to_dense_graph()
