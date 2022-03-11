@@ -13,6 +13,7 @@ class BaseGraph:
 
     def __init__(self, log_level: LogLevel = "WARNING", verbose: bool = False):
         """Initialize BaseGraph object."""
+        self.log_level = log_level
         self.idmap = idhandler.IDmap()
         self.logger = get_logger(
             self.__class__.__name__,
