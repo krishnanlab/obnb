@@ -381,6 +381,21 @@ class TestSparseGraph(unittest.TestCase):
         self.assertEqual(list(graph.node_ids), ids)
         self.assertEqual(graph.mat.tolist(), mat.tolist())
 
+    @parameterized.expand(
+        [
+            (["b", "c", "d"], [{1: 2}, {0: 2, 2: 3}, {1: 3}]),
+            (["e", "a", "c"], [{2: 0.5}, {}, {0: 0.5}]),
+        ],
+    )
+    def test_induced_subgraph(self, subgraph_node_ids, subgraph_edge_data):
+        graph = SparseGraph(weighted=True, directed=False)
+        graph.read_npz(self.npz_path1)
+
+        with self.subTest(subgraph_node_ids=subgraph_node_ids):
+            subgraph = graph.induced_subgraph(subgraph_node_ids)
+            self.assertEqual(list(subgraph.node_ids), subgraph_node_ids)
+            self.assertEqual(subgraph.edge_data, subgraph_edge_data)
+
 
 class TestDirectedSparseGraph(unittest.TestCase):
     def test_add_edge(self):
