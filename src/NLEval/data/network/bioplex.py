@@ -4,7 +4,7 @@ from .base import BaseNdexData
 class BioPlex(BaseNdexData):
     """The BioPlex3-shared Protein Protein Interaction network."""
 
-    cx_uuid = "f7a218c0-2376-11ea-bb65-0ac135e8bacf"
+    cx_uuid = "daab35d6-a17d-11ec-b3be-0ac135e8bacf"
 
     def __init__(self, root: str, **kwargs):
         """Initialize the BioPlex network data."""

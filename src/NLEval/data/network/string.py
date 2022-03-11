@@ -4,7 +4,7 @@ from .base import BaseNdexData
 class STRING(BaseNdexData):
     """The STRING Human Protein Protein Interaction network."""
 
-    cx_uuid = "d14db454-3d18-11e8-a935-0ac135e8bacf"
+    cx_uuid = "03bdbc9e-a17e-11ec-b3be-0ac135e8bacf"
 
     def __init__(self, root: str, **kwargs):
         """Initialize the STRING network data."""
