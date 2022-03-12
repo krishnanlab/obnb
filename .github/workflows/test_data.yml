@@ -1,7 +1,7 @@
 name: Test Data
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
   schedule:
     - cron: '59 23 * * 1,5'
 
