@@ -37,12 +37,13 @@ pip install git+https://github.com/pyg-team/pytorch_geometric.git#egg=torch-geom
 
 ### Full dev installation
 
-With Python3.8 or above and CUDA10.2:
-
 ```bash
+conda create -n nle-dev-pyg python=3.9 -y && conda activate nle-dev-pyg
 pip install -e .[dev]
-conda install pytorch=1.9 torchvision torchaudio cudatoolkit=10.2 -c pytorch
-conda install pyg -c pyg -c conda-forge
+conda install pytorch=1.11.0 torchvision=0.12.0 cudatoolkit=10.2 -c pytorch -y
+pip install torch-scatter torch-sparse torch-cluster -f https://data.pyg.org/whl/torch-1.11.0+cu102.html
+pip install git+https://github.com/pyg-team/pytorch_geometric.git#egg=torch-geometric[full]
+conda clean --all -y
 ```
 
 ## Quick Demonstration
