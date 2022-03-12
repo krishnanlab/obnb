@@ -772,5 +772,5 @@ class DirectedSparseGraph(SparseGraph):
         )
 
     def connected_components(self):
-        """Connected components for directed graph is not implemented yet."""
+        """Find connected components."""
         raise NotImplementedError

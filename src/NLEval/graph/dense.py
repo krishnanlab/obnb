@@ -5,6 +5,7 @@ from ..typing import LogLevel
 from ..typing import Optional
 from ..typing import Union
 from ..util import checkers
+from ..util.exceptions import IDNotExistError
 from ..util.idhandler import IDmap
 from .base import BaseGraph
 from .sparse import SparseGraph

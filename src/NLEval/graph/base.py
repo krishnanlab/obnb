@@ -110,7 +110,7 @@ class BaseGraph:
         return not self.size
 
     def induced_subgraph(self, node_ids: List[str]):
-        """Return a subgraph induced by a subset of nodes"""
+        """Return a subgraph induced by a subset of nodes."""
         raise NotImplementedError
 
     def connected_components(self) -> List[List[str]]:
