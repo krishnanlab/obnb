@@ -77,6 +77,7 @@ class TestData(unittest.TestCase):
             self.lsc = NLEval.data.DisGeNet(self.tmp_dir)
 
     @pytest.mark.longruns
+    @pytest.mark.highmemory
     def test_funcoup(self):
         self.graph = NLEval.data.FunCoup(self.tmp_dir)
         self.assertEqual(self.graph.size, 17783)
@@ -101,6 +102,7 @@ class TestData(unittest.TestCase):
         self.assertEqual(self.graph.num_edges, 849002)
 
     @pytest.mark.longruns
+    @pytest.mark.highmemory
     def test_string(self):
         self.graph = NLEval.data.STRING(self.tmp_dir)
         self.assertEqual(self.graph.size, 18513)
