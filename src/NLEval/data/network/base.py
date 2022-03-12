@@ -25,6 +25,7 @@ class BaseNdexData(BaseData, SparseGraph):
         redownload: bool = False,
         reprocess: bool = False,
         cx_kwargs: Optional[Dict[str, Any]] = None,
+        **kwargs,
     ):
         """Initialize the BaseNdexData object.
 
@@ -48,6 +49,7 @@ class BaseNdexData(BaseData, SparseGraph):
             reprocess=reprocess,
             weighted=weighted,
             directed=directed,
+            **kwargs,
         )
 
     @property

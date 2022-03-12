@@ -408,6 +408,7 @@ class SparseGraph(BaseGraph):
         if node_id_entry not in ["r", "n"]:
             raise ValueError(f"Unkown node ID entry {node_id_entry!r}")
 
+        self.logger.info("Loading raw cs file")
         with open(path, "r") as f:
             cx_stream = json.load(f)
 
@@ -415,6 +416,7 @@ class SparseGraph(BaseGraph):
         raw_edges = cx_stream[entry_map["edges"]]["edges"]
 
         # Load node IDs
+        self.logger.info("Loading nodes")
         node_idx_to_id = {}
         if not use_node_alias:
             raw_nodes = cx_stream[entry_map["nodes"]]["nodes"]
@@ -463,6 +465,7 @@ class SparseGraph(BaseGraph):
             node_idx_to_id_converted = node_idx_to_id
 
         # Load edge weights using the specified edge attribute name
+        self.logger.info("Reading edges")
         edge_weight_dict = {}
         if edge_weight_attr_name is not None:
             for ea in cx_stream[entry_map["edgeAttributes"]]["edgeAttributes"]:
@@ -475,6 +478,7 @@ class SparseGraph(BaseGraph):
                         )
 
         # Write edges
+        self.logger.info("Loading edges to graph")
         for edge in raw_edges:
             try:
                 node_id1 = node_idx_to_id_converted[edge["s"]]
