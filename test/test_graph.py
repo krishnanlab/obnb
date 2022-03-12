@@ -823,6 +823,36 @@ class TestDenseGraph(unittest.TestCase):
         subgraph = graph.induced_subgraph(node_ids)
         self.assertEqual(subgraph.mat.tolist(), adjmat)
 
+    def test_connected_components(self):
+        graph = DenseGraph.from_mat(
+            np.array(
+                [
+                    [0, 1, 0, 0, 0],
+                    [1, 0, 0, 0, 0],
+                    [0, 0, 0, 2, 1],
+                    [0, 0, 2, 0, 1],
+                    [0, 0, 1, 1, 0],
+                ],
+            ),
+            ["a", "b", "c", "d", "e"],
+        )
+
+        # Two connected components
+        self.assertEqual(
+            graph.connected_components(),
+            [["c", "d", "e"], ["a", "b"]],
+        )
+        self.assertFalse(graph.is_connected())
+
+        # Largest connected subgraph
+        subgraph = graph.largest_connected_subgraph()
+        self.assertTrue(subgraph.is_connected())
+        self.assertEqual(subgraph.node_ids, ("c", "d", "e"))
+        self.assertEqual(
+            subgraph.mat.tolist(),
+            [[0, 2, 1], [2, 0, 1], [1, 1, 0]],
+        )
+
 
 class TestFeatureVec(unittest.TestCase):
     @classmethod

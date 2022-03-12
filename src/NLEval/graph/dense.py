@@ -105,11 +105,41 @@ class DenseGraph(BaseGraph):
             verbose=self.verbose,
         )
 
+    def connected_components(self) -> List[List[str]]:
+        """Find connected components via Breadth First Search.
+
+        Returns a list of connected components sorted by the number of nodes,
+        each of which is a list of node ids within a connected component.
+
+        Note:
+            This BFS approach assumes the graph is undirected.
+
+        """
+        unvisited = np.arange(self.num_nodes)
+        connected_components = []
+
+        while unvisited.size > 0:
+            visited = np.zeros(0)
+            tovisit = unvisited[0:1]
+
+            while tovisit.size > 0:
+                visited = np.union1d(visited, tovisit)
+                tovisit_next = np.where(self.mat[tovisit].sum(0) > 0)[0]
+                tovisit = np.setdiff1d(tovisit_next, visited)
+
+            unvisited = np.setdiff1d(unvisited, visited)
+            connected_components.append(
+                [self.idmap.lst[int(i)] for i in visited],
+            )
+
+        return sorted(connected_components, key=len, reverse=True)
+
     @classmethod
     def from_mat(
         cls,
         mat: np.ndarray,
         ids: Optional[Union[List[str], IDmap]] = None,
+        **kwargs,
     ):
         """Construct DenseGraph using ids and adjcency matrix.
 
@@ -128,7 +158,7 @@ class DenseGraph(BaseGraph):
                 f"Inconsistent dimension between IDs ({idmap.size}) and the "
                 f"matrix ({mat.shape[0]})",
             )
-        graph = cls()
+        graph = cls(**kwargs)
         graph.idmap = idmap
         graph.mat = mat
         return graph
