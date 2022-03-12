@@ -268,53 +268,53 @@ class TestSparseGraph(unittest.TestCase):
         self.assertEqual(graph.idmap.lst, self.case.IDlst)
         self.assertEqual(graph.edge_data, self.case.data_weighted)
 
-    def test_read_npz(self):
-        for weighted in True, False:
+    @parameterized.expand([(True,), (False,)])
+    def test_read_npz(self, weighted):
+        if weighted:
+            edge_data = self.edge_data_weighted1
+        else:
+            edge_data = self.edge_data_unweighted1
+
+        with self.subTest(weighted=weighted):
+            graph = SparseGraph(weighted=weighted, directed=False)
+            graph.read_npz(self.npz_path1)
+            self.assertEqual(graph._edge_data, edge_data)
+            self.assertEqual(graph.idmap.lst, self.node_ids1.tolist())
+
+            graph = SparseGraph.from_npz(
+                self.npz_path1,
+                weighted=weighted,
+                directed=False,
+            )
+            self.assertEqual(graph._edge_data, edge_data)
+            self.assertEqual(graph.idmap.lst, self.node_ids1.tolist())
+
+    @parameterized.expand([(True,), (False,)])
+    def test_write_npz(self, weighted):
+        with self.subTest(weighted=weighted):
+            graph = SparseGraph(weighted=weighted, directed=False)
+            graph._edge_data = self.edge_data_weighted1
+            graph.idmap = graph.idmap.from_list(self.node_ids1.tolist())
+
+            out_path = osp.join(self.tmp_dir, "test_save.npz")
+            graph.save_npz(out_path, weighted=weighted)
+
+            npz_files = np.load(out_path)
+            self.assertEqual(
+                npz_files["edge_index"].tolist(),
+                self.edge_index1.tolist(),
+            )
+            self.assertEqual(
+                npz_files["node_ids"].tolist(),
+                self.node_ids1.tolist(),
+            )
             if weighted:
-                edge_data = self.edge_data_weighted1
+                self.assertEqual(
+                    npz_files["edge_weight"].tolist(),
+                    self.edge_weight1.tolist(),
+                )
             else:
-                edge_data = self.edge_data_unweighted1
-
-            with self.subTest(weighted=weighted):
-                graph = SparseGraph(weighted=weighted, directed=False)
-                graph.read_npz(self.npz_path1)
-                self.assertEqual(graph._edge_data, edge_data)
-                self.assertEqual(graph.idmap.lst, self.node_ids1.tolist())
-
-                graph = SparseGraph.from_npz(
-                    self.npz_path1,
-                    weighted=weighted,
-                    directed=False,
-                )
-                self.assertEqual(graph._edge_data, edge_data)
-                self.assertEqual(graph.idmap.lst, self.node_ids1.tolist())
-
-    def test_write_npz(self):
-        for weighted in True, False:
-            with self.subTest(weighted=weighted):
-                graph = SparseGraph(weighted=weighted, directed=False)
-                graph._edge_data = self.edge_data_weighted1
-                graph.idmap = graph.idmap.from_list(self.node_ids1.tolist())
-
-                out_path = osp.join(self.tmp_dir, "test_save.npz")
-                graph.save_npz(out_path, weighted=weighted)
-
-                npz_files = np.load(out_path)
-                self.assertEqual(
-                    npz_files["edge_index"].tolist(),
-                    self.edge_index1.tolist(),
-                )
-                self.assertEqual(
-                    npz_files["node_ids"].tolist(),
-                    self.node_ids1.tolist(),
-                )
-                if weighted:
-                    self.assertEqual(
-                        npz_files["edge_weight"].tolist(),
-                        self.edge_weight1.tolist(),
-                    )
-                else:
-                    self.assertFalse("edge_weight" in npz_files)
+                self.assertFalse("edge_weight" in npz_files)
 
     def template_test_construct_adj_vec(self, weighted, directed, lst=None):
         graph = SparseGraph.from_npy(
@@ -373,13 +373,27 @@ class TestSparseGraph(unittest.TestCase):
                 [1, 0, 1, 0],
             ],
         )
-        print("???", mat, type(mat), mat.shape)
         ids = ["a", "b", "c", "d"]
         graph = SparseGraph.from_mat(mat, ids)
         graph = graph.to_dense_graph()
         self.assertIsInstance(graph, DenseGraph)
         self.assertEqual(list(graph.node_ids), ids)
         self.assertEqual(graph.mat.tolist(), mat.tolist())
+
+    @parameterized.expand(
+        [
+            (["b", "c", "d"], [{1: 2}, {0: 2, 2: 3}, {1: 3}]),
+            (["e", "a", "c"], [{2: 0.5}, {}, {0: 0.5}]),
+        ],
+    )
+    def test_induced_subgraph(self, subgraph_node_ids, subgraph_edge_data):
+        graph = SparseGraph(weighted=True, directed=False)
+        graph.read_npz(self.npz_path1)
+
+        with self.subTest(subgraph_node_ids=subgraph_node_ids):
+            subgraph = graph.induced_subgraph(subgraph_node_ids)
+            self.assertEqual(list(subgraph.node_ids), subgraph_node_ids)
+            self.assertEqual(subgraph.edge_data, subgraph_edge_data)
 
 
 class TestDirectedSparseGraph(unittest.TestCase):

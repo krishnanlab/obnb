@@ -7,6 +7,7 @@ from ..typing import LogLevel
 from ..typing import Optional
 from ..typing import Union
 from ..util import checkers
+from ..util.exceptions import IDNotExistError
 from ..util.idhandler import IDmap
 from .base import BaseGraph
 
@@ -75,6 +76,37 @@ class SparseGraph(BaseGraph):
             fvec_lst = [self.construct_adj_vec(int(i)) for i in idx]
             fvec = np.asarray(fvec_lst)
         return fvec
+
+    def induced_subgraph(self, node_ids: List[str]):
+        """Return a subgraph induced by a subset of nodes.
+
+        Args:
+            node_ids (List[str]): List of nodes of interest.
+
+        """
+        graph = SparseGraph(
+            weighted=self.weighted,
+            directed=self.directed,
+            self_loops=self.self_loops,
+            log_level=self.log_level,
+        )
+
+        # Add nodes to new graph and make sure all nodes are present
+        for node in node_ids:
+            if node not in self.idmap:
+                raise IDNotExistError(f"{node!r} is not in the graph")
+            graph.add_id(node)
+
+        # Add edges between selected nodes
+        node_ids_set = set(node_ids)
+        for node1 in node_ids:
+            node1_idx = self.idmap[node1]
+            for node2_idx, weight in self.edge_data[node1_idx].items():
+                node2 = self.idmap.lst[node2_idx]
+                if node2 in node_ids_set:
+                    graph.add_edge(node1, node2, weight)
+
+        return graph
 
     def construct_adj_vec(self, src_idx: int):
         """Construct and return a specific row vector of the adjacency matrix.

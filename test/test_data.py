@@ -49,6 +49,7 @@ class TestData(unittest.TestCase):
         raises=TimeoutError,
         reason="Sometimes DisGeNet is just not working...",
     )
+    @pytest.mark.longruns
     def test_disgenet(self):
         with Timeout(600):
             lsc = NLEval.data.DisGeNet(self.tmp_dir)
