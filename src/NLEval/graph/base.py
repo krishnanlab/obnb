@@ -15,6 +15,7 @@ class BaseGraph:
         """Initialize BaseGraph object."""
         self.log_level = log_level
         self.idmap = idhandler.IDmap()
+        self.verbose = verbose
         self.logger = get_logger(
             self.__class__.__name__,
             log_level=log_level,

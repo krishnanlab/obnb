@@ -1,5 +1,6 @@
 import ndex2
 
+from ... import logger
 from ...graph import SparseGraph
 from ...typing import Any
 from ...typing import Dict
@@ -25,6 +26,7 @@ class BaseNdexData(BaseData, SparseGraph):
         redownload: bool = False,
         reprocess: bool = False,
         cx_kwargs: Optional[Dict[str, Any]] = None,
+        **kwargs,
     ):
         """Initialize the BaseNdexData object.
 
@@ -48,6 +50,7 @@ class BaseNdexData(BaseData, SparseGraph):
             reprocess=reprocess,
             weighted=weighted,
             directed=directed,
+            **kwargs,
         )
 
     @property
@@ -60,6 +63,7 @@ class BaseNdexData(BaseData, SparseGraph):
 
     def download(self):
         """Download data from NDEX via ndex2 client."""
+        logger.info(f"Retrieve NDEx network with uuid: {self.cx_uuid}")
         client = ndex2.client.Ndex2()
         client_resp = client.get_network_as_cx_stream(self.cx_uuid)
         with open(self.raw_file_path(0), "wb") as f:
@@ -67,9 +71,12 @@ class BaseNdexData(BaseData, SparseGraph):
 
     def process(self):
         """Process data and save for later useage."""
+        logger.info(f"Process raw file {self.raw_file_path(0)}")
         self.read_cx_stream_file(self.raw_file_path(0), **self.cx_kwargs)
         self.save_npz(self.processed_file_path(0), self.weighted)
+        logger.info(f"Saved processed file {self.processed_file_path(0)}")
 
     def load_processed_data(self):
         """Load processed network."""
+        logger.info(f"Load processed file {self.processed_file_path(0)}")
         self.read_npz(self.processed_file_path(0))

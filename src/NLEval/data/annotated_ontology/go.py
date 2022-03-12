@@ -94,8 +94,8 @@ class GeneOntology(BaseAnnotatedOntologyData):
             self.iapply(filter_, progress_bar=True)
             logger.info(self.stats())
 
-        logger.info("Saving processed gmt...")
         self.export_gmt(self.processed_file_path(0))
+        logger.info(f"Saved processed file {self.processed_file_path(0)}")
 
 
 class GOBP(GeneOntology):

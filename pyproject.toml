@@ -29,4 +29,5 @@ addopts = [
 ]
 markers = [
     "longruns",
+    "highmemory",
 ]
