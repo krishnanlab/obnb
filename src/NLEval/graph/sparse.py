@@ -1,3 +1,5 @@
+import itertools
+
 import numpy as np
 
 from ..typing import Callable
@@ -107,6 +109,42 @@ class SparseGraph(BaseGraph):
                     graph.add_edge(node1, node2, weight)
 
         return graph
+
+    def connected_components(self) -> List[List[str]]:
+        """Finding connected components via Breadth First Search.
+
+        Returns a list of connected components sorted by the number of nodes,
+        each of which is a list of node ids within a connected component.
+
+        """
+        visited = set()
+        unvisited = set(range(self.num_nodes))
+        connected_components = []
+
+        while unvisited:
+            comp = set()
+            tovisit = {unvisited.pop()}
+
+            while tovisit:
+                comp.update(tovisit)
+                tovisit_next = itertools.chain.from_iterable(
+                    [self._edge_data[i] for i in tovisit],
+                )
+                tovisit = set(tovisit_next).difference(comp)
+
+            visited.update(comp)
+            unvisited.difference_update(comp)
+            connected_components.append([self.idmap.lst[i] for i in comp])
+
+        return sorted(connected_components, key=len, reverse=True)
+
+    def is_connected(self) -> bool:
+        """Retrun True if the graph is connected."""
+        return len(self.connected_components()) == 1
+
+    def largest_connected_subgraph(self):
+        """Return the largest connected subgraph of the graph."""
+        return self.induced_subgraph(self.connected_components()[0])
 
     def construct_adj_vec(self, src_idx: int):
         """Construct and return a specific row vector of the adjacency matrix.
@@ -740,3 +778,7 @@ class DirectedSparseGraph(SparseGraph):
             reduction,
             self._rev_edge_data,
         )
+
+    def connected_components(self):
+        """Connected components for directed graph is not implemented yet."""
+        raise NotImplementedError
