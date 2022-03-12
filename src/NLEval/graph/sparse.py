@@ -91,6 +91,7 @@ class SparseGraph(BaseGraph):
             directed=self.directed,
             self_loops=self.self_loops,
             log_level=self.log_level,
+            verbose=self.verbose,
         )
 
         # Add nodes to new graph and make sure all nodes are present
@@ -117,24 +118,22 @@ class SparseGraph(BaseGraph):
         each of which is a list of node ids within a connected component.
 
         """
-        visited = set()
         unvisited = set(range(self.num_nodes))
         connected_components = []
 
         while unvisited:
-            comp = set()
+            visited = set()
             tovisit = {unvisited.pop()}
 
             while tovisit:
-                comp.update(tovisit)
+                visited.update(tovisit)
                 tovisit_next = itertools.chain.from_iterable(
                     [self._edge_data[i] for i in tovisit],
                 )
-                tovisit = set(tovisit_next).difference(comp)
+                tovisit = set(tovisit_next).difference(visited)
 
-            visited.update(comp)
-            unvisited.difference_update(comp)
-            connected_components.append([self.idmap.lst[i] for i in comp])
+            unvisited.difference_update(visited)
+            connected_components.append([self.idmap.lst[i] for i in visited])
 
         return sorted(connected_components, key=len, reverse=True)
 
@@ -361,6 +360,7 @@ class SparseGraph(BaseGraph):
         cls,
         mat,
         ids: Optional[Union[List[str], IDmap]] = None,
+        **kwargs,
     ):  # noqa
         """Construct SparseGraph using ids and adjacency matrix.
 
