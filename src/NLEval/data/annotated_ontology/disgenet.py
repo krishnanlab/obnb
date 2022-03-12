@@ -70,6 +70,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
         ]
 
     def download_annotations(self):
+        logger.info(f"Download annotation from: {self.annotation_url}")
         resp = requests.get(self.annotation_url)
         annotation_file_name = self.annotation_file_name
         with open(osp.join(self.raw_dir, annotation_file_name), "wb") as f:
@@ -104,5 +105,5 @@ class DisGeNet(BaseAnnotatedOntologyData):
             self.iapply(filter_, progress_bar=True)
             logger.info(self.stats())
 
-        logger.info("Saving processed gmt...")
         self.export_gmt(self.processed_file_path(0))
+        logger.info(f"Saved processed file {self.processed_file_path(0)}")

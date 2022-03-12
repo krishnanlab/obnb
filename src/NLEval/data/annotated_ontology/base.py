@@ -2,6 +2,7 @@ import os.path as osp
 
 import requests
 
+from ... import logger
 from ...label import LabelsetCollection
 from ...typing import List
 from ...typing import Optional
@@ -58,6 +59,7 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
 
     def download_ontology(self):
         """Download ontology from obo foundary."""
+        logger.info(f"Download obo from: {self.ontology_url}")
         resp = requests.get(self.ontology_url)
         with open(self.ontology_file_path, "wb") as f:
             f.write(resp.content)
@@ -77,4 +79,5 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
 
     def load_processed_data(self):
         """Load processed labels from GMT."""
+        logger.info(f"Load processed file {self.processed_file_path(0)}")
         self.read_gmt(self.processed_file_path(0))
