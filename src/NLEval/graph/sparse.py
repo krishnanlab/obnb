@@ -1,3 +1,5 @@
+import itertools
+
 import numpy as np
 
 from ..typing import Callable
@@ -89,6 +91,7 @@ class SparseGraph(BaseGraph):
             directed=self.directed,
             self_loops=self.self_loops,
             log_level=self.log_level,
+            verbose=self.verbose,
         )
 
         # Add nodes to new graph and make sure all nodes are present
@@ -107,6 +110,32 @@ class SparseGraph(BaseGraph):
                     graph.add_edge(node1, node2, weight)
 
         return graph
+
+    def connected_components(self) -> List[List[str]]:
+        """Find connected components via Breadth First Search.
+
+        Returns a list of connected components sorted by the number of nodes,
+        each of which is a list of node ids within a connected component.
+
+        """
+        unvisited = set(range(self.num_nodes))
+        connected_components = []
+
+        while unvisited:
+            visited = set()
+            tovisit = {unvisited.pop()}
+
+            while tovisit:
+                visited.update(tovisit)
+                tovisit_next = itertools.chain.from_iterable(
+                    [self._edge_data[i] for i in tovisit],
+                )
+                tovisit = set(tovisit_next).difference(visited)
+
+            unvisited.difference_update(visited)
+            connected_components.append([self.idmap.lst[i] for i in visited])
+
+        return sorted(connected_components, key=len, reverse=True)
 
     def construct_adj_vec(self, src_idx: int):
         """Construct and return a specific row vector of the adjacency matrix.
@@ -323,6 +352,7 @@ class SparseGraph(BaseGraph):
         cls,
         mat,
         ids: Optional[Union[List[str], IDmap]] = None,
+        **kwargs,
     ):  # noqa
         """Construct SparseGraph using ids and adjacency matrix.
 
@@ -740,3 +770,7 @@ class DirectedSparseGraph(SparseGraph):
             reduction,
             self._rev_edge_data,
         )
+
+    def connected_components(self):
+        """Find connected components."""
+        raise NotImplementedError

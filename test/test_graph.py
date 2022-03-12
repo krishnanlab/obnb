@@ -395,6 +395,30 @@ class TestSparseGraph(unittest.TestCase):
             self.assertEqual(list(subgraph.node_ids), subgraph_node_ids)
             self.assertEqual(subgraph.edge_data, subgraph_edge_data)
 
+    def test_connected_components(self):
+        graph = SparseGraph(weighted=True, directed=False)
+        graph.add_id(["a", "b", "c", "d", "e"])
+        graph.add_edge("a", "b", 1)
+        graph.add_edge("c", "d", 2)
+        graph.add_edge("c", "e", 1)
+        graph.add_edge("d", "e", 1)
+
+        # Two connected components
+        self.assertEqual(
+            graph.connected_components(),
+            [["c", "d", "e"], ["a", "b"]],
+        )
+        self.assertFalse(graph.is_connected())
+
+        # Largest connected subgraph
+        subgraph = graph.largest_connected_subgraph()
+        self.assertTrue(subgraph.is_connected())
+        self.assertEqual(subgraph.node_ids, ("c", "d", "e"))
+        self.assertEqual(
+            subgraph.edge_data,
+            [{1: 2, 2: 1}, {0: 2, 2: 1}, {0: 1, 1: 1}],
+        )
+
 
 class TestDirectedSparseGraph(unittest.TestCase):
     def test_add_edge(self):
@@ -783,6 +807,50 @@ class TestDenseGraph(unittest.TestCase):
         self.assertEqual(
             graph._edge_data,
             [{2: 0.4}, {3: 0.3}, {0: 0.4, 4: 0.1}, {1: 0.3}, {2: 0.1}],
+        )
+
+    @parameterized.expand(
+        [
+            (["4", "3", "2"], [[0, 0, 0.3], [0, 0, 0], [0.3, 0, 0]]),
+            (["4", "3", "2"], [[0, 0, 0.3], [0, 0, 0], [0.3, 0, 0]]),
+        ],
+    )
+    def test_induced_subgraph(self, node_ids, adjmat):
+        graph = DenseGraph.from_mat(
+            self.case.data_mat[:, 1:],
+            self.case.data_mat[:, 0].astype(int).astype(str).tolist(),
+        )
+        subgraph = graph.induced_subgraph(node_ids)
+        self.assertEqual(subgraph.mat.tolist(), adjmat)
+
+    def test_connected_components(self):
+        graph = DenseGraph.from_mat(
+            np.array(
+                [
+                    [0, 1, 0, 0, 0],
+                    [1, 0, 0, 0, 0],
+                    [0, 0, 0, 2, 1],
+                    [0, 0, 2, 0, 1],
+                    [0, 0, 1, 1, 0],
+                ],
+            ),
+            ["a", "b", "c", "d", "e"],
+        )
+
+        # Two connected components
+        self.assertEqual(
+            graph.connected_components(),
+            [["c", "d", "e"], ["a", "b"]],
+        )
+        self.assertFalse(graph.is_connected())
+
+        # Largest connected subgraph
+        subgraph = graph.largest_connected_subgraph()
+        self.assertTrue(subgraph.is_connected())
+        self.assertEqual(subgraph.node_ids, ("c", "d", "e"))
+        self.assertEqual(
+            subgraph.mat.tolist(),
+            [[0, 2, 1], [2, 0, 1], [1, 1, 0]],
         )
 
 

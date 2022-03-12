@@ -5,6 +5,7 @@ from ..typing import LogLevel
 from ..typing import Optional
 from ..typing import Union
 from ..util import checkers
+from ..util.exceptions import IDNotExistError
 from ..util.idhandler import IDmap
 from .base import BaseGraph
 from .sparse import SparseGraph
@@ -83,11 +84,63 @@ class DenseGraph(BaseGraph):
         """
         return self.mat[self.idmap[node_id1], self.idmap[node_id2]]
 
+    def induced_subgraph(self, node_ids: List[str]):
+        """Return a subgraph induced by a subset of nodes.
+
+        Args:
+            node_ids (List[str]): List of nodes of interest.
+
+        """
+        # Add nodes to new graph and make sure all nodes are present
+        for node in node_ids:
+            if node not in self.idmap:
+                raise IDNotExistError(f"{node!r} is not in the graph")
+
+        # Find index of the corresponding nodes and usge to subset adjmat
+        idx = self.idmap[node_ids]
+
+        return self.from_mat(
+            self.mat[idx][:, idx],
+            node_ids,
+            log_level=self.log_level,
+            verbose=self.verbose,
+        )
+
+    def connected_components(self) -> List[List[str]]:
+        """Find connected components via Breadth First Search.
+
+        Returns a list of connected components sorted by the number of nodes,
+        each of which is a list of node ids within a connected component.
+
+        Note:
+            This BFS approach assumes the graph is undirected.
+
+        """
+        unvisited = np.arange(self.num_nodes)
+        connected_components = []
+
+        while unvisited.size > 0:
+            visited = np.zeros(0)
+            tovisit = unvisited[0:1]
+
+            while tovisit.size > 0:
+                visited = np.union1d(visited, tovisit)
+                tovisit_next = np.where(self.mat[tovisit].sum(0) > 0)[0]
+                tovisit = np.setdiff1d(tovisit_next, visited)
+
+            unvisited = np.setdiff1d(unvisited, visited)
+            connected_components.append(
+                [self.idmap.lst[int(i)] for i in visited],
+            )
+
+        return sorted(connected_components, key=len, reverse=True)
+
     @classmethod
     def from_mat(
         cls,
         mat: np.ndarray,
         ids: Optional[Union[List[str], IDmap]] = None,
+        **kwargs,
     ):
         """Construct DenseGraph using ids and adjcency matrix.
 
@@ -106,7 +159,7 @@ class DenseGraph(BaseGraph):
                 f"Inconsistent dimension between IDs ({idmap.size}) and the "
                 f"matrix ({mat.shape[0]})",
             )
-        graph = cls()
+        graph = cls(**kwargs)
         graph.idmap = idmap
         graph.mat = mat
         return graph
