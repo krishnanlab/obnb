@@ -11,10 +11,10 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: [3.8, 3.9]
-        torch-version: [1.9.0]
+        torch-version: [1.10.0]
         include:
-          - torch-version: 1.9.0
-            torchvision-version: 0.10.0
+          - torch-version: 1.10.0
+            torchvision-version: 0.11.1
 
     steps:
     - uses: actions/checkout@v2
@@ -40,10 +40,6 @@ jobs:
     - name: Install latest PyG from github
       run: |
         pip install git+https://github.com/pyg-team/pytorch_geometric.git#egg=torch-geometric[full]
-
-    - name: Install NLEval
-      run: |
-        pip install -e .
 
     - name: Execute example scripts
       shell: bash
