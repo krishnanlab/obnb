@@ -1,5 +1,6 @@
 from copy import deepcopy
 
+from ..typing import List
 from ..typing import LogLevel
 from ..typing import Tuple
 from ..typing import Union
@@ -107,3 +108,19 @@ class BaseGraph:
     def isempty(self):
         """bool: true if graph is empty, indicated by empty idmap."""
         return not self.size
+
+    def induced_subgraph(self, node_ids: List[str]):
+        """Return a subgraph induced by a subset of nodes"""
+        raise NotImplementedError
+
+    def connected_components(self) -> List[List[str]]:
+        """Find connected components."""
+        raise NotImplementedError
+
+    def is_connected(self) -> bool:
+        """Retrun True if the graph is connected."""
+        return len(self.connected_components()) == 1
+
+    def largest_connected_subgraph(self):
+        """Return the largest connected subgraph of the graph."""
+        return self.induced_subgraph(self.connected_components()[0])

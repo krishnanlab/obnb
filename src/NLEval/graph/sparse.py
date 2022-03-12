@@ -112,7 +112,7 @@ class SparseGraph(BaseGraph):
         return graph
 
     def connected_components(self) -> List[List[str]]:
-        """Finding connected components via Breadth First Search.
+        """Find connected components via Breadth First Search.
 
         Returns a list of connected components sorted by the number of nodes,
         each of which is a list of node ids within a connected component.
@@ -136,14 +136,6 @@ class SparseGraph(BaseGraph):
             connected_components.append([self.idmap.lst[i] for i in visited])
 
         return sorted(connected_components, key=len, reverse=True)
-
-    def is_connected(self) -> bool:
-        """Retrun True if the graph is connected."""
-        return len(self.connected_components()) == 1
-
-    def largest_connected_subgraph(self):
-        """Return the largest connected subgraph of the graph."""
-        return self.induced_subgraph(self.connected_components()[0])
 
     def construct_adj_vec(self, src_idx: int):
         """Construct and return a specific row vector of the adjacency matrix.
