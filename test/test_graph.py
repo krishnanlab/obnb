@@ -395,6 +395,30 @@ class TestSparseGraph(unittest.TestCase):
             self.assertEqual(list(subgraph.node_ids), subgraph_node_ids)
             self.assertEqual(subgraph.edge_data, subgraph_edge_data)
 
+    def test_connected_components(self):
+        graph = SparseGraph(weighted=True, directed=False)
+        graph.add_id(["a", "b", "c", "d", "e"])
+        graph.add_edge("a", "b", 1)
+        graph.add_edge("c", "d", 2)
+        graph.add_edge("c", "e", 1)
+        graph.add_edge("d", "e", 1)
+
+        # Two connected components
+        self.assertEqual(
+            graph.connected_components(),
+            [["c", "d", "e"], ["a", "b"]],
+        )
+        self.assertFalse(graph.is_connected())
+
+        # Largest connected subgraph
+        subgraph = graph.largest_connected_subgraph()
+        self.assertTrue(subgraph.is_connected())
+        self.assertEqual(subgraph.node_ids, ("c", "d", "e"))
+        self.assertEqual(
+            subgraph.edge_data,
+            [{1: 2, 2: 1}, {0: 2, 2: 1}, {0: 1, 1: 1}],
+        )
+
 
 class TestDirectedSparseGraph(unittest.TestCase):
     def test_add_edge(self):
