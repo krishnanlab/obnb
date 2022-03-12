@@ -68,10 +68,6 @@ class TestData(unittest.TestCase):
             self.assertEqual(self.graph.size, 8364)
             self.assertEqual(self.graph.num_edges, 71408)
 
-    @pytest.mark.xfail(
-        raises=TimeoutError,
-        reason="Sometimes DisGeNet is just not working...",
-    )
     @pytest.mark.longruns
     def test_disgenet(self):
         with Timeout(600):
