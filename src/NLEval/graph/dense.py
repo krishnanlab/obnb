@@ -83,6 +83,28 @@ class DenseGraph(BaseGraph):
         """
         return self.mat[self.idmap[node_id1], self.idmap[node_id2]]
 
+    def induced_subgraph(self, node_ids: List[str]):
+        """Return a subgraph induced by a subset of nodes.
+
+        Args:
+            node_ids (List[str]): List of nodes of interest.
+
+        """
+        # Add nodes to new graph and make sure all nodes are present
+        for node in node_ids:
+            if node not in self.idmap:
+                raise IDNotExistError(f"{node!r} is not in the graph")
+
+        # Find index of the corresponding nodes and usge to subset adjmat
+        idx = self.idmap[node_ids]
+
+        return self.from_mat(
+            self.mat[idx][:, idx],
+            node_ids,
+            log_level=self.log_level,
+            verbose=self.verbose,
+        )
+
     @classmethod
     def from_mat(
         cls,

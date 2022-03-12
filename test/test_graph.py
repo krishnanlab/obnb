@@ -809,6 +809,20 @@ class TestDenseGraph(unittest.TestCase):
             [{2: 0.4}, {3: 0.3}, {0: 0.4, 4: 0.1}, {1: 0.3}, {2: 0.1}],
         )
 
+    @parameterized.expand(
+        [
+            (["4", "3", "2"], [[0, 0, 0.3], [0, 0, 0], [0.3, 0, 0]]),
+            (["4", "3", "2"], [[0, 0, 0.3], [0, 0, 0], [0.3, 0, 0]]),
+        ],
+    )
+    def test_induced_subgraph(self, node_ids, adjmat):
+        graph = DenseGraph.from_mat(
+            self.case.data_mat[:, 1:],
+            self.case.data_mat[:, 0].astype(int).astype(str).tolist(),
+        )
+        subgraph = graph.induced_subgraph(node_ids)
+        self.assertEqual(subgraph.mat.tolist(), adjmat)
+
 
 class TestFeatureVec(unittest.TestCase):
     @classmethod
