@@ -105,10 +105,11 @@ class SparseGraph(BaseGraph):
         # Map edge data to the new graph
         for node1 in node_ids:
             node1_idx = self.idmap[node1]
-            node1_edge_data = graph._edge_data[old_idx_to_new_idx[node1_idx]]
-            for node2_idx, weight in self.edge_data[node1_idx].items():
-                if node2_idx in old_idx_to_new_idx:
-                    node1_edge_data[old_idx_to_new_idx[node2_idx]] = weight
+            graph._edge_data[old_idx_to_new_idx[node1_idx]] = {
+                old_idx_to_new_idx[node2_idx]: weight
+                for node2_idx, weight in self.edge_data[node1_idx].items()
+                if node2_idx in old_idx_to_new_idx
+            }
 
         return graph
 
