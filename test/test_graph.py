@@ -225,6 +225,14 @@ class TestSparseGraph(unittest.TestCase):
                 [{1: 1.0, 2: 0.5}, {0: 1.0}, {0: 0.5}],
             )
 
+    @parameterized.expand([(True, 3), (False, 4)])
+    def test_num_nodes(self, directed, ans):
+        graph = SparseGraph(weighted=False, directed=directed)
+        graph.add_edge("a", "b")
+        graph.add_edge("b", "a")
+        graph.add_edge("c", "a")
+        self.assertEqual(ans, graph.num_edges)
+
     @parameterized.expand(itertools.product((True, False), (True, False)))
     def test_add_edge_self_loops(self, directed, self_loops):
         with self.subTest(directed=directed, self_loops=self_loops):
@@ -752,6 +760,16 @@ class TestDenseGraph(unittest.TestCase):
             directed=False,
         )
         self.check_graph(graph)
+
+    @parameterized.expand(
+        [
+            ([[0, 1, 0], [1, 0, 0], [1, 0, 0]], 3),
+            ([[0, 1, 1], [1, 0, 0], [1, 0, 0]], 4),
+        ],
+    )
+    def test_num_nodes(self, mat, ans):
+        graph = DenseGraph.from_mat(np.array(mat), ["a", "b", "c"])
+        self.assertEqual(ans, graph.num_edges)
 
     def test_from_mat(self):
         with self.subTest("From matrix with first column ids"):

@@ -105,6 +105,11 @@ class BaseGraph:
         """int: number of nodes in graph."""
         return self.num_nodes
 
+    @property
+    def num_edges(self) -> int:
+        """int: Number of edges."""
+        raise NotImplementedError
+
     def isempty(self):
         """bool: true if graph is empty, indicated by empty idmap."""
         return not self.size
@@ -123,4 +128,14 @@ class BaseGraph:
 
     def largest_connected_subgraph(self):
         """Return the largest connected subgraph of the graph."""
-        return self.induced_subgraph(self.connected_components()[0])
+        comps = self.connected_components()
+        self.logger.info(f"Components sizes = {list(map(len, comps))}")
+
+        subgraph = self.induced_subgraph(comps[0])
+        self.logger.info(
+            f"Number of nodes = {subgraph.num_nodes:,} ({self.num_nodes:,} "
+            f"originally), number of edges = {subgraph.num_edges:,} "
+            f"({self.num_edges:,} originally)",
+        )
+
+        return subgraph

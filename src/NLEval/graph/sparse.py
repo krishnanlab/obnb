@@ -95,19 +95,21 @@ class SparseGraph(BaseGraph):
         )
 
         # Add nodes to new graph and make sure all nodes are present
-        for node in node_ids:
+        old_idx_to_new_idx = {}
+        for new_idx, node in enumerate(node_ids):
             if node not in self.idmap:
                 raise IDNotExistError(f"{node!r} is not in the graph")
             graph.add_id(node)
+            old_idx_to_new_idx[self.idmap[node]] = new_idx
 
-        # Add edges between selected nodes
-        node_ids_set = set(node_ids)
+        # Map edge data to the new graph
         for node1 in node_ids:
             node1_idx = self.idmap[node1]
-            for node2_idx, weight in self.edge_data[node1_idx].items():
-                node2 = self.idmap.lst[node2_idx]
-                if node2 in node_ids_set:
-                    graph.add_edge(node1, node2, weight)
+            graph._edge_data[old_idx_to_new_idx[node1_idx]] = {
+                old_idx_to_new_idx[node2_idx]: weight
+                for node2_idx, weight in self.edge_data[node1_idx].items()
+                if node2_idx in old_idx_to_new_idx
+            }
 
         return graph
 
