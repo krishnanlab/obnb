@@ -33,6 +33,11 @@ class DenseGraph(BaseGraph):
         return self.mat[idx]
 
     @property
+    def num_edges(self) -> int:
+        """int: Number of edges."""
+        return (self.mat != 0).sum()
+
+    @property
     def mat(self):
         """Node information stored as numpy matrix."""
         return self._mat
