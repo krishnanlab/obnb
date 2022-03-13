@@ -3,6 +3,7 @@ from tqdm import tqdm
 
 from ... import logger
 from ...graph import OntologyGraph
+from ...label import LabelsetCollection
 from ...label.filters import LabelsetPairwiseFilterJaccard
 from ...label.filters import LabelsetPairwiseFilterOverlap
 from ...label.filters import LabelsetRangeFilterSize
@@ -83,18 +84,18 @@ class GeneOntology(BaseAnnotatedOntologyData):
         # Propagate annotations and show progress
         g.complete_node_attrs(pbar=True)
 
-        self.read_ontology_graph(
+        lsc = LabelsetCollection.from_ontology_graph(
             g,
             min_size=self.min_size,
             namespace=self.namespace,
         )
-        logger.info(self.stats())
+        logger.info(lsc.stats())
 
         for filter_ in self.filters:
-            self.iapply(filter_, progress_bar=True)
-            logger.info(self.stats())
+            lsc.iapply(filter_, progress_bar=True)
+            logger.info(lsc.stats())
 
-        self.export_gmt(self.processed_file_path(0))
+        lsc.export_gmt(self.processed_file_path(0))
         logger.info(f"Saved processed file {self.processed_file_path(0)}")
 
 

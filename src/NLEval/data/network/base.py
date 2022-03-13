@@ -72,8 +72,11 @@ class BaseNdexData(BaseData, SparseGraph):
     def process(self):
         """Process data and save for later useage."""
         logger.info(f"Process raw file {self.raw_file_path(0)}")
-        self.read_cx_stream_file(self.raw_file_path(0), **self.cx_kwargs)
-        self.save_npz(self.processed_file_path(0), self.weighted)
+        cx_graph = SparseGraph.from_cx_stream_file(
+            self.raw_file_path(0),
+            **self.cx_kwargs,
+        )
+        cx_graph.save_npz(self.processed_file_path(0), self.weighted)
         logger.info(f"Saved processed file {self.processed_file_path(0)}")
 
     def load_processed_data(self):

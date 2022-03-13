@@ -41,6 +41,7 @@ class BaseData:
 
         self._download()
         self._process()
+        self.load_processed_data()
 
     @property
     def classname(self) -> str:
@@ -115,5 +116,3 @@ class BaseData:
             logger.info("Processing...")
             self.process()
             logger.info("Done!")
-        else:
-            self.load_processed_data()
