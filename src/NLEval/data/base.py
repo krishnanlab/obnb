@@ -102,7 +102,7 @@ class BaseData:
         """Check to see if files downloaded first before downloading."""
         os.makedirs(self.raw_dir, exist_ok=True)
         if self.redownload or not self.download_completed():
-            logger.info("Downloading...")
+            logger.info("Start downloading {self.classname}...")
             self.download()
 
     def process(self):
@@ -113,6 +113,5 @@ class BaseData:
         """Check to see if processed file exist and process if not."""
         os.makedirs(self.processed_dir, exist_ok=True)
         if self.redownload or self.reprocess or not self.process_completed():
-            logger.info("Processing...")
+            logger.info("Start processing {self.classname}...")
             self.process()
-            logger.info("Done!")
