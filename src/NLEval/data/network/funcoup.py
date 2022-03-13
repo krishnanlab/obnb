@@ -20,6 +20,7 @@ class FunCoup(BaseNdexData):
             root,
             weighted=True,
             directed=False,
+            largest_comp=True,
             cx_kwargs={
                 "interaction_types": ["has functional association with"],
                 "node_id_prefix": "ensembl",

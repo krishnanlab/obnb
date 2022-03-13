@@ -440,7 +440,7 @@ class SparseGraph(BaseGraph):
         if node_id_entry not in ["r", "n"]:
             raise ValueError(f"Unkown node ID entry {node_id_entry!r}")
 
-        self.logger.info("Loading raw cs file")
+        self.logger.info("Loading raw cx file")
         with open(path, "r") as f:
             cx_stream = json.load(f)
 

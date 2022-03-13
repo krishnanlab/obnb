@@ -17,6 +17,7 @@ class HIPPIE(BaseNdexData):
             root,
             weighted=True,
             directed=False,
+            largest_comp=True,
             cx_kwargs={
                 "interaction_types": ["interacts-with"],
                 "node_id_prefix": "ncbigene",

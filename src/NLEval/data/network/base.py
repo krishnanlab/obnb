@@ -25,6 +25,7 @@ class BaseNdexData(BaseData, SparseGraph):
         directed: bool,
         redownload: bool = False,
         reprocess: bool = False,
+        largest_comp: bool = False,
         cx_kwargs: Optional[Dict[str, Any]] = None,
         **kwargs,
     ):
@@ -40,9 +41,12 @@ class BaseNdexData(BaseData, SparseGraph):
             reprocess (bool): If set to True, always process the data
                 even if the processed data file already exists in the
                 corresponding data folder (default: obj:`False`).
+            largest_comp (bool): If set to True, then only take the largest
+                connected component of the graph.
             cx_kwargs: Keyword arguments used for reading the cx file.
 
         """
+        self.largest_comp = largest_comp
         self.cx_kwargs: Dict[str, Any] = cx_kwargs or {}
         super().__init__(
             root,
@@ -72,8 +76,16 @@ class BaseNdexData(BaseData, SparseGraph):
     def process(self):
         """Process data and save for later useage."""
         logger.info(f"Process raw file {self.raw_file_path(0)}")
-        self.read_cx_stream_file(self.raw_file_path(0), **self.cx_kwargs)
-        self.save_npz(self.processed_file_path(0), self.weighted)
+        cx_graph = SparseGraph(
+            weighted=self.weighted,
+            directed=self.directed,
+            log_level=self.log_level,
+            verbose=self.verbose,
+        )
+        cx_graph.read_cx_stream_file(self.raw_file_path(0), **self.cx_kwargs)
+        if self.largest_comp:
+            cx_graph = cx_graph.largest_connected_subgraph()
+        cx_graph.save_npz(self.processed_file_path(0), self.weighted)
         logger.info(f"Saved processed file {self.processed_file_path(0)}")
 
     def load_processed_data(self):

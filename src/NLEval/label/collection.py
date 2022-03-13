@@ -612,6 +612,18 @@ class LabelsetCollection(idhandler.IDprop):
                     if len(label_set) >= min_size:
                         self.add_labelset(label_set, label_id, label_info)
 
+    @classmethod
+    def from_ontology_graph(
+        cls,
+        graph: OntologyGraph,
+        min_size: int = 10,
+        namespace: Optional[str] = None,
+    ):
+        """Construct LabelsetCollection object from an annotated ontology."""
+        lsc = cls()
+        lsc.read_ontology_graph(graph, min_size=min_size, namespace=namespace)
+        return lsc
+
     def read_gmt(self, path: str, sep: str = "\t"):
         """Load data from Gene Matrix Transpose `.gmt` file.
 
