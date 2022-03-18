@@ -15,6 +15,7 @@ def load_data(
     sparse: bool = False,
     filter_negative: bool = True,
     log_level: LogLevel = "WARNING",
+    progress_bar: bool = False,
 ):
     """Load graph and node labels.
 
@@ -41,11 +42,18 @@ def load_data(
 
     # Filter labels
     print(f"Number of labelsets before filtering: {len(lsc.label_ids)}")
-    lsc.iapply(EntityExistenceFilter(g.idmap.lst, log_level=log_level))
-    lsc.iapply(LabelsetRangeFilterSize(min_val=50, log_level=log_level))
+    lsc.iapply(
+        EntityExistenceFilter(g.idmap.lst, log_level=log_level),
+        progress_bar=progress_bar,
+    )
+    lsc.iapply(
+        LabelsetRangeFilterSize(min_val=50, log_level=log_level),
+        progress_bar=progress_bar,
+    )
     if filter_negative:
         lsc.iapply(
             NegativeGeneratorHypergeom(p_thresh=0.05, log_level=log_level),
+            progress_bar=progress_bar,
         )
     print(f"Number of labelsets after filtering: {len(lsc.label_ids)}")
 
@@ -58,3 +66,4 @@ def load_data(
 
 if __name__ == "__main__":
     load_data(log_level="DEBUG")
+    load_data(progress_bar=True)

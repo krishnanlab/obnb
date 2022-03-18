@@ -79,7 +79,7 @@ g = graph.DenseGraph.from_edglst("data/networks/STRING-EXP.edg", weighted=True, 
 lsc = label.LabelsetCollection.from_gmt("data/labels/KEGGBP.gmt")
 
 # Remove genes not present in the network from the geneset collection
-lsc.iapply(label.filters.EntityExistenceFilter(g.idmap.lst))
+lsc.iapply(label.filters.EntityExistenceFilter(g.node_ids))
 
 # Remove small genesets
 lsc.iapply(label.filters.LabelsetRangeFilterSize(min_val=50))

@@ -39,14 +39,19 @@ class NegativeGeneratorHypergeom(BaseFilter):
         p_thresh = self.p_thresh
         return f"{self.__class__.__name__}({p_thresh=})"
 
-    def compute_pval_mat(self, lsc):
+    def compute_pval_mat(self, lsc, progress_bar):
         """Compute labelset pairwise hyppergeometric p-val."""
         all_entities = set(lsc.entity_ids)
         tot_num_entities = len(all_entities)
         num_labelsets = len(lsc.label_ids)
 
         pval_mat = np.zeros((num_labelsets, num_labelsets))
-        for i, j in combinations(range(num_labelsets), 2):
+        for i, j in tqdm(
+            combinations(range(num_labelsets), 2),
+            desc="Computing hypergeometric p-value matrix",
+            total=(num_labelsets * (num_labelsets - 1) // 2),
+            disable=not progress_bar,
+        ):
             label_id1 = lsc.label_ids[i]
             label_id2 = lsc.label_ids[j]
             labelset1 = lsc.get_labelset(label_id1)
@@ -73,7 +78,7 @@ class NegativeGeneratorHypergeom(BaseFilter):
         return pval_mat, all_entities
 
     def __call__(self, lsc, progress_bar):
-        pval_mat, all_entities = self.compute_pval_mat(lsc)
+        pval_mat, all_entities = self.compute_pval_mat(lsc, progress_bar)
 
         pbar = tqdm(lsc.label_ids, disable=not progress_bar)
         pbar.set_description(f"{self!r}")

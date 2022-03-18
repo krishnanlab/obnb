@@ -55,8 +55,7 @@ class BaseFilter:
         val_getter = self.get_val_getter(lsc)
         mod_fun = self.get_mod_fun(lsc)
 
-        pbar = tqdm(entity_ids, disable=not progress_bar)
-        pbar.set_description(f"{self!r}")
+        pbar = tqdm(entity_ids, desc=f"{self!r}", disable=not progress_bar)
         for entity_id in pbar:
             if self.criterion(val_getter(entity_id)):
                 mod_fun(entity_id)
