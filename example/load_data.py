@@ -41,11 +41,18 @@ def load_data(
 
     # Filter labels
     print(f"Number of labelsets before filtering: {len(lsc.label_ids)}")
-    lsc.iapply(EntityExistenceFilter(g.idmap.lst, log_level=log_level))
-    lsc.iapply(LabelsetRangeFilterSize(min_val=50, log_level=log_level))
+    lsc.iapply(
+        EntityExistenceFilter(g.idmap.lst, log_level=log_level),
+        progress_bar=True,
+    )
+    lsc.iapply(
+        LabelsetRangeFilterSize(min_val=50, log_level=log_level),
+        progress_bar=True,
+    )
     if filter_negative:
         lsc.iapply(
             NegativeGeneratorHypergeom(p_thresh=0.05, log_level=log_level),
+            progress_bar=True,
         )
     print(f"Number of labelsets after filtering: {len(lsc.label_ids)}")
 
