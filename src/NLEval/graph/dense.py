@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 
 from ..typing import List
@@ -14,9 +16,14 @@ from .sparse import SparseGraph
 class DenseGraph(BaseGraph):
     """DenseGraph object storing data using numpy array."""
 
-    def __init__(self, log_level: LogLevel = "WARNING", verbose: bool = False):
+    def __init__(
+        self,
+        log_level: LogLevel = "WARNING",
+        verbose: bool = False,
+        logger: Optional[logging.Logger] = None,
+    ):
         """Initialize DenseGraph object."""
-        super().__init__(log_level=log_level, verbose=verbose)
+        super().__init__(log_level=log_level, verbose=verbose, logger=logger)
         self._mat = np.array([])
 
     def __getitem__(self, key):

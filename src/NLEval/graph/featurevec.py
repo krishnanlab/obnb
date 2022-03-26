@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from itertools import chain
 
 import numpy as np
@@ -7,6 +8,7 @@ from scipy.spatial import distance
 
 from ..typing import INT_TYPE
 from ..typing import LogLevel
+from ..typing import Optional
 from ..typing import Sequence
 from ..util import checkers
 from ..util.idhandler import IDmap
@@ -21,10 +23,11 @@ class FeatureVec(DenseGraph):
         dim=None,
         log_level: LogLevel = "WARNING",
         verbose: bool = True,
+        logger: Optional[logging.Logger] = None,
     ):
         """Initialize FeatureVec object."""
         # TODO: create from dict
-        super().__init__()
+        super().__init__(log_level=log_level, verbose=verbose, logger=logger)
         self.dim = dim
 
     @property
