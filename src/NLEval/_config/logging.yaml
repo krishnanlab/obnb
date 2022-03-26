@@ -2,7 +2,7 @@ version: 1
 disable_existing_loggers: false
 formatters:
   defaultFormatter:
-    format: '%(name)s:%(funcName)s:%(levelname)s:%(message)s'
+    format: '[%(levelname)s] %(name)s - %(funcName)s - %(message)s'
   briefFormatter:
     format: '%(message)s'
 handlers:
