@@ -5,6 +5,8 @@ formatters:
     format: '[%(levelname)s] %(name)s - %(funcName)s - %(message)s'
   briefFormatter:
     format: '%(message)s'
+  preciseFormatter:
+    format: '%(asctime)s [%(levelname)s] %(module)s - %(funcName)s - %(message)s'
 handlers:
   defaultConsoleHandler:
     class: logging.StreamHandler
@@ -14,6 +16,10 @@ handlers:
     class: logging.StreamHandler
     level: DEBUG
     formatter: briefFormatter
+  preciseConsoleHandler:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: preciseFormatter
 loggers:
   NLEval:
     level: INFO
@@ -22,4 +28,8 @@ loggers:
   NLEval_brief:
     level: INFO
     handlers: [briefConsoleHandler]
+    propagate: no
+  NLEval_precise:
+    level: INFO
+    handlers: [preciseConsoleHandler]
     propagate: no
