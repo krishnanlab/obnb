@@ -315,8 +315,8 @@ class LabelsetCollection(idhandler.IDprop):
             splitter: A splitter function that split the entities based on
                 their labels and optionally the an entity.
             property_name: Name of the entity property used by the splitter. Do
-                not use any property and use only the labels if not specified
-                (default: :obj:`None`).
+                not use any property and use only the labels if set to
+                :obj:`None`.
             target_ids: Tuple of entity ids for the output masks and label
                 vector to align with. Use ``self.entity_ids`` if not specified.
             labelset_name: Indicate which specific labelset to split. Split

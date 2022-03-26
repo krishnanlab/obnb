@@ -129,11 +129,19 @@ class LabelsetRangeFilterSplit(BaseRangeFilter):
         self,
         min_val: float,
         splitter: Splitter,
+        count_negatives: bool = True,
         **kwargs,
     ):
-        """Initialize LabelsetRangeFilterTrainTestPos object."""
+        """Initialize LabelsetRangeFilterTrainTestPos object.
+
+        Args:
+            count_negatives: Whether or not to filter based on the number of
+                negatives in each split (default: ``True``).
+
+        """
         super().__init__(min_val=min_val, **kwargs)
         self.splitter = splitter
+        self.count_negatives = count_negatives
         self.kwargs = kwargs
 
     @property
@@ -150,14 +158,22 @@ class LabelsetRangeFilterSplit(BaseRangeFilter):
 
         def val_getter(label_id):
             y_all, masks = lsc.split(self.splitter, **self.kwargs)
+            neg_idx = lsc.entity[lsc.get_negative(label_id)]
+            self.logger.debug(f"{label_id = } {neg_idx = }")
+            # TODO: make label_ids to index mapping?
             y = y_all[:, lsc.label_ids.index(label_id)]
-            min_num_pos = np.inf
+            min_num_pos = min_num_neg = np.inf
             for mask in masks.values():
                 for i in range(mask.shape[1]):
                     num_pos = y[mask[:, i]].sum()
+                    masked_idx = np.where(mask[:, i])[0]
                     min_num_pos = min(min_num_pos, num_pos)
-            self.logger.info(f"{label_id}, {min_num_pos=}")
-            return min_num_pos
+                    if self.count_negatives:
+                        num_neg = np.intersect1d(neg_idx, masked_idx).size
+                        self.logger.debug(f"{num_neg = }, {masked_idx = }")
+                        min_num_neg = min(min_num_neg, num_neg)
+            self.logger.info(f"{label_id}, {min_num_pos=}, {min_num_neg=}")
+            return min(min_num_pos, min_num_neg)
 
         return val_getter
 

@@ -7,6 +7,15 @@ from NLEval.label import split
 
 class TestFilter(unittest.TestCase):
     def setUp(self):
+        """
+                a   b   c   d   e   f   g   h
+        -------------------------------------
+        Group1  x   x   x
+        Group2      x       x
+        Group3                  x   x   x
+        Group4  x       x           x
+        Group5  x                           x
+        """
         self.lsc = LabelsetCollection()
         self.lsc.add_labelset(["a", "b", "c"], "Group1")
         self.lsc.add_labelset(["b", "d"], "Group2")
@@ -416,6 +425,7 @@ class TestFilter(unittest.TestCase):
         self.lsc.entity.new_property("test_property", 0, int)
         for i, j in enumerate(["a", "b", "c", "d", "e", "f", "g", "h"]):
             self.lsc.entity.set_property(j, "test_property", i)
+        log_level = "INFO"
 
         # Train = [a, b], Test = [c, d, e, f, g, h], Group3 does not have any
         # postives in the training split, hence should be removed
@@ -425,12 +435,32 @@ class TestFilter(unittest.TestCase):
                 filters.LabelsetRangeFilterSplit(
                     1,
                     splitter,
+                    count_negatives=False,
                     property_name="test_property",
+                    log_level=log_level,
                 ),
             )
             self.assertEqual(
                 lsc.label_ids,
                 ["Group1", "Group2", "Group4", "Group5"],
+            )
+
+        # Same as above, but take into acount of negatives. Group1 is removed
+        # due to the lack of negatives (all negatives in training set)
+        splitter = split.ThresholdPartition(2)
+        with self.subTest(splitter=splitter):
+            lsc = self.lsc.apply(
+                filters.LabelsetRangeFilterSplit(
+                    1,
+                    splitter,
+                    count_negatives=True,
+                    property_name="test_property",
+                    log_level=log_level,
+                ),
+            )
+            self.assertEqual(
+                lsc.label_ids,
+                ["Group2", "Group4", "Group5"],
             )
 
         # Train = [a], Test = [b, c, d, e, f, g, h], Both Group2 and Group3 do
@@ -441,7 +471,9 @@ class TestFilter(unittest.TestCase):
                 filters.LabelsetRangeFilterSplit(
                     1,
                     splitter,
+                    count_negatives=False,
                     property_name="test_property",
+                    log_level=log_level,
                 ),
             )
             self.assertEqual(
@@ -515,7 +547,9 @@ class TestFilter(unittest.TestCase):
                     filters.LabelsetRangeFilterSplit(
                         1,
                         splitter,
+                        count_negatives=False,
                         property_name="test_property",
+                        log_level=log_level,
                     ),
                 )
 
