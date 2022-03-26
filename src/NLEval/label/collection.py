@@ -298,7 +298,7 @@ class LabelsetCollection(idhandler.IDprop):
 
         return y_out
 
-    @lru_cache
+    @lru_cache  # noqa: B019
     def split(  # TODO: Reduce cylic complexity..
         self,
         splitter: Splitter,

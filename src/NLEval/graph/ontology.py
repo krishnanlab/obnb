@@ -85,7 +85,7 @@ class OntologyGraph(DirectedSparseGraph):
         else:
             return self._ancestors.__wrapped__(self, node)
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=None)  # noqa: B019
     def _ancestors(self, node: Union[str, int]) -> Set[str]:
         node_idx = self.get_node_idx(node)
         if len(self._edge_data[node_idx]) == 0:  # root node
@@ -197,7 +197,7 @@ class OntologyGraph(DirectedSparseGraph):
         """
         return self.idmap.get_property(self.get_node_id(node), "node_name")
 
-    @functools.lru_cache(maxsize=None)
+    @functools.lru_cache(maxsize=None)  # noqa: B019
     def _aggregate_node_attrs(self, node_idx: int) -> List[str]:
         node_attr: Iterable[str]
         if len(self._rev_edge_data[node_idx]) == 0:  # is leaf node
