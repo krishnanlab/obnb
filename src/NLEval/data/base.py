@@ -1,8 +1,10 @@
+import logging
 import os
 import os.path as osp
 
 from .. import logger
 from ..typing import List
+from ..typing import LogLevel
 from ..util.path import cleandir
 
 
@@ -21,6 +23,7 @@ class BaseData:
         root: str,
         redownload: bool = False,
         reprocess: bool = False,
+        log_level: LogLevel = "INFO",
         **kwargs,
     ):
         """Initialize BaseData object.
@@ -38,10 +41,16 @@ class BaseData:
         self.root = root
         self.redownload = redownload
         self.reprocess = reprocess
+        self.log_level = log_level
 
+        self._setup_process_logger()
         self._download()
         self._process()
         self.load_processed_data()
+
+    def _setup_process_logger(self):
+        self.process_logger = logging.getLogger("NLEval_precise")
+        self.process_logger.setLevel(getattr(logging, self.log_level))
 
     @property
     def classname(self) -> str:
@@ -57,6 +66,11 @@ class BaseData:
     def processed_dir(self) -> str:
         """Return raw file directory."""
         return cleandir(osp.join(self.root, self.classname, "processed"))
+
+    @property
+    def info_dir(self) -> str:
+        """Return info file directory."""
+        return cleandir(osp.join(self.root, self.classname, "info"))
 
     @property
     def raw_files(self) -> List[str]:

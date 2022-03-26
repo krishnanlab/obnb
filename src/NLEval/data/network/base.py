@@ -79,8 +79,7 @@ class BaseNdexData(BaseData, SparseGraph):
         cx_graph = SparseGraph(
             weighted=self.weighted,
             directed=self.directed,
-            log_level=self.log_level,
-            verbose=self.verbose,
+            logger=self.process_logger,
         )
         cx_graph.read_cx_stream_file(self.raw_file_path(0), **self.cx_kwargs)
         if self.largest_comp:
