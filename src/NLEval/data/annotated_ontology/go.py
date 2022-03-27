@@ -1,7 +1,6 @@
 import mygene
 from tqdm import tqdm
 
-from ... import logger
 from ...graph import OntologyGraph
 from ...label import LabelsetCollection
 from ...label.filters import LabelsetPairwiseFilterJaccard
@@ -89,14 +88,14 @@ class GeneOntology(BaseAnnotatedOntologyData):
             min_size=self.min_size,
             namespace=self.namespace,
         )
-        logger.info(lsc.stats())
+        self.plogger.info(lsc.stats())
 
         for filter_ in self.filters:
             lsc.iapply(filter_, progress_bar=True)
-            logger.info(lsc.stats())
+            self.plogger.info(lsc.stats())
 
         lsc.export_gmt(self.processed_file_path(0))
-        logger.info(f"Saved processed file {self.processed_file_path(0)}")
+        self.plogger.info(f"Saved processed file {self.processed_file_path(0)}")
 
 
 class GOBP(GeneOntology):

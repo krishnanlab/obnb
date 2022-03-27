@@ -2,7 +2,6 @@ import logging
 import os
 import os.path as osp
 
-from .. import logger
 from ..typing import List
 from ..typing import LogLevel
 from ..util.path import cleandir
@@ -46,11 +45,20 @@ class BaseData:
         self._setup_process_logger()
         self._download()
         self._process()
+        self.plogger.removeHandler(self._filehdlr)
+
         self.load_processed_data()
 
     def _setup_process_logger(self):
-        self.process_logger = logging.getLogger("NLEval_precise")
-        self.process_logger.setLevel(getattr(logging, self.log_level))
+        """Set up process logger for data processing steps."""
+        os.makedirs(self.info_dir, exist_ok=True)
+        self.plogger = logging.getLogger("NLEval_precise")
+        self.plogger.setLevel(getattr(logging, self.log_level))
+
+        logpath = osp.join(self.info_dir, "run.log")
+        self._filehdlr = logging.FileHandler(logpath)
+        self._filehdlr.setFormatter(self.plogger.handlers[0].formatter)
+        self.plogger.addHandler(self._filehdlr)
 
     @property
     def classname(self) -> str:
@@ -116,7 +124,7 @@ class BaseData:
         """Check to see if files downloaded first before downloading."""
         os.makedirs(self.raw_dir, exist_ok=True)
         if self.redownload or not self.download_completed():
-            logger.info(f"Start downloading {self.classname}...")
+            self.plogger.info(f"Start downloading {self.classname}...")
             self.download()
 
     def process(self):
@@ -127,5 +135,5 @@ class BaseData:
         """Check to see if processed file exist and process if not."""
         os.makedirs(self.processed_dir, exist_ok=True)
         if self.redownload or self.reprocess or not self.process_completed():
-            logger.info(f"Start processing {self.classname}...")
+            self.plogger.info(f"Start processing {self.classname}...")
             self.process()

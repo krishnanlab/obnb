@@ -5,7 +5,6 @@ import pandas as pd
 import requests
 from tqdm import tqdm
 
-from ... import logger
 from ...graph import OntologyGraph
 from ...label import LabelsetCollection
 from ...label.filters import LabelsetPairwiseFilterJaccard
@@ -71,7 +70,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
         ]
 
     def download_annotations(self):
-        logger.info(f"Download annotation from: {self.annotation_url}")
+        self.plogger.info(f"Download annotation from: {self.annotation_url}")
         resp = requests.get(self.annotation_url)
         annotation_file_name = self.annotation_file_name
         with open(osp.join(self.raw_dir, annotation_file_name), "wb") as f:
@@ -100,11 +99,11 @@ class DisGeNet(BaseAnnotatedOntologyData):
         g.complete_node_attrs(pbar=True)
 
         lsc = LabelsetCollection.from_ontology_graph(g, min_size=self.min_size)
-        logger.info(lsc.stats())
+        self.plogger.info(lsc.stats())
 
         for filter_ in self.filters:
             lsc.iapply(filter_, progress_bar=True)
-            logger.info(lsc.stats())
+            self.plogger.info(lsc.stats())
 
         lsc.export_gmt(self.processed_file_path(0))
-        logger.info(f"Saved processed file {self.processed_file_path(0)}")
+        self.plogger.info(f"Saved processed file {self.processed_file_path(0)}")
