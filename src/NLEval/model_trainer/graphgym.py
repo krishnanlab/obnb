@@ -67,8 +67,9 @@ class GraphGymTrainer(GNNTrainer):
         assert_cfg(cfg_gg)
         # Only support multilabel classification
         cfg_gg.dataset.task_type = "classification"
-        dump_cfg(cfg_gg)
 
+        pyg_gg.set_out_dir(cfg_gg.out_dir, cfg_file)
+        dump_cfg(cfg_gg)
         pyg_gg.set_run_dir(cfg_gg.out_dir)
         pyg_gg.set_printing()  # TODO: remove log file? Use only for training..
 
