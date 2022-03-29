@@ -1,7 +1,9 @@
+import logging
 from copy import deepcopy
 
 from ..typing import List
 from ..typing import LogLevel
+from ..typing import Optional
 from ..typing import Tuple
 from ..typing import Union
 from ..util import checkers
@@ -12,16 +14,25 @@ from ..util.logger import get_logger
 class BaseGraph:
     """Base Graph object that contains basic graph operations."""
 
-    def __init__(self, log_level: LogLevel = "WARNING", verbose: bool = False):
+    def __init__(
+        self,
+        log_level: LogLevel = "WARNING",
+        verbose: bool = False,
+        logger: Optional[logging.Logger] = None,
+    ):
         """Initialize BaseGraph object."""
-        self.log_level = log_level
-        self.idmap = idhandler.IDmap()
         self.verbose = verbose
-        self.logger = get_logger(
-            self.__class__.__name__,
-            log_level=log_level,
-            verbose=verbose,
-        )
+        if logger is None:
+            self.log_level = log_level
+            self.logger = get_logger(
+                self.__class__.__name__,
+                log_level=log_level,
+                verbose=verbose,
+            )
+        else:
+            self.logger = logger
+            self.log_level = logging.getLevelName(logger.getEffectiveLevel())
+        self.idmap = idhandler.IDmap()
 
     @property
     def node_ids(self) -> Tuple[str, ...]:

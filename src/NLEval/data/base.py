@@ -1,8 +1,9 @@
+import logging
 import os
 import os.path as osp
 
-from .. import logger
 from ..typing import List
+from ..typing import LogLevel
 from ..util.path import cleandir
 
 
@@ -21,6 +22,7 @@ class BaseData:
         root: str,
         redownload: bool = False,
         reprocess: bool = False,
+        log_level: LogLevel = "INFO",
         **kwargs,
     ):
         """Initialize BaseData object.
@@ -38,10 +40,25 @@ class BaseData:
         self.root = root
         self.redownload = redownload
         self.reprocess = reprocess
+        self.log_level = log_level
 
+        self._setup_process_logger()
         self._download()
         self._process()
+        self.plogger.removeHandler(self._filehdlr)
+
         self.load_processed_data()
+
+    def _setup_process_logger(self):
+        """Set up process logger for data processing steps."""
+        os.makedirs(self.info_dir, exist_ok=True)
+        self.plogger = logging.getLogger("NLEval_precise")
+        self.plogger.setLevel(getattr(logging, self.log_level))
+
+        logpath = osp.join(self.info_dir, "run.log")
+        self._filehdlr = logging.FileHandler(logpath)
+        self._filehdlr.setFormatter(self.plogger.handlers[0].formatter)
+        self.plogger.addHandler(self._filehdlr)
 
     @property
     def classname(self) -> str:
@@ -57,6 +74,11 @@ class BaseData:
     def processed_dir(self) -> str:
         """Return raw file directory."""
         return cleandir(osp.join(self.root, self.classname, "processed"))
+
+    @property
+    def info_dir(self) -> str:
+        """Return info file directory."""
+        return cleandir(osp.join(self.root, self.classname, "info"))
 
     @property
     def raw_files(self) -> List[str]:
@@ -102,7 +124,7 @@ class BaseData:
         """Check to see if files downloaded first before downloading."""
         os.makedirs(self.raw_dir, exist_ok=True)
         if self.redownload or not self.download_completed():
-            logger.info(f"Start downloading {self.classname}...")
+            self.plogger.info(f"Start downloading {self.classname}...")
             self.download()
 
     def process(self):
@@ -113,5 +135,5 @@ class BaseData:
         """Check to see if processed file exist and process if not."""
         os.makedirs(self.processed_dir, exist_ok=True)
         if self.redownload or self.reprocess or not self.process_completed():
-            logger.info(f"Start processing {self.classname}...")
+            self.plogger.info(f"Start processing {self.classname}...")
             self.process()

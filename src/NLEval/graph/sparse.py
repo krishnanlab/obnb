@@ -1,4 +1,5 @@
 import itertools
+import logging
 
 import numpy as np
 
@@ -24,9 +25,10 @@ class SparseGraph(BaseGraph):
         self_loops: bool = False,
         log_level: LogLevel = "WARNING",
         verbose: bool = False,
+        logger: Optional[logging.Logger] = None,
     ):
         """Initialize SparseGraph object."""
-        super().__init__(log_level=log_level, verbose=verbose)
+        super().__init__(log_level=log_level, verbose=verbose, logger=logger)
         self._edge_data: EdgeData = []
         self.weighted = weighted
         self.directed = directed
@@ -90,8 +92,7 @@ class SparseGraph(BaseGraph):
             weighted=self.weighted,
             directed=self.directed,
             self_loops=self.self_loops,
-            log_level=self.log_level,
-            verbose=self.verbose,
+            logger=self.logger,
         )
 
         # Add nodes to new graph and make sure all nodes are present
@@ -730,6 +731,7 @@ class DirectedSparseGraph(SparseGraph):
         weighted: bool = True,
         log_level: LogLevel = "WARNING",
         verbose: bool = False,
+        logger: Optional[logging.Logger] = None,
     ):
         """Initialize the directed sparse graoh."""
         super().__init__(
@@ -737,6 +739,7 @@ class DirectedSparseGraph(SparseGraph):
             directed=True,
             log_level=log_level,
             verbose=verbose,
+            logger=logger,
         )
         self._rev_edge_data: EdgeData = []
 

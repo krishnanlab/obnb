@@ -1,5 +1,6 @@
 import functools
 import itertools
+import logging
 from collections import defaultdict
 from contextlib import contextmanager
 
@@ -35,9 +36,14 @@ class OntologyGraph(DirectedSparseGraph):
 
     """
 
-    def __init__(self, log_level: LogLevel = "WARNING", verbose: bool = False):
+    def __init__(
+        self,
+        log_level: LogLevel = "WARNING",
+        verbose: bool = False,
+        logger: Optional[logging.Logger] = None,
+    ):
         """Initialize the ontology graph."""
-        super().__init__(log_level=log_level, verbose=verbose)
+        super().__init__(log_level=log_level, verbose=verbose, logger=logger)
         self.idmap = idhandler.IDprop()
         self.idmap.new_property("node_attr", default_val=None)
         self.idmap.new_property("node_name", default_val=None)
