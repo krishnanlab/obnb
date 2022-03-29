@@ -42,23 +42,25 @@ class BaseData:
         self.reprocess = reprocess
         self.log_level = log_level
 
-        self._setup_process_logger()
+        file_handler = self._setup_process_logger()
         self._download()
         self._process()
-        self.plogger.removeHandler(self._filehdlr)
+        self.plogger.removeHandler(file_handler)
 
         self.load_processed_data()
 
-    def _setup_process_logger(self):
-        """Set up process logger for data processing steps."""
+    def _setup_process_logger(self) -> logging.FileHandler:
+        """Set up process logger and file handler for data processing steps."""
         os.makedirs(self.info_dir, exist_ok=True)
         self.plogger = logging.getLogger("NLEval_precise")
         self.plogger.setLevel(getattr(logging, self.log_level))
 
         logpath = osp.join(self.info_dir, "run.log")
-        self._filehdlr = logging.FileHandler(logpath)
-        self._filehdlr.setFormatter(self.plogger.handlers[0].formatter)
-        self.plogger.addHandler(self._filehdlr)
+        file_handler = logging.FileHandler(logpath)
+        file_handler.setFormatter(self.plogger.handlers[0].formatter)
+        self.plogger.addHandler(file_handler)
+
+        return file_handler
 
     @property
     def classname(self) -> str:
