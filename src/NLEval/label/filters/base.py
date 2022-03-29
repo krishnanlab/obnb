@@ -1,5 +1,6 @@
 from tqdm import tqdm
 
+from ...typing import List
 from ...typing import LogLevel
 from ...util.logger import get_logger
 
@@ -46,9 +47,16 @@ class BaseFilter:
             verbose=verbose,
         )
 
+    @property
+    def params(self) -> List[str]:
+        """Parameter list."""
+        return []
+
     def __repr__(self):
         """Return name of the filer."""
-        return self.__class__.__name__
+        name = self.__class__.__name__
+        params = ", ".join([f"{i}={self.__dict__[i]}" for i in self.params])
+        return f"{name}({params})"
 
     def __call__(self, lsc, progress_bar):
         entity_ids = self.get_ids(lsc)

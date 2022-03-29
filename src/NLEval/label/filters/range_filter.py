@@ -1,5 +1,6 @@
 import numpy as np
 
+from ...typing import List
 from ...typing import Optional
 from ..collection import Splitter
 from .base import BaseFilter
@@ -31,10 +32,10 @@ class BaseRangeFilter(BaseFilter):
         self.min_val = min_val
         self.max_val = max_val
 
-    def __repr__(self):
-        """Return name of the RangeFilter and its parameters."""
-        min_val, max_val = self.min_val, self.max_val
-        return f"{super().__repr__()}({min_val=}, {max_val=})"
+    @property
+    def params(self) -> List[str]:
+        """Parameter list."""
+        return ["min_val", "max_val"]
 
     def criterion(self, val):
         if self.min_val is not None:
