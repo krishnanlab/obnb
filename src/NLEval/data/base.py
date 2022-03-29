@@ -6,8 +6,8 @@ from ..typing import Any
 from ..typing import List
 from ..typing import LogLevel
 from ..typing import Optional
-from ..util.logger import attach_file_handler
 from ..util.logger import get_logger
+from ..util.logger import log_file_context
 from ..util.path import cleandir
 from ..util.path import hash_to_hexdigest
 
@@ -48,14 +48,15 @@ class BaseData:
         # Redownload > reprocess
         reprocess = reprocess or redownload
 
-        file_handler = self._setup_process_logger()
-        self._download(redownload)
-        self._process(reprocess)
-        self.plogger.removeHandler(file_handler)
+        self._setup_process_logger()
+        log_path = osp.join(self.info_dir, "run.log")
+        with log_file_context(self.plogger, log_path):
+            self._download(redownload)
+            self._process(reprocess)
 
         self.load_processed_data()
 
-    def _setup_process_logger(self) -> logging.FileHandler:
+    def _setup_process_logger(self):
         """Set up process logger and file handler for data processing steps."""
         os.makedirs(self.info_dir, exist_ok=True)
         self.plogger = get_logger(
@@ -63,11 +64,6 @@ class BaseData:
             base_logger="NLEval_precise",
             log_level=self.log_level,
         )
-
-        log_path = osp.join(self.info_dir, "run.log")
-        file_handler = attach_file_handler(self.plogger, log_path)
-
-        return file_handler
 
     @property
     def classname(self) -> str:
