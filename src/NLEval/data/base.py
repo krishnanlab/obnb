@@ -2,9 +2,14 @@ import logging
 import os
 import os.path as osp
 
+from ..typing import Any
 from ..typing import List
 from ..typing import LogLevel
+from ..typing import Optional
+from ..util.logger import attach_file_handler
+from ..util.logger import get_logger
 from ..util.path import cleandir
+from ..util.path import hash_to_hexdigest
 
 
 class BaseData:
@@ -53,13 +58,14 @@ class BaseData:
     def _setup_process_logger(self) -> logging.FileHandler:
         """Set up process logger and file handler for data processing steps."""
         os.makedirs(self.info_dir, exist_ok=True)
-        self.plogger = logging.getLogger("NLEval_precise")
-        self.plogger.setLevel(getattr(logging, self.log_level))
+        self.plogger = get_logger(
+            None,
+            base_logger="NLEval_precise",
+            log_level=self.log_level,
+        )
 
-        logpath = osp.join(self.info_dir, "run.log")
-        file_handler = logging.FileHandler(logpath)
-        file_handler.setFormatter(self.plogger.handlers[0].formatter)
-        self.plogger.addHandler(file_handler)
+        log_path = osp.join(self.info_dir, "run.log")
+        file_handler = attach_file_handler(self.plogger, log_path)
 
         return file_handler
 
