@@ -38,13 +38,14 @@ class BaseData:
         super().__init__(**kwargs)
 
         self.root = root
-        self.redownload = redownload
-        self.reprocess = reprocess
         self.log_level = log_level
 
+        # Redownload > reprocess
+        reprocess = reprocess or redownload
+
         file_handler = self._setup_process_logger()
-        self._download()
-        self._process()
+        self._download(redownload)
+        self._process(reprocess)
         self.plogger.removeHandler(file_handler)
 
         self.load_processed_data()
@@ -122,10 +123,10 @@ class BaseData:
         """Download raw files."""
         raise NotImplementedError
 
-    def _download(self):
+    def _download(self, redownload: bool):
         """Check to see if files downloaded first before downloading."""
         os.makedirs(self.raw_dir, exist_ok=True)
-        if self.redownload or not self.download_completed():
+        if redownload or not self.download_completed():
             self.plogger.info(f"Start downloading {self.classname}...")
             self.download()
 
@@ -133,9 +134,9 @@ class BaseData:
         """Process raw files."""
         raise NotImplementedError
 
-    def _process(self):
+    def _process(self, reprocess: bool):
         """Check to see if processed file exist and process if not."""
         os.makedirs(self.processed_dir, exist_ok=True)
-        if self.redownload or self.reprocess or not self.process_completed():
+        if reprocess or not self.process_completed():
             self.plogger.info(f"Start processing {self.classname}...")
             self.process()
