@@ -23,10 +23,15 @@ class BaseExistenceFilter(BaseFilter):
         self.target_lst = target_lst
         self.remove_specified = remove_specified
 
-    def __repr__(self):
-        """Return name of the ExistenceFilter and its parameters."""
-        remove_specified = self.remove_specified
-        return f"{super().__repr__()}({remove_specified=})"
+    @property
+    def params(self) -> List[str]:
+        """Parameter list."""
+        return ["remove_specified"]
+
+    @property
+    def all_params(self) -> List[str]:
+        """All parameter list."""
+        return ["target_lst"] + self.params
 
     def criterion(self, val):
         if self.remove_specified:

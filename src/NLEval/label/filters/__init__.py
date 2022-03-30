@@ -1,4 +1,5 @@
 """Filter objecst for preprocessing the labelset collection."""
+from .base import Compose
 from .existence_filter import EntityExistenceFilter
 from .existence_filter import LabelsetExistenceFilter
 from .negative_generator import NegativeGeneratorHypergeom
@@ -9,6 +10,7 @@ from .range_filter import LabelsetRangeFilterSize
 from .range_filter import LabelsetRangeFilterSplit
 
 __all__ = [
+    "Compose",
     "EntityExistenceFilter",
     "LabelsetExistenceFilter",
     "EntityRangeFilterNoccur",

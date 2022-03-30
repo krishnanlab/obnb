@@ -5,6 +5,7 @@ from copy import deepcopy
 import numpy as np
 
 from . import checkers
+from ..typing import Dict
 from ..typing import ITERABLE_TYPE
 from ..typing import List
 from .exceptions import IDExistsError
@@ -17,6 +18,10 @@ class IDlst:
     """ID list object that stores a list of IDs"""
 
     def __init__(self):
+        self.reset()
+
+    def reset(self):
+        """Reset ID list."""
         self._lst = []
 
     def __iter__(self):
@@ -186,7 +191,6 @@ class IDmap(IDlst):
 
     def __init__(self):
         super().__init__()
-        self._map = {}
 
     def __contains__(self, identifier):
         checkers.checkType("ID", str, identifier)
@@ -227,8 +231,8 @@ class IDmap(IDlst):
                 new IDmap. If set to None, then leave as empty.
 
         """
-        self._lst = []
-        self._map = {}
+        super().reset()
+        self._map: Dict[str, int] = {}
 
         if identifiers is not None:
             for identifier in identifiers:
@@ -300,6 +304,10 @@ class IDprop(IDmap):
 
     def __init__(self):
         super().__init__()
+
+    def reset(self):
+        """Reset ID properties."""
+        super().reset()
         self._prop_default_val = {}
         self._prop_default_type = {}
         self._prop = {}

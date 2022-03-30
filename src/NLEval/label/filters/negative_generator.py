@@ -4,6 +4,7 @@ import numpy as np
 from scipy.stats import hypergeom
 from tqdm import tqdm
 
+from ...typing import List
 from .base import BaseFilter
 
 
@@ -34,10 +35,10 @@ class NegativeGeneratorHypergeom(BaseFilter):
         self.p_thresh = p_thresh
         super().__init__(**kwargs)
 
-    def __repr__(self):
-        """Return name of the NegativeGeneratorHypergeom and its parameters."""
-        p_thresh = self.p_thresh
-        return f"{self.__class__.__name__}({p_thresh=})"
+    @property
+    def params(self) -> List[str]:
+        """Parameter list."""
+        return ["p_thresh"]
 
     def compute_pval_mat(self, lsc, progress_bar):
         """Compute labelset pairwise hyppergeometric p-val."""

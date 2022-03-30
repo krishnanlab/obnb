@@ -1,5 +1,8 @@
 from tqdm import tqdm
 
+from ...typing import Any
+from ...typing import Dict
+from ...typing import List
 from ...typing import LogLevel
 from ...util.logger import get_logger
 
@@ -46,9 +49,29 @@ class BaseFilter:
             verbose=verbose,
         )
 
+    @property
+    def params(self) -> List[str]:
+        """Parameter list."""
+        return []
+
+    @property
+    def all_params(self) -> List[str]:
+        """All parameter list."""
+        return self.params
+
     def __repr__(self):
         """Return name of the filer."""
-        return self.__class__.__name__
+        name = self.__class__.__name__
+        params = ", ".join([f"{i}={self.__dict__[i]}" for i in self.params])
+        return f"{name}({params})"
+
+    def to_config(self) -> Dict[str, Any]:
+        """Turn into a config dict."""
+        return {
+            self.__class__.__name__: {
+                param: self.__dict__[param] for param in self.all_params
+            },
+        }
 
     def __call__(self, lsc, progress_bar):
         entity_ids = self.get_ids(lsc)
@@ -68,3 +91,26 @@ class BaseFilter:
     def mod_name(self):
         """Name of modification to entity."""
         return "UNKNOWN"
+
+
+class Compose(BaseFilter):
+    """Composition of filters."""
+
+    def __init__(self, *filters):
+        """Initialize composition."""
+        super().__init__()
+        self.filters = filters
+
+    def __repr__(self):
+        """Return namaes of each filter."""
+        reprs = "\n".join(f"\t- {filter_!r}" for filter_ in self.filters)
+        return f"Composition of filters:\n{reprs}"
+
+    def to_config(self):
+        """Turn into a list of config dict."""
+        return [filter_.to_config() for filter_ in self.filters]
+
+    def __call__(self, lsc, progress_bar):
+        for filter_ in self.filters:
+            print(lsc.stats())
+            filter_.__call__(lsc, progress_bar)
