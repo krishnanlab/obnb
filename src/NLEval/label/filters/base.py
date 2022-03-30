@@ -61,7 +61,7 @@ class BaseFilter:
         return f"{name}({params})"
 
     def to_config(self) -> Dict[str, Any]:
-        """Turn into a config file"""
+        """Turn into a config file."""
         return {
             self.__class__.__name__: {
                 param: self.__dict__[param] for param in self.params

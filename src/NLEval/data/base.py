@@ -131,7 +131,7 @@ class BaseData:
             for processed_file in self.processed_files
         )
 
-    def load_processed_data(self):
+    def load_processed_data(self, path: Optional[str] = None):
         """Load processed data into the data object."""
         raise NotImplementedError
 

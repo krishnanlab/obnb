@@ -76,7 +76,8 @@ class BaseNdexData(BaseData, SparseGraph):
         cx_graph.save_npz(self.processed_file_path(0), self.weighted)
         self.plogger.info(f"Saved processed file {self.processed_file_path(0)}")
 
-    def load_processed_data(self):
+    def load_processed_data(self, path: Optional[str] = None):
         """Load processed network."""
-        self.plogger.info(f"Load processed file {self.processed_file_path(0)}")
-        self.read_npz(self.processed_file_path(0))
+        path = path or self.processed_file_path(0)
+        self.plogger.info(f"Load processed file {path}")
+        self.read_npz(path)
