@@ -28,6 +28,11 @@ class BaseExistenceFilter(BaseFilter):
         """Parameter list."""
         return ["remove_specified"]
 
+    @property
+    def all_params(self) -> List[str]:
+        """All parameter list."""
+        return ["target_lst"] + self.params
+
     def criterion(self, val):
         if self.remove_specified:
             return val in self.target_lst
