@@ -87,4 +87,4 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
         """Load processed labels from GMT."""
         path = path or self.processed_file_path(0)
         self.plogger.info(f"Load processed file {path}")
-        self.read_gmt(path)
+        self.read_gmt(path, reload=True)

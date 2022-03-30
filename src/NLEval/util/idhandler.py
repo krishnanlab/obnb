@@ -17,6 +17,10 @@ class IDlst:
     """ID list object that stores a list of IDs"""
 
     def __init__(self):
+        self.reset()
+
+    def reset(self):
+        """Reset ID list."""
         self._lst = []
 
     def __iter__(self):
@@ -186,7 +190,6 @@ class IDmap(IDlst):
 
     def __init__(self):
         super().__init__()
-        self._map = {}
 
     def __contains__(self, identifier):
         checkers.checkType("ID", str, identifier)
@@ -227,7 +230,7 @@ class IDmap(IDlst):
                 new IDmap. If set to None, then leave as empty.
 
         """
-        self._lst = []
+        super().reset()
         self._map = {}
 
         if identifiers is not None:
@@ -300,6 +303,10 @@ class IDprop(IDmap):
 
     def __init__(self):
         super().__init__()
+
+    def reset(self):
+        """Reset ID properties."""
+        super().reset()
         self._prop_default_val = {}
         self._prop_default_type = {}
         self._prop = {}

@@ -47,6 +47,10 @@ class LabelsetCollection(idhandler.IDprop):
     def __init__(self):
         """Initialize LabelsetCollection object."""
         super().__init__()
+
+    def reset(self):
+        """Reset all labelsets and entities."""
+        super().reset()
         self.entity = idhandler.IDprop()
         self.entity.new_property("Noccur", 0, int)
         self.new_property("Info", "NA", str)
@@ -624,14 +628,17 @@ class LabelsetCollection(idhandler.IDprop):
         lsc.read_ontology_graph(graph, min_size=min_size, namespace=namespace)
         return lsc
 
-    def read_gmt(self, path: str, sep: str = "\t"):
+    def read_gmt(self, path: str, sep: str = "\t", reload: bool = False):
         """Load data from Gene Matrix Transpose `.gmt` file.
 
         Args:
             path: path to the `.gmt` file.
             sep: seperator used in the GMT file.
+            reload: Remove existing labelsets before loading if set to True.
 
         """
+        if reload:
+            self.reset()
         with open(path, "r") as f:
             for line in f:
                 label_id, label_info, *lst = line.strip().split(sep)

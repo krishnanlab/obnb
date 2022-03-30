@@ -175,10 +175,11 @@ class BaseData:
             if retransform:
                 shutil.rmtree(cache_dir)
             else:
+                cache_path = osp.join(cache_dir, "data.gmt")
                 self.plogger.info(
-                    f"Loading cached transformed data from {cache_dir}",
+                    f"Loading cached transformed data from {cache_path}",
                 )
-                self.load_processed_data(osp.join(cache_dir, "data.gmt"))
+                self.load_processed_data(cache_path)
                 return
 
         os.makedirs(cache_dir)
