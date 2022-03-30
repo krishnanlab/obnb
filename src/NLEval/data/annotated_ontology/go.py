@@ -88,11 +88,11 @@ class GeneOntology(BaseAnnotatedOntologyData):
             min_size=self.min_size,
             namespace=self.namespace,
         )
-        self.plogger.info(lsc.stats())
+        self.plogger.info(f"Raw stats:\n{lsc.stats()}")
 
         for filter_ in self.filters:
             lsc.iapply(filter_, progress_bar=True)
-            self.plogger.info(lsc.stats())
+            self.plogger.info(f"Applied {filter_}:\n{lsc.stats()}")
 
         lsc.export_gmt(self.processed_file_path(0))
         self.plogger.info(f"Saved processed file {self.processed_file_path(0)}")

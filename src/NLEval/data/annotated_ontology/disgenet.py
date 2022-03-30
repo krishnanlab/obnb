@@ -99,11 +99,11 @@ class DisGeNet(BaseAnnotatedOntologyData):
         g.complete_node_attrs(pbar=True)
 
         lsc = LabelsetCollection.from_ontology_graph(g, min_size=self.min_size)
-        self.plogger.info(lsc.stats())
+        self.plogger.info(f"Raw stats:\n{lsc.stats()}")
 
         for filter_ in self.filters:
             lsc.iapply(filter_, progress_bar=True)
-            self.plogger.info(lsc.stats())
+            self.plogger.info(f"Applied {filter_}:\n{lsc.stats()}")
 
         lsc.export_gmt(self.processed_file_path(0))
         self.plogger.info(f"Saved processed file {self.processed_file_path(0)}")

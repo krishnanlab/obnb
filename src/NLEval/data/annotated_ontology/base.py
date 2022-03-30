@@ -77,8 +77,11 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
 
     def transform(self, transformation: Any, cache_dir: str):
         """Apply a transformation to the loaded data."""
-        self.iapply(transformation)
-        # TODO: need to log stuff
+        self.plogger.info(f"Before transformation:\n{self.stats()}")
+        self.plogger.info(f"Applying transformation:\n{transformation}")
+        self.iapply(transformation, progress_bar=True)
+        self.plogger.info(f"After transformation:\n{self.stats()}")
+
         out_path = osp.join(cache_dir, "data.gmt")
         self.export_gmt(out_path)
         self.plogger.info(f"Saved cache transformation to {out_path}")
