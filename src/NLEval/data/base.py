@@ -1,6 +1,8 @@
-import logging
 import os
 import os.path as osp
+import shutil
+
+import yaml
 
 from ..typing import Any
 from ..typing import List
@@ -9,7 +11,7 @@ from ..typing import Optional
 from ..util.logger import get_logger
 from ..util.logger import log_file_context
 from ..util.path import cleandir
-from ..util.path import hash_to_hexdigest
+from ..util.path import hexdigest
 
 
 class BaseData:
@@ -27,7 +29,9 @@ class BaseData:
         root: str,
         redownload: bool = False,
         reprocess: bool = False,
+        retransform: bool = False,
         log_level: LogLevel = "INFO",
+        transformation: Optional[Any] = None,
         **kwargs,
     ):
         """Initialize BaseData object.
@@ -38,6 +42,10 @@ class BaseData:
                 raw files are downloaded (default: False).
             reprocess (bool): If set to True, reprocess the data even if the
                 processed data is available (default: False).
+            retransform (bool): If set to tTrue, retransform the data even if
+                the cached transformation is available (default: False).
+            transformation: Optional transformation to be applied to the data
+                obect.
 
         """
         super().__init__(**kwargs)
@@ -45,16 +53,17 @@ class BaseData:
         self.root = root
         self.log_level = log_level
 
-        # Redownload > reprocess
+        # Redownload > reprocess > retransform
         reprocess = reprocess or redownload
+        retransform = retransform or reprocess
 
         self._setup_process_logger()
-        log_path = osp.join(self.info_dir, "run.log")
-        with log_file_context(self.plogger, log_path):
+        with log_file_context(self.plogger, self.info_log_path):
             self._download(redownload)
             self._process(reprocess)
 
         self.load_processed_data()
+        self._transform(retransform, transformation)
 
     def _setup_process_logger(self):
         """Set up process logger and file handler for data processing steps."""
@@ -94,6 +103,11 @@ class BaseData:
     def processed_files(self) -> List[str]:
         """Return a list of processed file names."""
         raise NotImplementedError
+
+    @property
+    def info_log_path(self) -> str:
+        """Return path to the data processing information log file."""
+        return osp.join(self.info_dir, "run.log")
 
     def raw_file_path(self, idx: int) -> str:
         """Return path to a raw file given its index."""
@@ -142,3 +156,33 @@ class BaseData:
         if reprocess or not self.process_completed():
             self.plogger.info(f"Start processing {self.classname}...")
             self.process()
+
+    def transform(self, transformation: Any, cache_dir: str):
+        """Apply a transformation to the loaded data."""
+        raise NotImplementedError
+
+    def _transform(self, retransform: bool, transformation: Optional[Any]):
+        """Check to see if cached transformed data exist and load if so."""
+        if transformation is None:
+            return
+
+        config_dump = yaml.dump(transformation.to_config())
+        hexhash = hexdigest(config_dump)
+        self.plogger.debug(f"{hexhash=}")
+        cache_dir = osp.join(self.processed_dir, hexhash)
+        if osp.isdir(cache_dir):
+            # TODO: option to furthercheck if info matches (config.yaml)
+            if retransform:
+                shutil.rmtree(cache_dir)
+            else:
+                self.plogger.info(
+                    f"Loading cached transformed data from {cache_dir}",
+                )
+                self.load_processed_data(osp.join(cache_dir, "data.gmt"))
+                return
+
+        os.makedirs(cache_dir)
+        with open(osp.join(cache_dir, "config.yaml"), "w") as f:
+            f.write(config_dump)
+        with log_file_context(self.plogger, osp.join(cache_dir, "run.log")):
+            self.transform(transformation, cache_dir)

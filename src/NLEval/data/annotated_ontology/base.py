@@ -3,6 +3,7 @@ import os.path as osp
 import requests
 
 from ...label import LabelsetCollection
+from ...typing import Any
 from ...typing import List
 from ...typing import Optional
 from ..base import BaseData
@@ -19,12 +20,10 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
     def __init__(
         self,
         root: str,
-        redownload: bool = False,
-        reprocess: bool = False,
         **kwargs,
     ):
         """Initialize the BaseAnnotatedOntologyData object."""
-        super().__init__(root, redownload=redownload, reprocess=reprocess)
+        super().__init__(root, **kwargs)
 
     @property
     def raw_files(self) -> List[str]:
@@ -76,7 +75,16 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
         """Process raw data and save as gmt for future usage."""
         raise NotImplementedError
 
-    def load_processed_data(self):
+    def transform(self, transformation: Any, cache_dir: str):
+        """Apply a transformation to the loaded data."""
+        self.iapply(transformation)
+        # TODO: need to log stuff
+        out_path = osp.join(cache_dir, "data.gmt")
+        self.export_gmt(out_path)
+        self.plogger.info(f"Saved cache transformation to {out_path}")
+
+    def load_processed_data(self, path: Optional[str] = None):
         """Load processed labels from GMT."""
-        self.plogger.info(f"Load processed file {self.processed_file_path(0)}")
-        self.read_gmt(self.processed_file_path(0))
+        path = path or self.processed_file_path(0)
+        self.plogger.info(f"Load processed file {path}")
+        self.read_gmt(path)
