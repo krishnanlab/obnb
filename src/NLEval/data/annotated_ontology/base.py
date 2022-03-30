@@ -57,7 +57,7 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
 
     @property
     def filters(self):
-        """Filters to be applied to the labelset collection."""
+        """Labelset collection processing filters."""
         return []
 
     def download_ontology(self):

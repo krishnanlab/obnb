@@ -5,6 +5,7 @@ from copy import deepcopy
 import numpy as np
 
 from . import checkers
+from ..typing import Dict
 from ..typing import ITERABLE_TYPE
 from ..typing import List
 from .exceptions import IDExistsError
@@ -231,7 +232,7 @@ class IDmap(IDlst):
 
         """
         super().reset()
-        self._map = {}
+        self._map: Dict[str, int] = {}
 
         if identifiers is not None:
             for identifier in identifiers:
