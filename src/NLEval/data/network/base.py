@@ -22,8 +22,6 @@ class BaseNdexData(BaseData, SparseGraph):
         root: str,
         weighted: bool,
         directed: bool,
-        redownload: bool = False,
-        reprocess: bool = False,
         largest_comp: bool = False,
         cx_kwargs: Optional[Dict[str, Any]] = None,
         **kwargs,
@@ -34,12 +32,6 @@ class BaseNdexData(BaseData, SparseGraph):
             root (str): The root directory of the data.
             weighted (bool): Whether the network is weighted or not.
             undirected (bool): Whether the network is undirected or not.
-            redownload (bool): If set to True, always download the data
-                even if the raw data file already exists in the corresponding
-                data folder (default: :obj:`False`).
-            reprocess (bool): If set to True, always process the data
-                even if the processed data file already exists in the
-                corresponding data folder (default: obj:`False`).
             largest_comp (bool): If set to True, then only take the largest
                 connected component of the graph.
             cx_kwargs: Keyword arguments used for reading the cx file.
@@ -49,8 +41,6 @@ class BaseNdexData(BaseData, SparseGraph):
         self.cx_kwargs: Dict[str, Any] = cx_kwargs or {}
         super().__init__(
             root,
-            redownload=redownload,
-            reprocess=reprocess,
             weighted=weighted,
             directed=directed,
             **kwargs,
