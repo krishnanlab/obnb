@@ -9,6 +9,8 @@ import pytest
 from NLEval.util.timer import Timeout
 from parameterized import parameterized
 
+LEVEL = "DEBUG"
+
 # Name, reprocess, redownload
 full_data_test_param = [
     ("Download", False, False),
@@ -52,7 +54,7 @@ class TestData(unittest.TestCase):
 
     @pytest.mark.longruns
     def test_biogrid(self):
-        self.graph = NLEval.data.BioGRID(self.tmp_dir, verbose=True)
+        self.graph = NLEval.data.BioGRID(self.tmp_dir, log_level=LEVEL)
         self.assertEqual(self.graph.size, 25702)
         self.assertEqual(self.graph.num_edges, 1200390)
 
@@ -63,7 +65,7 @@ class TestData(unittest.TestCase):
                 self.tmp_dir_preserve,
                 reprocess=reprocess,
                 redownload=redownload,
-                verbose=True,
+                log_level=LEVEL,
             )
             self.assertEqual(self.graph.size, 8124)
             self.assertEqual(self.graph.num_edges, 71096)
@@ -71,12 +73,12 @@ class TestData(unittest.TestCase):
     @pytest.mark.longruns
     def test_disgenet(self):
         with Timeout(600):
-            self.lsc = NLEval.data.DisGeNet(self.tmp_dir, verbose=True)
+            self.lsc = NLEval.data.DisGeNet(self.tmp_dir, log_level=LEVEL)
 
     @pytest.mark.longruns
     @pytest.mark.highmemory
     def test_funcoup(self):
-        self.graph = NLEval.data.FunCoup(self.tmp_dir, verbose=True)
+        self.graph = NLEval.data.FunCoup(self.tmp_dir, log_level=LEVEL)
         self.assertEqual(self.graph.size, 17757)
         self.assertEqual(self.graph.num_edges, 10027562)
 
@@ -84,24 +86,24 @@ class TestData(unittest.TestCase):
     @pytest.mark.longruns
     def test_go(self, name):
         with self.subTest(name):
-            self.lsc = getattr(NLEval.data, name)(self.tmp_dir, verbose=True)
+            self.lsc = getattr(NLEval.data, name)(self.tmp_dir, log_level=LEVEL)
 
     @pytest.mark.longruns
     def test_hippie(self):
-        self.graph = NLEval.data.HIPPIE(self.tmp_dir, verbose=True)
+        self.graph = NLEval.data.HIPPIE(self.tmp_dir, log_level=LEVEL)
         self.assertEqual(self.graph.size, 17926)
         self.assertEqual(self.graph.num_edges, 770740)
 
     @pytest.mark.longruns
     def test_humannet(self):
-        self.graph = NLEval.data.HumanNet(self.tmp_dir, verbose=True)
+        self.graph = NLEval.data.HumanNet(self.tmp_dir, log_level=LEVEL)
         self.assertEqual(self.graph.size, 17751)
         self.assertEqual(self.graph.num_edges, 848948)
 
     @pytest.mark.longruns
     @pytest.mark.highmemory
     def test_string(self):
-        self.graph = NLEval.data.STRING(self.tmp_dir, verbose=True)
+        self.graph = NLEval.data.STRING(self.tmp_dir, log_level=LEVEL)
         self.assertEqual(self.graph.size, 18513)
         self.assertEqual(self.graph.num_edges, 11038228)
 
