@@ -10,6 +10,7 @@ from ..typing import LogLevel
 from ..typing import Optional
 from ..typing import Union
 from ..util import checkers
+from ..util.cx_explorer import CXExplorer
 from ..util.exceptions import IDNotExistError
 from ..util.idhandler import IDmap
 from .base import BaseGraph
@@ -443,17 +444,13 @@ class SparseGraph(BaseGraph):
 
         self.logger.info("Loading raw cx file")
         with open(path, "r") as f:
-            cx_stream = json.load(f)
-
-        entry_map = {list(j)[0]: i for i, j in enumerate(cx_stream)}
-        raw_edges = cx_stream[entry_map["edges"]]["edges"]
+            cx_data = CXExplorer.from_cx_stream(json.load(f))
 
         # Load node IDs
         self.logger.info("Loading nodes")
         node_idx_to_id = {}
         if not use_node_alias:
-            raw_nodes = cx_stream[entry_map["nodes"]]["nodes"]
-            for node in raw_nodes:
+            for node in cx_data["nodes"]:
                 node_name = node[node_id_entry]
                 if node_id_prefix is not None:
                     if not node_name.startswith(node_id_prefix):
@@ -469,7 +466,7 @@ class SparseGraph(BaseGraph):
                 raise ValueError(
                     "Must specify node_id_prefix when use_node_alias is set.",
                 )
-            for na in cx_stream[entry_map["nodeAttributes"]]["nodeAttributes"]:
+            for na in cx_data["nodeAttributes"]:
                 if na["n"] == "alias":
                     idx, values = na["po"], na["v"]
                     values = values if isinstance(values, list) else [values]
@@ -501,7 +498,7 @@ class SparseGraph(BaseGraph):
         self.logger.info("Reading edges")
         edge_weight_dict = {}
         if edge_weight_attr_name is not None:
-            for ea in cx_stream[entry_map["edgeAttributes"]]["edgeAttributes"]:
+            for ea in cx_data["edgeAttributes"]:
                 if ea["n"] == edge_weight_attr_name:
                     try:
                         edge_weight_dict[ea["po"]] = float(ea["v"])
@@ -512,7 +509,7 @@ class SparseGraph(BaseGraph):
 
         # Write edges
         self.logger.info("Loading edges to graph")
-        for edge in raw_edges:
+        for edge in cx_data["edges"]:
             try:
                 node_id1 = node_idx_to_id_converted[edge["s"]]
                 node_id2 = node_idx_to_id_converted[edge["t"]]

@@ -76,11 +76,10 @@ class TestData(unittest.TestCase):
             self.lsc = NLEval.data.DisGeNet(self.tmp_dir, log_level=LEVEL)
 
     @pytest.mark.longruns
-    @pytest.mark.highmemory
     def test_funcoup(self):
         self.graph = NLEval.data.FunCoup(self.tmp_dir, log_level=LEVEL)
-        self.assertEqual(self.graph.size, 17757)
-        self.assertEqual(self.graph.num_edges, 10027562)
+        self.assertEqual(self.graph.size, 16315)
+        self.assertEqual(self.graph.num_edges, 8300942)
 
     @parameterized.expand([("GOBP",), ("GOCC",), ("GOMF",)])
     @pytest.mark.longruns
@@ -103,8 +102,8 @@ class TestData(unittest.TestCase):
     @pytest.mark.longruns
     def test_pcnet(self):
         self.graph = NLEval.data.PCNet(self.tmp_dir, log_level=LEVEL)
-        self.assertEqual(self.graph.size, 18820)
-        self.assertEqual(self.graph.num_edges, 5386218)
+        self.assertEqual(self.graph.size, 18570)
+        self.assertEqual(self.graph.num_edges, 5350472)
 
     @pytest.mark.longruns
     @pytest.mark.highmemory
