@@ -478,8 +478,9 @@ class SparseGraph(BaseGraph):
         # Convert node IDs
         if node_id_converter is not None:
             self.logger.info("Start converting gene IDs.")
-
+            log_level_id = logging.getLevelName(self.log_level)
             try:
+                node_id_converter.logger.setLevel(log_level_id)
                 node_id_converter.query_bulk(list(node_idx_to_id.values()))
             except AttributeError:
                 pass
