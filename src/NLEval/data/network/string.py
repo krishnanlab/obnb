@@ -1,3 +1,4 @@
+from ...util.converter import MyGeneInfoConverter
 from .base import BaseNdexData
 
 
@@ -16,6 +17,7 @@ class STRING(BaseNdexData):
             cx_kwargs={
                 "interaction_types": ["interacts-with"],
                 "node_id_prefix": "ncbigene",
+                "node_id_converter": MyGeneInfoConverter(),
                 "default_edge_weight": 0.0,
                 "edge_weight_attr_name": "combined_score",
                 "reduction": "max",
