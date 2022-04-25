@@ -80,7 +80,7 @@ class MyGeneInfoConverter:
                     continue
 
                 old_gene_id = self.convert_map[gene]
-                self.logger.info(
+                self.logger.warning(
                     f"Overwriting {gene} -> {old_gene_id} to "
                     f"{gene} -> {gene_id}",
                 )
