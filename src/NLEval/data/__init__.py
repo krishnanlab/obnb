@@ -8,6 +8,7 @@ from .network import BioPlex
 from .network import FunCoup
 from .network import HIPPIE
 from .network import HumanNet
+from .network import PCNet
 from .network import STRING
 
 __all__ = [
@@ -20,5 +21,6 @@ __all__ = [
     "GOMF",
     "HIPPIE",
     "HumanNet",
+    "PCNet",
     "STRING",
 ]
