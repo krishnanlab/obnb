@@ -6,10 +6,11 @@ from ..typing import List
 class MyGeneInfoConverter:
     """Gene ID conversion via MyGeneInfo."""
 
-    def __init__(self):
+    def __init__(self, **query_kwargs):
         """Initialize the converter."""
         self.client = mygene.MyGeneInfo()
         self.convert_map = {}
+        self.query_kwargs = query_kwargs
 
     def __call__(self, old_id: str) -> str:
         """Convert an ID to entrez gene ID.
@@ -35,8 +36,12 @@ class MyGeneInfoConverter:
 
     def query_bulk(self, ids: List[str]):
         """Query gene IDs in bulk for performnace."""
-        queries = self.client.getgenes(ids, fields="entrezgene")
+        queries = self.client.querymany(
+            ids,
+            entrezonly=True,
+            fields="entrezgene",
+            **self.query_kwargs,
+        )
         for query in queries:
             gene = query["query"]
-            if "entrezgene" in query:
-                self.convert_map[gene] = query["entrezgene"]
+            self.convert_map[gene] = query.get("entrezgene")
