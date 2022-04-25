@@ -3,6 +3,7 @@ import mygene
 from ..typing import Dict
 from ..typing import List
 from ..typing import LogLevel
+from ..typing import Optional
 from ..util.logger import get_logger
 
 
@@ -28,7 +29,7 @@ class MyGeneInfoConverter:
 
         """
         self.client = mygene.MyGeneInfo()
-        self.convert_map: Dict[str, str] = {}
+        self.convert_map: Dict[str, Optional[str]] = {}
 
         self.logger = get_logger(self.__class__.__name__, log_level=log_level)
 
@@ -36,14 +37,14 @@ class MyGeneInfoConverter:
         self.species = species
         self.query_kwargs = query_kwargs
 
-    def __call__(self, old_id: str) -> str:
+    def __call__(self, old_id: str) -> Optional[str]:
         """Convert an ID to entrez gene ID.
 
         Args:
             old_id (str): gene/protein ID to be converted.
 
         Returns:
-            str: Entrez gene ID.
+            str: Entrez gene ID, or None if not available.
 
         """
         try:
