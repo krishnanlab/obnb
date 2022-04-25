@@ -1,15 +1,24 @@
 import mygene
 
+from ..typing import Dict
 from ..typing import List
 
 
 class MyGeneInfoConverter:
     """Gene ID conversion via MyGeneInfo."""
 
-    def __init__(self, **query_kwargs):
-        """Initialize the converter."""
+    def __init__(self, species: str = "human", **query_kwargs):
+        """Initialize the converter.
+
+        Args:
+            species (str): comma-separated species name of interest
+            query_kwargs: Other keyword arguments for
+                mygene.MyGeneInfo.querymany
+
+        """
         self.client = mygene.MyGeneInfo()
-        self.convert_map = {}
+        self.convert_map: Dict[str, str] = {}
+        self.species = species
         self.query_kwargs = query_kwargs
 
     def __call__(self, old_id: str) -> str:
@@ -40,6 +49,7 @@ class MyGeneInfoConverter:
             ids,
             entrezonly=True,
             fields="entrezgene",
+            species=self.species,
             **self.query_kwargs,
         )
         for query in queries:
