@@ -37,5 +37,6 @@ class MyGeneInfoConverter:
         """Query gene IDs in bulk for performnace."""
         queries = self.client.getgenes(ids, fields="entrezgene")
         for query in queries:
+            gene = query["query"]
             if "entrezgene" in query:
-                self.convert_map[query["query"]] = query["entrezgene"]
+                self.convert_map[gene] = query["entrezgene"]
