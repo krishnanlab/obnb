@@ -1,7 +1,9 @@
 name: Example Executions
 
 on:
-  - pull_request
+  workflow_dispatch:
+  schedule:
+    - cron: '59 23 * * 1,5'
 
 jobs:
   run_examples:
