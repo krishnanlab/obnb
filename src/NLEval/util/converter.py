@@ -1,3 +1,6 @@
+import json
+import os
+
 import mygene
 
 from ..typing import Dict
@@ -13,6 +16,9 @@ class MyGeneInfoConverter:
 
     def __init__(
         self,
+        root: Optional[str] = None,
+        use_cache: bool = True,
+        save_cache: bool = True,
         log_level: LogLevel = "INFO",
         remove_multimap: bool = True,
         species: str = "human",
@@ -21,6 +27,13 @@ class MyGeneInfoConverter:
         """Initialize the converter.
 
         Args:
+            root (str, optional): Root data directory for caching gene ID
+                conversion mapping. If None, do not save cache.
+            use_cache (bool): If set to True, then use cached gene conversion,
+                which is found under <root>/.cache/mygene_convert.json
+            save_cache (bool): If set to True, then save cache after query_bulk
+                is called. The conversion mappings are merged with existing
+                cache if available.
             log_level: Logging level.
             remove_multimap (bool): If set to True, then ignore any gene
                 that is mapped to multiple entrez gene id.
@@ -32,11 +45,36 @@ class MyGeneInfoConverter:
         self.client = mygene.MyGeneInfo()
         self.convert_map: Dict[str, Optional[str]] = {}
 
+        self.root = root
+        self.use_cache = use_cache
+        self.save_cache = save_cache
         self.logger = get_logger(self.__class__.__name__, log_level=log_level)
 
         self.remove_multimap = remove_multimap
         self.species = species
         self.query_kwargs = query_kwargs
+
+    @property
+    def root(self) -> Optional[str]:
+        """Cache data directory."""
+        return self._root
+
+    @root.setter
+    def root(self, root: Optional[str]):
+        if root is not None:
+            cache_dir = os.path.join(root, ".cache")
+            os.makedirs(cache_dir, exist_ok=True)
+            root = cache_dir
+        self._root = root
+
+    @property
+    def cache_path(self) -> Optional[str]:
+        """Cached gene conversion file path."""
+        return (
+            None
+            if self.root is None
+            else os.path.join(self.root, "mygene_convert.json")
+        )
 
     def __getitem__(self, old_id: str) -> Optional[str]:
         """Convert an ID to entrez gene ID.
@@ -68,10 +106,60 @@ class MyGeneInfoConverter:
         """Iterate over genes converted."""
         yield from self.convert_map
 
-    def query_bulk(self, ids: List[str]):
+    def _load_cache(self):
+        if not self.use_cache:
+            return
+
+        if self.root is None:
+            self.logger.warning(
+                "load_cache option set but root directory not defined, "
+                "skipping cache loading.",
+            )
+            return
+
+        try:
+            with open(self.cache_path, "r") as f:
+                self.convert_map = json.load(f)
+            self.logger.info(f"Loaded gene conversion cache {self.cache_path}")
+        except FileNotFoundError:
+            self.logger.info(f"Cache file not yet available {self.cache_path}")
+
+    def _save_cache(self):
+        if not self.save_cache:
+            return
+
+        if self.root is None:
+            self.logger.warning(
+                "save_cache option set but root directory not defined, "
+                "skipping cache saving.",
+            )
+            return
+
+        full_convert_map = {}
+        if os.path.isfile(self.cache_path):
+            with open(self.cache_path, "r") as f:
+                full_convert_map = json.load(f)
+
+        for i, j in self.convert_map.items():
+            if i in full_convert_map and j != full_convert_map[i]:
+                self.logger.error(
+                    f"Conflicting mapping for {i!r}, previously mapped to"
+                    f"{full_convert_map[i]!r}, overwritting to {j!r})",
+                )
+            full_convert_map[i] = j
+
+        with open(self.cache_path, "w") as f:
+            json.dump(full_convert_map, f, indent=4)
+        self.logger.info(f"Gene conversion cache saved {self.cache_path}")
+
+    def query_bulk(
+        self,
+        ids: List[str],
+    ):
         """Query gene IDs in bulk for performnace."""
+        self._load_cache()
         queries = self.client.querymany(
-            ids,
+            set(ids).difference(self.convert_map),
             entrezonly=True,
             fields="entrezgene",
             species=self.species,
@@ -94,3 +182,4 @@ class MyGeneInfoConverter:
                     f"{gene} -> {gene_id}",
                 )
             self.convert_map[gene] = gene_id
+        self._save_cache()
