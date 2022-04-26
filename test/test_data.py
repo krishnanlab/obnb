@@ -59,6 +59,7 @@ class TestData(unittest.TestCase):
         self.assertEqual(self.graph.num_edges, 1100282)
 
     @parameterized.expand(full_data_test_param)
+    @pytest.mark.mediumruns
     def test_bioplex(self, name, reprocess, redownload):
         with self.subTest(name):
             self.graph = NLEval.data.BioPlex(
@@ -70,7 +71,7 @@ class TestData(unittest.TestCase):
             self.assertEqual(self.graph.size, 8116)
             self.assertEqual(self.graph.num_edges, 71046)
 
-    @pytest.mark.longruns
+    @pytest.mark.mediumruns
     def test_disgenet(self):
         with Timeout(600):
             self.lsc = NLEval.data.DisGeNet(self.tmp_dir, log_level=LEVEL)

@@ -25,9 +25,10 @@ required_plugins = [
 addopts = [
     "--strict-markers",
     "-m",
-    "not longruns",
+    "not longruns and not mediumruns",
 ]
 markers = [
     "longruns",
+    "mediumruns",
     "highmemory",
 ]
