@@ -1,6 +1,7 @@
 import mygene
 
 from ..typing import Dict
+from ..typing import Iterator
 from ..typing import List
 from ..typing import LogLevel
 from ..typing import Optional
@@ -37,7 +38,7 @@ class MyGeneInfoConverter:
         self.species = species
         self.query_kwargs = query_kwargs
 
-    def __call__(self, old_id: str) -> Optional[str]:
+    def __getitem__(self, old_id: str) -> Optional[str]:
         """Convert an ID to entrez gene ID.
 
         Args:
@@ -58,6 +59,14 @@ class MyGeneInfoConverter:
             )
             self.convert_map[old_id] = new_id
         return new_id
+
+    def __len__(self) -> int:
+        """Number of genes converted."""
+        return len(self.convert_map)
+
+    def __iter__(self) -> Iterator[Optional[str]]:
+        """Iterate over genes converted."""
+        yield from self.convert_map
 
     def query_bulk(self, ids: List[str]):
         """Query gene IDs in bulk for performnace."""
