@@ -158,28 +158,44 @@ class MyGeneInfoConverter:
     ):
         """Query gene IDs in bulk for performnace."""
         self._load_cache()
-        queries = self.client.querymany(
-            set(ids).difference(self.convert_map),
-            entrezonly=True,
-            fields="entrezgene",
-            species=self.species,
-            **self.query_kwargs,
-        )
-        for query in queries:
-            gene = query["query"]
-            gene_id = query.get("entrezgene")
-            if gene in self.convert_map:
-                if self.remove_multimap:
-                    self.convert_map[gene] = None
-                    self.logger.info(
-                        f"Removing {gene} due to multiple entrez mapping.",
-                    )
-                    continue
 
-                old_gene_id = self.convert_map[gene]
-                self.logger.warning(
-                    f"Overwriting {gene} -> {old_gene_id} to "
-                    f"{gene} -> {gene_id}",
-                )
-            self.convert_map[gene] = gene_id
-        self._save_cache()
+        ids_set = set(ids)
+        ids_to_query = ids_set.difference(self.convert_map)
+        self.logger.info(
+            f"Total number of genes: {len(ids):,} ({len(ids_set):,} unique)",
+        )
+
+        if ids_to_query:
+            self.logger.info(
+                f"Number of genes to be queried: {len(ids_to_query)}",
+            )
+            queries = self.client.querymany(
+                ids_to_query,
+                entrezonly=True,
+                fields="entrezgene",
+                species=self.species,
+                **self.query_kwargs,
+            )
+
+            for query in queries:
+                gene = query["query"]
+                gene_id = query.get("entrezgene")
+                if gene in self.convert_map:
+                    if self.remove_multimap:
+                        self.convert_map[gene] = None
+                        self.logger.info(
+                            f"Removing {gene} due to multiple entrez mapping.",
+                        )
+                        continue
+
+                    old_gene_id = self.convert_map[gene]
+                    self.logger.warning(
+                        f"Overwriting {gene} -> {old_gene_id} to "
+                        f"{gene} -> {gene_id}",
+                    )
+                self.convert_map[gene] = gene_id
+
+            self._save_cache()
+
+        else:
+            self.logger.info(f"No query needed.")
