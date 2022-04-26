@@ -18,7 +18,7 @@ class BioGRID(BaseNdexData):
                 "interaction_types": ["interacts-with"],
                 "node_id_prefix": "ncbigene",
                 "node_id_entry": "r",
-                "node_id_converter": MyGeneInfoConverter(),
+                "node_id_converter": MyGeneInfoConverter(root=root),
             },
             **kwargs,
         )

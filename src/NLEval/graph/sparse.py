@@ -3,10 +3,10 @@ import logging
 
 import numpy as np
 
-from ..typing import Callable
 from ..typing import EdgeData
 from ..typing import List
 from ..typing import LogLevel
+from ..typing import Mapping
 from ..typing import Optional
 from ..typing import Union
 from ..util import checkers
@@ -403,7 +403,7 @@ class SparseGraph(BaseGraph):
         edge_weight_attr_name: Optional[str] = None,
         reduction: Optional[str] = "max",
         use_node_alias: bool = False,
-        node_id_converter: Optional[Callable[[str], str]] = None,
+        node_id_converter: Optional[Mapping[str, str]] = None,
     ):
         """Read from a CX stream file.
 
@@ -433,8 +433,8 @@ class SparseGraph(BaseGraph):
                 the node_id_prefix becomes mandatory.If multiple node ID
                 aliases with matching prefix are available, use the first one.
                 (defaut: :obj:`False`)
-            node_id_converter (Callable[str, str], optional): A function that
-                maps a given node ID to a new node ID of interest.
+            node_id_converter (Mapping[str, str], optional): A mapping object
+                that maps a given node ID to a new node ID of interest.
 
         """
         import json  # noreorder
@@ -487,7 +487,7 @@ class SparseGraph(BaseGraph):
 
             node_idx_to_id_converted = {}
             for i, j in node_idx_to_id.items():
-                node_id_converted = node_id_converter(j)
+                node_id_converted = node_id_converter[j]
                 if node_id_converted is not None:
                     node_idx_to_id_converted[i] = node_id_converted
 
