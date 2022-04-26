@@ -109,8 +109,8 @@ class TestData(unittest.TestCase):
     @pytest.mark.highmemory
     def test_string(self):
         self.graph = NLEval.data.STRING(self.tmp_dir, log_level=LEVEL)
-        self.assertEqual(self.graph.size, 18457)
-        self.assertEqual(self.graph.num_edges, 10990600)
+        self.assertEqual(self.graph.size, 18484)
+        self.assertEqual(self.graph.num_edges, 11021544)
 
 
 if __name__ == "__main__":
