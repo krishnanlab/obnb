@@ -79,8 +79,8 @@ class TestData(unittest.TestCase):
     @pytest.mark.longruns
     def test_funcoup(self):
         self.graph = NLEval.data.FunCoup(self.tmp_dir, log_level=LEVEL)
-        self.assertEqual(self.graph.size, 16315)
-        self.assertEqual(self.graph.num_edges, 8300942)
+        self.assertEqual(self.graph.size, 17662)
+        self.assertEqual(self.graph.num_edges, 9732196)
 
     @parameterized.expand([("GOBP",), ("GOCC",), ("GOMF",)])
     @pytest.mark.longruns
