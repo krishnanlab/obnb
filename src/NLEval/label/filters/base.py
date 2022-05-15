@@ -1,9 +1,6 @@
 from tqdm import tqdm
 
-from ...typing import Any
-from ...typing import Dict
-from ...typing import List
-from ...typing import LogLevel
+from ...typing import Any, Dict, List, LogLevel
 from ...util.logger import get_logger
 
 

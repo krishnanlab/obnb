@@ -2,6 +2,10 @@
 requires = ["setuptools>=42.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[tool.isort]
+profile = "black"
+line_length = 80
+
 [tool.mypy]
 ignore_missing_imports = true
 follow_imports = "skip"

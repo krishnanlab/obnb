@@ -3,15 +3,8 @@ from functools import lru_cache
 import numpy as np
 
 from ..graph import OntologyGraph
-from ..typing import Dict
-from ..typing import Iterator
-from ..typing import List
-from ..typing import Optional
-from ..typing import Set
-from ..typing import Splitter
-from ..typing import Tuple
-from ..util import checkers
-from ..util import idhandler
+from ..typing import Dict, Iterator, List, Optional, Set, Splitter, Tuple
+from ..util import checkers, idhandler
 from ..util.exceptions import IDExistsError
 from .filters.base import BaseFilter
 

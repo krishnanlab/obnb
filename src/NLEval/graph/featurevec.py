@@ -6,10 +6,7 @@ from itertools import chain
 import numpy as np
 from scipy.spatial import distance
 
-from ..typing import INT_TYPE
-from ..typing import LogLevel
-from ..typing import Optional
-from ..typing import Sequence
+from ..typing import INT_TYPE, LogLevel, Optional, Sequence
 from ..util import checkers
 from ..util.idhandler import IDmap
 from .dense import DenseGraph

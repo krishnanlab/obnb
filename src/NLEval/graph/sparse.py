@@ -3,12 +3,7 @@ import logging
 
 import numpy as np
 
-from ..typing import EdgeData
-from ..typing import List
-from ..typing import LogLevel
-from ..typing import Mapping
-from ..typing import Optional
-from ..typing import Union
+from ..typing import EdgeData, List, LogLevel, Mapping, Optional, Union
 from ..util import checkers
 from ..util.cx_explorer import CXExplorer
 from ..util.exceptions import IDNotExistError

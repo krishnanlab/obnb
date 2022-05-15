@@ -1,19 +1,21 @@
 """Collection of types used in NLEval."""
-from typing import Any
-from typing import Callable
-from typing import DefaultDict
-from typing import Dict
-from typing import Iterable
-from typing import Iterator
-from typing import List
-from typing import Literal
-from typing import Mapping
-from typing import Optional
-from typing import Sequence
-from typing import Set
-from typing import TextIO
-from typing import Tuple
-from typing import Union
+from typing import (
+    Any,
+    Callable,
+    DefaultDict,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    Sequence,
+    Set,
+    TextIO,
+    Tuple,
+    Union,
+)
 
 import numpy as np
 

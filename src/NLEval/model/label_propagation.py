@@ -3,8 +3,7 @@ import warnings
 import numpy as np
 
 from ..graph.base import BaseGraph
-from ..util.checkers import checkValueNonnegative
-from ..util.checkers import checkValuePositive
+from ..util.checkers import checkValueNonnegative, checkValuePositive
 from ..util.exceptions import NotConvergedWarning
 
 

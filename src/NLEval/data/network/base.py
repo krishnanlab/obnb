@@ -1,10 +1,7 @@
 import ndex2
 
 from ...graph import SparseGraph
-from ...typing import Any
-from ...typing import Dict
-from ...typing import List
-from ...typing import Optional
+from ...typing import Any, Dict, List, Optional
 from ..base import BaseData
 
 

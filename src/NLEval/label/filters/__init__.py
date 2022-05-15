@@ -1,13 +1,16 @@
 """Filter objecst for preprocessing the labelset collection."""
 from .base import Compose
-from .existence_filter import EntityExistenceFilter
-from .existence_filter import LabelsetExistenceFilter
+from .existence_filter import EntityExistenceFilter, LabelsetExistenceFilter
 from .negative_generator import NegativeGeneratorHypergeom
-from .pairwise_filter import LabelsetPairwiseFilterJaccard
-from .pairwise_filter import LabelsetPairwiseFilterOverlap
-from .range_filter import EntityRangeFilterNoccur
-from .range_filter import LabelsetRangeFilterSize
-from .range_filter import LabelsetRangeFilterSplit
+from .pairwise_filter import (
+    LabelsetPairwiseFilterJaccard,
+    LabelsetPairwiseFilterOverlap,
+)
+from .range_filter import (
+    EntityRangeFilterNoccur,
+    LabelsetRangeFilterSize,
+    LabelsetRangeFilterSplit,
+)
 
 __all__ = [
     "Compose",

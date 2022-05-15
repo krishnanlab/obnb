@@ -6,16 +6,18 @@ from contextlib import contextmanager
 
 from tqdm import trange
 
-from ..typing import DefaultDict
-from ..typing import Iterable
-from ..typing import Iterator
-from ..typing import List
-from ..typing import LogLevel
-from ..typing import Optional
-from ..typing import Set
-from ..typing import Term
-from ..typing import TextIO
-from ..typing import Union
+from ..typing import (
+    DefaultDict,
+    Iterable,
+    Iterator,
+    List,
+    LogLevel,
+    Optional,
+    Set,
+    Term,
+    TextIO,
+    Union,
+)
 from ..util import idhandler
 from ..util.exceptions import OboTermIncompleteError
 from .sparse import DirectedSparseGraph

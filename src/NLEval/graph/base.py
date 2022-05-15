@@ -1,13 +1,8 @@
 import logging
 from copy import deepcopy
 
-from ..typing import List
-from ..typing import LogLevel
-from ..typing import Optional
-from ..typing import Tuple
-from ..typing import Union
-from ..util import checkers
-from ..util import idhandler
+from ..typing import List, LogLevel, Optional, Tuple, Union
+from ..util import checkers, idhandler
 from ..util.logger import get_logger
 
 
