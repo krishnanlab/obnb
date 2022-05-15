@@ -15,18 +15,18 @@ jobs:
         python-version: ['3.8']
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Install packages
-      run:
-        python -m pip install --upgrade pip
-        pip install -e .[dev]
+      - name: Install packages
+        run:
+          python -m pip install --upgrade pip
+          pip install -e .[dev]
 
-    - name: Run data tests
-      run:
-        pytest test/test_data.py -m "(longruns or not longruns) and not highmemory" -s -v
+      - name: Run data tests
+        run:
+          pytest test/test_data.py -m "(longruns or not longruns) and not highmemory" -s -v
