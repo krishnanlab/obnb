@@ -5,12 +5,7 @@ import torch
 from torch_geometric.data import Data
 from torch_geometric.transforms import Constant
 
-from ..typing import Any
-from ..typing import Dict
-from ..typing import List
-from ..typing import LogLevel
-from ..typing import Optional
-from ..typing import Tuple
+from ..typing import Any, Dict, List, LogLevel, Optional, Tuple
 from .base import BaseTrainer
 
 

@@ -5,11 +5,9 @@ from itertools import chain
 import torch
 from torch_geometric import graphgym as pyg_gg
 from torch_geometric import seed_everything
-from torch_geometric.data import Batch
-from torch_geometric.data import DataLoader
+from torch_geometric.data import Batch, DataLoader
 from torch_geometric.graphgym import cfg as cfg_gg
-from torch_geometric.graphgym.config import assert_cfg
-from torch_geometric.graphgym.config import dump_cfg
+from torch_geometric.graphgym.config import assert_cfg, dump_cfg
 from torch_geometric.graphgym.loader import get_loader
 from torch_geometric.graphgym.logger import Logger as Logger_gg
 from torch_geometric.graphgym.model_builder import create_model
@@ -18,10 +16,7 @@ from torch_geometric.graphgym.train import train_epoch
 from torch_geometric.graphgym.utils.comp_budget import params_count
 from torch_geometric.graphgym.utils.device import auto_select_device
 
-from ..typing import Any
-from ..typing import Dict
-from ..typing import List
-from ..typing import Optional
+from ..typing import Any, Dict, List, Optional
 from .gnn import GNNTrainer
 
 

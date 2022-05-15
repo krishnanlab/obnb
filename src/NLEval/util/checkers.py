@@ -6,9 +6,7 @@ to a function call is valid.
 """
 import numpy as np
 
-from ..typing import INT_TYPE
-from ..typing import ITERABLE_TYPE
-from ..typing import NUMERIC_TYPE
+from ..typing import INT_TYPE, ITERABLE_TYPE, NUMERIC_TYPE
 
 __all__ = [
     "checkValuePositive",

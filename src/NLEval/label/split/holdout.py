@@ -2,8 +2,7 @@ import numpy as np
 
 from ...typing import Tuple
 from ...util.checkers import checkType
-from .base import BaseRandomSplit
-from .base import BaseSortedSplit
+from .base import BaseRandomSplit, BaseSortedSplit
 
 
 class BaseHoldout(BaseSortedSplit):

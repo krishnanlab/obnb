@@ -2,12 +2,7 @@ import numpy as np
 
 from ..graph.base import BaseGraph
 from ..graph.featurevec import MultiFeatureVec
-from ..typing import Any
-from ..typing import Callable
-from ..typing import Dict
-from ..typing import LogLevel
-from ..typing import Optional
-from ..typing import Sequence
+from ..typing import Any, Callable, Dict, LogLevel, Optional, Sequence
 from ..util.checkers import checkNumpyArrayShape
 from ..util.logger import get_logger
 

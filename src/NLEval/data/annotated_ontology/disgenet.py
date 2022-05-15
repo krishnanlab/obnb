@@ -7,9 +7,11 @@ from tqdm import tqdm
 
 from ...graph import OntologyGraph
 from ...label import LabelsetCollection
-from ...label.filters import LabelsetPairwiseFilterJaccard
-from ...label.filters import LabelsetPairwiseFilterOverlap
-from ...label.filters import LabelsetRangeFilterSize
+from ...label.filters import (
+    LabelsetPairwiseFilterJaccard,
+    LabelsetPairwiseFilterOverlap,
+    LabelsetRangeFilterSize,
+)
 from ...util.exceptions import IDNotExistError
 from .base import BaseAnnotatedOntologyData
 

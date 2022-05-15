@@ -1,8 +1,6 @@
 """Annotated ontology data."""
 from .disgenet import DisGeNet
-from .go import GOBP
-from .go import GOCC
-from .go import GOMF
+from .go import GOBP, GOCC, GOMF
 
 __all__ = [
     "DisGeNet",

@@ -1,7 +1,6 @@
 import numpy as np
 
-from ...typing import List
-from ...typing import Optional
+from ...typing import List, Optional
 from ..collection import Splitter
 from .base import BaseFilter
 

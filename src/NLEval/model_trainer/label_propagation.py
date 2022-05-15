@@ -1,7 +1,6 @@
 import numpy as np
 
-from ..typing import Any
-from ..typing import Dict
+from ..typing import Any, Dict
 from .base import BaseTrainer
 
 

@@ -1,10 +1,8 @@
 """Graph and feature vector objects."""
 from .dense import DenseGraph
-from .featurevec import FeatureVec
-from .featurevec import MultiFeatureVec
+from .featurevec import FeatureVec, MultiFeatureVec
 from .ontology import OntologyGraph
-from .sparse import DirectedSparseGraph
-from .sparse import SparseGraph
+from .sparse import DirectedSparseGraph, SparseGraph
 
 __all__ = [
     "DenseGraph",

@@ -1,8 +1,8 @@
 import unittest
 
 import numpy as np
-from NLEval.graph import DenseGraph
-from NLEval.graph import SparseGraph
+
+from NLEval.graph import DenseGraph, SparseGraph
 from NLEval.model import label_propagation
 
 

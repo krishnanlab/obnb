@@ -4,14 +4,9 @@ import shutil
 
 import yaml
 
-from ..typing import Any
-from ..typing import List
-from ..typing import LogLevel
-from ..typing import Optional
-from ..util.logger import get_logger
-from ..util.logger import log_file_context
-from ..util.path import cleandir
-from ..util.path import hexdigest
+from ..typing import Any, List, LogLevel, Optional
+from ..util.logger import get_logger, log_file_context
+from ..util.path import cleandir, hexdigest
 
 
 class BaseData:
@@ -120,8 +115,7 @@ class BaseData:
     def download_completed(self) -> bool:
         """Check if all raw files are downloaded."""
         return all(
-            osp.isfile(osp.join(self.raw_dir, raw_file))
-            for raw_file in self.raw_files
+            osp.isfile(osp.join(self.raw_dir, raw_file)) for raw_file in self.raw_files
         )
 
     def process_completed(self) -> bool:

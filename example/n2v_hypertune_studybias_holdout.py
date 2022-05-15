@@ -5,15 +5,16 @@ import tempfile
 
 import numpy as np
 from load_data import load_data
-from NLEval.graph import FeatureVec
-from NLEval.graph import MultiFeatureVec
-from NLEval.label.filters import LabelsetRangeFilterSplit
-from NLEval.label.split import RatioPartition
-from NLEval.model_trainer import MultiSupervisedLearningTrainer
-from NLEval.model_trainer import SupervisedLearningTrainer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
 
+from NLEval.graph import FeatureVec, MultiFeatureVec
+from NLEval.label.filters import LabelsetRangeFilterSplit
+from NLEval.label.split import RatioPartition
+from NLEval.model_trainer import (
+    MultiSupervisedLearningTrainer,
+    SupervisedLearningTrainer,
+)
 
 TEMP_DIR = tempfile.mkdtemp()
 NETWORK = "STRING-EXP"
@@ -86,11 +87,7 @@ for label_id in lsc.label_ids:
         f"Valid: {results['val_auroc']:.4f}\t"
         f"Test: {results['test_auroc']:.4f}\t{label_id}",
     )
-
-print(
-    f"Average test score = {np.mean(scores):.4f}, "
-    f"std = {np.std(scores):.4f}\n",
-)
+print(f"Average test score = {np.mean(scores):.4f}, std = {np.std(scores):.4f}\n")
 
 # No hyperparameter selection
 for q, fvec in zip(qs, fvecs):

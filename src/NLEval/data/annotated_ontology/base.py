@@ -3,9 +3,7 @@ import os.path as osp
 import requests
 
 from ...label import LabelsetCollection
-from ...typing import Any
-from ...typing import List
-from ...typing import Optional
+from ...typing import Any, List, Optional
 from ..base import BaseData
 
 

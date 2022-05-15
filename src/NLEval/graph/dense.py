@@ -2,10 +2,7 @@ import logging
 
 import numpy as np
 
-from ..typing import List
-from ..typing import LogLevel
-from ..typing import Optional
-from ..typing import Union
+from ..typing import List, LogLevel, Optional, Union
 from ..util import checkers
 from ..util.exceptions import IDNotExistError
 from ..util.idhandler import IDmap

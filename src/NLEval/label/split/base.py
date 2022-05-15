@@ -1,8 +1,6 @@
 import numpy as np
 
-from ...typing import Iterator
-from ...typing import Optional
-from ...typing import Tuple
+from ...typing import Iterator, Optional, Tuple
 
 
 class BaseSplit:

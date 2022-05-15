@@ -2,10 +2,10 @@ import os
 import unittest
 
 from commonvar import SAMPLE_DATA_DIR
+
 from NLEval.graph import OntologyGraph
 from NLEval.label import LabelsetCollection
-from NLEval.util.exceptions import IDExistsError
-from NLEval.util.exceptions import IDNotExistError
+from NLEval.util.exceptions import IDExistsError, IDNotExistError
 
 
 class TestLabelsetCollection(unittest.TestCase):

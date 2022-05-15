@@ -1,10 +1,10 @@
 import unittest
 
 import numpy as np
-from NLEval.label import LabelsetCollection
-from NLEval.label import split
-from NLEval.util.exceptions import IDNotExistError
 from sklearn.model_selection import KFold
+
+from NLEval.label import LabelsetCollection, split
+from NLEval.util.exceptions import IDNotExistError
 
 
 class TestSplit(unittest.TestCase):

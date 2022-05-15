@@ -1,12 +1,15 @@
 import numpy as np
-from NLEval import label
-from NLEval.graph import MultiFeatureVec
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedKFold
 
+from NLEval import label
+from NLEval.graph import MultiFeatureVec
+
 LABEL_FP = "/mnt/research/compbio/krishnanlab/projects/data_onto_mapping/data/tissue/RealTextManualAnnotations.txt"
 # EXP_DATA_FP = "/mnt/research/compbio/krishnanlab/data/GEO/2019-07-29_downloaded-files/2019-07-31.npz"
-EXP_DATA_FP = "/mnt/home/liurenmi/repo/ContextNet/data/sample/GEO_2019-07-31_filtered.npz"
+EXP_DATA_FP = (
+    "/mnt/home/liurenmi/repo/ContextNet/data/sample/GEO_2019-07-31_filtered.npz"
+)
 
 # Load gene expression labels
 label_dict = {}  # sample id -> sample label

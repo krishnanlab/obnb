@@ -2,12 +2,12 @@ from time import perf_counter
 
 import numpy as np
 from load_data import load_data
+from sklearn.metrics import roc_auc_score as auroc
+
 from NLEval.label.filters import LabelsetRangeFilterSplit
 from NLEval.label.split import RatioPartition
 from NLEval.model.label_propagation import OneHopPropagation
 from NLEval.model_trainer import LabelPropagationTrainer
-from sklearn.metrics import roc_auc_score as auroc
-
 
 # Load daatset
 g, lsc = load_data("STRING-EXP", "KEGGBP")

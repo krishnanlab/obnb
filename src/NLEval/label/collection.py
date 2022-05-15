@@ -3,15 +3,8 @@ from functools import lru_cache
 import numpy as np
 
 from ..graph import OntologyGraph
-from ..typing import Dict
-from ..typing import Iterator
-from ..typing import List
-from ..typing import Optional
-from ..typing import Set
-from ..typing import Splitter
-from ..typing import Tuple
-from ..util import checkers
-from ..util import idhandler
+from ..typing import Dict, Iterator, List, Optional, Set, Splitter, Tuple
+from ..util import checkers, idhandler
 from ..util.exceptions import IDExistsError
 from .filters.base import BaseFilter
 
@@ -247,9 +240,7 @@ class LabelsetCollection(idhandler.IDprop):
         neg = self.get_property(label_id, "Negative")
 
         if neg == {None}:
-            all_positives = {
-                i for i in self.entity.map if self.get_noccur(i) > 0
-            }
+            all_positives = {i for i in self.entity.map if self.get_noccur(i) > 0}
             return all_positives - self.get_labelset(label_id)
 
         return neg
@@ -379,10 +370,7 @@ class LabelsetCollection(idhandler.IDprop):
 
         if property_name is not None:
             x = np.array(
-                [
-                    self.entity.get_property(i, property_name)
-                    for i in self.entity_ids
-                ],
+                [self.entity.get_property(i, property_name) for i in self.entity_ids],
             )
         else:
             x = y
@@ -504,9 +492,7 @@ class LabelsetCollection(idhandler.IDprop):
 
         """
         entity_ids = self.entity_ids
-        entity_idmap = {
-            entity_id: idx for idx, entity_id in enumerate(entity_ids)
-        }
+        entity_idmap = {entity_id: idx for idx, entity_id in enumerate(entity_ids)}
         label_ids = self.label_ids
         label_info_list = [self.get_info(label_id) for label_id in label_ids]
         mat = np.zeros((len(entity_ids), len(label_ids)), dtype=int)

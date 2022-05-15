@@ -4,10 +4,11 @@ import shutil
 import tempfile
 import unittest
 
-import NLEval.data
 import pytest
-from NLEval.util.timer import Timeout
 from parameterized import parameterized
+
+import NLEval.data
+from NLEval.util.timer import Timeout
 
 LEVEL = "DEBUG"
 
@@ -36,10 +37,7 @@ class TestData(unittest.TestCase):
     def tearDownClass(cls):
         shutil.rmtree(cls.tmp_dir)
         shutil.rmtree(cls.tmp_dir_preserve)
-        print(
-            f"Removed temporary directories: {cls.tmp_dir}, "
-            f"{cls.tmp_dir_preserve}",
-        )
+        print(f"Removed temporary directories: {cls.tmp_dir}, {cls.tmp_dir_preserve}")
 
     def setUp(self):
         self.graph = self.lsc = None

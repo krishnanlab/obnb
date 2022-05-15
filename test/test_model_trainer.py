@@ -1,10 +1,10 @@
 import unittest
 
-import NLEval.model_trainer
 import numpy as np
+
+import NLEval.model_trainer
 from NLEval import model_trainer
-from NLEval.graph import DenseGraph
-from NLEval.graph import MultiFeatureVec
+from NLEval.graph import DenseGraph, MultiFeatureVec
 from NLEval.model_trainer.base import BaseTrainer
 from NLEval.util.exceptions import IDNotExistError
 

@@ -3,12 +3,7 @@ import logging
 
 import numpy as np
 
-from ..typing import EdgeData
-from ..typing import List
-from ..typing import LogLevel
-from ..typing import Mapping
-from ..typing import Optional
-from ..typing import Union
+from ..typing import EdgeData, List, LogLevel, Mapping, Optional, Union
 from ..util import checkers
 from ..util.cx_explorer import CXExplorer
 from ..util.exceptions import IDNotExistError
@@ -514,10 +509,7 @@ class SparseGraph(BaseGraph):
             try:
                 node_id1 = node_idx_to_id_converted[edge["s"]]
                 node_id2 = node_idx_to_id_converted[edge["t"]]
-                if (
-                    interaction_types is not None
-                    and edge["i"] not in interaction_types
-                ):
+                if interaction_types is not None and edge["i"] not in interaction_types:
                     self.logger.debug(
                         f"Skipping edge {edge} due to mismatched interaction "
                         f"type with the specified {interaction_types}",

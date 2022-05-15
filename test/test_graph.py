@@ -9,17 +9,20 @@ from copy import deepcopy
 import ndex2
 import numpy as np
 from commonvar import SAMPLE_DATA_DIR
-from NLEval.graph import DenseGraph
-from NLEval.graph import DirectedSparseGraph
-from NLEval.graph import FeatureVec
-from NLEval.graph import MultiFeatureVec
-from NLEval.graph import OntologyGraph
-from NLEval.graph import SparseGraph
+from parameterized import parameterized
+from scipy.spatial import distance
+
+from NLEval.graph import (
+    DenseGraph,
+    DirectedSparseGraph,
+    FeatureVec,
+    MultiFeatureVec,
+    OntologyGraph,
+    SparseGraph,
+)
 from NLEval.graph.base import BaseGraph
 from NLEval.util import idhandler
 from NLEval.util.exceptions import IDExistsError
-from parameterized import parameterized
-from scipy.spatial import distance
 
 
 def shuffle_sparse(graph):
