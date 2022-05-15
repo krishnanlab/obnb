@@ -115,8 +115,7 @@ class BaseData:
     def download_completed(self) -> bool:
         """Check if all raw files are downloaded."""
         return all(
-            osp.isfile(osp.join(self.raw_dir, raw_file))
-            for raw_file in self.raw_files
+            osp.isfile(osp.join(self.raw_dir, raw_file)) for raw_file in self.raw_files
         )
 
     def process_completed(self) -> bool:

@@ -509,10 +509,7 @@ class SparseGraph(BaseGraph):
             try:
                 node_id1 = node_idx_to_id_converted[edge["s"]]
                 node_id2 = node_idx_to_id_converted[edge["t"]]
-                if (
-                    interaction_types is not None
-                    and edge["i"] not in interaction_types
-                ):
+                if interaction_types is not None and edge["i"] not in interaction_types:
                     self.logger.debug(
                         f"Skipping edge {edge} due to mismatched interaction "
                         f"type with the specified {interaction_types}",

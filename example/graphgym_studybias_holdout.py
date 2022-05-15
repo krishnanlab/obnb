@@ -5,10 +5,7 @@ from load_data import load_data
 from NLEval.label.filters import LabelsetRangeFilterSplit
 from NLEval.label.split import RatioPartition
 from NLEval.metric import auroc
-from NLEval.model_trainer.graphgym import (
-    GraphGymTrainer,
-    graphgym_model_wrapper,
-)
+from NLEval.model_trainer.graphgym import GraphGymTrainer, graphgym_model_wrapper
 
 # Load dataset (with sparse graph)
 g, lsc = load_data("STRING-EXP", "KEGGBP", sparse=True, filter_negative=False)

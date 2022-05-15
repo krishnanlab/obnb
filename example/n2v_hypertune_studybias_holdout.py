@@ -87,11 +87,7 @@ for label_id in lsc.label_ids:
         f"Valid: {results['val_auroc']:.4f}\t"
         f"Test: {results['test_auroc']:.4f}\t{label_id}",
     )
-
-print(
-    f"Average test score = {np.mean(scores):.4f}, "
-    f"std = {np.std(scores):.4f}\n",
-)
+print(f"Average test score = {np.mean(scores):.4f}, std = {np.std(scores):.4f}\n")
 
 # No hyperparameter selection
 for q, fvec in zip(qs, fvecs):

@@ -223,9 +223,7 @@ class MultiFeatureVec(FeatureVec):
         if isinstance(fset_idx, int):
             fset_slice = slice(indptr[fset_idx], indptr[fset_idx + 1])
         else:
-            fset_slices = [
-                list(range(indptr[i], indptr[i + 1])) for i in fset_idx
-            ]
+            fset_slices = [list(range(indptr[i], indptr[i + 1])) for i in fset_idx]
             fset_slice = list(chain(*fset_slices))
 
         return self.mat[idx][:, fset_slice]

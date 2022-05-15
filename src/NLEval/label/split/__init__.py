@@ -1,10 +1,5 @@
 """Genearting data splits from the labelset collection."""
-from .holdout import (
-    AllHoldout,
-    RandomRatioHoldout,
-    RatioHoldout,
-    ThresholdHoldout,
-)
+from .holdout import AllHoldout, RandomRatioHoldout, RatioHoldout, ThresholdHoldout
 from .partition import RandomRatioPartition, RatioPartition, ThresholdPartition
 
 __all__ = [
