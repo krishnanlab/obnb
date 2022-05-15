@@ -1,4 +1,6 @@
 #!/bin/bash --login
+# The first pos arg is the name of the conda environment, for example:
+# sh run_all nle-dev-pyg
 
 source ~/.bashrc
 

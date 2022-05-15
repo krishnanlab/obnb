@@ -4,6 +4,6 @@ rules:
   line-length: disable
   document-start: disable
   truthy:
-    level: error
+    level: warning
   braces:
     max-spaces-inside: 1
