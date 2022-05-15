@@ -5,11 +5,10 @@ repos:
       - id: yamllint
         args: [-c=.yamllint.yml]
 
-  - repo: https://github.com/asottile/reorder_python_imports
-    rev: v2.6.0
+  - repo: https://github.com/pycqa/isort
+    rev: 5.10.1
     hooks:
-      - id: reorder-python-imports
-        args: ["--py38-plus"]
+      - id: isort
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.0.1
