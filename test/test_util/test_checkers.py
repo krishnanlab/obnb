@@ -1,9 +1,8 @@
 import unittest
 
 import numpy as np
-from NLEval.typing import FLOAT_TYPE
-from NLEval.typing import INT_TYPE
-from NLEval.typing import ITERABLE_TYPE
+
+from NLEval.typing import FLOAT_TYPE, INT_TYPE, ITERABLE_TYPE
 from NLEval.util import checkers
 
 

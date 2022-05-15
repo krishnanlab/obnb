@@ -4,10 +4,11 @@ import shutil
 import tempfile
 import unittest
 
-import NLEval.data
 import pytest
-from NLEval.util.timer import Timeout
 from parameterized import parameterized
+
+import NLEval.data
+from NLEval.util.timer import Timeout
 
 LEVEL = "DEBUG"
 

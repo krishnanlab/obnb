@@ -1,9 +1,9 @@
 import unittest
 
 import numpy as np
-from NLEval.util.parallel import ParDat
-from NLEval.util.parallel import ParDatMap
 from sklearn.linear_model import LogisticRegression
+
+from NLEval.util.parallel import ParDat, ParDatMap
 
 
 class TestParDatLogReg(unittest.TestCase):
