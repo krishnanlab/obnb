@@ -1,8 +1,6 @@
 import time
 
-from NLEval.util.parallel import ParDat
-from NLEval.util.parallel import ParDatExe
-from NLEval.util.parallel import ParDatMap
+from NLEval.util.parallel import ParDat, ParDatExe, ParDatMap
 
 lst = list(range(10))
 

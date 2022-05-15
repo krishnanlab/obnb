@@ -5,15 +5,16 @@ import tempfile
 
 import numpy as np
 from load_data import load_data
-from NLEval.graph import FeatureVec
-from NLEval.graph import MultiFeatureVec
-from NLEval.label.filters import LabelsetRangeFilterSplit
-from NLEval.label.split import RatioPartition
-from NLEval.model_trainer import MultiSupervisedLearningTrainer
-from NLEval.model_trainer import SupervisedLearningTrainer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
 
+from NLEval.graph import FeatureVec, MultiFeatureVec
+from NLEval.label.filters import LabelsetRangeFilterSplit
+from NLEval.label.split import RatioPartition
+from NLEval.model_trainer import (
+    MultiSupervisedLearningTrainer,
+    SupervisedLearningTrainer,
+)
 
 TEMP_DIR = tempfile.mkdtemp()
 NETWORK = "STRING-EXP"

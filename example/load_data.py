@@ -1,11 +1,12 @@
 import os.path as osp
 
-from NLEval.graph import DenseGraph
-from NLEval.graph import SparseGraph
+from NLEval.graph import DenseGraph, SparseGraph
 from NLEval.label import LabelsetCollection
-from NLEval.label.filters import EntityExistenceFilter
-from NLEval.label.filters import LabelsetRangeFilterSize
-from NLEval.label.filters import NegativeGeneratorHypergeom
+from NLEval.label.filters import (
+    EntityExistenceFilter,
+    LabelsetRangeFilterSize,
+    NegativeGeneratorHypergeom,
+)
 from NLEval.typing import LogLevel
 
 

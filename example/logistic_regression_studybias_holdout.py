@@ -1,10 +1,10 @@
 import numpy as np
 from load_data import load_data
-from NLEval.label.split import RatioPartition
-from NLEval.model_trainer import SupervisedLearningTrainer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
 
+from NLEval.label.split import RatioPartition
+from NLEval.model_trainer import SupervisedLearningTrainer
 
 # Load dataset
 g, lsc = load_data("STRING-EXP", "KEGGBP")
