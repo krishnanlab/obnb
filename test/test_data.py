@@ -101,8 +101,8 @@ class TestData(unittest.TestCase):
     @pytest.mark.longruns
     def test_pcnet(self):
         self.graph = NLEval.data.PCNet(self.tmp_dir, log_level=LEVEL)
-        self.assertEqual(self.graph.size, 18297)
-        self.assertEqual(self.graph.num_edges, 5202828)
+        self.assertEqual(self.graph.size, 18290)
+        self.assertEqual(self.graph.num_edges, 5202094)
 
     @pytest.mark.longruns
     @pytest.mark.highmemory
