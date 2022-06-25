@@ -2,7 +2,7 @@ import logging
 
 import numpy as np
 
-from ..typing import List, LogLevel, Optional, Union
+from ..typing import Dict, List, LogLevel, Optional, Union
 from ..util import checkers
 from ..util.exceptions import IDNotExistError
 from ..util.idhandler import IDmap
@@ -199,3 +199,19 @@ class DenseGraph(BaseGraph):
     def to_sparse_graph(self):
         """Convert DenseGraphh to a SparseGraph."""
         return SparseGraph.from_mat(self.mat, self.idmap)
+
+    def save_npz(self, out_path: str, key_map: Optional[Dict[str, str]] = None):
+        """Save the graph as dense array npz file.
+
+        The npz file contains two fields, including "adj" and "node_ids". The
+        two keys can be replaced using the key_map argument.
+
+        Args:
+            out_path (str): path to the output file.
+            key_map: Dictionary mapping the default keys to new keys.
+
+        """
+        default_key_map = {"adj": "adj", "node_ids": "node_ids"}
+        default_key_map.update(key_map or dict())
+        adj_key, ids_key = default_key_map["adj"], default_key_map["node_ids"]
+        np.savez(out_path, **{adj_key: self.mat, ids_key: self.node_ids})
