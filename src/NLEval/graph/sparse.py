@@ -333,7 +333,7 @@ class SparseGraph(BaseGraph):
             self.add_edge(node_id1, node_id2, weight)
 
     @classmethod
-    def from_edglst(cls, path_to_edglst, weighted, directed, cut_threshold=0):
+    def from_edgelist(cls, path_to_edglst, weighted, directed, cut_threshold=0):
         graph = cls(weighted=weighted, directed=directed)
         reader = cls.edglst_reader
         graph.read(path_to_edglst, reader=reader, cut_threshold=cut_threshold)

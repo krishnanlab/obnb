@@ -180,9 +180,9 @@ class DenseGraph(BaseGraph):
         return cls.from_mat(mat)
 
     @classmethod
-    def from_edglst(cls, path_to_edglst, weighted, directed, **kwargs):
+    def from_edgelist(cls, path_to_edglst, weighted, directed, **kwargs):
         """Read from edgelist and construct BaseGraph."""
-        graph = SparseGraph.from_edglst(
+        graph = SparseGraph.from_edgelist(
             path_to_edglst,
             weighted,
             directed,

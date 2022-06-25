@@ -17,7 +17,7 @@ i = 24  # index of labelset
 k = 50  # numbers of top genes to display
 
 # load graph and labelset collection
-g = DenseGraph.from_edglst(GRAPH_FP, weighted=True, directed=False)
+g = DenseGraph.from_edgelist(GRAPH_FP, weighted=True, directed=False)
 lsc = LabelsetCollection.from_gmt(LABEL_FP)
 lsc.iapply(filters.EntityExistenceFilter(g.idmap.lst))
 lsc.iapply(filters.LabelsetRangeFilterSize(min_val=50))

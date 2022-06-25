@@ -38,7 +38,7 @@ def load_data(
 
     # Load data
     graph_factory = SparseGraph if sparse else DenseGraph
-    g = graph_factory.from_edglst(graph_path, weighted=True, directed=False)
+    g = graph_factory.from_edgelist(graph_path, weighted=True, directed=False)
     lsc = LabelsetCollection.from_gmt(label_path)
 
     # Filter labels
