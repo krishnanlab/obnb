@@ -259,7 +259,7 @@ class SparseGraph(BaseGraph):
             return 0
 
     @staticmethod
-    def edglst_reader(edg_path, weighted, directed, cut_threshold):
+    def edgelist_reader(edg_path, weighted, directed, cut_threshold):
         """Edge list file reader.
 
         Read line by line from a edge list file and yield (node_id1, node_id2,
@@ -311,7 +311,7 @@ class SparseGraph(BaseGraph):
                     except TypeError:
                         yield str(node_id1), str(node_id2), weight
 
-    def read(self, file, reader="edglst", cut_threshold=0):
+    def read(self, file, reader="edgelist", cut_threshold=0):
         """Read data and construct sparse graph.
 
         Args:
@@ -333,10 +333,10 @@ class SparseGraph(BaseGraph):
             self.add_edge(node_id1, node_id2, weight)
 
     @classmethod
-    def from_edgelist(cls, path_to_edglst, weighted, directed, cut_threshold=0):
+    def from_edgelist(cls, path_to_edgelist, weighted, directed, cut_threshold=0):
         graph = cls(weighted=weighted, directed=directed)
-        reader = cls.edglst_reader
-        graph.read(path_to_edglst, reader=reader, cut_threshold=cut_threshold)
+        reader = cls.edgelist_reader
+        graph.read(path_to_edgelist, reader=reader, cut_threshold=cut_threshold)
         return graph
 
     @classmethod
@@ -576,7 +576,7 @@ class SparseGraph(BaseGraph):
                 self._edge_data[i][j] = 1.0
 
     @staticmethod
-    def edglst_writer(outpth, edge_gen, weighted, directed, cut_threshold):
+    def edgelist_writer(outpth, edge_gen, weighted, directed, cut_threshold):
         """Edge list file writer.
 
         Write line by line to edge list.
@@ -639,20 +639,20 @@ class SparseGraph(BaseGraph):
                 weight = edge_data_copy[src_idx][dst_idx]
                 yield src_node_id, dst_node_id, weight
 
-    def save(self, outpth, writer="edglst", cut_threshold=0):
+    def save(self, outpth, writer="edgelist", cut_threshold=0):
         """Save graph to file.
 
         Args:
             outpth (str): path to output file
             writer (str): writer function (or name of default writer) to
-                generate file ('edglst', 'npy').
+                generate file ('edgelist', 'npy').
             cut_threshold (float): threshold of edge weights below which the
                 edges are not considered.
 
         """
         if isinstance(writer, str):
-            if writer == "edglst":
-                writer = self.edglst_writer
+            if writer == "edgelist":
+                writer = self.edgelist_writer
             elif writer == "npy":
                 writer = self.npy_writer
             else:

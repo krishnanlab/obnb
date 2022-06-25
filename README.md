@@ -73,7 +73,7 @@ Alternatively, could load from local files as shown in the following examplse.
 from NLEval import graph, label, model_trainer
 
 # Load a weighted undirected graph from an edge list file
-g = graph.DenseGraph.from_edglst("data/networks/STRING-EXP.edg", weighted=True, directed=False)
+g = graph.DenseGraph.from_edgelist("data/networks/STRING-EXP.edg", weighted=True, directed=False)
 
 # Load geneset collection from a GMT file
 lsc = label.LabelsetCollection.from_gmt("data/labels/KEGGBP.gmt")

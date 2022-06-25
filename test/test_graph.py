@@ -252,7 +252,7 @@ class TestSparseGraph(unittest.TestCase):
             self.assertEqual(sorted(graph.node_ids), ["a", "b"])
             self.assertEqual(graph._edge_data, edge_data)
 
-    def test_read_edglst_unweighted(self):
+    def test_read_edgelist_unweighted(self):
         graph = SparseGraph.from_edgelist(
             self.case.tu_path,
             weighted=False,
@@ -261,7 +261,7 @@ class TestSparseGraph(unittest.TestCase):
         self.assertEqual(graph.idmap.lst, self.case.IDlst)
         self.assertEqual(graph.edge_data, self.case.data_unweighted)
 
-    def test_read_edglst_weighted(self):
+    def test_read_edgelist_weighted(self):
         graph = SparseGraph.from_edgelist(
             self.case.tw_path,
             weighted=True,
@@ -756,7 +756,7 @@ class TestDenseGraph(unittest.TestCase):
                 node_id2 = graph.idmap.lst[j]
                 self.assertEqual(graph.get_edge(node_id1, node_id2), mat[i, j])
 
-    def test_from_edglst(self):
+    def test_from_edgelist(self):
         graph = DenseGraph.from_edgelist(
             self.case.tw_path,
             weighted=True,
