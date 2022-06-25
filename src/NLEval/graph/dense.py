@@ -212,6 +212,6 @@ class DenseGraph(BaseGraph):
 
         """
         default_key_map = {"adj": "adj", "node_ids": "node_ids"}
-        default_key_map.update(key_map or dict())
+        default_key_map.update(key_map or {})
         adj_key, ids_key = default_key_map["adj"], default_key_map["node_ids"]
         np.savez(out_path, **{adj_key: self.mat, ids_key: self.node_ids})
