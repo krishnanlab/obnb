@@ -263,20 +263,24 @@ class SparseGraph(BaseGraph):
         """Edge list file reader.
 
         Read line by line from a edge list file and yield (node_id1, node_id2,
-        weight)
+        weight).
+
+        Note:
+            Will always only read the first three columns.
 
         """
         with open(edg_path, "r") as f:
             for line in f:
+                terms = line.strip().split("\t")[:3]
                 try:
-                    node_id1, node_id2, weight = line.split("\t")
+                    node_id1, node_id2, weight = terms
                     weight = float(weight)
                     if weight <= cut_threshold:
                         continue
                     if not weighted:
                         weight = float(1)
                 except ValueError:
-                    node_id1, node_id2 = line.split("\t")
+                    node_id1, node_id2 = terms
                     weight = float(1)
                 node_id1 = node_id1.strip()
                 node_id2 = node_id2.strip()
