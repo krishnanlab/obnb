@@ -275,7 +275,7 @@ class SparseGraph(BaseGraph):
                 try:
                     node_id1, node_id2, weight = terms
                     weight = float(weight)
-                    if weight <= cut_threshold:
+                    if (cut_threshold is not None) and (weight <= cut_threshold):
                         continue
                     if not weighted:
                         weight = float(1)
@@ -309,13 +309,13 @@ class SparseGraph(BaseGraph):
             for j in range(num_nodes):
                 node_id2 = mat[j, 0]
                 weight = mat[i, j + 1]
-                if weight > cut_threshold:
+                if cut_threshold is None or weight > cut_threshold:
                     try:
                         yield str(int(node_id1)), str(int(node_id2)), weight
                     except TypeError:
                         yield str(node_id1), str(node_id2), weight
 
-    def read(self, file, reader="edgelist", cut_threshold=0):
+    def read(self, file, reader="edgelist", cut_threshold=None):
         """Read data and construct sparse graph.
 
         Args:
@@ -323,7 +323,8 @@ class SparseGraph(BaseGraph):
             weighted(bool): if not weighted, all weights are set to 1
             directed(bool): if not directed, automatically add 2 edges
             reader: generator function that yield edges from file
-            cut_threshold(float): threshold below which edges are not considered
+            cut_threshold(float, optional): threshold below which edges are not
+                considered
 
         TODO: reader part looks sus, check unit test
 
@@ -337,14 +338,14 @@ class SparseGraph(BaseGraph):
             self.add_edge(node_id1, node_id2, weight)
 
     @classmethod
-    def from_edgelist(cls, path_to_edgelist, weighted, directed, cut_threshold=0):
+    def from_edgelist(cls, path_to_edgelist, weighted, directed, cut_threshold=None):
         graph = cls(weighted=weighted, directed=directed)
         reader = cls.edgelist_reader
         graph.read(path_to_edgelist, reader=reader, cut_threshold=cut_threshold)
         return graph
 
     @classmethod
-    def from_npy(cls, npy, weighted, directed, cut_threshold=0):
+    def from_npy(cls, npy, weighted, directed, cut_threshold=None):
         graph = cls(weighted=weighted, directed=directed)
         reader = cls.npy_reader
         graph.read(npy, reader=reader, cut_threshold=cut_threshold)

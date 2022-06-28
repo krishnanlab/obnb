@@ -266,6 +266,7 @@ class TestSparseGraph(unittest.TestCase):
             self.case.tw_path,
             weighted=True,
             directed=False,
+            cut_threshold=0,
         )
         self.assertEqual(graph.idmap.lst, self.case.IDlst)
         self.assertEqual(graph.edge_data, self.case.data_weighted)
@@ -275,6 +276,7 @@ class TestSparseGraph(unittest.TestCase):
             self.case.data_mat,
             weighted=True,
             directed=False,
+            cut_threshold=0,
         )
         self.assertEqual(graph.idmap.lst, self.case.IDlst)
         self.assertEqual(graph.edge_data, self.case.data_weighted)
