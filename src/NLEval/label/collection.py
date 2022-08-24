@@ -2,11 +2,11 @@ from functools import lru_cache
 
 import numpy as np
 
-from ..graph import OntologyGraph
-from ..typing import Dict, Iterator, List, Optional, Set, Splitter, Tuple
-from ..util import checkers, idhandler
-from ..util.exceptions import IDExistsError
-from .filters.base import BaseFilter
+from NLEval.graph import OntologyGraph
+from NLEval.typing import Dict, Iterator, List, Optional, Set, Splitter, Tuple
+from NLEval.util import checkers, idhandler
+from NLEval.util.exceptions import IDExistsError
+from NLEval.label.filters.base import BaseFilter
 
 
 class LabelsetCollection(idhandler.IDprop):

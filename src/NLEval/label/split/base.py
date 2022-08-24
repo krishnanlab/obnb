@@ -1,6 +1,6 @@
 import numpy as np
 
-from ...typing import Iterator, Optional, Tuple
+from NLEval.typing import Iterator, Optional, Tuple
 
 
 class BaseSplit:

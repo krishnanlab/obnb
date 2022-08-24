@@ -4,9 +4,9 @@ import shutil
 
 import yaml
 
-from ..typing import Any, List, LogLevel, Optional
-from ..util.logger import get_logger, log_file_context
-from ..util.path import cleandir, hexdigest
+from NLEval.typing import Any, List, LogLevel, Optional
+from NLEval.util.logger import get_logger, log_file_context
+from NLEval.util.path import cleandir, hexdigest
 
 
 class BaseData:

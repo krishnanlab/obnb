@@ -3,8 +3,8 @@ import os
 
 import mygene
 
-from ..typing import Dict, Iterator, List, LogLevel, Optional
-from ..util.logger import get_logger
+from NLEval.typing import Dict, Iterator, List, LogLevel, Optional
+from NLEval.util.logger import get_logger
 
 
 class MyGeneInfoConverter:

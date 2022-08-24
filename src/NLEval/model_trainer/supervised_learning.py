@@ -1,8 +1,8 @@
 import numpy as np
 
-from ..typing import Any, Dict, LogLevel, Optional
-from ..util.checkers import checkNumpyArrayShape
-from .base import BaseTrainer
+from NLEval.typing import Any, Dict, LogLevel, Optional
+from NLEval.util.checkers import checkNumpyArrayShape
+from NLEval.model_trainer.base import BaseTrainer
 
 
 class SupervisedLearningTrainer(BaseTrainer):

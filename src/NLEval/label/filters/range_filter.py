@@ -1,8 +1,8 @@
 import numpy as np
 
-from ...typing import List, Optional
-from ..collection import Splitter
-from .base import BaseFilter
+from NLEval.typing import List, Optional
+from NLEval.label.collection import Splitter
+from NLEval.label.filters.base import BaseFilter
 
 
 class BaseRangeFilter(BaseFilter):

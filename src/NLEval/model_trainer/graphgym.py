@@ -16,8 +16,8 @@ from torch_geometric.graphgym.train import train_epoch
 from torch_geometric.graphgym.utils.comp_budget import params_count
 from torch_geometric.graphgym.utils.device import auto_select_device
 
-from ..typing import Any, Dict, List, Optional
-from .gnn import GNNTrainer
+from NLEval.typing import Any, Dict, List, Optional
+from NLEval.model_trainer.gnn import GNNTrainer
 
 
 class GraphGymTrainer(GNNTrainer):

@@ -6,7 +6,7 @@ from contextlib import contextmanager
 
 import yaml
 
-from ..typing import LogLevel, Optional
+from NLEval.typing import LogLevel, Optional
 
 
 def config_logger():

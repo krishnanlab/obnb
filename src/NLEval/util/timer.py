@@ -1,7 +1,7 @@
 import signal
 import time
 
-from .checkers import checkType
+from NLEval.util.checkers import checkType
 
 
 class Timeit:

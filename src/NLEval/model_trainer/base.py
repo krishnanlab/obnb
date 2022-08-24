@@ -1,10 +1,10 @@
 import numpy as np
 
-from ..graph.base import BaseGraph
-from ..graph.featurevec import MultiFeatureVec
-from ..typing import Any, Callable, Dict, LogLevel, Optional, Sequence
-from ..util.checkers import checkNumpyArrayShape
-from ..util.logger import get_logger
+from NLEval.graph.base import BaseGraph
+from NLEval.graph.featurevec import MultiFeatureVec
+from NLEval.typing import Any, Callable, Dict, LogLevel, Optional, Sequence
+from NLEval.util.checkers import checkNumpyArrayShape
+from NLEval.util.logger import get_logger
 
 
 class BaseTrainer:

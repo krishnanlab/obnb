@@ -1,5 +1,5 @@
-from ...util.converter import MyGeneInfoConverter
-from .base import BaseNdexData
+from NLEval.util.converter import MyGeneInfoConverter
+from NLEval.data.network.base import BaseNdexData
 
 
 class HumanNet(BaseNdexData):

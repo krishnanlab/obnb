@@ -2,9 +2,9 @@ import os.path as osp
 
 import requests
 
-from ...label import LabelsetCollection
-from ...typing import Any, List, Optional
-from ..base import BaseData
+from NLEval.label import LabelsetCollection
+from NLEval.typing import Any, List, Optional
+from NLEval.data.base import BaseData
 
 
 class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):

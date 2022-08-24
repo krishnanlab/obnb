@@ -1,6 +1,19 @@
 """Interface with various databases to retrieve data."""
-from .annotated_ontology import GOBP, GOCC, GOMF, DisGeNet
-from .network import HIPPIE, STRING, BioGRID, BioPlex, FunCoup, HumanNet, PCNet
+from NLEval.data.annotated_ontology import (
+    DisGeNet,
+    GOBP,
+    GOCC,
+    GOMF,
+)
+from NLEval.data.network import (
+    BioGRID,
+    BioPlex,
+    FunCoup,
+    HIPPIE,
+    HumanNet,
+    PCNet,
+    STRING,
+)
 
 __all__ = [
     "BioGRID",

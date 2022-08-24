@@ -4,9 +4,9 @@ from copy import deepcopy
 
 import numpy as np
 
-from ..typing import ITERABLE_TYPE, Dict, List
-from . import checkers
-from .exceptions import IDExistsError, IDNotExistError
+from NLEval.typing import ITERABLE_TYPE, Dict, List
+from NLEval.util import checkers
+from NLEval.util.exceptions import IDExistsError, IDNotExistError
 
 __all__ = ["IDlst", "IDmap", "IDprop"]
 

@@ -5,7 +5,7 @@ import mygene
 import ndex2
 from requests import RequestException
 
-from ..typing import Dict, List, Optional, Set
+from NLEval.typing import Dict, List, Optional, Set
 
 
 class CXExplorer:

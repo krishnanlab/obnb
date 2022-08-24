@@ -1,9 +1,9 @@
 import logging
 from copy import deepcopy
 
-from ..typing import List, LogLevel, Optional, Tuple, Union
-from ..util import checkers, idhandler
-from ..util.logger import get_logger
+from NLEval.typing import List, LogLevel, Optional, Tuple, Union
+from NLEval.util import checkers, idhandler
+from NLEval.util.logger import get_logger
 
 
 class BaseGraph:

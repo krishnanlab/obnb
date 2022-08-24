@@ -1,6 +1,6 @@
 """Unified framework for training different types of models."""
-from .label_propagation import LabelPropagationTrainer
-from .supervised_learning import (
+from NLEval.model_trainer.label_propagation import LabelPropagationTrainer
+from NLEval.model_trainer.supervised_learning import (
     MultiSupervisedLearningTrainer,
     SupervisedLearningTrainer,
 )

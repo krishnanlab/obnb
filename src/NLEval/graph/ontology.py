@@ -6,7 +6,7 @@ from contextlib import contextmanager
 
 from tqdm import trange
 
-from ..typing import (
+from NLEval.typing import (
     DefaultDict,
     Iterable,
     Iterator,
@@ -18,9 +18,9 @@ from ..typing import (
     TextIO,
     Union,
 )
-from ..util import idhandler
-from ..util.exceptions import OboTermIncompleteError
-from .sparse import DirectedSparseGraph
+from NLEval.util import idhandler
+from NLEval.util.exceptions import OboTermIncompleteError
+from NLEval.graph.sparse import DirectedSparseGraph
 
 
 class OntologyGraph(DirectedSparseGraph):

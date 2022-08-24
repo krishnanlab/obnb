@@ -5,15 +5,15 @@ import pandas as pd
 import requests
 from tqdm import tqdm
 
-from ...graph import OntologyGraph
-from ...label import LabelsetCollection
-from ...label.filters import (
+from NLEval.graph import OntologyGraph
+from NLEval.label import LabelsetCollection
+from NLEval.label.filters import (
     LabelsetPairwiseFilterJaccard,
     LabelsetPairwiseFilterOverlap,
     LabelsetRangeFilterSize,
 )
-from ...util.exceptions import IDNotExistError
-from .base import BaseAnnotatedOntologyData
+from NLEval.util.exceptions import IDNotExistError
+from NLEval.data.annotated_ontology.base import BaseAnnotatedOntologyData
 
 
 class DisGeNet(BaseAnnotatedOntologyData):

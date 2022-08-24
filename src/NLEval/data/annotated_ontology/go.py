@@ -1,14 +1,14 @@
 import mygene
 from tqdm import tqdm
 
-from ...graph import OntologyGraph
-from ...label import LabelsetCollection
-from ...label.filters import (
+from NLEval.graph import OntologyGraph
+from NLEval.label import LabelsetCollection
+from NLEval.label.filters import (
     LabelsetPairwiseFilterJaccard,
     LabelsetPairwiseFilterOverlap,
     LabelsetRangeFilterSize,
 )
-from .base import BaseAnnotatedOntologyData
+from NLEval.data.annotated_ontology.base import BaseAnnotatedOntologyData
 
 
 class GeneOntology(BaseAnnotatedOntologyData):

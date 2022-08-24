@@ -2,12 +2,12 @@ import logging
 
 import numpy as np
 
-from ..typing import List, LogLevel, Optional, Union
-from ..util import checkers
-from ..util.exceptions import IDNotExistError
-from ..util.idhandler import IDmap
-from .base import BaseGraph
-from .sparse import SparseGraph
+from NLEval.typing import List, LogLevel, Optional, Union
+from NLEval.util import checkers
+from NLEval.util.exceptions import IDNotExistError
+from NLEval.util.idhandler import IDmap
+from NLEval.graph.base import BaseGraph
+from NLEval.graph.sparse import SparseGraph
 
 
 class DenseGraph(BaseGraph):

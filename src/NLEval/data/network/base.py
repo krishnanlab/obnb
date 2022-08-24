@@ -1,8 +1,8 @@
 import ndex2
 
-from ...graph import SparseGraph
-from ...typing import Any, Dict, List, Optional
-from ..base import BaseData
+from NLEval.graph import SparseGraph
+from NLEval.typing import Any, Dict, List, Optional
+from NLEval.data.base import BaseData
 
 
 class BaseNdexData(BaseData, SparseGraph):
