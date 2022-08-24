@@ -1,7 +1,7 @@
 from tqdm import tqdm
 
-from ...typing import Any, Dict, List, LogLevel
-from ...util.logger import get_logger
+from NLEval.typing import Any, Dict, List, LogLevel
+from NLEval.util.logger import get_logger
 
 
 class BaseFilter:

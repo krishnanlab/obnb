@@ -1,11 +1,11 @@
 """Network data."""
-from .biogrid import BioGRID
-from .bioplex import BioPlex
-from .funcoup import FunCoup
-from .hippie import HIPPIE
-from .humannet import HumanNet
-from .pcnet import PCNet
-from .string import STRING
+from NLEval.data.network.biogrid import BioGRID
+from NLEval.data.network.bioplex import BioPlex
+from NLEval.data.network.funcoup import FunCoup
+from NLEval.data.network.hippie import HIPPIE
+from NLEval.data.network.humannet import HumanNet
+from NLEval.data.network.pcnet import PCNet
+from NLEval.data.network.string import STRING
 
 __all__ = [
     "BioGRID",

@@ -1,7 +1,7 @@
 import numpy as np
 
-from ..typing import Any, Dict
-from .base import BaseTrainer
+from NLEval.typing import Any, Dict
+from NLEval.model_trainer.base import BaseTrainer
 
 
 class LabelPropagationTrainer(BaseTrainer):

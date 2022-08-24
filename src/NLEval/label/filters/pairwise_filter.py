@@ -1,7 +1,7 @@
 import numpy as np
 
-from ...typing import Set
-from .range_filter import BaseRangeFilter
+from NLEval.typing import Set
+from NLEval.label.filters.range_filter import BaseRangeFilter
 
 
 class BaseLabelsetPairwiseFilter(BaseRangeFilter):

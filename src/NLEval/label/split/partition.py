@@ -2,9 +2,9 @@ from collections import Counter
 
 import numpy as np
 
-from ...typing import List, Tuple
-from ...util.checkers import checkTypesInIterableErrEmpty
-from .base import BaseRandomSplit, BaseSortedSplit
+from NLEval.typing import List, Tuple
+from NLEval.util.checkers import checkTypesInIterableErrEmpty
+from NLEval.label.split.base import BaseRandomSplit, BaseSortedSplit
 
 
 class BasePartition(BaseSortedSplit):

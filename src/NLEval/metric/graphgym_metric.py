@@ -4,8 +4,8 @@ from functools import wraps
 import torch
 from torch import Tensor
 
-from ..typing import List, Metric
-from .standard import auroc, log2_auprc_prior, precision_at_topk
+from NLEval.typing import List, Metric
+from NLEval.metric.standard import auroc, log2_auprc_prior, precision_at_topk
 
 __all__ = [
     "graphgym_auroc",

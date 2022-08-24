@@ -5,8 +5,8 @@ import torch
 from torch_geometric.data import Data
 from torch_geometric.transforms import Constant
 
-from ..typing import Any, Dict, List, LogLevel, Optional, Tuple
-from .base import BaseTrainer
+from NLEval.typing import Any, Dict, List, LogLevel, Optional, Tuple
+from NLEval.model_trainer.base import BaseTrainer
 
 
 class GNNTrainer(BaseTrainer):

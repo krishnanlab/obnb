@@ -1,7 +1,7 @@
 import warnings
 from functools import wraps
 
-from ..typing import Optional
+from NLEval.typing import Optional
 
 
 class Deprecated:

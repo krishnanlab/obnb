@@ -2,8 +2,8 @@ import multiprocessing as mp
 
 from tqdm import tqdm
 
-from ..typing import Any, Iterator, List, Tuple
-from . import checkers
+from NLEval.typing import Any, Iterator, List, Tuple
+from NLEval.util import checkers
 
 mp.set_start_method("fork")
 

@@ -3,12 +3,12 @@ import logging
 
 import numpy as np
 
-from ..typing import EdgeData, List, LogLevel, Mapping, Optional, Union
-from ..util import checkers
-from ..util.cx_explorer import CXExplorer
-from ..util.exceptions import IDNotExistError
-from ..util.idhandler import IDmap
-from .base import BaseGraph
+from NLEval.typing import EdgeData, List, LogLevel, Mapping, Optional, Union
+from NLEval.util import checkers
+from NLEval.util.cx_explorer import CXExplorer
+from NLEval.util.exceptions import IDNotExistError
+from NLEval.util.idhandler import IDmap
+from NLEval.graph.base import BaseGraph
 
 
 class SparseGraph(BaseGraph):
@@ -703,7 +703,7 @@ class SparseGraph(BaseGraph):
 
     def to_dense_graph(self):
         """Convert SparseGraph to a DenseGraph."""
-        from .dense import DenseGraph  # noreorder
+        from NLEval.graph.dense import DenseGraph  # noreorder
 
         return DenseGraph.from_mat(self.to_adjmat(), self.idmap)
 
