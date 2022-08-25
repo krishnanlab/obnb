@@ -5,6 +5,10 @@ from NLEval.label.filters.existence_filter import (
     LabelsetExistenceFilter,
 )
 from NLEval.label.filters.negative_generator import NegativeGeneratorHypergeom
+from NLEval.label.filters.nonred import (
+    LabelsetNonRedFilterJaccard,
+    LabelsetNonRedFilterOverlap,
+)
 from NLEval.label.filters.pairwise_filter import (
     LabelsetPairwiseFilterJaccard,
     LabelsetPairwiseFilterOverlap,
@@ -18,8 +22,10 @@ from NLEval.label.filters.range_filter import (
 __all__ = [
     "Compose",
     "EntityExistenceFilter",
-    "LabelsetExistenceFilter",
     "EntityRangeFilterNoccur",
+    "LabelsetExistenceFilter",
+    "LabelsetNonRedFilterJaccard",
+    "LabelsetNonRedFilterOverlap",
     "LabelsetPairwiseFilterJaccard",
     "LabelsetPairwiseFilterOverlap",
     "LabelsetRangeFilterSize",
