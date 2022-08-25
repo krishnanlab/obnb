@@ -3,8 +3,8 @@ from itertools import combinations
 
 import numpy as np
 
-from NLEval.label.collection import LabelsetCollection
 from NLEval.graph import SparseGraph
+from NLEval.label.collection import LabelsetCollection
 from NLEval.label.filters.base import BaseFilter
 from NLEval.typing import List
 
@@ -126,7 +126,8 @@ class BaseLabelsetNonRedFilter(BaseFilter):
 
                 # Handle ties by considering the labelset with the largest size
                 if len(where := np.where(r == r.max())[0]) > 1:
-                    where = [max(where, key=lambda i: len(labelsets[i]))]
+                    idx_to_size = {i: len(j) for i, j in enumerate(labelsets)}
+                    where = [max(where, key=idx_to_size.get)]  # type: ignore
 
                 nonred_label_id = component.pop(where[0])
                 self.logger.debug(f"{nonred_label_id=}, {component=!r}")
@@ -138,17 +139,17 @@ class BaseLabelsetNonRedFilter(BaseFilter):
                 # Extract representative labelsets from the rest of the labelsets
                 nonred_label_ids.update(
                     self.get_nonred_label_ids(g.induced_subgraph(component), lsc)
-                    | {nonred_label_id}
+                    | {nonred_label_id},
                 )
 
         return nonred_label_ids
-
 
     def get_val_getter(self, lsc):
         # Extract non-redundant labelset ids and then remove anything outside
         # of this sed
         g = self.construct_labelset_graph(lsc)
         from pprint import pprint
+
         pprint(g.edge_data)
         nonred_label_ids = self.get_nonred_label_ids(g, lsc)
         self.logger.debug(f"{nonred_label_ids=}")
