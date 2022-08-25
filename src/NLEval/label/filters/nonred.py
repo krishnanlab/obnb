@@ -6,7 +6,7 @@ import numpy as np
 from NLEval.graph import SparseGraph
 from NLEval.label.collection import LabelsetCollection
 from NLEval.label.filters.base import BaseFilter
-from NLEval.typing import List
+from NLEval.typing import List, Set
 
 
 class BaseLabelsetNonRedFilter(BaseFilter):
@@ -68,7 +68,7 @@ class BaseLabelsetNonRedFilter(BaseFilter):
             raise ValueError(f"'threshold' must be within [0, 1], got {threshold}")
 
     @staticmethod
-    def compute_redundancy(labelset1: set[str], labelset2: set[str]) -> float:
+    def compute_redundancy(labelset1: Set[str], labelset2: Set[str]) -> float:
         raise NotImplementedError
 
     def construct_labelset_graph(self, lsc):
@@ -84,7 +84,7 @@ class BaseLabelsetNonRedFilter(BaseFilter):
         return g
 
     @staticmethod
-    def _get_redundant_ratio(labelsets: List[set[str]], idx: int) -> float:
+    def _get_redundant_ratio(labelsets: List[Set[str]], idx: int) -> float:
         """Compute the ratio of elements in a set that is in some other sets."""
         current_labelset = labelsets[idx]
         all_execpt_idx = [i for i in range(len(labelsets)) if i != idx]
@@ -96,7 +96,7 @@ class BaseLabelsetNonRedFilter(BaseFilter):
         self,
         g: SparseGraph,
         lsc: LabelsetCollection,
-    ) -> set[str]:
+    ) -> Set[str]:
         """Extract non-redundant labelsets.
 
         Args:
