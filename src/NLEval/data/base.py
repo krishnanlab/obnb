@@ -47,18 +47,21 @@ class BaseData:
 
         self.root = root
         self.log_level = log_level
-
-        # Redownload > reprocess > retransform
-        reprocess = reprocess or redownload
-        retransform = retransform or reprocess
+        self._setup_redos(redownload, reprocess, retransform)
 
         self._setup_process_logger()
         with log_file_context(self.plogger, self.info_log_path):
-            self._download(redownload)
-            self._process(reprocess)
+            self._download()
+            self._process()
 
         self.load_processed_data()
-        self._transform(retransform, transformation)
+        self._transform(transformation)
+
+    def _setup_redos(self, redownload: bool, reprocess: bool, retransform: bool):
+        # Redownload > reprocess > retransform
+        self.redownload = redownload
+        self.reprocess = reprocess or self.redownload
+        self.retransform = retransform or self.reprocess
 
     def _setup_process_logger(self):
         """Set up process logger and file handler for data processing steps."""
@@ -133,10 +136,10 @@ class BaseData:
         """Download raw files."""
         raise NotImplementedError
 
-    def _download(self, redownload: bool):
+    def _download(self):
         """Check to see if files downloaded first before downloading."""
         os.makedirs(self.raw_dir, exist_ok=True)
-        if redownload or not self.download_completed():
+        if self.redownload or not self.download_completed():
             self.plogger.info(f"Start downloading {self.classname}...")
             self.download()
 
@@ -144,10 +147,10 @@ class BaseData:
         """Process raw files."""
         raise NotImplementedError
 
-    def _process(self, reprocess: bool):
+    def _process(self):
         """Check to see if processed file exist and process if not."""
         os.makedirs(self.processed_dir, exist_ok=True)
-        if reprocess or not self.process_completed():
+        if self.reprocess or not self.process_completed():
             self.plogger.info(f"Start processing {self.classname}...")
             self.process()
 
@@ -155,7 +158,7 @@ class BaseData:
         """Apply a transformation to the loaded data."""
         raise NotImplementedError
 
-    def _transform(self, retransform: bool, transformation: Optional[Any]):
+    def _transform(self, transformation: Optional[Any]):
         """Check to see if cached transformed data exist and load if so."""
         if transformation is None:
             return
@@ -166,7 +169,7 @@ class BaseData:
         cache_dir = osp.join(self.processed_dir, hexhash)
         if osp.isdir(cache_dir):
             # TODO: option to furthercheck if info matches (config.yaml)
-            if retransform:
+            if self.retransform:
                 shutil.rmtree(cache_dir)
             else:
                 cache_path = osp.join(cache_dir, "data.gmt")
