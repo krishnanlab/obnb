@@ -1,5 +1,7 @@
+mygene==3.2.2
+ndex2==3.4.0
 numpy==1.22.4
+pyroe==0.6.2
+scanpy==1.9.1
 scikit-learn==1.0.2
 tqdm==4.60.0
-ndex2==3.4.0
-mygene==3.2.2

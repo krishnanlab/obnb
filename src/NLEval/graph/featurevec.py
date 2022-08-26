@@ -6,10 +6,10 @@ from itertools import chain
 import numpy as np
 from scipy.spatial import distance
 
+from NLEval.graph.dense import DenseGraph
 from NLEval.typing import INT_TYPE, LogLevel, Optional, Sequence
 from NLEval.util import checkers
 from NLEval.util.idhandler import IDmap
-from NLEval.graph.dense import DenseGraph
 
 
 class FeatureVec(DenseGraph):
@@ -170,6 +170,42 @@ class FeatureVec(DenseGraph):
         new_mat = np.zeros((len(new_idmap), self.mat.shape[1]))
         new_mat[r_idx] = self.mat[l_idx]
         self._mat = new_mat
+
+    def read_anndata(self, adata, obs_id_name: str = "_index_"):
+        """Read feature data from AnnData object.
+
+        Notes:
+            This will overwrite existing data in the object.
+
+        Args:
+            adata: The AnnData object to be loaded.
+            obs_id_name: Name of the observation dataframe column to be used
+                as entity IDs. If set to '_index_' (default), then use the
+                index column.
+
+        """
+        # TODO: add feature ids?
+        if obs_id_name == "_index_":
+            ids = adata.obs.index.tolist()
+        else:
+            ids = adata.obs[obs_id_name].tolist()
+        self.idmap = IDmap.from_list(ids)
+        self.mat = adata.X.toarray()
+
+    @classmethod
+    def from_anndata(cls, adata, obs_id_name: str = "_index_", **kwargs):
+        """Construct FeatureVec from AnnData.
+
+        Args:
+            adata: The AnnData object to be loaded.
+            obs_id_name: Name of the observation dataframe column to be used
+                as entity IDs. If set to '_index_' (default), then use the
+                index column.
+
+        """
+        graph = cls(**kwargs)
+        graph.read_anndata(adata, obs_id_name)
+        return graph
 
     @classmethod
     def from_emd(cls, path_to_emd, **kwargs):
