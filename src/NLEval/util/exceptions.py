@@ -1,3 +1,7 @@
+class DataNotFoundError(Exception):
+    """Raised when an particular version of arvhival data is unavailable."""
+
+
 class IDNotExistError(Exception):
     """Raised when query ID not exist."""
 

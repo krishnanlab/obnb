@@ -38,7 +38,6 @@ class AlevinFry(BaseData, FeatureVec):
         self,
         root: str,
         dataset_id: int,  # TODO: add option to view data id -> name?
-        redownload: bool = False,  # TODO: why is this not saved in BaseData
         quiet: bool = False,  # TODO: after captured to log, replace this w loglvl
         delete_tar: bool = False,
         **kwargs,
@@ -49,8 +48,6 @@ class AlevinFry(BaseData, FeatureVec):
             root: The root directory of the data.
             dataset_id: The ID of the Alevin-Fry dataset (see more at
                 https://github.com/COMBINE-lab/pyroe).
-            redownload: If set to True, then force redownload the data even
-                they have been downloaded previously.
             quiet: If set to True, do not print any information to the screen
                 about data downloading and processing.
             delete_art: If set to True, delete the tar ball file after the
@@ -58,7 +55,6 @@ class AlevinFry(BaseData, FeatureVec):
 
         """
         self.dataset_id = dataset_id
-        self.redownload = redownload
         self.quiet = quiet
         self.delete_tar = delete_tar
         self._metadata: Dict[str, str] = {}

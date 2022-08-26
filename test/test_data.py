@@ -8,6 +8,7 @@ import pytest
 from parameterized import parameterized
 
 import NLEval.data
+from NLEval.util.exceptions import DataNotFoundError
 from NLEval.util.timer import Timeout
 
 LEVEL = "DEBUG"
@@ -110,6 +111,21 @@ class TestData(unittest.TestCase):
         self.graph = NLEval.data.STRING(self.tmp_dir, log_level=LEVEL)
         self.assertEqual(self.graph.size, 18484)
         self.assertEqual(self.graph.num_edges, 11021544)
+
+
+@pytest.mark.mediumruns
+def test_archive_data_v1(tmpdir):
+    print(tmpdir)
+    with pytest.raises(ValueError):
+        g = NLEval.data.BioGRID(tmpdir, version="nledata-vDNE-test")
+
+    with pytest.raises(DataNotFoundError):
+        g = NLEval.data.HIPPIE(tmpdir, version="nledata-v1.0-test")
+
+    # TODO: check changed version redownload
+    g = NLEval.data.BioGRID(tmpdir, version="nledata-v1.0-test")
+    assert g.size == 19276
+    assert g.num_edges == 1100282
 
 
 if __name__ == "__main__":
