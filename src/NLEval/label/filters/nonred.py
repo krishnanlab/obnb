@@ -148,9 +148,7 @@ class BaseLabelsetNonRedFilter(BaseFilter):
         # Extract non-redundant labelset ids and then remove anything outside
         # of this sed
         g = self.construct_labelset_graph(lsc)
-        from pprint import pprint
 
-        pprint(g.edge_data)
         nonred_label_ids = self.get_nonred_label_ids(g, lsc)
         self.logger.debug(f"{nonred_label_ids=}")
 
