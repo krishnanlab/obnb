@@ -1,8 +1,6 @@
 from functools import partial
 from itertools import combinations
 
-import numpy as np
-
 from NLEval.graph import SparseGraph
 from NLEval.label.collection import LabelsetCollection
 from NLEval.label.filters.base import BaseFilter
@@ -121,15 +119,16 @@ class BaseLabelsetNonRedFilter(BaseFilter):
                 # Determine the representative labelset to use
                 labelsets = list(map(lsc.get_labelset, component))
                 get_redundant_ratio = partial(self._get_redundant_ratio, labelsets)
-                r = np.array(list(map(get_redundant_ratio, range(comp_size))))
+                r = list(map(get_redundant_ratio, range(comp_size)))
+                s = list(map(len, labelsets))
                 self.logger.debug(f"Redundant ratios {r=!r}")
+                self.logger.debug(f"Labelset sizes {s=!r}")
 
-                # Handle ties by considering the labelset with the largest size
-                if len(where := np.where(r == r.max())[0]) > 1:
-                    idx_to_size = {i: len(j) for i, j in enumerate(labelsets)}
-                    where = [max(where, key=idx_to_size.get)]  # type: ignore
+                # Sort by redundant ratios first, then labelset sizes
+                sorted_idx = sorted(range(comp_size), key=list(zip(r, s)).__getitem__)
+                self.logger.debug(f"Sorted index = {sorted_idx}")
 
-                nonred_label_id = component.pop(where[0])
+                nonred_label_id = component.pop(sorted_idx[-1])
                 self.logger.debug(f"{nonred_label_id=}, {component=!r}")
 
                 # TODO: change to g.get_nbrs
