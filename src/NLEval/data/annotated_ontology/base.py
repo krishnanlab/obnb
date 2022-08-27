@@ -2,9 +2,9 @@ import os.path as osp
 
 import requests
 
+from NLEval.data.base import BaseData
 from NLEval.label import LabelsetCollection
 from NLEval.typing import Any, List, Optional
-from NLEval.data.base import BaseData
 
 
 class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
@@ -89,11 +89,11 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
         lsc.export_gmt(out_path)
         self.plogger.info(f"Saved processed file {out_path}")
 
-    def transform(self, transformation: Any, cache_dir: str):
-        """Apply a transformation to the loaded data."""
+    def transform(self, transform: Any, cache_dir: str):
+        """Apply a (pre-)transformation to the loaded data."""
         self.plogger.info(f"Before transformation:\n{self.stats()}")
-        self.plogger.info(f"Applying transformation:\n{transformation}")
-        self.iapply(transformation, progress_bar=True)
+        self.plogger.info(f"Applying transformation:\n{transform}")
+        self.iapply(transform, progress_bar=True)
         self.plogger.info(f"After transformation:\n{self.stats()}")
 
         out_path = osp.join(cache_dir, "data.gmt")

@@ -37,7 +37,7 @@ class BaseData:
         reprocess: bool = False,
         retransform: bool = False,
         log_level: LogLevel = "INFO",
-        transformation: Optional[Any] = None,
+        transform: Optional[Any] = None,
         **kwargs,
     ):
         """Initialize BaseData object.
@@ -50,7 +50,7 @@ class BaseData:
                 processed data is available (default: False).
             retransform (bool): If set to tTrue, retransform the data even if
                 the cached transformation is available (default: False).
-            transformation: Optional transformation to be applied to the data
+            transform: Optional transformation to be applied to the data
                 obect.
 
         """
@@ -70,7 +70,7 @@ class BaseData:
             self._download_archive()
 
         self.load_processed_data()
-        self._transform(transformation)
+        self._transform(transform)
 
     def _setup_redos(self, redownload: bool, reprocess: bool, retransform: bool):
         # Redownload > reprocess > retransform
@@ -169,17 +169,17 @@ class BaseData:
             self.plogger.info(f"Start processing {self.classname}...")
             self.process()
 
-    def transform(self, transformation: Any, cache_dir: str):
-        """Apply a transformation to the loaded data."""
+    def transform(self, transform: Any, cache_dir: str):
+        """Apply a (pre-)transformation to the loaded data."""
         raise NotImplementedError
 
-    def _transform(self, transformation: Optional[Any]):
+    def _transform(self, transform: Optional[Any]):
         """Check to see if cached transformed data exist and load if so."""
         # TODO: make this pretransform and add a transform version that do not save?
-        if transformation is None:
+        if transform is None:
             return
 
-        config_dump = yaml.dump(transformation.to_config())
+        config_dump = yaml.dump(transform.to_config())
         hexhash = hexdigest(config_dump)
         self.plogger.debug(f"{hexhash=}")
         cache_dir = osp.join(self.processed_dir, hexhash)
@@ -199,7 +199,7 @@ class BaseData:
         with open(osp.join(cache_dir, "config.yaml"), "w") as f:
             f.write(config_dump)
         with log_file_context(self.plogger, osp.join(cache_dir, "run.log")):
-            self.transform(transformation, cache_dir)
+            self.transform(transform, cache_dir)
 
     def get_data_url(self, version: str) -> str:
         """Obtain archive data URL.
