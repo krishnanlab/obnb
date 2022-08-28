@@ -25,20 +25,27 @@ def test_disgenet(tmpdir, caplog, mocker, subtests):
         assert osp.isdir(osp.join(datadir, "processed"))
         assert osp.isdir(osp.join(datadir, "raw"))
         assert osp.isdir(osp.join(datadir, "info"))
+        transform_called += 1  # called due to pre-transform
+        assert spy.call_count == transform_called
 
     with subtests.test("Download then transform"):
         lsc = DisGeNet(tmpdir, transform=filter_)
-        transform_called += 1
+        transform_called += 1  # called due to transform
         assert spy.call_count == transform_called
         assert osp.isfile(config_path)
 
     with subtests.test("Load transformed data from cache"):
         lsc = DisGeNet(tmpdir, transform=filter_)
+        transform_called += 0  # not called since found in cache
         assert spy.call_count == transform_called
 
     with subtests.test("Forced retransform due to modified config"):
         with open(config_path, "w") as f:
             f.write("")
         lsc = DisGeNet(tmpdir, transform=filter_)
-        transform_called += 1
+        transform_called += 1  # called due to mismatched config
         assert spy.call_count == transform_called
+
+    with subtests.test("Cannot set pre-transform for archived data"):
+        with pytest.raises(ValueError):
+            lsc = DisGeNet(tmpdir, pre_transform=filter_, version="nledata-v1.0-test")

@@ -35,7 +35,7 @@ class GeneOntology(BaseAnnotatedOntologyData):
         super().__init__(root, **kwargs)
 
     @property
-    def filters(self):
+    def _default_pre_transform(self):
         return Compose(
             LabelsetRangeFilterSize(max_val=self.max_size),
             LabelsetPairwiseFilterJaccard(
@@ -91,7 +91,7 @@ class GeneOntology(BaseAnnotatedOntologyData):
             min_size=self.min_size,
             namespace=self.namespace,
         )
-        self.filter_and_save(lsc)
+        lsc.export_gmt(self.processed_file_path(0))
 
 
 class GOBP(GeneOntology):

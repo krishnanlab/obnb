@@ -4,7 +4,6 @@ import requests
 
 from NLEval.data.base import BaseData
 from NLEval.label import LabelsetCollection
-from NLEval.label.filters import Compose
 from NLEval.typing import Any, List, Optional
 
 
@@ -54,11 +53,6 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
                 f"Annotation file name not available for {self.classname!r}",
             )
 
-    @property
-    def filters(self):
-        """Labelset collection processing filters."""
-        return Compose()
-
     def download_ontology(self):
         """Download ontology from obo foundary."""
         self.plogger.info(f"Download obo from: {self.ontology_url}")
@@ -78,16 +72,6 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
     def process(self):
         """Process raw data and save as gmt for future usage."""
         raise NotImplementedError
-
-    def filter_and_save(self, lsc):
-        self.plogger.info(f"Raw stats:\n{lsc.stats()}")
-
-        self.plogger.info(f"Apply {self.filters}\n")
-        lsc.iapply(self.filters, progress_bar=True)
-
-        out_path = self.processed_file_path(0)
-        lsc.save(out_path)
-        self.plogger.info(f"Saved processed file {out_path}")
 
     def transform(self, transform: Any):
         """Apply a (pre-)transformation to the loaded data."""

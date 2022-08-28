@@ -56,7 +56,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
         super().__init__(root, **kwargs)
 
     @property
-    def filters(self):
+    def _default_pre_transform(self):
         return Compose(
             LabelsetRangeFilterSize(max_val=self.max_size),
             LabelsetPairwiseFilterJaccard(
@@ -102,4 +102,4 @@ class DisGeNet(BaseAnnotatedOntologyData):
         g.complete_node_attrs(pbar=True)
 
         lsc = LabelsetCollection.from_ontology_graph(g, min_size=self.min_size)
-        self.filter_and_save(lsc)
+        lsc.export_gmt(self.processed_file_path(0))

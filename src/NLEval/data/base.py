@@ -38,6 +38,7 @@ class BaseData:
         retransform: bool = False,
         log_level: LogLevel = "INFO",
         transform: Optional[Any] = None,
+        pre_transform: Any = "default",
         **kwargs,
     ):
         """Initialize BaseData object.
@@ -51,7 +52,14 @@ class BaseData:
             retransform (bool): If set to tTrue, retransform the data even if
                 the cached transformation is available (default: False).
             transform: Optional transformation to be applied to the data
-                obect.
+                object.
+            pre_transform: Optional pre_transformation to be applied to the
+                data object before saving as the final processed data object.
+                If set to 'default', will use the default pre_transformation.
+
+        Note:
+            The `pre_transform` option is only valid when `version` is set to
+            'latest'.
 
         """
         super().__init__(**kwargs)
@@ -59,6 +67,7 @@ class BaseData:
         self.root = root
         self.version = version
         self.log_level = log_level
+        self.pre_transform = pre_transform
         self._setup_redos(redownload, reprocess, retransform)
         self._setup_process_logger()
 
@@ -86,6 +95,28 @@ class BaseData:
             base_logger="NLEval_precise",
             log_level=self.log_level,
         )
+
+    @property
+    def _default_pre_transform(self) -> Any:
+        return None
+
+    @property
+    def pre_transform(self) -> Any:
+        return self._pre_transform
+
+    @pre_transform.setter
+    def pre_transform(self, pre_transform):
+        if pre_transform == "default":
+            self._pre_transform = self._default_pre_transform
+        elif isinstance(pre_transform, str):
+            raise ValueError(f"Unknown pre_transform option {pre_transform}")
+        elif self.version != "latest":
+            raise ValueError(
+                "pre_transform option is only valid when version='latest', "
+                f"got {self.version!r} instead",
+            )
+        else:
+            self._pre_transform = pre_transform
 
     @property
     def classname(self) -> str:
@@ -166,15 +197,39 @@ class BaseData:
             self.download()
 
     def process(self):
-        """Process raw files."""
+        """Process raw files and save processed data."""
         raise NotImplementedError
 
     def _process(self):
         """Check to see if processed file exist and process if not."""
         os.makedirs(self.processed_dir, exist_ok=True)
-        if self.reprocess or not self.process_completed():
-            self.plogger.info(f"Start processing {self.classname}...")
-            self.process()
+        if not self.reprocess and self.process_completed():
+            return
+
+        # Process data
+        self.plogger.info(f"Start processing {self.classname}...")
+        self.process()
+
+        if self.pre_transform is None:
+            return
+
+        # Pre-transform data
+        self.load_processed_data()
+        self.plogger.info(f"Applying pre-transformation {self.pre_transform}")
+        self.transform(self.pre_transform)
+
+        outpath = self.processed_file_path(0)
+        self.save(outpath)
+        self.plogger.info(f"Saved pre-transformed file {outpath}")
+
+    def save(self, path):
+        """Save the data object to file.
+
+        Args:
+            path: Path to the data file to save.
+
+        """
+        raise NotImplementedError
 
     def transform(self, transform: Any):
         """Apply a (pre-)transformation to the loaded data."""
@@ -231,15 +286,6 @@ class BaseData:
             out_path = osp.join(cache_dir, self.processed_files[0])
             self.save(out_path)
             self.plogger.info(f"Saved cache transformation to {out_path}")
-
-    def save(self, path):
-        """Save the data object to file.
-
-        Args:
-            path: Path to the data file to save.
-
-        """
-        raise NotImplementedError
 
     def get_data_url(self, version: str) -> str:
         """Obtain archive data URL.
