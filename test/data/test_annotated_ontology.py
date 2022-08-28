@@ -31,7 +31,13 @@ def test_disgenet(tmpdir, caplog, mocker, subtests):
         transform_called += 1  # called due to pre-transform
         assert spy.call_count == transform_called
 
-    with subtests.test("Download then transform"):
+    with subtests.test("Download then transform without saving"):
+        lsc = DisGeNet(tmpdir, transform=filter_, cache_transform=False)
+        transform_called += 1  # called due to transform
+        assert spy.call_count == transform_called
+        assert not osp.isfile(config_path)  # did not save cache
+
+    with subtests.test("Download then transform and save"):
         lsc = DisGeNet(tmpdir, transform=filter_)
         transform_called += 1  # called due to transform
         assert spy.call_count == transform_called
