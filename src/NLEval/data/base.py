@@ -169,7 +169,7 @@ class BaseData:
             self.plogger.info(f"Start processing {self.classname}...")
             self.process()
 
-    def transform(self, transform: Any, cache_dir: str):
+    def transform(self, transform: Any):
         """Apply a (pre-)transformation to the loaded data."""
         raise NotImplementedError
 
@@ -179,6 +179,7 @@ class BaseData:
         if transform is None:
             return
 
+        # Check if transformed data cache is available and load directly if so
         config_dump = yaml.dump(transform.to_config())
         hexhash = hexdigest(config_dump)
         self.plogger.debug(f"{hexhash=}")
@@ -188,18 +189,26 @@ class BaseData:
             if self.retransform:
                 shutil.rmtree(cache_dir)
             else:
-                cache_path = osp.join(cache_dir, "data.gmt")
-                self.plogger.info(
-                    f"Loading cached transformed data from {cache_path}",
-                )
+                cache_path = osp.join(cache_dir, self.processed_files[0])
+                self.plogger.info(f"Loading cached transformed data from {cache_path}")
                 self.load_processed_data(cache_path)
                 return
 
         os.makedirs(cache_dir)
         with open(osp.join(cache_dir, "config.yaml"), "w") as f:
             f.write(config_dump)
+
+        # Transform and save data transformed data to cache
+        # TODO: add option to disable saving option
         with log_file_context(self.plogger, osp.join(cache_dir, "run.log")):
-            self.transform(transform, cache_dir)
+            self.plogger.info(f"Before transformation:\n{self.stats()}")
+            self.plogger.info(f"Applying transformation:\n{transform}")
+            self.transform(transform)
+            self.plogger.info(f"After transformation:\n{self.stats()}")
+
+            out_path = osp.join(cache_dir, self.processed_files[0])
+            self.export_gmt(out_path)
+            self.plogger.info(f"Saved cache transformation to {out_path}")
 
     def get_data_url(self, version: str) -> str:
         """Obtain archive data URL.
