@@ -26,6 +26,7 @@ ignore_missing_imports = true
 minversion = "6.0"
 required_plugins = [
     "pytest-cov",
+    "pytest-mock",
     "pytest-subtests",
 ]
 
