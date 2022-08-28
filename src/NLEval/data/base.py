@@ -134,6 +134,11 @@ class BaseData:
         return cleandir(osp.join(self.root, self.classname, "processed"))
 
     @property
+    def cache_dir(self) -> str:
+        """Return transformed data cache directory."""
+        return cleandir(osp.join(self.processed_dir, ".cache"))
+
+    @property
     def info_dir(self) -> str:
         """Return info file directory."""
         return cleandir(osp.join(self.root, self.classname, "info"))
@@ -245,7 +250,7 @@ class BaseData:
         config = transform.to_config()
         config_dump = yaml.dump(config)
         hexhash = hexdigest(config_dump)
-        cache_dir = osp.join(self.processed_dir, hexhash)
+        cache_dir = osp.join(self.cache_dir, hexhash)
         cache_config_path = osp.join(cache_dir, "config.yaml")
         if osp.isdir(cache_dir):
             # TODO: option to furthercheck if info matches (config.yaml)
