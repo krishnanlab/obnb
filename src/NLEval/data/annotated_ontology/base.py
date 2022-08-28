@@ -53,11 +53,6 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
                 f"Annotation file name not available for {self.classname!r}",
             )
 
-    @property
-    def filters(self):
-        """Labelset collection processing filters."""
-        return []
-
     def download_ontology(self):
         """Download ontology from obo foundary."""
         self.plogger.info(f"Download obo from: {self.ontology_url}")
@@ -78,21 +73,14 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
         """Process raw data and save as gmt for future usage."""
         raise NotImplementedError
 
-    def filter_and_save(self, lsc):
-        self.plogger.info(f"Raw stats:\n{lsc.stats()}")
-
-        for filter_ in self.filters:
-            lsc.iapply(filter_, progress_bar=True)
-            self.plogger.info(f"Applied {filter_}:\n{lsc.stats()}")
-
-        out_path = self.processed_file_path(0)
-        lsc.export_gmt(out_path)
-        self.plogger.info(f"Saved processed file {out_path}")
-
-    def transform(self, transform: Any):
+    def apply_transform(self, transform: Any):
         """Apply a (pre-)transformation to the loaded data."""
         # TODO: Option to disabble progress bar?
         self.iapply(transform, progress_bar=True)
+
+    def save(self, path):
+        """Save the labelset collection as gmt."""
+        self.export_gmt(path)
 
     def load_processed_data(self, path: Optional[str] = None):
         """Load processed labels from GMT."""

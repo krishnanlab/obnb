@@ -1,8 +1,8 @@
 import ndex2
 
+from NLEval.data.base import BaseData
 from NLEval.graph import SparseGraph
 from NLEval.typing import Any, Dict, List, Optional
-from NLEval.data.base import BaseData
 
 
 class BaseNdexData(BaseData, SparseGraph):
@@ -77,4 +77,4 @@ class BaseNdexData(BaseData, SparseGraph):
         """Load processed network."""
         path = path or self.processed_file_path(0)
         self.plogger.info(f"Load processed file {path}")
-        self.read_npz(path)
+        self.read_npz(path)  # FIX: make sure old data purged

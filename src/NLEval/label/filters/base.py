@@ -100,7 +100,7 @@ class Compose(BaseFilter):
 
     def __repr__(self):
         """Return namaes of each filter."""
-        reprs = "\n".join(f"\t- {filter_!r}" for filter_ in self.filters)
+        reprs = "\n".join(f"\t- {filter_!r}" for filter_ in self.filters) or "None"
         return f"Composition of filters:\n{reprs}"
 
     def to_config(self):
@@ -109,5 +109,5 @@ class Compose(BaseFilter):
 
     def __call__(self, lsc, progress_bar):
         for filter_ in self.filters:
-            print(lsc.stats())
             filter_.__call__(lsc, progress_bar)
+            print(lsc.stats())  # TODO: use logger
