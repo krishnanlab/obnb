@@ -214,14 +214,16 @@ class BaseData:
 
         # Transform and save data transformed data to cache
         # TODO: add option to disable saving option
+        # Fix: imlement stats for graph/feature data types
         with log_file_context(self.plogger, osp.join(cache_dir, "run.log")):
-            self.plogger.info(f"Before transformation:\n{self.stats()}")
+            self.plogger.info(f"Before transformation:\n{self.stats()}")  # type: ignore
             self.plogger.info(f"Applying transformation:\n{transform}")
             self.transform(transform)
-            self.plogger.info(f"After transformation:\n{self.stats()}")
+            self.plogger.info(f"After transformation:\n{self.stats()}")  # type: ignore
 
             out_path = osp.join(cache_dir, self.processed_files[0])
-            self.export_gmt(out_path)
+            # Fix: make this generic, not specific to lsc (add a save method?)
+            self.export_gmt(out_path)  # type: ignore
             self.plogger.info(f"Saved cache transformation to {out_path}")
 
     def get_data_url(self, version: str) -> str:
