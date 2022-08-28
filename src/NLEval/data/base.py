@@ -180,22 +180,36 @@ class BaseData:
             return
 
         # Check if transformed data cache is available and load directly if so
-        config_dump = yaml.dump(transform.to_config())
+        config = transform.to_config()
+        config_dump = yaml.dump(config)
         hexhash = hexdigest(config_dump)
-        self.plogger.debug(f"{hexhash=}")
         cache_dir = osp.join(self.processed_dir, hexhash)
+        cache_config_path = osp.join(cache_dir, "config.yaml")
         if osp.isdir(cache_dir):
             # TODO: option to furthercheck if info matches (config.yaml)
-            if self.retransform:
-                shutil.rmtree(cache_dir)
-            else:
+            with open(cache_config_path, "r") as f:
+                force_retransform = False
+                if (cache_config := yaml.safe_load(f)) != config:
+                    self.plogger.warning(
+                        f"Found transformed cache in {cache_dir} but found in "
+                        "compatible configs, over writting now. Please report "
+                        "to the GitHub issue if you saw this message, along "
+                        "with the specific transformation you used.",
+                    )
+                    force_retransform = True
+                self.plogger.debug(f"config:\n{pformat(config)!s}")
+                self.plogger.debug(f"cache_config:\n{pformat(cache_config)!s}")
+
+            if not self.retransform and not force_retransform:
                 cache_path = osp.join(cache_dir, self.processed_files[0])
                 self.plogger.info(f"Loading cached transformed data from {cache_path}")
                 self.load_processed_data(cache_path)
                 return
 
+            shutil.rmtree(cache_dir)
+
         os.makedirs(cache_dir)
-        with open(osp.join(cache_dir, "config.yaml"), "w") as f:
+        with open(cache_config_path, "w") as f:
             f.write(config_dump)
 
         # Transform and save data transformed data to cache
