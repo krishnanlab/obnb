@@ -144,7 +144,14 @@ class BaseData:
         )
 
     def load_processed_data(self, path: Optional[str] = None):
-        """Load processed data into the data object."""
+        """Load processed data into the data object.
+
+        Note:
+            Any existing data must be purged upon calling this function. That
+            is, the data object (self) will contain exactly the data loaded,
+            but not not anything else.
+
+        """
         raise NotImplementedError
 
     def download(self):
