@@ -37,7 +37,7 @@ class BaseData:
         reprocess: bool = False,
         retransform: bool = False,
         log_level: LogLevel = "INFO",
-        transformation: Optional[Any] = None,
+        transform: Optional[Any] = None,
         **kwargs,
     ):
         """Initialize BaseData object.
@@ -50,7 +50,7 @@ class BaseData:
                 processed data is available (default: False).
             retransform (bool): If set to tTrue, retransform the data even if
                 the cached transformation is available (default: False).
-            transformation: Optional transformation to be applied to the data
+            transform: Optional transformation to be applied to the data
                 obect.
 
         """
@@ -70,7 +70,7 @@ class BaseData:
             self._download_archive()
 
         self.load_processed_data()
-        self._transform(transformation)
+        self._transform(transform)
 
     def _setup_redos(self, redownload: bool, reprocess: bool, retransform: bool):
         # Redownload > reprocess > retransform
@@ -169,37 +169,62 @@ class BaseData:
             self.plogger.info(f"Start processing {self.classname}...")
             self.process()
 
-    def transform(self, transformation: Any, cache_dir: str):
-        """Apply a transformation to the loaded data."""
+    def transform(self, transform: Any):
+        """Apply a (pre-)transformation to the loaded data."""
         raise NotImplementedError
 
-    def _transform(self, transformation: Optional[Any]):
+    def _transform(self, transform: Optional[Any]):
         """Check to see if cached transformed data exist and load if so."""
         # TODO: make this pretransform and add a transform version that do not save?
-        if transformation is None:
+        if transform is None:
             return
 
-        config_dump = yaml.dump(transformation.to_config())
+        # Check if transformed data cache is available and load directly if so
+        config = transform.to_config()
+        config_dump = yaml.dump(config)
         hexhash = hexdigest(config_dump)
-        self.plogger.debug(f"{hexhash=}")
         cache_dir = osp.join(self.processed_dir, hexhash)
+        cache_config_path = osp.join(cache_dir, "config.yaml")
         if osp.isdir(cache_dir):
             # TODO: option to furthercheck if info matches (config.yaml)
-            if self.retransform:
-                shutil.rmtree(cache_dir)
-            else:
-                cache_path = osp.join(cache_dir, "data.gmt")
-                self.plogger.info(
-                    f"Loading cached transformed data from {cache_path}",
-                )
+            with open(cache_config_path, "r") as f:
+                force_retransform = False
+                if (cache_config := yaml.safe_load(f)) != config:
+                    self.plogger.warning(
+                        f"Found transformed cache in {cache_dir} but found in "
+                        "compatible configs, over writting now. Please report "
+                        "to the GitHub issue if you saw this message, along "
+                        "with the specific transformation you used.",
+                    )
+                    force_retransform = True
+                self.plogger.debug(f"config:\n{pformat(config)!s}")
+                self.plogger.debug(f"cache_config:\n{pformat(cache_config)!s}")
+
+            if not self.retransform and not force_retransform:
+                cache_path = osp.join(cache_dir, self.processed_files[0])
+                self.plogger.info(f"Loading cached transformed data from {cache_path}")
                 self.load_processed_data(cache_path)
                 return
 
+            shutil.rmtree(cache_dir)
+
         os.makedirs(cache_dir)
-        with open(osp.join(cache_dir, "config.yaml"), "w") as f:
+        with open(cache_config_path, "w") as f:
             f.write(config_dump)
+
+        # Transform and save data transformed data to cache
+        # TODO: add option to disable saving option
+        # Fix: imlement stats for graph/feature data types
         with log_file_context(self.plogger, osp.join(cache_dir, "run.log")):
-            self.transform(transformation, cache_dir)
+            self.plogger.info(f"Before transformation:\n{self.stats()}")  # type: ignore
+            self.plogger.info(f"Applying transformation:\n{transform}")
+            self.transform(transform)
+            self.plogger.info(f"After transformation:\n{self.stats()}")  # type: ignore
+
+            out_path = osp.join(cache_dir, self.processed_files[0])
+            # Fix: make this generic, not specific to lsc (add a save method?)
+            self.export_gmt(out_path)  # type: ignore
+            self.plogger.info(f"Saved cache transformation to {out_path}")
 
     def get_data_url(self, version: str) -> str:
         """Obtain archive data URL.
