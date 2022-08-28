@@ -15,6 +15,7 @@ from NLEval.label.filters import (
     LabelsetRangeFilterSize,
 )
 from NLEval.util.exceptions import IDNotExistError
+from NLEval.util.logger import display_pbar
 
 
 class DisGeNet(BaseAnnotatedOntologyData):
@@ -88,7 +89,8 @@ class DisGeNet(BaseAnnotatedOntologyData):
         annot_df = pd.read_csv(self.annotation_file_path, sep="\t")
 
         sub_df = annot_df[annot_df["DSI"] >= self.dsi_threshold]
-        pbar = tqdm(sub_df[["geneId", "diseaseId"]].values)
+        enable_pbar = display_pbar(self.log_level)
+        pbar = tqdm(sub_df[["geneId", "diseaseId"]].values, disable=not enable_pbar)
         pbar.set_description("Annotating DOIDs")
         for gene_id, disease_id in pbar:
             for doid in umls_to_doid[disease_id]:
@@ -99,7 +101,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
         g._update_node_attr_finalize()
 
         # Propagate annotations and show progress
-        g.complete_node_attrs(pbar=True)
+        g.complete_node_attrs(pbar=enable_pbar)
 
         lsc = LabelsetCollection.from_ontology_graph(g, min_size=self.min_size)
         lsc.export_gmt(self.processed_file_path(0))

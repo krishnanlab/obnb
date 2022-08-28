@@ -1,3 +1,4 @@
+import logging
 import os
 import os.path as osp
 import shutil
@@ -72,6 +73,7 @@ class BaseData:
         self.version = version
         self.log_level = log_level
         self.cache_transform = cache_transform
+
         self.pre_transform = pre_transform
         self._setup_redos(redownload, reprocess, retransform)
         self._setup_process_logger()
@@ -122,6 +124,8 @@ class BaseData:
             )
         else:
             self._pre_transform = pre_transform
+
+        self._pre_transform.logger.setLevel(logging.getLevelName(self.log_level))
 
     @property
     def classname(self) -> str:

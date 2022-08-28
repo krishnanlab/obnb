@@ -10,6 +10,7 @@ from NLEval.label.filters import (
     LabelsetPairwiseFilterOverlap,
     LabelsetRangeFilterSize,
 )
+from NLEval.util.logger import display_pbar
 
 
 class GeneOntology(BaseAnnotatedOntologyData):
@@ -72,7 +73,8 @@ class GeneOntology(BaseAnnotatedOntologyData):
                 entrezonly=True,
             )
 
-        pbar = tqdm(queries)
+        enable_pbar = display_pbar(self.log_level)
+        pbar = tqdm(queries, disable=not enable_pbar)
         pbar.set_description("Annotating GO terms")
         for query in pbar:
             try:
@@ -84,7 +86,7 @@ class GeneOntology(BaseAnnotatedOntologyData):
         g._update_node_attr_finalize()
 
         # Propagate annotations and show progress
-        g.complete_node_attrs(pbar=True)
+        g.complete_node_attrs(pbar=enable_pbar)
 
         lsc = LabelsetCollection.from_ontology_graph(
             g,

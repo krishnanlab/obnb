@@ -110,4 +110,4 @@ class Compose(BaseFilter):
     def __call__(self, lsc, progress_bar):
         for filter_ in self.filters:
             filter_.__call__(lsc, progress_bar)
-            print(lsc.stats())  # TODO: use logger
+            self.logger.info(lsc.stats())
