@@ -5,15 +5,16 @@ import pandas as pd
 import requests
 from tqdm import tqdm
 
+from NLEval.data.annotated_ontology.base import BaseAnnotatedOntologyData
 from NLEval.graph import OntologyGraph
 from NLEval.label import LabelsetCollection
 from NLEval.label.filters import (
+    Compose,
     LabelsetPairwiseFilterJaccard,
     LabelsetPairwiseFilterOverlap,
     LabelsetRangeFilterSize,
 )
 from NLEval.util.exceptions import IDNotExistError
-from NLEval.data.annotated_ontology.base import BaseAnnotatedOntologyData
 
 
 class DisGeNet(BaseAnnotatedOntologyData):
@@ -56,7 +57,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
 
     @property
     def filters(self):
-        return [
+        return Compose(
             LabelsetRangeFilterSize(max_val=self.max_size),
             LabelsetPairwiseFilterJaccard(
                 self.jaccard,
@@ -69,7 +70,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
                 inclusive=True,
             ),
             LabelsetRangeFilterSize(min_val=self.min_size),
-        ]
+        )
 
     def download_annotations(self):
         self.plogger.info(f"Download annotation from: {self.annotation_url}")

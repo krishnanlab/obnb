@@ -4,6 +4,7 @@ import requests
 
 from NLEval.data.base import BaseData
 from NLEval.label import LabelsetCollection
+from NLEval.label.filters import Compose
 from NLEval.typing import Any, List, Optional
 
 
@@ -56,7 +57,7 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
     @property
     def filters(self):
         """Labelset collection processing filters."""
-        return []
+        return Compose()
 
     def download_ontology(self):
         """Download ontology from obo foundary."""
@@ -81,9 +82,8 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
     def filter_and_save(self, lsc):
         self.plogger.info(f"Raw stats:\n{lsc.stats()}")
 
-        for filter_ in self.filters:
-            lsc.iapply(filter_, progress_bar=True)
-            self.plogger.info(f"Applied {filter_}:\n{lsc.stats()}")
+        self.plogger.info(f"Apply {self.filters}\n")
+        lsc.iapply(self.filters, progress_bar=True)
 
         out_path = self.processed_file_path(0)
         lsc.export_gmt(out_path)

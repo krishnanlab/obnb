@@ -1,14 +1,15 @@
 import mygene
 from tqdm import tqdm
 
+from NLEval.data.annotated_ontology.base import BaseAnnotatedOntologyData
 from NLEval.graph import OntologyGraph
 from NLEval.label import LabelsetCollection
 from NLEval.label.filters import (
+    Compose,
     LabelsetPairwiseFilterJaccard,
     LabelsetPairwiseFilterOverlap,
     LabelsetRangeFilterSize,
 )
-from NLEval.data.annotated_ontology.base import BaseAnnotatedOntologyData
 
 
 class GeneOntology(BaseAnnotatedOntologyData):
@@ -35,7 +36,7 @@ class GeneOntology(BaseAnnotatedOntologyData):
 
     @property
     def filters(self):
-        return [
+        return Compose(
             LabelsetRangeFilterSize(max_val=self.max_size),
             LabelsetPairwiseFilterJaccard(
                 self.jaccard,
@@ -48,7 +49,7 @@ class GeneOntology(BaseAnnotatedOntologyData):
                 inclusive=True,
             ),
             LabelsetRangeFilterSize(min_val=self.min_size),
-        ]
+        )
 
     def download_annotations(self):
         pass
