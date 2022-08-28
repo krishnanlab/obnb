@@ -73,7 +73,7 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
         """Process raw data and save as gmt for future usage."""
         raise NotImplementedError
 
-    def transform(self, transform: Any):
+    def apply_transform(self, transform: Any):
         """Apply a (pre-)transformation to the loaded data."""
         # TODO: Option to disabble progress bar?
         self.iapply(transform, progress_bar=True)

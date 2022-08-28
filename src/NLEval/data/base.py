@@ -79,7 +79,7 @@ class BaseData:
             self._download_archive()
 
         self.load_processed_data()
-        self._transform(transform)
+        self._apply_transform(transform)
 
     def _setup_redos(self, redownload: bool, reprocess: bool, retransform: bool):
         # Redownload > reprocess > retransform
@@ -216,7 +216,7 @@ class BaseData:
         # Pre-transform data
         self.load_processed_data()
         self.plogger.info(f"Applying pre-transformation {self.pre_transform}")
-        self.transform(self.pre_transform)
+        self.apply_transform(self.pre_transform)
 
         outpath = self.processed_file_path(0)
         self.save(outpath)
@@ -231,11 +231,11 @@ class BaseData:
         """
         raise NotImplementedError
 
-    def transform(self, transform: Any):
+    def apply_transform(self, transform: Any):
         """Apply a (pre-)transformation to the loaded data."""
         raise NotImplementedError
 
-    def _transform(self, transform: Optional[Any]):
+    def _apply_transform(self, transform: Optional[Any]):
         """Check to see if cached transformed data exist and load if so."""
         # TODO: make this pretransform and add a transform version that do not save?
         if transform is None:
@@ -280,7 +280,7 @@ class BaseData:
         with log_file_context(self.plogger, osp.join(cache_dir, "run.log")):
             self.plogger.info(f"Before transformation:\n{self.stats()}")  # type: ignore
             self.plogger.info(f"Applying transformation:\n{transform}")
-            self.transform(transform)
+            self.apply_transform(transform)
             self.plogger.info(f"After transformation:\n{self.stats()}")  # type: ignore
 
             out_path = osp.join(cache_dir, self.processed_files[0])

@@ -100,7 +100,7 @@ class Compose(BaseFilter):
 
     def __repr__(self):
         """Return namaes of each filter."""
-        reprs = "\n".join(f"\t- {filter_!r}" for filter_ in self.filters) or "\nNone"
+        reprs = "\n".join(f"\t- {filter_!r}" for filter_ in self.filters) or "None"
         return f"Composition of filters:\n{reprs}"
 
     def to_config(self):

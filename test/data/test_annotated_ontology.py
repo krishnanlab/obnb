@@ -16,7 +16,10 @@ def test_disgenet(tmpdir, caplog, mocker, subtests):
     filter_ = LabelsetRangeFilterSize(min_val=100, max_val=200)
     hexhash = hexdigest(yaml.dump(filter_.to_config()))
     config_path = osp.join(datadir, "processed", hexhash, "config.yaml")
-    spy = mocker.spy(NLEval.data.annotated_ontology.disgenet.DisGeNet, "transform")
+    spy = mocker.spy(
+        NLEval.data.annotated_ontology.disgenet.DisGeNet,
+        "apply_transform",
+    )
     transform_called = 0
 
     with subtests.test("Normal download"):
