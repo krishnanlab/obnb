@@ -222,9 +222,17 @@ class BaseData:
             self.plogger.info(f"After transformation:\n{self.stats()}")  # type: ignore
 
             out_path = osp.join(cache_dir, self.processed_files[0])
-            # Fix: make this generic, not specific to lsc (add a save method?)
-            self.export_gmt(out_path)  # type: ignore
+            self.save(out_path)
             self.plogger.info(f"Saved cache transformation to {out_path}")
+
+    def save(self, path):
+        """Save the data object to file.
+
+        Args:
+            path: Path to the data file to save.
+
+        """
+        raise NotImplementedError
 
     def get_data_url(self, version: str) -> str:
         """Obtain archive data URL.

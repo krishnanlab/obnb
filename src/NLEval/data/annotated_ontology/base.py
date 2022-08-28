@@ -86,13 +86,17 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
         lsc.iapply(self.filters, progress_bar=True)
 
         out_path = self.processed_file_path(0)
-        lsc.export_gmt(out_path)
+        lsc.save(out_path)
         self.plogger.info(f"Saved processed file {out_path}")
 
     def transform(self, transform: Any):
         """Apply a (pre-)transformation to the loaded data."""
         # TODO: Option to disabble progress bar?
         self.iapply(transform, progress_bar=True)
+
+    def save(self, path):
+        """Save the labelset collection as gmt."""
+        self.export_gmt(path)
 
     def load_processed_data(self, path: Optional[str] = None):
         """Load processed labels from GMT."""
