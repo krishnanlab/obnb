@@ -4,6 +4,7 @@ import shutil
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import datetime
 from io import BytesIO
 from pprint import pformat
 from zipfile import ZipFile
@@ -105,7 +106,9 @@ class BaseData:
             params["pre_transform"] = self.pre_transform.to_config()
         config = {
             "package_version": NLEval.__version__,
-            self.classname: params,
+            "processed_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "data_module": self.classname,
+            "data_module_params": params,
         }
         checkConfig("Data config", config, max_depth=3, white_list=["pre_transform"])
         return config
