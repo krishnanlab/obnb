@@ -1,4 +1,3 @@
-from NLEval.util.converter import MyGeneInfoConverter
 from NLEval.data.network.base import BaseNdexData
 
 
@@ -17,7 +16,7 @@ class HumanNet(BaseNdexData):
             cx_kwargs={
                 "interaction_types": ["associates-with"],
                 "node_id_prefix": "ncbigene",
-                "node_id_converter": MyGeneInfoConverter(root=root),
+                "node_id_converter": "HumanEntrez",
                 "default_edge_weight": 0.0,
                 "edge_weight_attr_name": "LLS",
                 "reduction": None,

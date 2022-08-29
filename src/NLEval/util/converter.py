@@ -4,6 +4,7 @@ import os
 import mygene
 
 from NLEval.typing import Dict, Iterator, List, LogLevel, Optional
+from NLEval.util.checkers import checkType
 from NLEval.util.logger import get_logger
 
 
@@ -12,6 +13,7 @@ class MyGeneInfoConverter:
 
     def __init__(
         self,
+        *,
         root: Optional[str] = None,
         use_cache: bool = True,
         save_cache: bool = True,
@@ -194,4 +196,24 @@ class MyGeneInfoConverter:
             self._save_cache()
 
         else:
-            self.logger.info(f"No query needed.")
+            self.logger.info("No query needed.")
+
+    @classmethod
+    def construct(cls, name: str):
+        """Construct default converter based on name.
+
+        Currently available options:
+
+            - HumanEntrez
+
+        """
+        checkType("Name of converter", str, name)
+        if name == "HumanEntrez":
+            converter = cls(
+                scopes="entrezgene,ensemblgene,symbol",
+                species="human",
+            )
+        else:
+            raise ValueError(f"Unknown converter {name!r}.")
+
+        return converter

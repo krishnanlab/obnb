@@ -1,4 +1,3 @@
-from NLEval.util.converter import MyGeneInfoConverter
 from NLEval.data.network.base import BaseNdexData
 
 
@@ -24,7 +23,7 @@ class FunCoup(BaseNdexData):
             cx_kwargs={
                 "interaction_types": ["has functional association with"],
                 "node_id_prefix": "ensembl",
-                "node_id_converter": MyGeneInfoConverter(root=root),
+                "node_id_converter": "HumanEntrez",
                 "default_edge_weight": 0.0,
                 "edge_weight_attr_name": "#0:PFC",
                 "reduction": "max",

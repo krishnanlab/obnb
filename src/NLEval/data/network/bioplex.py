@@ -1,4 +1,3 @@
-from NLEval.util.converter import MyGeneInfoConverter
 from NLEval.data.network.base import BaseNdexData
 
 
@@ -18,7 +17,7 @@ class BioPlex(BaseNdexData):
                 "interaction_types": ["interacts-with"],
                 "node_id_prefix": "ncbigene",
                 "node_id_entry": "r",
-                "node_id_converter": MyGeneInfoConverter(root=root),
+                "node_id_converter": "HumanEntrez",
             },
             **kwargs,
         )

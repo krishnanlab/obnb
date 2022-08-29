@@ -3,12 +3,13 @@ import logging
 
 import numpy as np
 
+from NLEval.graph.base import BaseGraph
 from NLEval.typing import EdgeData, List, LogLevel, Mapping, Optional, Union
 from NLEval.util import checkers
+from NLEval.util.converter import MyGeneInfoConverter
 from NLEval.util.cx_explorer import CXExplorer
 from NLEval.util.exceptions import IDNotExistError
 from NLEval.util.idhandler import IDmap
-from NLEval.graph.base import BaseGraph
 
 
 class SparseGraph(BaseGraph):
@@ -398,7 +399,7 @@ class SparseGraph(BaseGraph):
         edge_weight_attr_name: Optional[str] = None,
         reduction: Optional[str] = "max",
         use_node_alias: bool = False,
-        node_id_converter: Optional[Mapping[str, str]] = None,
+        node_id_converter: Optional[Union[Mapping[str, str], str]] = None,
     ):
         """Read from a CX stream file.
 
@@ -428,8 +429,10 @@ class SparseGraph(BaseGraph):
                 the node_id_prefix becomes mandatory.If multiple node ID
                 aliases with matching prefix are available, use the first one.
                 (defaut: :obj:`False`)
-            node_id_converter (Mapping[str, str], optional): A mapping object
-                that maps a given node ID to a new node ID of interest.
+            node_id_converter (Union[Mapping[str, str], str], optional): A
+                mapping object that maps a given node ID to a new node ID of
+                interest. Or the name of a predefined MygeneInfoConverter
+                object as a string.
 
         """
         import json  # noreorder
@@ -472,10 +475,14 @@ class SparseGraph(BaseGraph):
 
         # Convert node IDs
         if node_id_converter is not None:
+            if isinstance(node_id_converter, str):
+                node_id_converter = MyGeneInfoConverter.construct(node_id_converter)
+
             self.logger.info("Start converting gene IDs.")
             log_level_id = logging.getLevelName(self.log_level)
             try:
                 node_id_converter.logger.setLevel(log_level_id)
+                node_id_converter.root = self.root
                 node_id_converter.query_bulk(list(node_idx_to_id.values()))
             except AttributeError:
                 pass
