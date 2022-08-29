@@ -50,6 +50,7 @@ class GeneOntology(BaseAnnotatedOntologyData):
                 inclusive=True,
             ),
             LabelsetRangeFilterSize(min_val=self.min_size),
+            log_level=self.log_level,
         )
 
     def download_annotations(self):

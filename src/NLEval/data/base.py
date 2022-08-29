@@ -125,8 +125,6 @@ class BaseData:
         else:
             self._pre_transform = pre_transform
 
-        self._pre_transform.logger.setLevel(logging.getLevelName(self.log_level))
-
     @property
     def classname(self) -> str:
         """Return data object name."""
