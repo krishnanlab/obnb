@@ -1,4 +1,5 @@
 """Logger utils."""
+import logging
 import logging.config
 import os.path as osp
 import pathlib
@@ -6,7 +7,14 @@ from contextlib import contextmanager
 
 import yaml
 
-from NLEval.typing import LogLevel, Optional
+from NLEval.typing import LogLevel, Optional, Union
+
+
+def display_pbar(level: Union[int, str], threshold="INFO") -> bool:
+    """Determines whether to display progress bar."""
+    level_int = level if isinstance(level, int) else logging.getLevelName(level)
+    threshold_int = logging.getLevelName(threshold)
+    return level_int <= threshold_int
 
 
 def config_logger():

@@ -15,7 +15,7 @@ def test_disgenet(tmpdir, caplog, mocker, subtests):
     datadir = osp.join(tmpdir, "DisGeNet")
     filter_ = LabelsetRangeFilterSize(min_val=100, max_val=200)
     hexhash = hexdigest(yaml.dump(filter_.to_config()))
-    config_path = osp.join(datadir, "processed", hexhash, "config.yaml")
+    config_path = osp.join(datadir, "processed", ".cache", hexhash, "config.yaml")
     spy = mocker.spy(
         NLEval.data.annotated_ontology.disgenet.DisGeNet,
         "apply_transform",
@@ -31,7 +31,13 @@ def test_disgenet(tmpdir, caplog, mocker, subtests):
         transform_called += 1  # called due to pre-transform
         assert spy.call_count == transform_called
 
-    with subtests.test("Download then transform"):
+    with subtests.test("Download then transform without saving"):
+        lsc = DisGeNet(tmpdir, transform=filter_, cache_transform=False)
+        transform_called += 1  # called due to transform
+        assert spy.call_count == transform_called
+        assert not osp.isfile(config_path)  # did not save cache
+
+    with subtests.test("Download then transform and save"):
         lsc = DisGeNet(tmpdir, transform=filter_)
         transform_called += 1  # called due to transform
         assert spy.call_count == transform_called

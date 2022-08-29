@@ -5,6 +5,7 @@ import requests
 from NLEval.data.base import BaseData
 from NLEval.label import LabelsetCollection
 from NLEval.typing import Any, List, Optional
+from NLEval.util.logger import display_pbar
 
 
 class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
@@ -75,8 +76,7 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
 
     def apply_transform(self, transform: Any):
         """Apply a (pre-)transformation to the loaded data."""
-        # TODO: Option to disabble progress bar?
-        self.iapply(transform, progress_bar=True)
+        self.iapply(transform, progress_bar=display_pbar(self.log_level))
 
     def save(self, path):
         """Save the labelset collection as gmt."""

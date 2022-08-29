@@ -1,3 +1,4 @@
+import logging
 import os
 import os.path as osp
 import shutil
@@ -37,8 +38,9 @@ class BaseData:
         reprocess: bool = False,
         retransform: bool = False,
         log_level: LogLevel = "INFO",
-        transform: Optional[Any] = None,
         pre_transform: Any = "default",
+        transform: Optional[Any] = None,
+        cache_transform: bool = True,
         **kwargs,
     ):
         """Initialize BaseData object.
@@ -51,11 +53,14 @@ class BaseData:
                 processed data is available (default: False).
             retransform (bool): If set to tTrue, retransform the data even if
                 the cached transformation is available (default: False).
-            transform: Optional transformation to be applied to the data
-                object.
             pre_transform: Optional pre_transformation to be applied to the
                 data object before saving as the final processed data object.
                 If set to 'default', will use the default pre_transformation.
+            transform: Optional transformation to be applied to the data
+                object.
+            cache_transform: Whether or not to cache the transformed data. The
+                cached transformed data will be saved under
+                `<data_root_directory>/processed/.cache/`.
 
         Note:
             The `pre_transform` option is only valid when `version` is set to
@@ -67,6 +72,8 @@ class BaseData:
         self.root = root
         self.version = version
         self.log_level = log_level
+        self.cache_transform = cache_transform
+
         self.pre_transform = pre_transform
         self._setup_redos(redownload, reprocess, retransform)
         self._setup_process_logger()
@@ -118,6 +125,8 @@ class BaseData:
         else:
             self._pre_transform = pre_transform
 
+        self._pre_transform.logger.setLevel(logging.getLevelName(self.log_level))
+
     @property
     def classname(self) -> str:
         """Return data object name."""
@@ -132,6 +141,11 @@ class BaseData:
     def processed_dir(self) -> str:
         """Return raw file directory."""
         return cleandir(osp.join(self.root, self.classname, "processed"))
+
+    @property
+    def cache_dir(self) -> str:
+        """Return transformed data cache directory."""
+        return cleandir(osp.join(self.processed_dir, ".cache"))
 
     @property
     def info_dir(self) -> str:
@@ -241,13 +255,16 @@ class BaseData:
         if transform is None:
             return
 
-        # Check if transformed data cache is available and load directly if so
+        # Set up configs and cache related variables
         config = transform.to_config()
         config_dump = yaml.dump(config)
         hexhash = hexdigest(config_dump)
-        cache_dir = osp.join(self.processed_dir, hexhash)
+        cache_dir = osp.join(self.cache_dir, hexhash)
         cache_config_path = osp.join(cache_dir, "config.yaml")
-        if osp.isdir(cache_dir):
+        cache_file_path = osp.join(cache_dir, self.processed_files[0])
+
+        # Check if transformed data cache is available and load directly if so
+        if osp.isfile(cache_file_path):
             # TODO: option to furthercheck if info matches (config.yaml)
             with open(cache_config_path, "r") as f:
                 force_retransform = False
@@ -274,18 +291,21 @@ class BaseData:
         with open(cache_config_path, "w") as f:
             f.write(config_dump)
 
-        # Transform and save data transformed data to cache
+        # Apply transformation to the data
         # TODO: add option to disable saving option
-        # Fix: imlement stats for graph/feature data types
+        # FIX: imlement stats for graph/feature data types
         with log_file_context(self.plogger, osp.join(cache_dir, "run.log")):
             self.plogger.info(f"Before transformation:\n{self.stats()}")  # type: ignore
             self.plogger.info(f"Applying transformation:\n{transform}")
             self.apply_transform(transform)
             self.plogger.info(f"After transformation:\n{self.stats()}")  # type: ignore
 
-            out_path = osp.join(cache_dir, self.processed_files[0])
-            self.save(out_path)
-            self.plogger.info(f"Saved cache transformation to {out_path}")
+        # Optionally, save transformed data to cache
+        if self.cache_transform:
+            self.save(cache_file_path)
+            self.plogger.info(f"Saved cache transformation to {cache_file_path}")
+        else:
+            shutil.rmtree(cache_dir)
 
     def get_data_url(self, version: str) -> str:
         """Obtain archive data URL.
