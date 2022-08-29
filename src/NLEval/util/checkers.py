@@ -6,7 +6,7 @@ to a function call is valid.
 """
 import numpy as np
 
-from NLEval.typing import INT_TYPE, NUMERIC_TYPE, Iterable, Tuple
+from NLEval.typing import INT_TYPE, NUMERIC_TYPE, Iterable, List, Optional, Tuple
 
 __all__ = [
     "checkConfig",
@@ -162,6 +162,7 @@ def checkConfig(
     *,
     allowed_types: Tuple[type, ...] = (int, float, str, bool, type(None)),
     max_depth: int = 2,
+    white_list: Optional[List[str]] = None,
 ):
     """Check a configuration dictionary.
 
@@ -171,6 +172,7 @@ def checkConfig(
         max_depth: Maximum number of levels of dictonary allowed. When it is
             set to one, then nested dictionary, i.e., dictonary as parameter,
             is disallowed.
+        white_list: List of keys to bypass the checks.
 
     """
     checkType("name", str, name)
@@ -178,13 +180,18 @@ def checkConfig(
     checkType("allowed_types", tuple, allowed_types)
     checkType("max_depth", INT_TYPE, max_depth)
     checkValuePositive("max_depth", max_depth)
+    checkNullableType("white_list", list, white_list)
+    white_list = white_list or []
+    checkTypesInIterable("white_list", str, white_list)
 
     def _check_val_in_config(config_dict, depth):
         if depth > max_depth:
             raise ValueError(f"Max depth ({max_depth}) exceeded")
 
         for key, val in config_dict.items():
-            if isinstance(val, dict):
+            if key in white_list:
+                continue
+            elif isinstance(val, dict):
                 _check_val_in_config(val, depth + 1)
             elif isinstance(val, Iterable):
                 checkTypesInIterable(key, allowed_types, val)
