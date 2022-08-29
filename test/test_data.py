@@ -54,8 +54,8 @@ class TestData(unittest.TestCase):
     @pytest.mark.longruns
     def test_biogrid(self):
         self.graph = NLEval.data.BioGRID(self.tmp_dir, log_level=LEVEL)
-        self.assertEqual(self.graph.size, 19276)
-        self.assertEqual(self.graph.num_edges, 1100282)
+        self.assertEqual(self.graph.size, 19263)
+        self.assertEqual(self.graph.num_edges, 1099756)
 
     @parameterized.expand(full_data_test_param)
     @pytest.mark.mediumruns
@@ -67,8 +67,8 @@ class TestData(unittest.TestCase):
                 redownload=redownload,
                 log_level=LEVEL,
             )
-            self.assertEqual(self.graph.size, 8116)
-            self.assertEqual(self.graph.num_edges, 71046)
+            self.assertEqual(self.graph.size, 8108)
+            self.assertEqual(self.graph.num_edges, 71004)
 
     @pytest.mark.mediumruns
     def test_disgenet(self):
@@ -78,8 +78,8 @@ class TestData(unittest.TestCase):
     @pytest.mark.longruns
     def test_funcoup(self):
         self.graph = NLEval.data.FunCoup(self.tmp_dir, log_level=LEVEL)
-        self.assertEqual(self.graph.size, 17662)
-        self.assertEqual(self.graph.num_edges, 9732196)
+        self.assertEqual(self.graph.size, 17905)
+        self.assertEqual(self.graph.num_edges, 10042420)
 
     @parameterized.expand([("GOBP",), ("GOCC",), ("GOMF",)])
     @pytest.mark.longruns
@@ -90,27 +90,27 @@ class TestData(unittest.TestCase):
     @pytest.mark.longruns
     def test_hippie(self):
         self.graph = NLEval.data.HIPPIE(self.tmp_dir, log_level=LEVEL)
-        self.assertEqual(self.graph.size, 17879)
+        self.assertEqual(self.graph.size, 17830)
         self.assertEqual(self.graph.num_edges, 769474)
 
     @pytest.mark.longruns
     def test_humannet(self):
         self.graph = NLEval.data.HumanNet(self.tmp_dir, log_level=LEVEL)
-        self.assertEqual(self.graph.size, 17740)
-        self.assertEqual(self.graph.num_edges, 848552)
+        self.assertEqual(self.graph.size, 17739)
+        self.assertEqual(self.graph.num_edges, 848414)
 
     @pytest.mark.longruns
     def test_pcnet(self):
         self.graph = NLEval.data.PCNet(self.tmp_dir, log_level=LEVEL)
-        self.assertEqual(self.graph.size, 18271)
-        self.assertEqual(self.graph.num_edges, 5193996)
+        self.assertEqual(self.graph.size, 18256)
+        self.assertEqual(self.graph.num_edges, 5190378)
 
     @pytest.mark.longruns
     @pytest.mark.highmemory
     def test_string(self):
         self.graph = NLEval.data.STRING(self.tmp_dir, log_level=LEVEL)
-        self.assertEqual(self.graph.size, 18484)
-        self.assertEqual(self.graph.num_edges, 11021544)
+        self.assertEqual(self.graph.size, 18480)
+        self.assertEqual(self.graph.num_edges, 11019492)
 
 
 @pytest.mark.mediumruns
