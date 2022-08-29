@@ -1,4 +1,3 @@
-import logging
 import os
 import os.path as osp
 import shutil
@@ -12,6 +11,7 @@ from zipfile import ZipFile
 import requests
 import yaml
 
+import NLEval
 from NLEval._config.config import NLEDATA_URL_DICT, NLEDATA_URL_DICT_STABLE
 from NLEval.typing import Any, Dict, List, LogLevel, Optional
 from NLEval.util.exceptions import DataNotFoundError
@@ -28,6 +28,8 @@ class BaseData:
     not yet available. Otherwise, directly load the previously processed file.
 
     """
+
+    CONFIG_KEYS: List[str] = ["version"]
 
     def __init__(
         self,
@@ -87,6 +89,18 @@ class BaseData:
 
         self.load_processed_data()
         self._apply_transform(transform)
+
+    def to_config(self) -> Dict[str, Any]:
+        """Generate configuration dictionary from the data object."""
+        params = {key: getattr(self, key) for key in self.CONFIG_KEYS}
+        if self.pre_transform is not None:
+            params["pre_transform"] = self.pre_transform.to_config()
+        config = {
+            "package_version": NLEval.__version__,
+            "module_name": __name__,
+            self.classname: params,
+        }
+        return config
 
     def _setup_redos(self, redownload: bool, reprocess: bool, retransform: bool):
         # Redownload > reprocess > retransform
