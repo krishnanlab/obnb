@@ -12,8 +12,8 @@ from zipfile import ZipFile
 import requests
 import yaml
 
-from NLEval._config import config
-from NLEval.typing import Any, List, LogLevel, Optional
+from NLEval._config.config import NLEDATA_URL_DICT, NLEDATA_URL_DICT_STABLE
+from NLEval.typing import Any, Dict, List, LogLevel, Optional
 from NLEval.util.exceptions import DataNotFoundError
 from NLEval.util.logger import get_logger, log_file_context
 from NLEval.util.path import cleandir, hexdigest
@@ -319,8 +319,8 @@ class BaseData:
             str: URL to download the archive data.
 
         """
-        if (base_url := config.NLEDATA_URL_DICT.get(version)) is None:
-            versions = list(config.NLEDATA_URL_DICT_STABLE) + ["latest"]
+        if (base_url := NLEDATA_URL_DICT.get(version)) is None:
+            versions = list(NLEDATA_URL_DICT_STABLE) + ["latest"]
             raise ValueError(
                 f"Unrecognized version {version!r}, please choose from the "
                 f"following versions:\n{pformat(versions)}",
