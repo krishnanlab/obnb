@@ -6,21 +6,22 @@ to a function call is valid.
 """
 import numpy as np
 
-from NLEval.typing import INT_TYPE, ITERABLE_TYPE, NUMERIC_TYPE
+from NLEval.typing import INT_TYPE, ITERABLE_TYPE, NUMERIC_TYPE, Tuple
 
 __all__ = [
-    "checkValuePositive",
-    "checkValueNonnegative",
-    "checkType",
+    "checkConfig",
     "checkNullableType",
-    "checkTypesInIterable",
-    "checkTypesInList",
-    "checkTypesInSet",
-    "checkTypesInNumpyArray",
-    "checkTypesInIterableErrEmpty",
     "checkNumpyArrayIsNumeric",
     "checkNumpyArrayNDim",
     "checkNumpyArrayShape",
+    "checkType",
+    "checkTypesInIterable",
+    "checkTypesInIterableErrEmpty",
+    "checkTypesInList",
+    "checkTypesInNumpyArray",
+    "checkTypesInSet",
+    "checkValueNonnegative",
+    "checkValuePositive",
 ]
 
 
@@ -152,3 +153,45 @@ def checkNumpyArrayShape(name, targetShape, ary):
         raise ValueError(
             f"{name!r} should be in shape {targetShape!r}, not {shape!r}",
         )
+
+
+def checkConfig(
+    name: str,
+    config,
+    /,
+    *,
+    allowed_types: Tuple[type, ...] = (int, float, str, bool, type(None)),
+    max_depth: int = 2,
+):
+    """Check a configuration dictionary.
+
+    Args:
+        name: Name of the input config dict.
+        allowed_types: A tuple containing all allowed types.
+        max_depth: Maximum number of levels of dictonary allowed. When it is
+            set to one, then nested dictionary, i.e., dictonary as parameter,
+            is disallowed.
+
+    """
+    checkType("name", str, name)
+    checkType("config", dict, config)
+    checkType("allowed_types", tuple, allowed_types)
+    checkType("max_depth", INT_TYPE, max_depth)
+    checkValuePositive("max_depth", max_depth)
+
+    def _check_val_in_config(config_dict, depth):
+        if depth > max_depth:
+            raise ValueError(f"Max depth ({max_depth}) exceeded")
+
+        for key, val in config_dict.items():
+            if isinstance(val, dict):
+                _check_val_in_config(val, depth + 1)
+            elif any(isinstance(val, i) for i in allowed_types):
+                continue
+            else:
+                raise TypeError(
+                    f"The {key!r} parameter type ({type(val)})in the config dict "
+                    f"{name!r} is not allowed. Allowed types are: {allowed_types!r}",
+                )
+
+    _check_val_in_config(config, 1)
