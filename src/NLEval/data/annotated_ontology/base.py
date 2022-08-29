@@ -11,6 +11,7 @@ from NLEval.util.logger import display_pbar
 class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
     """General object for labelset collection from annotated ontology."""
 
+    CONFIG_KEYS: List[str] = BaseData.CONFIG_KEYS + ["ontology_url", "annotation_url"]
     ontology_url: Optional[str] = None
     annotation_url: Optional[str] = None
     ontology_file_name: Optional[str] = None

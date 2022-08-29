@@ -14,6 +14,7 @@ from NLEval.label.filters import (
     LabelsetPairwiseFilterOverlap,
     LabelsetRangeFilterSize,
 )
+from NLEval.typing import List
 from NLEval.util.exceptions import IDNotExistError
 from NLEval.util.logger import display_pbar
 
@@ -33,6 +34,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
 
     """
 
+    CONFIG_KEYS: List[str] = BaseAnnotatedOntologyData.CONFIG_KEYS + ["dsi_threshold"]
     ontology_url = "http://purl.obolibrary.org/obo/doid.obo"
     annotation_url = "https://www.disgenet.org/static/disgenet_ap1/files/downloads/all_gene_disease_associations.tsv.gz"
     ontology_file_name = "doid.obo"
@@ -71,6 +73,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
                 inclusive=True,
             ),
             LabelsetRangeFilterSize(min_val=self.min_size),
+            log_level=self.log_level,
         )
 
     def download_annotations(self):

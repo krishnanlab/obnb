@@ -1,4 +1,3 @@
-import logging
 import os
 import os.path as osp
 import shutil
@@ -12,8 +11,9 @@ from zipfile import ZipFile
 import requests
 import yaml
 
-from NLEval._config import config
-from NLEval.typing import Any, List, LogLevel, Optional
+import NLEval
+from NLEval._config.config import NLEDATA_URL_DICT, NLEDATA_URL_DICT_STABLE
+from NLEval.typing import Any, Dict, List, LogLevel, Optional
 from NLEval.util.exceptions import DataNotFoundError
 from NLEval.util.logger import get_logger, log_file_context
 from NLEval.util.path import cleandir, hexdigest
@@ -28,6 +28,8 @@ class BaseData:
     not yet available. Otherwise, directly load the previously processed file.
 
     """
+
+    CONFIG_KEYS: List[str] = ["version"]
 
     def __init__(
         self,
@@ -88,6 +90,18 @@ class BaseData:
         self.load_processed_data()
         self._apply_transform(transform)
 
+    def to_config(self) -> Dict[str, Any]:
+        """Generate configuration dictionary from the data object."""
+        params = {key: getattr(self, key) for key in self.CONFIG_KEYS}
+        if self.pre_transform is not None:
+            params["pre_transform"] = self.pre_transform.to_config()
+        config = {
+            "package_version": NLEval.__version__,
+            "module_name": __name__,
+            self.classname: params,
+        }
+        return config
+
     def _setup_redos(self, redownload: bool, reprocess: bool, retransform: bool):
         # Redownload > reprocess > retransform
         self.redownload = redownload
@@ -124,8 +138,6 @@ class BaseData:
             )
         else:
             self._pre_transform = pre_transform
-
-        self._pre_transform.logger.setLevel(logging.getLevelName(self.log_level))
 
     @property
     def classname(self) -> str:
@@ -236,6 +248,11 @@ class BaseData:
         self.save(outpath)
         self.plogger.info(f"Saved pre-transformed file {outpath}")
 
+        config_path = osp.join(self.info_dir, "config.yaml")
+        with open(config_path, "w") as f:
+            f.write(yaml.dump(self.to_config(), sort_keys=False))
+            self.plogger.info(f"Config file saved to {config_path}")
+
     def save(self, path):
         """Save the data object to file.
 
@@ -321,8 +338,8 @@ class BaseData:
             str: URL to download the archive data.
 
         """
-        if (base_url := config.NLEDATA_URL_DICT.get(version)) is None:
-            versions = list(config.NLEDATA_URL_DICT_STABLE) + ["latest"]
+        if (base_url := NLEDATA_URL_DICT.get(version)) is None:
+            versions = list(NLEDATA_URL_DICT_STABLE) + ["latest"]
             raise ValueError(
                 f"Unrecognized version {version!r}, please choose from the "
                 f"following versions:\n{pformat(versions)}",

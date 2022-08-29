@@ -12,6 +12,13 @@ class BaseNdexData(BaseData, SparseGraph):
 
     """
 
+    CONFIG_KEYS: List[str] = BaseData.CONFIG_KEYS + [
+        "uuid",
+        "weighted",
+        "directed",
+        "largest_comp",
+        # "cx_kwargs",  # FIX: make cx_kwargs to have str vals only first
+    ]
     uuid: Optional[str] = None
 
     def __init__(

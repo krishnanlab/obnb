@@ -93,9 +93,9 @@ class BaseFilter:
 class Compose(BaseFilter):
     """Composition of filters."""
 
-    def __init__(self, *filters):
+    def __init__(self, *filters, log_level: LogLevel = "WARNING"):
         """Initialize composition."""
-        super().__init__()
+        super().__init__(log_level=log_level)
         self.filters = filters
 
     def __repr__(self):
