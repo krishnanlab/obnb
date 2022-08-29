@@ -14,6 +14,7 @@ import yaml
 import NLEval
 from NLEval._config.config import NLEDATA_URL_DICT, NLEDATA_URL_DICT_STABLE
 from NLEval.typing import Any, Dict, List, LogLevel, Optional
+from NLEval.util.checkers import checkConfig
 from NLEval.util.exceptions import DataNotFoundError
 from NLEval.util.logger import get_logger, log_file_context
 from NLEval.util.path import cleandir, hexdigest
@@ -100,6 +101,7 @@ class BaseData:
             "module_name": __name__,
             self.classname: params,
         }
+        checkConfig("Data object config", config, max_depth=2)
         return config
 
     def _setup_redos(self, redownload: bool, reprocess: bool, retransform: bool):
