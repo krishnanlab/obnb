@@ -186,7 +186,7 @@ def checkConfig(
         for key, val in config_dict.items():
             if isinstance(val, dict):
                 _check_val_in_config(val, depth + 1)
-            elif any(isinstance(val, i) for i in allowed_types):
+            elif isinstance(val, allowed_types):
                 continue
             else:
                 raise TypeError(
