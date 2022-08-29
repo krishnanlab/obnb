@@ -105,7 +105,6 @@ class BaseData:
             params["pre_transform"] = self.pre_transform.to_config()
         config = {
             "package_version": NLEval.__version__,
-            "module_name": __name__,
             self.classname: params,
         }
         checkConfig("Data config", config, max_depth=3, white_list=["pre_transform"])
