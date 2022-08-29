@@ -248,6 +248,11 @@ class BaseData:
         self.save(outpath)
         self.plogger.info(f"Saved pre-transformed file {outpath}")
 
+        config_path = osp.join(self.info_dir, "config.yaml")
+        with open(config_path, "w") as f:
+            f.write(yaml.dump(self.to_config(), sort_keys=False))
+            self.plogger.info(f"Config file saved to {config_path}")
+
     def save(self, path):
         """Save the data object to file.
 
