@@ -186,6 +186,8 @@ def checkConfig(
         for key, val in config_dict.items():
             if isinstance(val, dict):
                 _check_val_in_config(val, depth + 1)
+            elif isinstance(val, Iterable):
+                checkTypesInIterable(key, allowed_types, val)
             elif isinstance(val, allowed_types):
                 continue
             else:
