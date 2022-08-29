@@ -20,10 +20,10 @@ class FunCoup(BaseNdexData):
             weighted=True,
             directed=False,
             largest_comp=True,
+            node_id_converter="HumanEntrez",
             cx_kwargs={
                 "interaction_types": ["has functional association with"],
                 "node_id_prefix": "ensembl",
-                "node_id_converter": "HumanEntrez",
                 "default_edge_weight": 0.0,
                 "edge_weight_attr_name": "#0:PFC",
                 "reduction": "max",

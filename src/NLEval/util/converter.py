@@ -199,7 +199,7 @@ class MyGeneInfoConverter:
             self.logger.info("No query needed.")
 
     @classmethod
-    def construct(cls, name: str):
+    def construct(cls, name: str, **kwargs):
         """Construct default converter based on name.
 
         Currently available options:
@@ -212,6 +212,7 @@ class MyGeneInfoConverter:
             converter = cls(
                 scopes="entrezgene,ensemblgene,symbol",
                 species="human",
+                **kwargs,
             )
         else:
             raise ValueError(f"Unknown converter {name!r}.")
