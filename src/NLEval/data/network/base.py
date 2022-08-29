@@ -14,7 +14,7 @@ class BaseNdexData(BaseData, SparseGraph):
     """
 
     CONFIG_KEYS: List[str] = BaseData.CONFIG_KEYS + [
-        "uuid",
+        "cx_uuid",
         "weighted",
         "directed",
         "largest_comp",
