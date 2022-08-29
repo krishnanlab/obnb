@@ -1,4 +1,3 @@
-from NLEval.util.converter import MyGeneInfoConverter
 from NLEval.data.network.base import BaseNdexData
 
 
@@ -14,10 +13,10 @@ class STRING(BaseNdexData):
             weighted=True,
             directed=False,
             largest_comp=True,
+            node_id_converter="HumanEntrez",
             cx_kwargs={
                 "interaction_types": ["interacts-with"],
                 "node_id_prefix": "ncbigene",
-                "node_id_converter": MyGeneInfoConverter(root=root),
                 "default_edge_weight": 0.0,
                 "edge_weight_attr_name": "combined_score",
                 "reduction": "max",

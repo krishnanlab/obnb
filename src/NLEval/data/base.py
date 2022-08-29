@@ -92,7 +92,14 @@ class BaseData:
         self._apply_transform(transform)
 
     def to_config(self) -> Dict[str, Any]:
-        """Generate configuration dictionary from the data object."""
+        """Generate configuration dictionary from the data object.
+
+        Note:
+            If a parameter of the data object is a dictionary, it cannot
+            contain value that is another dictionary. The only exception
+            currently is `pre_transform`.
+
+        """
         params = {key: getattr(self, key) for key in self.CONFIG_KEYS}
         if self.pre_transform is not None:
             params["pre_transform"] = self.pre_transform.to_config()
@@ -101,7 +108,7 @@ class BaseData:
             "module_name": __name__,
             self.classname: params,
         }
-        checkConfig("Data object config", config, max_depth=2)
+        checkConfig("Data config", config, max_depth=3, white_list=["pre_transform"])
         return config
 
     def _setup_redos(self, redownload: bool, reprocess: bool, retransform: bool):

@@ -1,4 +1,3 @@
-from NLEval.util.converter import MyGeneInfoConverter
 from NLEval.data.network.base import BaseNdexData
 
 
@@ -14,13 +13,10 @@ class PCNet(BaseNdexData):
             weighted=False,
             directed=False,
             largest_comp=True,
+            node_id_converter="HumanEntrez",
             cx_kwargs={
                 "interaction_types": ["neighbor-of"],
                 "node_id_entry": "n",
-                "node_id_converter": MyGeneInfoConverter(
-                    root=root,
-                    scopes="symbol",
-                ),
                 "node_id_prefix": None,
             },
             **kwargs,

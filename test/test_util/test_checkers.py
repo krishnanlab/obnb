@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from NLEval.typing import FLOAT_TYPE, INT_TYPE, ITERABLE_TYPE
+from NLEval.typing import FLOAT_TYPE, INT_TYPE, Iterable
 from NLEval.util import checkers
 
 
@@ -45,9 +45,9 @@ class TestCheckers(unittest.TestCase):
         n_int_tuple = (1, 2, 3)
         n_int_lst = [1, 2, 3]
         n_int_ary = np.array([1, 2, 3])
-        self.assertIsInstance(n_int_tuple, ITERABLE_TYPE)
-        self.assertIsInstance(n_int_lst, ITERABLE_TYPE)
-        self.assertIsInstance(n_int_ary, ITERABLE_TYPE)
+        self.assertIsInstance(n_int_tuple, Iterable)
+        self.assertIsInstance(n_int_lst, Iterable)
+        self.assertIsInstance(n_int_ary, Iterable)
 
     def test_checkType(self):
         checkers.checkType("n_int", int, self.n_int)

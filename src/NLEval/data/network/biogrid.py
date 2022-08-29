@@ -1,4 +1,3 @@
-from NLEval.util.converter import MyGeneInfoConverter
 from NLEval.data.network.base import BaseNdexData
 
 
@@ -14,11 +13,11 @@ class BioGRID(BaseNdexData):
             weighted=False,
             directed=False,
             largest_comp=True,
+            node_id_converter="HumanEntrez",
             cx_kwargs={
                 "interaction_types": ["interacts-with"],
                 "node_id_prefix": "ncbigene",
                 "node_id_entry": "r",
-                "node_id_converter": MyGeneInfoConverter(root=root),
             },
             **kwargs,
         )

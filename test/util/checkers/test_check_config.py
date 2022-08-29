@@ -15,6 +15,7 @@ config3 = {
         },
     },
 }
+config4 = {"a": 3, "b": [1, 2, "3"], "c": {"x": [1, 2, "3"]}}
 
 
 def test_check_config_valtypes():
@@ -46,3 +47,17 @@ def test_check_config_depth():
     checkConfig("config3", config3, allowed_types=(int,), max_depth=3)
     with pytest.raises(ValueError):
         checkConfig("config3", config3, allowed_types=(int,), max_depth=2)
+
+    checkConfig("config4", config4, allowed_types=(int, str), max_depth=2)
+    with pytest.raises(ValueError):
+        checkConfig("config4", config4, allowed_types=(int, str), max_depth=1)
+
+
+def test_check_config_white_list():
+    checkConfig("config1", config1, allowed_types=(int, str), white_list=["c"])
+    checkConfig("config2", config2, allowed_types=(int,), white_list=["y"])
+
+    # White list must be a list of str
+    with pytest.raises(TypeError):
+        checkConfig("config2", config2, allowed_types=(int,), white_list="y")
+        checkConfig("config2", config2, allowed_types=(int,), white_list=["y", 2])

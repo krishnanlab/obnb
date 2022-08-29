@@ -3,12 +3,12 @@ import logging
 
 import numpy as np
 
+from NLEval.graph.base import BaseGraph
 from NLEval.typing import EdgeData, List, LogLevel, Mapping, Optional, Union
 from NLEval.util import checkers
 from NLEval.util.cx_explorer import CXExplorer
 from NLEval.util.exceptions import IDNotExistError
 from NLEval.util.idhandler import IDmap
-from NLEval.graph.base import BaseGraph
 
 
 class SparseGraph(BaseGraph):
@@ -474,6 +474,7 @@ class SparseGraph(BaseGraph):
         if node_id_converter is not None:
             self.logger.info("Start converting gene IDs.")
             log_level_id = logging.getLevelName(self.log_level)
+
             try:
                 node_id_converter.logger.setLevel(log_level_id)
                 node_id_converter.query_bulk(list(node_idx_to_id.values()))
