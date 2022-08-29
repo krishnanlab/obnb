@@ -4,6 +4,7 @@ import shutil
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import datetime
 from io import BytesIO
 from pprint import pformat
 from zipfile import ZipFile
@@ -105,8 +106,9 @@ class BaseData:
             params["pre_transform"] = self.pre_transform.to_config()
         config = {
             "package_version": NLEval.__version__,
-            "module_name": __name__,
-            self.classname: params,
+            "processed_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "data_module": self.classname,
+            "data_module_params": params,
         }
         checkConfig("Data config", config, max_depth=3, white_list=["pre_transform"])
         return config
@@ -245,18 +247,17 @@ class BaseData:
         self.plogger.info(f"Start processing {self.classname}...")
         self.process()
 
-        if self.pre_transform is None:
-            return
-
         # Pre-transform data
-        self.load_processed_data()
-        self.plogger.info(f"Applying pre-transformation {self.pre_transform}")
-        self.apply_transform(self.pre_transform)
+        if self.pre_transform is not None:
+            self.load_processed_data()
+            self.plogger.info(f"Applying pre-transformation {self.pre_transform}")
+            self.apply_transform(self.pre_transform)
 
-        outpath = self.processed_file_path(0)
-        self.save(outpath)
-        self.plogger.info(f"Saved pre-transformed file {outpath}")
+            outpath = self.processed_file_path(0)
+            self.save(outpath)
+            self.plogger.info(f"Saved pre-transformed file {outpath}")
 
+        # Save data config file
         config_path = osp.join(self.info_dir, "config.yaml")
         with open(config_path, "w") as f:
             f.write(yaml.dump(self.to_config(), sort_keys=False))
