@@ -17,7 +17,7 @@ class BaseNdexData(BaseData, SparseGraph):
         "weighted",
         "directed",
         "largest_comp",
-        # "cx_kwargs",  # FIX: make cx_kwargs to have str vals only first
+        "cx_kwargs",
     ]
     uuid: Optional[str] = None
 
