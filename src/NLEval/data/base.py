@@ -95,8 +95,9 @@ class BaseData:
         """Generate configuration dictionary from the data object.
 
         Note:
-            if a parameter of the data object is a dictionary, it cannot
-            contain value that is another dictionary.
+            If a parameter of the data object is a dictionary, it cannot
+            contain value that is another dictionary. The only exception
+            currently is `pre_transform`.
 
         """
         params = {key: getattr(self, key) for key in self.CONFIG_KEYS}
