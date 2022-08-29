@@ -107,7 +107,7 @@ class BaseData:
             "module_name": __name__,
             self.classname: params,
         }
-        checkConfig("Data object config", config, max_depth=3)
+        checkConfig("Data config", config, max_depth=3, white_list=["pre_transform"])
         return config
 
     def _setup_redos(self, redownload: bool, reprocess: bool, retransform: bool):
