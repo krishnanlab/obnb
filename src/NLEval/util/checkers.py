@@ -6,7 +6,7 @@ to a function call is valid.
 """
 import numpy as np
 
-from NLEval.typing import INT_TYPE, ITERABLE_TYPE, NUMERIC_TYPE, Tuple
+from NLEval.typing import INT_TYPE, NUMERIC_TYPE, Iterable, Tuple
 
 __all__ = [
     "checkConfig",
@@ -140,7 +140,7 @@ def checkNumpyArrayShape(name, targetShape, ary):
         ValueError: if the sape of the input array differ from the target shape
 
     """
-    if isinstance(targetShape, ITERABLE_TYPE):
+    if isinstance(targetShape, Iterable):
         checkTypesInIterable("targetShape", INT_TYPE, targetShape)
         NDim = len(targetShape)
     else:

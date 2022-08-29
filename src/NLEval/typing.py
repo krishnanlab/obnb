@@ -30,7 +30,6 @@ except ModuleNotFoundError:
 INT_TYPE = (int, np.int32, np.int64)
 FLOAT_TYPE = (float, np.float32, np.float64, np.float128)
 NUMERIC_TYPE = INT_TYPE + FLOAT_TYPE
-ITERABLE_TYPE = Iterable
 
 EdgeData = List[Dict[int, float]]
 
@@ -60,7 +59,6 @@ __all__ = [
     "INT_TYPE",
     "FLOAT_TYPE",
     "NUMERIC_TYPE",
-    "ITERABLE_TYPE",
     "LogLevel",
     "Metric",
     "Term",

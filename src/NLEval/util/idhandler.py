@@ -4,7 +4,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from NLEval.typing import ITERABLE_TYPE, Dict, List
+from NLEval.typing import Dict, Iterable, List
 from NLEval.util import checkers
 from NLEval.util.exceptions import IDExistsError, IDNotExistError
 
@@ -83,7 +83,7 @@ class IDlst:
         depending on input type"""
         if isinstance(identifier, str):
             return self._getitem_sinlge(identifier)
-        elif isinstance(identifier, ITERABLE_TYPE):
+        elif isinstance(identifier, Iterable):
             return self._getitem_multiple(identifier)
         else:
             raise TypeError(
