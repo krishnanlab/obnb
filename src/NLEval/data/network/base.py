@@ -48,7 +48,7 @@ class BaseNdexData(BaseData, SparseGraph):
 
         """
         self.largest_comp = largest_comp
-        self.node_id_converter = node_id_converter
+        self.node_id_converter = node_id_converter  # type: ignore
         self.cx_kwargs: Dict[str, Any] = cx_kwargs or {}
         super().__init__(
             root,

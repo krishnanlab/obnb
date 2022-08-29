@@ -6,7 +6,6 @@ import numpy as np
 from NLEval.graph.base import BaseGraph
 from NLEval.typing import EdgeData, List, LogLevel, Mapping, Optional, Union
 from NLEval.util import checkers
-from NLEval.util.converter import MyGeneInfoConverter
 from NLEval.util.cx_explorer import CXExplorer
 from NLEval.util.exceptions import IDNotExistError
 from NLEval.util.idhandler import IDmap
