@@ -37,6 +37,11 @@ class BaseLabelsetNonRedFilter(BaseFilter):
         self.threshold = threshold
 
     @property
+    def params(self) -> List[str]:
+        """Parameter list."""
+        return ["threshold"]
+
+    @property
     def mode_name(self):
         return "DROP LABELSET"
 
