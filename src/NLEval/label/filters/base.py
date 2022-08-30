@@ -59,14 +59,14 @@ class BaseFilter:
     def __repr__(self):
         """Return name of the filer."""
         name = self.__class__.__name__
-        params = ", ".join([f"{i}={self.__dict__[i]}" for i in self.params])
+        params = ", ".join([f"{i}={getattr(self, i)!r}" for i in self.params])
         return f"{name}({params})"
 
     def to_config(self) -> Dict[str, Any]:
         """Turn into a config dict."""
         return {
             self.__class__.__name__: {
-                param: self.__dict__[param] for param in self.all_params
+                param: getattr(self, param) for param in self.all_params
             },
         }
 
