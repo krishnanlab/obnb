@@ -1,7 +1,7 @@
 import os.path as osp
-import shutil
 from pathlib import Path
 from pprint import pformat
+from shutil import make_archive
 
 import NLEval.data
 import NLEval.util.logger
@@ -29,8 +29,9 @@ logger.info(
 for name in all_data:
     getattr(NLEval.data, name)(datadir)
     # TODO: validate data and print stats (# ndoes&edges for networks; stats() for lsc)
-    shutil.make_archive(osp.join(archdir, name), "zip", datadir, name, logger=logger)
+    make_archive(osp.join(archdir, name), "zip", datadir, name, logger=logger)
 
-# TODO: archive the cache dir
+make_archive(osp.join(archdir, ".cache"), "zip", datadir, ".cache", logger=logger)
+
 # TODO: validation summaries -> # of datasets, whih one of them failed/succeeded
 # TODO: optionally, upload to zenodo and validate once done (check failed uploads)
