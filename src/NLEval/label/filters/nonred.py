@@ -149,6 +149,7 @@ class BaseLabelsetNonRedFilter(BaseFilter):
         return nonred_label_ids
 
     def get_val_getter(self, lsc):
+        # TODO: add progress bar to the preprocessing step
         # Extract non-redundant labelset ids and then remove anything outside
         # of this sed
         g = self.construct_labelset_graph(lsc)
