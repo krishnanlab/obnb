@@ -91,7 +91,7 @@ class TestData(unittest.TestCase):
     def test_hippie(self):
         self.graph = NLEval.data.HIPPIE(self.tmp_dir, log_level=LEVEL)
         self.assertEqual(self.graph.size, 17830)
-        self.assertEqual(self.graph.num_edges, 769474)
+        self.assertEqual(self.graph.num_edges, 767644)
 
     @pytest.mark.longruns
     def test_humannet(self):
