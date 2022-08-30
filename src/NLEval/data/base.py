@@ -33,6 +33,9 @@ class BaseData:
 
     CONFIG_KEYS: List[str] = ["version"]
 
+    # Set to new data release name when preparing data for new release
+    _new_data_release: Optional[str] = None
+
     def __init__(
         self,
         root: str,
@@ -102,8 +105,11 @@ class BaseData:
 
         """
         params = {key: getattr(self, key) for key in self.CONFIG_KEYS}
+        # Set version to new data release version if it is set
+        params["version"] = self._new_data_release or params["version"]
         if self.pre_transform is not None:
             params["pre_transform"] = self.pre_transform.to_config()
+
         config = {
             "package_version": NLEval.__version__,
             "processed_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
