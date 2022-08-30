@@ -10,8 +10,8 @@ from NLEval.graph import OntologyGraph
 from NLEval.label import LabelsetCollection
 from NLEval.label.filters import (
     Compose,
-    LabelsetPairwiseFilterJaccard,
-    LabelsetPairwiseFilterOverlap,
+    LabelsetNonRedFilterJaccard,
+    LabelsetNonRedFilterOverlap,
     LabelsetRangeFilterSize,
 )
 from NLEval.typing import List
@@ -62,16 +62,8 @@ class DisGeNet(BaseAnnotatedOntologyData):
     def _default_pre_transform(self):
         return Compose(
             LabelsetRangeFilterSize(max_val=self.max_size),
-            LabelsetPairwiseFilterJaccard(
-                self.jaccard,
-                size_constraint="smaller",
-                inclusive=True,
-            ),
-            LabelsetPairwiseFilterOverlap(
-                self.overlap,
-                size_constraint="smaller",
-                inclusive=True,
-            ),
+            LabelsetNonRedFilterJaccard(self.jaccard),
+            LabelsetNonRedFilterOverlap(self.overlap),
             LabelsetRangeFilterSize(min_val=self.min_size),
             log_level=self.log_level,
         )
