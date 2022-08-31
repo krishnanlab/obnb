@@ -5,17 +5,15 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import datetime
-from io import BytesIO
 from pprint import pformat
-from zipfile import ZipFile
 
-import requests
 import yaml
 
 import NLEval
 from NLEval._config.config import NLEDATA_URL_DICT, NLEDATA_URL_DICT_STABLE
 from NLEval.typing import Any, Dict, List, LogLevel, Optional
 from NLEval.util.checkers import checkConfig
+from NLEval.util.download import download_unzip
 from NLEval.util.exceptions import DataNotFoundError
 from NLEval.util.logger import get_logger, log_file_context
 from NLEval.util.path import cleandir, hexdigest
@@ -387,16 +385,8 @@ class BaseData:
         self.plogger.info(f"Loading {self.classname} ({version=})...")
         self.plogger.info(f"Download URL: {data_url}")
 
-        # TODO: progress bar
         # WARNING: assumes zip file
-        r = requests.get(data_url)
-        if not r.ok:
-            self.plogger.error(f"Download filed: {r} {r.reason}")
-            raise requests.exceptions.RequestException(r)
-
-        self.plogger.info("Download completed, start unpacking...")
-        zf = ZipFile(BytesIO(r.content))
-        zf.extractall(self.root)
+        download_unzip(data_url, self.root, logger=self.plogger)
 
     def _download_archive(self):
         """Check if files data set up and download the archive if not."""
