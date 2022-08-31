@@ -3,8 +3,10 @@ from pathlib import Path
 from pprint import pformat
 from shutil import make_archive
 
+import NLEval
 import NLEval.data
 import NLEval.util.logger
+from NLEval._config.config import NLEDATA_URL_DICT
 from NLEval.data.base import BaseData
 
 homedir = Path(".").resolve()
@@ -12,9 +14,12 @@ datadir = osp.join(homedir, "data_release")
 archdir = osp.join(datadir, "archived")
 
 all_data = sorted(NLEval.data.__all__)
-# TODO: parse new release version?
-new_data_release = "nledata-v0.1.0-dev"
+new_data_release = NLEval.__data_version__
 
+if (url := NLEDATA_URL_DICT.get(new_data_release)) is not None:
+    raise ValueError(f"Data release version {new_data_release} exists ({url})")
+
+# Set this to enable setting the correct version number instead of 'latest'
 BaseData._new_data_release = new_data_release
 
 logger = NLEval.util.logger.get_logger(None, log_level="INFO")
