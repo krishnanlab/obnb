@@ -3,16 +3,22 @@ import os
 import shutil
 import tempfile
 import unittest
+from urllib.parse import urljoin
 
 import pytest
 from parameterized import parameterized
 
+import NLEval
 import NLEval.data
+from NLEval._config.config import NLEDATA_URL_DICT
+from NLEval.util.download import download_unzip
 from NLEval.util.exceptions import DataNotFoundError
 from NLEval.util.timer import Timeout
 
-LEVEL = "DEBUG"
-
+opts = {
+    "log_level": "DEBUG",
+    "version": NLEval.__data_version__,
+}
 # Name, reprocess, redownload
 full_data_test_param = [
     ("Download", False, False),
@@ -27,12 +33,16 @@ class TestData(unittest.TestCase):
     def setUpClass(cls):
         # Clean after every test function call
         cls.tmp_dir = tempfile.mkdtemp()
+
         # Clean at the end of the test class
         cls.tmp_dir_preserve = tempfile.mkdtemp()
         print(
             f"Created temporary directory for testing data: {cls.tmp_dir}, "
             f"{cls.tmp_dir_preserve}",
         )
+
+        data_url = urljoin(NLEDATA_URL_DICT[NLEval.__data_version__], ".cache.zip")
+        download_unzip(data_url, cls.tmp_dir_preserve)
 
     @classmethod
     def tearDownClass(cls):
@@ -53,7 +63,7 @@ class TestData(unittest.TestCase):
 
     @pytest.mark.longruns
     def test_biogrid(self):
-        self.graph = NLEval.data.BioGRID(self.tmp_dir, log_level=LEVEL)
+        self.graph = NLEval.data.BioGRID(self.tmp_dir, **opts)
         self.assertEqual(self.graph.size, 19263)
         self.assertEqual(self.graph.num_edges, 1099756)
 
@@ -65,7 +75,7 @@ class TestData(unittest.TestCase):
                 self.tmp_dir_preserve,
                 reprocess=reprocess,
                 redownload=redownload,
-                log_level=LEVEL,
+                **opts,
             )
             self.assertEqual(self.graph.size, 8108)
             self.assertEqual(self.graph.num_edges, 71004)
@@ -73,11 +83,11 @@ class TestData(unittest.TestCase):
     @pytest.mark.mediumruns
     def test_disgenet(self):
         with Timeout(600):
-            self.lsc = NLEval.data.DisGeNet(self.tmp_dir, log_level=LEVEL)
+            self.lsc = NLEval.data.DisGeNet(self.tmp_dir, **opts)
 
     @pytest.mark.longruns
     def test_funcoup(self):
-        self.graph = NLEval.data.FunCoup(self.tmp_dir, log_level=LEVEL)
+        self.graph = NLEval.data.FunCoup(self.tmp_dir, **opts)
         self.assertEqual(self.graph.size, 17905)
         self.assertEqual(self.graph.num_edges, 10042420)
 
@@ -85,30 +95,30 @@ class TestData(unittest.TestCase):
     @pytest.mark.longruns
     def test_go(self, name):
         with self.subTest(name):
-            self.lsc = getattr(NLEval.data, name)(self.tmp_dir, log_level=LEVEL)
+            self.lsc = getattr(NLEval.data, name)(self.tmp_dir, **opts)
 
     @pytest.mark.longruns
     def test_hippie(self):
-        self.graph = NLEval.data.HIPPIE(self.tmp_dir, log_level=LEVEL)
+        self.graph = NLEval.data.HIPPIE(self.tmp_dir, **opts)
         self.assertEqual(self.graph.size, 17830)
         self.assertEqual(self.graph.num_edges, 767644)
 
     @pytest.mark.longruns
     def test_humannet(self):
-        self.graph = NLEval.data.HumanNet(self.tmp_dir, log_level=LEVEL)
+        self.graph = NLEval.data.HumanNet(self.tmp_dir, **opts)
         self.assertEqual(self.graph.size, 17739)
         self.assertEqual(self.graph.num_edges, 848414)
 
     @pytest.mark.longruns
     def test_pcnet(self):
-        self.graph = NLEval.data.PCNet(self.tmp_dir, log_level=LEVEL)
+        self.graph = NLEval.data.PCNet(self.tmp_dir, **opts)
         self.assertEqual(self.graph.size, 18256)
         self.assertEqual(self.graph.num_edges, 5190378)
 
     @pytest.mark.longruns
     @pytest.mark.highmemory
     def test_string(self):
-        self.graph = NLEval.data.STRING(self.tmp_dir, log_level=LEVEL)
+        self.graph = NLEval.data.STRING(self.tmp_dir, **opts)
         self.assertEqual(self.graph.size, 18480)
         self.assertEqual(self.graph.num_edges, 11019492)
 

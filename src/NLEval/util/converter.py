@@ -147,7 +147,7 @@ class MyGeneInfoConverter:
             full_convert_map[i] = j
 
         with open(self.cache_path, "w") as f:
-            json.dump(full_convert_map, f, indent=4)
+            json.dump(full_convert_map, f, indent=4, sort_keys=True)
         self.logger.info(f"Gene conversion cache saved {self.cache_path}")
 
     def query_bulk(
