@@ -1,9 +1,9 @@
-name: Example Executions
+name: Examples on latest
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '59 23 * * 1,5'
+    - cron: '59 23 * * 0'
 
 jobs:
   run_examples:
@@ -13,10 +13,9 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: [3.8, 3.9]
-        torch-version: [1.10.0]
         include:
-          - torch-version: 1.10.0
-            torchvision-version: 0.11.1
+          - torch-version: 1.12.1
+            torchvision-version: 0.13.1
 
     steps:
       - uses: actions/checkout@v2
@@ -26,22 +25,17 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install NLEval
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[dev]
-
-      - name: Install PyG dependencies
-        run: |
           pip install torch==${{ matrix.torch-version }}+cpu torchvision==${{ matrix.torchvision-version }}+cpu -f https://download.pytorch.org/whl/torch_stable.html
-          pip install torch-scatter -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
-          pip install torch-sparse -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
-          pip install torch-cluster -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
-          pip install torch-spline-conv -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
-
-      - name: Install latest PyG from github
-        run: |
+          pip install torch-scatter torch-scatter torch-cluster -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
           pip install git+https://github.com/pyg-team/pytorch_geometric.git#egg=torch-geometric[full]
+          pip install -r requirements.txt
+
+      - name: Install NLEval
+        run: |
+          pip install -e .
 
       - name: Execute example scripts
         shell: bash
