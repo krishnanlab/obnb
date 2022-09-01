@@ -96,7 +96,7 @@ class SparseGraph(BaseGraph):
         for new_idx, node in enumerate(node_ids):
             if node not in self.idmap:
                 raise IDNotExistError(f"{node!r} is not in the graph")
-            graph.add_id(node)
+            graph.add_node(node)
             old_idx_to_new_idx[self.idmap[node]] = new_idx
 
         # Map edge data to the new graph
@@ -149,19 +149,13 @@ class SparseGraph(BaseGraph):
             fvec[nbr_idx] = weight
         return fvec
 
-    def _default_add_id(self, node_id: str) -> int:
+    def _default_add_node(self, node_id: str) -> int:
         """Add a new node ID if not existed yet."""
         if node_id not in self.idmap:
-            self.add_id(node_id)
+            self.add_node(node_id)
 
-    def add_id(self, node_id: Union[str, List[str]]):
-        """Create new nodes and initialize its edge data."""
-        if isinstance(node_id, list):
-            for single_node_id in node_id:
-                self.add_id(single_node_id)
-        else:
-            self.idmap.add_id(node_id)
-            self._edge_data.append({})
+    def _new_node_data(self):
+        self._edge_data.append({})
 
     def _add_edge(
         self,
@@ -241,8 +235,8 @@ class SparseGraph(BaseGraph):
             raise ValueError(f"Unknown reduction type {reduction!r}")
 
         # Check if node_id exists, add new if not, and return node index
-        self._default_add_id(node_id1)
-        self._default_add_id(node_id2)
+        self._default_add_node(node_id1)
+        self._default_add_node(node_id2)
 
         self._add_edge(
             node_id1,
@@ -366,7 +360,7 @@ class SparseGraph(BaseGraph):
             ids = list(map(str, range(mat.shape[0])))
         graph = cls(weighted=True, directed=True)
         for i in ids:
-            graph.add_id(i)
+            graph.add_node(i)
         for i, j in zip(*np.where(mat != 0)):
             graph.add_edge(graph.idmap.lst[i], graph.idmap.lst[j], mat[i, j])
         return graph
@@ -739,15 +733,9 @@ class DirectedSparseGraph(SparseGraph):
         """Adjacency list of reversed edge direction."""
         return self._rev_edge_data
 
-    def add_id(self, node_id: Union[str, List[str]]):
-        """Create new nodes and initialize its edge data."""
-        if isinstance(node_id, list):
-            for single_node_id in node_id:
-                self.add_id(single_node_id)
-        else:
-            self.idmap.add_id(node_id)
-            self._edge_data.append({})
-            self._rev_edge_data.append({})
+    def _new_node_data(self):
+        self._edge_data.append({})
+        self._rev_edge_data.append({})
 
     def add_edge(
         self,

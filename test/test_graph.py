@@ -34,7 +34,7 @@ def shuffle_sparse(graph):
     )
     for i in shuffle_idx:
         node_id = graph.idmap.lst[i]
-        new_graph.add_id(node_id)
+        new_graph.add_node(node_id)
     for idx1, node_id1 in enumerate(graph.idmap):
         for idx2, weight in graph.edge_data[graph.idmap[node_id1]].items():
             node_id2 = graph.idmap.lst[idx2]
@@ -169,30 +169,30 @@ class TestSparseGraph(unittest.TestCase):
     def tearDownClass(cls):
         shutil.rmtree(cls.tmp_dir)
 
-    def test_add_id(self):
+    def test_add_node(self):
         with self.subTest("Add single node"):
             graph = SparseGraph(weighted=False, directed=False)
 
-            graph.add_id("a")
+            graph.add_node("a")
             self.assertEqual(sorted(graph.node_ids), ["a"])
             self.assertEqual(graph._edge_data, [{}])
 
-            graph.add_id("b")
+            graph.add_node("b")
             self.assertEqual(sorted(graph.node_ids), ["a", "b"])
             self.assertEqual(graph._edge_data, [{}, {}])
 
-            self.assertRaises(IDExistsError, graph.add_id, "a")
-            self.assertRaises(IDExistsError, graph.add_id, "b")
+            self.assertRaises(IDExistsError, graph.add_node, "a")
+            self.assertRaises(IDExistsError, graph.add_node, "b")
 
         with self.subTest("Add multiple nodes"):
             graph = SparseGraph(weighted=False, directed=False)
 
-            graph.add_id(["a", "b"])
+            graph.add_nodes(["a", "b"])
             self.assertEqual(sorted(graph.node_ids), ["a", "b"])
             self.assertEqual(graph._edge_data, [{}, {}])
 
-            self.assertRaises(IDExistsError, graph.add_id, "a")
-            self.assertRaises(IDExistsError, graph.add_id, ["c", "b"])
+            self.assertRaises(IDExistsError, graph.add_node, "a")
+            self.assertRaises(IDExistsError, graph.add_nodes, ["c", "b"])
 
     def test_add_edge(self):
         graph = SparseGraph()
@@ -372,7 +372,7 @@ class TestSparseGraph(unittest.TestCase):
             with self.subTest(i=i):
                 self.assertTrue(graph == shuffle_sparse(graph))
         graph2 = deepcopy(graph)
-        graph2.add_id("x")
+        graph2.add_node("x")
         self.assertFalse(graph == graph2)
 
     def test_to_dense_graph(self):
@@ -408,7 +408,7 @@ class TestSparseGraph(unittest.TestCase):
 
     def test_connected_components(self):
         graph = SparseGraph(weighted=True, directed=False)
-        graph.add_id(["a", "b", "c", "d", "e"])
+        graph.add_nodes(["a", "b", "c", "d", "e"])
         graph.add_edge("a", "b", 1)
         graph.add_edge("c", "d", 2)
         graph.add_edge("c", "e", 1)
@@ -724,6 +724,13 @@ class TestDenseGraph(unittest.TestCase):
                         mat[idx1, idx2],
                         graph.get_edge(node_id1, node_id2),
                     )
+
+    def test_add_node(self):
+        graph = DenseGraph()
+
+        # add_node not set up for DenseGraph yet
+        with self.assertRaises(NotImplementedError):
+            graph.add_node("a")
 
     def test_mat(self):
         graph = DenseGraph()
@@ -1247,10 +1254,10 @@ class TestOntologyGraph(unittest.TestCase):
         graph = OntologyGraph()
         self.assertEqual(graph._edge_stats, [])
 
-        graph.add_id("a")
+        graph.add_node("a")
         self.assertEqual(graph._edge_stats, [0])
 
-        graph.add_id("b")
+        graph.add_node("b")
         self.assertEqual(graph._edge_stats, [0, 0])
 
         graph.add_edge("b", "a")
@@ -1262,7 +1269,7 @@ class TestOntologyGraph(unittest.TestCase):
     def test_node_name(self):
         graph = OntologyGraph()
 
-        graph.add_id("a")
+        graph.add_node("a")
         self.assertEqual(graph.get_node_name("a"), None)
 
         graph.set_node_name("a", "A")
@@ -1272,8 +1279,8 @@ class TestOntologyGraph(unittest.TestCase):
     def test_node_attr(self):
         graph = OntologyGraph()
 
-        graph.add_id("a")
-        graph.add_id("b")
+        graph.add_node("a")
+        graph.add_node("b")
         self.assertEqual(graph.get_node_attr("a"), None)
         self.assertEqual(graph.get_node_attr("b"), None)
 
@@ -1314,7 +1321,7 @@ class TestOntologyGraph(unittest.TestCase):
         """
         graph = OntologyGraph()
 
-        graph.add_id(["a", "b", "c", "d", "e", "f"])
+        graph.add_nodes(["a", "b", "c", "d", "e", "f"])
 
         graph.add_edge("b", "a")
         graph.add_edge("c", "a")
@@ -1368,7 +1375,7 @@ class TestOntologyGraph(unittest.TestCase):
         """
         graph = OntologyGraph()
 
-        graph.add_id(["a", "b", "c", "d", "e", "f"])
+        graph.add_nodes(["a", "b", "c", "d", "e", "f"])
 
         graph.add_edge("b", "a")
         graph.add_edge("c", "a")

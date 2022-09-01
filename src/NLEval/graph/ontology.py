@@ -6,6 +6,7 @@ from contextlib import contextmanager
 
 from tqdm import trange
 
+from NLEval.graph.sparse import DirectedSparseGraph
 from NLEval.typing import (
     DefaultDict,
     Iterable,
@@ -20,7 +21,6 @@ from NLEval.typing import (
 )
 from NLEval.util import idhandler
 from NLEval.util.exceptions import OboTermIncompleteError
-from NLEval.graph.sparse import DirectedSparseGraph
 
 
 class OntologyGraph(DirectedSparseGraph):
@@ -106,10 +106,9 @@ class OntologyGraph(DirectedSparseGraph):
             )
         return ancestors_set
 
-    def add_id(self, node_id: Union[str, List[str]]):
-        super().add_id(node_id)
-        for _ in range(len(node_id) if isinstance(node_id, list) else 1):
-            self._edge_stats.append(0)
+    def _new_node_data(self):
+        super()._new_node_data()
+        self._edge_stats.append(0)
 
     def add_edge(
         self,
@@ -319,7 +318,7 @@ class OntologyGraph(DirectedSparseGraph):
             for term in self.iter_terms(f):
                 term_id, term_name, term_xrefs, term_parents = term
 
-                self._default_add_id(term_id)
+                self._default_add_node(term_id)
 
                 if self.get_node_name(term_id) is None:
                     self.set_node_name(term_id, term_name)
