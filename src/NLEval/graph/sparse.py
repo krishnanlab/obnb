@@ -7,7 +7,7 @@ from NLEval.graph.base import BaseGraph
 from NLEval.typing import EdgeData, EdgeDir, List, LogLevel, Mapping, Optional, Union
 from NLEval.util import checkers
 from NLEval.util.cx_explorer import CXExplorer
-from NLEval.util.exceptions import IDNotExistError
+from NLEval.util.exceptions import EdgeNotExistError, IDNotExistError
 from NLEval.util.idhandler import IDmap
 
 
@@ -248,6 +248,27 @@ class SparseGraph(BaseGraph):
             return self.edge_data[self.idmap[node_id1]][self.idmap[node_id2]]
         except KeyError:
             return 0
+
+    def remove_edge(self, node_id1: str, node_id2: str):
+        """Remove an edge in the graph.
+
+        Args:
+            node_id1: ID of node 1.
+            node_id2: ID of node 2.
+
+        """
+        self._remove_edge(node_id1, node_id2, self.edge_data)
+        if not self.directed:
+            self._remove_edge(node_id2, node_id1, self.edge_data)
+
+    def _remove_edge(self, node_id1: str, node_id2: str, edge_data: EdgeData):
+        node_idx1 = self.get_node_idx(node_id1)
+        node_idx2 = self.get_node_idx(node_id2)
+
+        try:
+            edge_data[node_idx1].pop(node_idx2)
+        except KeyError:
+            raise EdgeNotExistError(f"The edge {node_id1}-{node_id2} does not exist.")
 
     @staticmethod
     def edglst_reader(edg_path, weighted, directed, cut_threshold):
@@ -771,6 +792,17 @@ class DirectedSparseGraph(SparseGraph):
             reduction,
             self._rev_edge_data,
         )
+
+    def remove_edge(self, node_id1: str, node_id2: str):
+        """Remove an edge in the graph.
+
+        Args:
+            node_id1: ID of node 1.
+            node_id2: ID of node 2.
+
+        """
+        self._remove_edge(node_id1, node_id2, self.edge_data)
+        self._remove_edge(node_id2, node_id1, self.rev_edge_data)
 
     def connected_components(self):
         """Find connected components."""
