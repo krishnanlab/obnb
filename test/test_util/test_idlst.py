@@ -120,11 +120,17 @@ class TestIDlst(unittest.TestCase):
         # test add existing ID --> error
         self.assertRaises(IDExistsError, self.IDlst1.add_id, "a")
 
-    def test_getID(self):
+    def test_get_id(self):
         for idx, ID in enumerate(self.lst):
-            self.assertEqual(self.IDlst1.getID(idx), ID)
+            self.assertEqual(self.IDlst1.get_id(idx), ID)
         # test type check
-        self.assertRaises(TypeError, self.IDlst1.getID, "asdf")
+        self.assertRaises(TypeError, self.IDlst1.get_id, "asdf")
+
+    def test_get_ids(self):
+        self.assertEqual(self.IDlst1.get_ids(range(3)), ["a", "b", "c"])
+        self.assertEqual(self.IDlst1.get_ids([1, 2]), ["b", "c"])
+        with self.assertRaises(TypeError):
+            self.assertEqual(self.IDlst1.get_ids(["1", 2]), ["b", "c"])
 
     def test_from_list(self):
         idlst = idhandler.IDlst.from_list(self.lst)

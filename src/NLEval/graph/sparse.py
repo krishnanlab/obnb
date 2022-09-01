@@ -626,9 +626,9 @@ class SparseGraph(BaseGraph):
         edge_data_copy = self._edge_data[:]
         for src_idx in range(len(edge_data_copy)):
             src_nbrs = edge_data_copy[src_idx]
-            src_node_id = self.idmap.getID(src_idx)
+            src_node_id = self.idmap.get_id(src_idx)
             for dst_idx in src_nbrs:
-                dst_node_id = self.idmap.getID(dst_idx)
+                dst_node_id = self.idmap.get_id(dst_idx)
                 if not self.directed:
                     edge_data_copy[dst_idx].pop(src_idx)
                 weight = edge_data_copy[src_idx][dst_idx]
