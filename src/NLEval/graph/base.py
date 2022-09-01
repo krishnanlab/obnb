@@ -1,7 +1,7 @@
 import logging
 from copy import deepcopy
 
-from NLEval.typing import List, LogLevel, Optional, Tuple, Union
+from NLEval.typing import Iterable, List, LogLevel, Optional, Tuple, Union
 from NLEval.util import checkers, idhandler
 from NLEval.util.logger import get_logger
 
@@ -43,6 +43,33 @@ class BaseGraph:
     def idmap(self, idmap):
         checkers.checkType("idmap", idhandler.IDmap, idmap)
         self._idmap = idmap
+
+    def add_node(self, node: str):
+        """Add a new node to the graph.
+
+        Args:
+            node: Name (or ID) of the node.
+
+        """
+        self.idmap.add_id(node)
+        self._new_node_data()
+
+    def _new_node_data(self):
+        """Set up data for the newly added node."""
+        raise NotImplementedError(
+            f"The add_node method has not been set up for {self.__class__!r}, "
+            f"need to implement method _new_node_data first.",
+        )
+
+    def add_nodes(self, nodes: Iterable[str]):
+        """Add new nodes to the graph.
+
+        Args:
+            node: Names (or IDs) of the nodes.
+
+        """
+        for node in nodes:
+            self.add_node(node)
 
     def get_node_id(self, node: Union[str, int]) -> str:
         """Return the node ID given the node index or node ID.

@@ -187,12 +187,12 @@ class TestSparseGraph(unittest.TestCase):
         with self.subTest("Add multiple nodes"):
             graph = SparseGraph(weighted=False, directed=False)
 
-            graph.add_node(["a", "b"])
+            graph.add_nodes(["a", "b"])
             self.assertEqual(sorted(graph.node_ids), ["a", "b"])
             self.assertEqual(graph._edge_data, [{}, {}])
 
             self.assertRaises(IDExistsError, graph.add_node, "a")
-            self.assertRaises(IDExistsError, graph.add_node, ["c", "b"])
+            self.assertRaises(IDExistsError, graph.add_nodes, ["c", "b"])
 
     def test_add_edge(self):
         graph = SparseGraph()
@@ -408,7 +408,7 @@ class TestSparseGraph(unittest.TestCase):
 
     def test_connected_components(self):
         graph = SparseGraph(weighted=True, directed=False)
-        graph.add_node(["a", "b", "c", "d", "e"])
+        graph.add_nodes(["a", "b", "c", "d", "e"])
         graph.add_edge("a", "b", 1)
         graph.add_edge("c", "d", 2)
         graph.add_edge("c", "e", 1)
@@ -724,6 +724,13 @@ class TestDenseGraph(unittest.TestCase):
                         mat[idx1, idx2],
                         graph.get_edge(node_id1, node_id2),
                     )
+
+    def test_add_node(self):
+        graph = DenseGraph()
+
+        # add_node not set up for DenseGraph yet
+        with self.assertRaises(NotImplementedError):
+            graph.add_node("a")
 
     def test_mat(self):
         graph = DenseGraph()
@@ -1314,7 +1321,7 @@ class TestOntologyGraph(unittest.TestCase):
         """
         graph = OntologyGraph()
 
-        graph.add_node(["a", "b", "c", "d", "e", "f"])
+        graph.add_nodes(["a", "b", "c", "d", "e", "f"])
 
         graph.add_edge("b", "a")
         graph.add_edge("c", "a")
@@ -1368,7 +1375,7 @@ class TestOntologyGraph(unittest.TestCase):
         """
         graph = OntologyGraph()
 
-        graph.add_node(["a", "b", "c", "d", "e", "f"])
+        graph.add_nodes(["a", "b", "c", "d", "e", "f"])
 
         graph.add_edge("b", "a")
         graph.add_edge("c", "a")

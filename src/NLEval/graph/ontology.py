@@ -106,10 +106,9 @@ class OntologyGraph(DirectedSparseGraph):
             )
         return ancestors_set
 
-    def add_node(self, node_id: Union[str, List[str]]):
-        super().add_node(node_id)
-        for _ in range(len(node_id) if isinstance(node_id, list) else 1):
-            self._edge_stats.append(0)
+    def _new_node_data(self):
+        super()._new_node_data()
+        self._edge_stats.append(0)
 
     def add_edge(
         self,

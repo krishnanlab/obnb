@@ -154,14 +154,8 @@ class SparseGraph(BaseGraph):
         if node_id not in self.idmap:
             self.add_node(node_id)
 
-    def add_node(self, node_id: Union[str, List[str]]):
-        """Create new nodes and initialize its edge data."""
-        if isinstance(node_id, list):
-            for single_node_id in node_id:
-                self.add_node(single_node_id)
-        else:
-            self.idmap.add_id(node_id)
-            self._edge_data.append({})
+    def _new_node_data(self):
+        self._edge_data.append({})
 
     def _add_edge(
         self,
@@ -739,15 +733,9 @@ class DirectedSparseGraph(SparseGraph):
         """Adjacency list of reversed edge direction."""
         return self._rev_edge_data
 
-    def add_node(self, node_id: Union[str, List[str]]):
-        """Create new nodes and initialize its edge data."""
-        if isinstance(node_id, list):
-            for single_node_id in node_id:
-                self.add_node(single_node_id)
-        else:
-            self.idmap.add_id(node_id)
-            self._edge_data.append({})
-            self._rev_edge_data.append({})
+    def _new_node_data(self):
+        self._edge_data.append({})
+        self._rev_edge_data.append({})
 
     def add_edge(
         self,
