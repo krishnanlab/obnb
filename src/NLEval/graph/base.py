@@ -81,6 +81,37 @@ class BaseGraph:
         for node in nodes:
             self.add_node(node, exist_ok=exist_ok)
 
+    def add_edge(
+        self,
+        node_id1: str,
+        node_id2: str,
+        weight: float = 1.0,
+        reduction: Optional[str] = None,
+    ):
+        """Add or update an edge in the graph.
+
+        Args:
+            node_id1: ID of node 1.
+            node_id2: ID of node 2.
+            weight: Edge weight to use.
+            reduction: Type of edge reduction to use if the target edge already
+                exist. If not set, warn if old edge exists with different edge
+                weight value then the input edge weight, and then overwite it
+                with the new value.
+
+        """
+        raise NotImplementedError
+
+    def remove_edge(self, node_id1: str, node_id2: str):
+        """Remove an edge in the graph.
+
+        Args:
+            node_id1: ID of node 1.
+            node_id2: ID of node 2.
+
+        """
+        raise NotImplementedError
+
     def get_node_id(self, node: Union[str, int]) -> str:
         """Return the node ID given the node index or node ID.
 
