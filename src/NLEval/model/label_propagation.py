@@ -2,9 +2,9 @@ import warnings
 
 import numpy as np
 
+from NLEval.exception import NotConvergedWarning
 from NLEval.graph.base import BaseGraph
 from NLEval.util.checkers import checkValueNonnegative, checkValuePositive
-from NLEval.util.exceptions import NotConvergedWarning
 
 
 class IterativePropagation:

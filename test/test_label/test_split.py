@@ -3,8 +3,8 @@ import unittest
 import numpy as np
 from sklearn.model_selection import KFold
 
+from NLEval.exception import IDNotExistError
 from NLEval.label import LabelsetCollection, split
-from NLEval.util.exceptions import IDNotExistError
 
 
 class TestSplit(unittest.TestCase):

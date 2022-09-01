@@ -6,6 +6,7 @@ from contextlib import contextmanager
 
 from tqdm import trange
 
+from NLEval.exception import OboTermIncompleteError
 from NLEval.graph.sparse import DirectedSparseGraph
 from NLEval.typing import (
     DefaultDict,
@@ -20,7 +21,6 @@ from NLEval.typing import (
     Union,
 )
 from NLEval.util import idhandler
-from NLEval.util.exceptions import OboTermIncompleteError
 
 
 class OntologyGraph(DirectedSparseGraph):

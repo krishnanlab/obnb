@@ -2,11 +2,9 @@ import unittest
 
 import numpy as np
 
-import NLEval.model_trainer
-from NLEval import model_trainer
+from NLEval.exception import IDNotExistError
 from NLEval.graph import DenseGraph, MultiFeatureVec
 from NLEval.model_trainer.base import BaseTrainer
-from NLEval.util.exceptions import IDNotExistError
 
 
 class TestBaseTrainer(unittest.TestCase):

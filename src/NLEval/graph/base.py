@@ -1,10 +1,10 @@
 import logging
 from copy import deepcopy
 
+from NLEval.exception import IDExistsError
 from NLEval.typing import EdgeDir, Iterable, List, LogLevel, Optional, Tuple, Union
 from NLEval.util import checkers, idhandler
 from NLEval.util.checkers import checkLiteral
-from NLEval.util.exceptions import IDExistsError
 from NLEval.util.logger import get_logger
 
 

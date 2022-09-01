@@ -2,11 +2,11 @@ import logging
 
 import numpy as np
 
+from NLEval.exception import IDNotExistError
 from NLEval.graph.base import BaseGraph
 from NLEval.graph.sparse import SparseGraph
 from NLEval.typing import EdgeDir, List, LogLevel, Optional, Union
 from NLEval.util import checkers
-from NLEval.util.exceptions import IDNotExistError
 from NLEval.util.idhandler import IDmap
 
 

@@ -1,7 +1,7 @@
 import unittest
 
+from NLEval.exception import IDExistsError, IDNotExistError
 from NLEval.util import idhandler
-from NLEval.util.exceptions import IDExistsError, IDNotExistError
 
 
 class TestIDprop(unittest.TestCase):

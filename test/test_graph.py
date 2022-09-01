@@ -12,6 +12,7 @@ from commonvar import SAMPLE_DATA_DIR
 from parameterized import parameterized
 from scipy.spatial import distance
 
+from NLEval.exception import EdgeNotExistError, IDExistsError
 from NLEval.graph import (
     DenseGraph,
     DirectedSparseGraph,
@@ -22,7 +23,6 @@ from NLEval.graph import (
 )
 from NLEval.graph.base import BaseGraph
 from NLEval.util import idhandler
-from NLEval.util.exceptions import EdgeNotExistError, IDExistsError
 
 
 def shuffle_sparse(graph):
