@@ -10,7 +10,7 @@ from pprint import pformat
 import yaml
 
 import NLEval
-from NLEval._config.config import NLEDATA_URL_DICT, NLEDATA_URL_DICT_STABLE
+from NLEval.config import NLEDATA_URL_DICT, NLEDATA_URL_DICT_STABLE
 from NLEval.typing import Any, Dict, List, LogLevel, Optional
 from NLEval.util.checkers import checkConfig
 from NLEval.util.download import download_unzip

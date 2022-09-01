@@ -1,12 +1,9 @@
 """Logger utils."""
 import logging
 import logging.config
-import os.path as osp
-import pathlib
 from contextlib import contextmanager
 
-import yaml
-
+from NLEval.config.logger_config import LOGGER_CONFIG
 from NLEval.typing import LogLevel, Optional, Union
 
 
@@ -19,9 +16,7 @@ def display_pbar(level: Union[int, str], threshold="INFO") -> bool:
 
 def config_logger():
     """Configure logger used by NLEval."""
-    homedir = pathlib.Path(__file__).parent.parent.absolute()
-    with open(osp.join(homedir, "_config", "logging.yaml"), "r") as f:
-        logging.config.dictConfig(yaml.safe_load(f.read()))
+    logging.config.dictConfig(LOGGER_CONFIG)
 
 
 def get_logger(
