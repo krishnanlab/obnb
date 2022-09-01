@@ -3,11 +3,11 @@ import logging
 
 import numpy as np
 
+from NLEval.exception import EdgeNotExistError, IDNotExistError
 from NLEval.graph.base import BaseGraph
 from NLEval.typing import EdgeData, EdgeDir, List, LogLevel, Mapping, Optional, Union
 from NLEval.util import checkers
 from NLEval.util.cx_explorer import CXExplorer
-from NLEval.util.exceptions import EdgeNotExistError, IDNotExistError
 from NLEval.util.idhandler import IDmap
 
 

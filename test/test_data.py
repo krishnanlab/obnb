@@ -11,8 +11,8 @@ from parameterized import parameterized
 import NLEval
 import NLEval.data
 from NLEval.config import NLEDATA_URL_DICT
+from NLEval.exception import DataNotFoundError
 from NLEval.util.download import download_unzip
-from NLEval.util.exceptions import DataNotFoundError
 from NLEval.util.timer import Timeout
 
 opts = {

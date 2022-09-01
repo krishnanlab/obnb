@@ -6,6 +6,7 @@ import requests
 from tqdm import tqdm
 
 from NLEval.data.annotated_ontology.base import BaseAnnotatedOntologyData
+from NLEval.exception import IDNotExistError
 from NLEval.graph import OntologyGraph
 from NLEval.label import LabelsetCollection
 from NLEval.label.filters import (
@@ -15,7 +16,6 @@ from NLEval.label.filters import (
     LabelsetRangeFilterSize,
 )
 from NLEval.typing import List
-from NLEval.util.exceptions import IDNotExistError
 from NLEval.util.logger import display_pbar
 
 
