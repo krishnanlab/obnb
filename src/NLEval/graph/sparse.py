@@ -7,7 +7,7 @@ from NLEval.graph.base import BaseGraph
 from NLEval.typing import EdgeData, EdgeDir, List, LogLevel, Mapping, Optional, Union
 from NLEval.util import checkers
 from NLEval.util.cx_explorer import CXExplorer
-from NLEval.util.exceptions import IDNotExistError
+from NLEval.util.exceptions import EdgeNotExistError, IDNotExistError
 from NLEval.util.idhandler import IDmap
 
 
@@ -154,11 +154,6 @@ class SparseGraph(BaseGraph):
             fvec[nbr_idx] = weight
         return fvec
 
-    def _default_add_node(self, node_id: str) -> int:
-        """Add a new node ID if not existed yet."""
-        if node_id not in self.idmap:
-            self.add_node(node_id)
-
     def _new_node_data(self):
         self._edge_data.append({})
 
@@ -239,10 +234,7 @@ class SparseGraph(BaseGraph):
         if reduction not in [None, "max", "min"]:
             raise ValueError(f"Unknown reduction type {reduction!r}")
 
-        # Check if node_id exists, add new if not, and return node index
-        self._default_add_node(node_id1)
-        self._default_add_node(node_id2)
-
+        self.add_nodes([node_id1, node_id2], exist_ok=True)
         self._add_edge(
             node_id1,
             node_id2,
@@ -256,6 +248,27 @@ class SparseGraph(BaseGraph):
             return self.edge_data[self.idmap[node_id1]][self.idmap[node_id2]]
         except KeyError:
             return 0
+
+    def remove_edge(self, node_id1: str, node_id2: str):
+        """Remove an edge in the graph.
+
+        Args:
+            node_id1: ID of node 1.
+            node_id2: ID of node 2.
+
+        """
+        self._remove_edge(node_id1, node_id2, self.edge_data)
+        if not self.directed:
+            self._remove_edge(node_id2, node_id1, self.edge_data)
+
+    def _remove_edge(self, node_id1: str, node_id2: str, edge_data: EdgeData):
+        node_idx1 = self.get_node_idx(node_id1)
+        node_idx2 = self.get_node_idx(node_id2)
+
+        try:
+            edge_data[node_idx1].pop(node_idx2)
+        except KeyError:
+            raise EdgeNotExistError(f"The edge {node_id1}-{node_id2} does not exist.")
 
     @staticmethod
     def edglst_reader(edg_path, weighted, directed, cut_threshold):
@@ -734,6 +747,15 @@ class DirectedSparseGraph(SparseGraph):
         self._rev_edge_data: EdgeData = []
 
     @property
+    def directed(self) -> bool:
+        return True
+
+    @directed.setter
+    def directed(self, directed: bool):
+        if not directed:
+            raise ValueError("{self.__class__.__name__} only allow directed=True")
+
+    @property
     def rev_edge_data(self) -> EdgeData:
         """Adjacency list of reversed edge direction."""
         return self._rev_edge_data
@@ -770,6 +792,17 @@ class DirectedSparseGraph(SparseGraph):
             reduction,
             self._rev_edge_data,
         )
+
+    def remove_edge(self, node_id1: str, node_id2: str):
+        """Remove an edge in the graph.
+
+        Args:
+            node_id1: ID of node 1.
+            node_id2: ID of node 2.
+
+        """
+        self._remove_edge(node_id1, node_id2, self.edge_data)
+        self._remove_edge(node_id2, node_id1, self.rev_edge_data)
 
     def connected_components(self):
         """Find connected components."""

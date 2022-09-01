@@ -22,7 +22,7 @@ from NLEval.graph import (
 )
 from NLEval.graph.base import BaseGraph
 from NLEval.util import idhandler
-from NLEval.util.exceptions import IDExistsError
+from NLEval.util.exceptions import EdgeNotExistError, IDExistsError
 
 
 def shuffle_sparse(graph):
@@ -181,6 +181,10 @@ class TestSparseGraph(unittest.TestCase):
             self.assertEqual(sorted(graph.node_ids), ["a", "b"])
             self.assertEqual(graph._edge_data, [{}, {}])
 
+            graph.add_node("a", exist_ok=True)
+            self.assertEqual(sorted(graph.node_ids), ["a", "b"])
+            self.assertEqual(graph._edge_data, [{}, {}])
+
             self.assertRaises(IDExistsError, graph.add_node, "a")
             self.assertRaises(IDExistsError, graph.add_node, "b")
 
@@ -227,6 +231,39 @@ class TestSparseGraph(unittest.TestCase):
                 graph._edge_data,
                 [{1: 1.0, 2: 0.5}, {0: 1.0}, {0: 0.5}],
             )
+
+    def test_remove_edge(self):
+        with self.subTest("Test sparse graph (directed=False)"):
+            graph = SparseGraph(directed=False)
+            graph.add_edge("a", "b")
+            graph.add_edge("b", "c")
+            self.assertEqual(graph._edge_data, [{1: 1.0}, {0: 1.0, 2: 1.0}, {1: 1.0}])
+
+            graph.remove_edge("a", "b")
+            self.assertEqual(graph._edge_data, [{}, {2: 1.0}, {1: 1.0}])
+
+            with self.assertRaises(EdgeNotExistError):
+                graph.remove_edge("a", "b")
+
+            graph.remove_edge("c", "b")
+            self.assertEqual(graph._edge_data, [{}, {}, {}])
+
+        with self.subTest("Test sparse graph (directed=True)"):
+            graph = SparseGraph(directed=True)
+
+            graph.add_edge("a", "b")
+            graph.add_edge("b", "a")
+            graph.add_edge("b", "c")
+            self.assertEqual(graph._edge_data, [{1: 1.0}, {0: 1.0, 2: 1.0}, {}])
+
+            graph.remove_edge("a", "b")
+            self.assertEqual(graph._edge_data, [{}, {0: 1.0, 2: 1.0}, {}])
+
+            with self.assertRaises(EdgeNotExistError):
+                graph.remove_edge("a", "b")
+
+            graph.remove_edge("b", "c")
+            self.assertEqual(graph._edge_data, [{}, {0: 1.0}, {}])
 
     @parameterized.expand([(True, 3), (False, 4)])
     def test_num_nodes(self, directed, ans):
@@ -475,6 +512,26 @@ class TestDirectedSparseGraph(unittest.TestCase):
                 graph._edge_data,
                 [{1: 1.0, 2: 0.5}, {0: 1.0}, {}],
             )
+
+    def test_remove_edge(self):
+        graph = DirectedSparseGraph()
+
+        graph.add_edge("a", "b")
+        graph.add_edge("b", "a")
+        graph.add_edge("b", "c")
+        self.assertEqual(graph._edge_data, [{1: 1.0}, {0: 1.0, 2: 1.0}, {}])
+        self.assertEqual(graph._rev_edge_data, [{1: 1.0}, {0: 1.0}, {1: 1.0}])
+
+        graph.remove_edge("a", "b")
+        self.assertEqual(graph._edge_data, [{}, {0: 1.0, 2: 1.0}, {}])
+        self.assertEqual(graph._rev_edge_data, [{1: 1.0}, {}, {1: 1.0}])
+
+        with self.assertRaises(EdgeNotExistError):
+            graph.remove_edge("a", "b")
+
+        graph.remove_edge("b", "c")
+        self.assertEqual(graph._edge_data, [{}, {0: 1.0}, {}])
+        self.assertEqual(graph._rev_edge_data, [{1: 1.0}, {}, {}])
 
 
 class TestCX(unittest.TestCase):

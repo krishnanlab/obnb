@@ -10,6 +10,10 @@ class IDExistsError(Exception):
     """Raised when try to add new ID that already exists."""
 
 
+class EdgeNotExistError(Exception):
+    """Raised when the edge being accessed does not exist."""
+
+
 class NotConvergedWarning(RuntimeWarning):
     """Warn when model not converged."""
 
