@@ -4,6 +4,7 @@ from copy import deepcopy
 from NLEval.typing import EdgeDir, Iterable, List, LogLevel, Optional, Tuple, Union
 from NLEval.util import checkers, idhandler
 from NLEval.util.checkers import checkLiteral
+from NLEval.util.exceptions import IDExistsError
 from NLEval.util.logger import get_logger
 
 
@@ -45,15 +46,21 @@ class BaseGraph:
         checkers.checkType("idmap", idhandler.IDmap, idmap)
         self._idmap = idmap
 
-    def add_node(self, node: str):
+    def add_node(self, node: str, exist_ok: bool = False):
         """Add a new node to the graph.
 
         Args:
             node: Name (or ID) of the node.
+            exist_ok: Do not raise IDExistsError even if the node to be added
+                already exist.
 
         """
-        self.idmap.add_id(node)
-        self._new_node_data()
+        try:
+            self.idmap.add_id(node)
+            self._new_node_data()
+        except IDExistsError as e:
+            if not exist_ok:
+                raise e
 
     def _new_node_data(self):
         """Set up data for the newly added node."""
@@ -62,15 +69,17 @@ class BaseGraph:
             f"need to implement method _new_node_data first.",
         )
 
-    def add_nodes(self, nodes: Iterable[str]):
+    def add_nodes(self, nodes: Iterable[str], exist_ok: bool = False):
         """Add new nodes to the graph.
 
         Args:
             node: Names (or IDs) of the nodes.
+            exist_ok: Do not raise IDExistsError even if the node to be added
+                already exist.
 
         """
         for node in nodes:
-            self.add_node(node)
+            self.add_node(node, exist_ok=exist_ok)
 
     def get_node_id(self, node: Union[str, int]) -> str:
         """Return the node ID given the node index or node ID.

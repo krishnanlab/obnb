@@ -181,6 +181,10 @@ class TestSparseGraph(unittest.TestCase):
             self.assertEqual(sorted(graph.node_ids), ["a", "b"])
             self.assertEqual(graph._edge_data, [{}, {}])
 
+            graph.add_node("a", exist_ok=True)
+            self.assertEqual(sorted(graph.node_ids), ["a", "b"])
+            self.assertEqual(graph._edge_data, [{}, {}])
+
             self.assertRaises(IDExistsError, graph.add_node, "a")
             self.assertRaises(IDExistsError, graph.add_node, "b")
 

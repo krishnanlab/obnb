@@ -318,7 +318,7 @@ class OntologyGraph(DirectedSparseGraph):
             for term in self.iter_terms(f):
                 term_id, term_name, term_xrefs, term_parents = term
 
-                self._default_add_node(term_id)
+                self.add_node(term_id, exist_ok=True)
 
                 if self.get_node_name(term_id) is None:
                     self.set_node_name(term_id, term_name)

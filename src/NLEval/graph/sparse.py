@@ -154,11 +154,6 @@ class SparseGraph(BaseGraph):
             fvec[nbr_idx] = weight
         return fvec
 
-    def _default_add_node(self, node_id: str) -> int:
-        """Add a new node ID if not existed yet."""
-        if node_id not in self.idmap:
-            self.add_node(node_id)
-
     def _new_node_data(self):
         self._edge_data.append({})
 
@@ -239,10 +234,7 @@ class SparseGraph(BaseGraph):
         if reduction not in [None, "max", "min"]:
             raise ValueError(f"Unknown reduction type {reduction!r}")
 
-        # Check if node_id exists, add new if not, and return node index
-        self._default_add_node(node_id1)
-        self._default_add_node(node_id2)
-
+        self.add_nodes([node_id1, node_id2], exist_ok=True)
         self._add_edge(
             node_id1,
             node_id2,
