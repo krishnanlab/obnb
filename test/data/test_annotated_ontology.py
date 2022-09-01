@@ -1,4 +1,3 @@
-import logging
 import os.path as osp
 
 import pytest
@@ -23,7 +22,7 @@ def test_disgenet(tmpdir, caplog, mocker, subtests):
     transform_called = 0
 
     with subtests.test("Normal download"):
-        lsc = DisGeNet(tmpdir)
+        DisGeNet(tmpdir)
         assert osp.isdir(datadir)
         assert osp.isdir(osp.join(datadir, "processed"))
         assert osp.isdir(osp.join(datadir, "raw"))
@@ -32,29 +31,29 @@ def test_disgenet(tmpdir, caplog, mocker, subtests):
         assert spy.call_count == transform_called
 
     with subtests.test("Download then transform without saving"):
-        lsc = DisGeNet(tmpdir, transform=filter_, cache_transform=False)
+        DisGeNet(tmpdir, transform=filter_, cache_transform=False)
         transform_called += 1  # called due to transform
         assert spy.call_count == transform_called
         assert not osp.isfile(config_path)  # did not save cache
 
     with subtests.test("Download then transform and save"):
-        lsc = DisGeNet(tmpdir, transform=filter_)
+        DisGeNet(tmpdir, transform=filter_)
         transform_called += 1  # called due to transform
         assert spy.call_count == transform_called
         assert osp.isfile(config_path)
 
     with subtests.test("Load transformed data from cache"):
-        lsc = DisGeNet(tmpdir, transform=filter_)
+        DisGeNet(tmpdir, transform=filter_)
         transform_called += 0  # not called since found in cache
         assert spy.call_count == transform_called
 
     with subtests.test("Forced retransform due to modified config"):
         with open(config_path, "w") as f:
             f.write("")
-        lsc = DisGeNet(tmpdir, transform=filter_)
+        DisGeNet(tmpdir, transform=filter_)
         transform_called += 1  # called due to mismatched config
         assert spy.call_count == transform_called
 
     with subtests.test("Cannot set pre-transform for archived data"):
         with pytest.raises(ValueError):
-            lsc = DisGeNet(tmpdir, pre_transform=filter_, version="nledata-v1.0-test")
+            DisGeNet(tmpdir, pre_transform=filter_, version="nledata-v1.0-test")

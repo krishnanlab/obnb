@@ -77,8 +77,7 @@ class BaseLabelsetNonRedFilter(BaseFilter):
     def construct_labelset_graph(self, lsc):
         t = self.threshold
         g = SparseGraph(weighted=False, directed=False, logger=self.logger)
-        # TODO: change to g.add_nodes
-        _ = list(map(g.add_node, self.get_ids(lsc)))
+        g.add_nodes(self.get_ids(lsc))
         for label_id_pair in combinations(self.get_ids(lsc), 2):
             red = self.compute_redundancy(*map(lsc.get_labelset, (label_id_pair)))
             if red > t:
@@ -136,8 +135,7 @@ class BaseLabelsetNonRedFilter(BaseFilter):
                 nonred_label_id = component.pop(sorted_idx[-1])
                 self.logger.debug(f"{nonred_label_id=}, {component=!r}")
 
-                # TODO: change to g.get_nbrs
-                nbrs = {g.idmap.lst[i] for i in g.edge_data[g.idmap[nonred_label_id]]}
+                nbrs = g.get_neighbors(nonred_label_id)
                 component = list(set(component).difference(nbrs))
 
                 # Extract representative labelsets from the rest of the labelsets
