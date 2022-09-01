@@ -78,7 +78,7 @@ class BaseLabelsetNonRedFilter(BaseFilter):
         t = self.threshold
         g = SparseGraph(weighted=False, directed=False, logger=self.logger)
         # TODO: change to g.add_nodes
-        _ = list(map(g.add_id, self.get_ids(lsc)))
+        _ = list(map(g.add_node, self.get_ids(lsc)))
         for label_id_pair in combinations(self.get_ids(lsc), 2):
             red = self.compute_redundancy(*map(lsc.get_labelset, (label_id_pair)))
             if red > t:

@@ -352,8 +352,8 @@ class TestLabelsetCollection(unittest.TestCase):
 
     def test_read_ontology_graph(self):
         graph = OntologyGraph()
-        graph.add_id("a")
-        graph.add_id("b")
+        graph.add_node("a")
+        graph.add_node("b")
         graph.set_node_name("a", "A")
         graph.set_node_name("b", "B")
         graph.set_node_attr("a", ["x", "y"])
