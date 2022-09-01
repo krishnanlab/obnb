@@ -4,7 +4,7 @@ import logging
 import numpy as np
 
 from NLEval.graph.base import BaseGraph
-from NLEval.typing import EdgeData, List, LogLevel, Mapping, Optional, Union
+from NLEval.typing import EdgeData, EdgeDir, List, LogLevel, Mapping, Optional, Union
 from NLEval.util import checkers
 from NLEval.util.cx_explorer import CXExplorer
 from NLEval.util.exceptions import IDNotExistError
@@ -76,6 +76,11 @@ class SparseGraph(BaseGraph):
             fvec_lst = [self.construct_adj_vec(int(i)) for i in idx]
             fvec = np.asarray(fvec_lst)
         return fvec
+
+    def _get_nbr_idxs(self, node_idx: int, direction: EdgeDir) -> List[int]:
+        if self.directed and direction != "out":
+            raise NotImplementedError("Use DirectedSparseGraph instead.")
+        return sorted(self.edge_data[node_idx])
 
     def induced_subgraph(self, node_ids: List[str]):
         """Return a subgraph induced by a subset of nodes.
@@ -626,9 +631,9 @@ class SparseGraph(BaseGraph):
         edge_data_copy = self._edge_data[:]
         for src_idx in range(len(edge_data_copy)):
             src_nbrs = edge_data_copy[src_idx]
-            src_node_id = self.idmap.getID(src_idx)
+            src_node_id = self.idmap.get_id(src_idx)
             for dst_idx in src_nbrs:
-                dst_node_id = self.idmap.getID(dst_idx)
+                dst_node_id = self.idmap.get_id(dst_idx)
                 if not self.directed:
                     edge_data_copy[dst_idx].pop(src_idx)
                 weight = edge_data_copy[src_idx][dst_idx]
@@ -732,6 +737,17 @@ class DirectedSparseGraph(SparseGraph):
     def rev_edge_data(self) -> EdgeData:
         """Adjacency list of reversed edge direction."""
         return self._rev_edge_data
+
+    def _get_nbr_idxs(self, node_idx: int, direction: EdgeDir) -> List[int]:
+        out_nbrs_idxs = set(self.edge_data[node_idx])
+        in_nbrs_idxs = set(self.rev_edge_data[node_idx])
+
+        if direction == "in":
+            return sorted(in_nbrs_idxs)
+        elif direction == "out":
+            return sorted(out_nbrs_idxs)
+        else:
+            return sorted(in_nbrs_idxs | out_nbrs_idxs)
 
     def _new_node_data(self):
         self._edge_data.append({})

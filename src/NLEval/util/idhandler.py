@@ -4,7 +4,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from NLEval.typing import Dict, Iterable
+from NLEval.typing import Dict, Iterable, List
 from NLEval.util import checkers
 from NLEval.util.exceptions import IDExistsError, IDNotExistError
 
@@ -169,9 +169,13 @@ class IDlst:
                 n += 1
         return n
 
-    def getID(self, idx):
+    def get_id(self, idx: int) -> str:
         """Return ID by its index"""
         return self._lst[idx]
+
+    def get_ids(self, idxs: Iterable[int]) -> List[str]:
+        """Return a list of IDs given indexes."""
+        return list(map(self._lst.__getitem__, idxs))
 
     @classmethod
     def from_list(cls, lst):

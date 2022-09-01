@@ -4,6 +4,8 @@ Type checking functions.
 This module contains a collection of checkers to ensure that the input value
 to a function call is valid.
 """
+from typing import get_args
+
 import numpy as np
 
 from NLEval.typing import INT_TYPE, NUMERIC_TYPE, Iterable, List, Optional, Tuple
@@ -35,6 +37,14 @@ def checkValueNonnegative(name, val):
     """Check if the input value is non-negative."""
     if not val >= 0:
         raise ValueError(f"{name!r} should be non-negative, got {val}")
+
+
+def checkLiteral(name, targetLiteral, val):
+    """Check if the input value matches one of the literals."""
+    if val not in (target_values := get_args(targetLiteral)):
+        raise ValueError(
+            f"Unknown value {val} for {name!r}, accepted literals are {target_values}",
+        )
 
 
 def checkNullableType(name, targetType, val):

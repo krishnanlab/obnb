@@ -32,6 +32,7 @@ FLOAT_TYPE = (float, np.float32, np.float64, np.float128)
 NUMERIC_TYPE = INT_TYPE + FLOAT_TYPE
 
 EdgeData = List[Dict[int, float]]
+EdgeDir = Literal["out", "in", "both"]
 
 LogLevel = Literal["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG", "NOTSET"]
 
@@ -46,6 +47,8 @@ __all__ = [
     "Callable",
     "DefaultDict",
     "Dict",
+    "EdgeData",
+    "EdgeDir",
     "Iterable",
     "List",
     "Literal",

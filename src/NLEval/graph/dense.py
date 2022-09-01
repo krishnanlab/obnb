@@ -2,12 +2,12 @@ import logging
 
 import numpy as np
 
-from NLEval.typing import List, LogLevel, Optional, Union
+from NLEval.graph.base import BaseGraph
+from NLEval.graph.sparse import SparseGraph
+from NLEval.typing import EdgeDir, List, LogLevel, Optional, Union
 from NLEval.util import checkers
 from NLEval.util.exceptions import IDNotExistError
 from NLEval.util.idhandler import IDmap
-from NLEval.graph.base import BaseGraph
-from NLEval.graph.sparse import SparseGraph
 
 
 class DenseGraph(BaseGraph):
@@ -67,6 +67,29 @@ class DenseGraph(BaseGraph):
                     f"Expecting {self.idmap.size} entries, not {val.shape[0]}",
                 )
         self._mat = val.copy()
+
+    @property
+    def nonzeros(self):
+        """Return an matrix indicating nonzero entries of the adjacency.
+
+        Note:
+            Technically, it considers 'positive' ratherthan 'nonzero'. That is,
+            the entries in the adjacency that have positive edge values.
+
+        """
+        return self.mat > 0
+
+    def _get_nbr_idxs(self, node_idx: int, direction: EdgeDir) -> List[int]:
+        nonzeros = self.nonzeros
+        out_nbrs_idxs = set(np.where(nonzeros[node_idx])[0].tolist())
+        in_nbrs_idxs = set(np.where(nonzeros[:, node_idx])[0].tolist())
+
+        if direction == "in":
+            return sorted(in_nbrs_idxs)
+        elif direction == "out":
+            return sorted(out_nbrs_idxs)
+        else:
+            return sorted(in_nbrs_idxs | out_nbrs_idxs)
 
     def propagate(self, seed: np.ndarray) -> np.ndarray:
         """Propagate label informmation.

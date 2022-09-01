@@ -1,8 +1,9 @@
 import logging
 from copy import deepcopy
 
-from NLEval.typing import Iterable, List, LogLevel, Optional, Tuple, Union
+from NLEval.typing import EdgeDir, Iterable, List, LogLevel, Optional, Tuple, Union
 from NLEval.util import checkers, idhandler
+from NLEval.util.checkers import checkLiteral
 from NLEval.util.logger import get_logger
 
 
@@ -98,6 +99,32 @@ class BaseGraph:
 
         """
         return node if isinstance(node, int) else self.idmap[node]
+
+    def get_neighbors(
+        self,
+        node: Union[str, int],
+        direction: EdgeDir = "both",
+    ) -> List[str]:
+        """Get neighboring nodes of the input node.
+
+        Args:
+            node: Node index (int) or node ID (str).
+            direction: Direction of the edges to be considered
+                ["in", "out", "both"], default is "both".
+
+        Return:
+            List[str]: List of neighboring node IDs.
+
+        """
+        checkLiteral("direction", EdgeDir, direction)
+        node_idx = self.get_node_idx(node)
+        nbr_idxs = self._get_nbr_idxs(node_idx, direction)
+        nbr_ids = self.idmap.get_ids(nbr_idxs)
+        return nbr_ids
+
+    def _get_nbr_idxs(self, node_idx: int, direction: EdgeDir) -> List[int]:
+        """Return neighboring node indexes given the current node index."""
+        raise NotImplementedError
 
     def copy(self):
         return deepcopy(self)
