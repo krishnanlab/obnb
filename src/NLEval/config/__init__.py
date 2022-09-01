@@ -1,4 +1,4 @@
-"""Configurations and common variables used by NLEval."""
+"""Configurations used by NLEval."""
 from NLEval.typing import Dict
 
 __all__ = [

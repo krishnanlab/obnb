@@ -5,7 +5,7 @@ from shutil import make_archive
 
 import NLEval
 import NLEval.data
-from NLEval._config.config import NLEDATA_URL_DICT
+from NLEval.config import NLEDATA_URL_DICT
 from NLEval.data.base import BaseData
 
 homedir = Path(".").resolve()

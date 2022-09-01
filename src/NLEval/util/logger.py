@@ -3,7 +3,7 @@ import logging
 import logging.config
 from contextlib import contextmanager
 
-from NLEval._config.logger_config import LOGGER_CONFIG
+from NLEval.config.logger_config import LOGGER_CONFIG
 from NLEval.typing import LogLevel, Optional, Union
 
 
