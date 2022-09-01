@@ -5,7 +5,6 @@ from shutil import make_archive
 
 import NLEval
 import NLEval.data
-import NLEval.util.logger
 from NLEval._config.config import NLEDATA_URL_DICT
 from NLEval.data.base import BaseData
 
@@ -22,7 +21,7 @@ if (url := NLEDATA_URL_DICT.get(new_data_release)) is not None:
 # Set this to enable setting the correct version number instead of 'latest'
 BaseData._new_data_release = new_data_release
 
-logger = NLEval.util.logger.get_logger(None, log_level="INFO")
+logger = NLEval.logger
 logger.info(f"{homedir=!r}")
 logger.info(
     f"Processing {len(all_data)} data objects for release "
