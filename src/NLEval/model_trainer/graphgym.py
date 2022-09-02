@@ -64,8 +64,6 @@ class GraphGymTrainer(GNNTrainer):
     def __init__(
         self,
         metrics,
-        graph,
-        features=None,
         device: str = "auto",
         metric_best: str = "auto",
         cfg_file: Optional[str] = None,
@@ -115,7 +113,7 @@ class GraphGymTrainer(GNNTrainer):
         self.epochs = cfg_gg.optim.max_epoch
         self.eval_steps = cfg_gg.train.eval_period
 
-        super().__init__(metrics, graph, features, device=selected_device)
+        super().__init__(metrics, device=selected_device)
 
     @staticmethod
     def register_metrics(metrics, metric_best):
@@ -133,7 +131,7 @@ class GraphGymTrainer(GNNTrainer):
         cfg_gg.params = params_count(mdl)
         return mdl
 
-    def get_loaders(self, y, masks, split_idx) -> List[DataLoader]:
+    def get_loaders(self, dataset, y, masks, split_idx) -> List[DataLoader]:
         """Obtain GraphGym data loaders.
 
         Two loaders are set, one is for training and the other is for 'all'.
@@ -145,7 +143,7 @@ class GraphGymTrainer(GNNTrainer):
 
         """
         # Create a copy of the data used for evaluation
-        data = self.data.clone().detach().cpu()
+        data = dataset.to_pyg_data().clone().detach().cpu()
         data.y = torch.Tensor(y).float()
 
         # Set training mask
@@ -193,7 +191,7 @@ class GraphGymTrainer(GNNTrainer):
 
         return results
 
-    def train(self, model, y, masks, split_idx=0):
+    def train(self, model, dataset, y, masks, split_idx=0):
         """Train model using GraphGym.
 
         Note that becuase NLEval only concerns transductive node classification
@@ -202,7 +200,7 @@ class GraphGymTrainer(GNNTrainer):
 
         """
         logger_gg = Logger_gg(name="train")
-        loaders = self.get_loaders(y, masks, split_idx)
+        loaders = self.get_loaders(dataset, y, masks, split_idx)
 
         optimizer = pyg_gg.create_optimizer(model.parameters(), cfg_gg.optim)
         scheduler = pyg_gg.create_scheduler(optimizer, cfg_gg.optim)
