@@ -3,6 +3,7 @@ from load_data import load_data
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
 
+from NLEval import Dataset
 from NLEval.label.split import RatioPartition
 from NLEval.model_trainer import SupervisedLearningTrainer
 from NLEval.util.parallel import ParDatMap
@@ -11,6 +12,7 @@ progressbar = True
 
 # Load dataset
 g, lsc = load_data("STRING-EXP", "KEGGBP")
+dataset = Dataset(feature=g.to_feature())
 
 # 3/2 train/test split using genes with higher PubMed Count for training
 splitter = RatioPartition(0.6, 0.4, ascending=False)
@@ -20,7 +22,7 @@ mdl = LogisticRegression(penalty="l2", solver="lbfgs")
 
 # Setup trainer, use auroc as the evaluation metric
 metrics = {"auroc": auroc}
-trainer = SupervisedLearningTrainer(metrics, g)
+trainer = SupervisedLearningTrainer(metrics)
 
 
 @ParDatMap(lsc.label_ids, n_workers=6, verbose=progressbar)
@@ -35,7 +37,7 @@ def predict_all_labelsets(label_id):
         property_name="PubMed Count",
         consider_negative=True,
     )
-    results = trainer.train(mdl, y, masks)
+    results = trainer.train(mdl, dataset, y, masks)
     tr_score, ts_score = results["train_auroc"], results["test_auroc"]
 
     if not progressbar:

@@ -3,6 +3,7 @@ import os.path as osp
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
 
+from NLEval import Dataset
 from NLEval.graph import DenseGraph
 from NLEval.label import filters
 from NLEval.label.collection import LabelsetCollection
@@ -21,6 +22,7 @@ g = DenseGraph.from_edglst(GRAPH_FP, weighted=True, directed=False)
 lsc = LabelsetCollection.from_gmt(LABEL_FP)
 lsc.iapply(filters.EntityExistenceFilter(g.idmap.lst))
 lsc.iapply(filters.LabelsetRangeFilterSize(min_val=50))
+dataset = Dataset(feature=g.to_feature())
 
 # initialize model
 mdl = LogisticRegression(penalty="l2", solver="liblinear")
@@ -44,8 +46,8 @@ y, masks = lsc.split(
 )
 
 metrics = {"auroc": auroc}
-trainer = SupervisedLearningTrainer(metrics, g)
-trainer.train(mdl, y, masks)
+trainer = SupervisedLearningTrainer(metrics)
+trainer.train(mdl, dataset, y, masks)
 score_dict = {i: j for i, j in zip(g.node_ids, mdl.decision_function(g.mat))}
 
 # print top ranked genes and its intersection with known ones
