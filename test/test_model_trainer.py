@@ -3,7 +3,8 @@ import unittest
 import numpy as np
 
 from NLEval.exception import IDNotExistError
-from NLEval.graph import DenseGraph, MultiFeatureVec
+from NLEval.feature import MultiFeatureVec
+from NLEval.graph import DenseGraph
 from NLEval.model_trainer.base import BaseTrainer
 
 

@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 
 from NLEval.exception import IDExistsError, IDNotExistError
-from NLEval.graph import FeatureVec
+from NLEval.feature import FeatureVec
 from NLEval.util import idhandler
 
 

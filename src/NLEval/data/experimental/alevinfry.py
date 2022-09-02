@@ -1,7 +1,7 @@
 import pyroe
 
 from NLEval.data.base import BaseData
-from NLEval.graph import FeatureVec
+from NLEval.feature import FeatureVec
 from NLEval.typing import Dict, List, Optional
 
 
