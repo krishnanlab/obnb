@@ -1,3 +1,4 @@
+"""Dataset object."""
 import numpy as np
 
 from NLEval.feature import MultiFeatureVec
@@ -9,6 +10,8 @@ from NLEval.util.idhandler import IDmap
 
 
 class Dataset:
+    """Dataset object."""
+
     def __init__(
         self,
         *,
@@ -16,6 +19,7 @@ class Dataset:
         feature: Optional[BaseFeature] = None,
         dual: bool = False,
     ):
+        """Initialize Dataset."""
         self.set_idmap(graph, feature)
         self.graph = graph
         self.feature = feature
@@ -27,7 +31,7 @@ class Dataset:
 
     @property
     def size(self) -> int:
-        """Number of instances in the dataset."""
+        """Instances number in the dataset."""
         return self.idmap.size
 
     @property
@@ -158,11 +162,11 @@ class Dataset:
 
         # Obtain features using the corresponding indexing mode
         if ind_mode == "ids":
-            return self._get_feat_from_ids(ind)
+            return self._get_feat_from_ids(ind)  # type: ignore
         elif ind_mode == "idxs":
-            return self._get_feat_from_idxs(ind)
+            return self._get_feat_from_idxs(ind)  # type: ignore
         elif ind_mode == "mask":
-            return self._get_feat_from_mask(ind)
+            return self._get_feat_from_mask(ind)  # type: ignore
         else:
             raise ValueError("This should not happen")
 

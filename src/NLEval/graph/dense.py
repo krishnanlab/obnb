@@ -225,7 +225,7 @@ class DenseGraph(BaseGraph):
         return SparseGraph.from_mat(self.mat, self.idmap)
 
     def to_coo(self):
-        """Convert DenseGraph to edge_index and edge_weight"""
+        """Convert DenseGraph to edge_index and edge_weight."""
         return self.to_sparse_graph().to_coo()
 
     def to_feature(self):
