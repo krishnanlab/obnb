@@ -1,3 +1,4 @@
+"""Single modality feature objects."""
 import numpy as np
 
 from NLEval.feature.base import BaseFeature
@@ -5,6 +6,8 @@ from NLEval.typing import Iterable, LogLevel, Optional, Union
 
 
 class FeatureVec(BaseFeature):
+    """FeatureVec object."""
+
     def __init__(
         self,
         dim: Optional[int] = None,
@@ -18,10 +21,10 @@ class FeatureVec(BaseFeature):
         self,
         idxs: Optional[Union[int, Iterable[int]]],
     ) -> np.ndarray:
-        pass
+        raise NotImplementedError
 
     def get_featvec(
         self,
         ids: Optional[Union[str, Iterable[str]]],
     ) -> np.ndarray:
-        pass
+        raise NotImplementedError

@@ -11,6 +11,8 @@ from NLEval.util.logger import get_logger
 
 
 class BaseFeature:
+    """BaseFeature object."""
+
     def __init__(
         self,
         dim: Optional[int] = None,
@@ -129,13 +131,18 @@ class BaseFeature:
         self.idmap.add_id(node_id)
         self.mat = new_mat
 
-    def get_featvec(self):
+    def get_featvec(self, ids: Optional[Union[Iterable[str], str]]) -> np.ndarray:
+        """Obtain features given entity IDs."""
         # XXX:
-        pass
+        raise NotImplementedError
 
-    def get_featvec_from_idx(self):
+    def get_featvec_from_idx(
+        self,
+        idxs: Optional[Union[Iterable[int], int]],
+    ) -> np.ndarray:
+        """Obtain features given entity indexes."""
         # XXX:
-        pass
+        raise NotImplementedError
 
     def align(
         self,

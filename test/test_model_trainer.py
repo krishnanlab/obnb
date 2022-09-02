@@ -32,7 +32,12 @@ class TestBaseTrainer(unittest.TestCase):
 
         mat = np.vstack(self.raw_data_list)
         indptr = np.array([0, 1, 2, 3])
-        self.features = MultiFeatureVec.from_mat(mat, indptr, ids, fset_ids)
+        self.features = MultiFeatureVec.from_mat(
+            mat,
+            ids,
+            indptr=indptr,
+            fset_ids=fset_ids,
+        )
 
         self.graph = DenseGraph()
         for i in raw_data:

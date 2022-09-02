@@ -23,7 +23,12 @@ def data():
 
 
 def test_from_mat(data):
-    mfv = MultiFeatureVec.from_mat(data.mat, data.indptr, data.ids, data.fset_ids)
+    mfv = MultiFeatureVec.from_mat(
+        data.mat,
+        data.ids,
+        indptr=data.indptr,
+        fset_ids=data.fset_ids,
+    )
     assert mfv.mat.tolist() == data.mat.tolist()
     assert mfv.indptr.tolist() == data.indptr.tolist()
     assert mfv.idmap.lst == data.ids
@@ -47,7 +52,7 @@ def test_from_mat(data):
 
 
 def test_from_mats(data):
-    mfv = MultiFeatureVec.from_mats(data.mats, data.ids, data.fset_ids)
+    mfv = MultiFeatureVec.from_mats(data.mats, data.ids, fset_ids=data.fset_ids)
     assert mfv.mat.tolist() == data.mat.tolist()
     assert mfv.indptr.tolist() == data.indptr.tolist()
     assert mfv.idmap.lst == data.ids
@@ -55,7 +60,7 @@ def test_from_mats(data):
 
 
 def test_get_features(subtests, data):
-    mfv = MultiFeatureVec.from_mats(data.mats, data.ids, data.fset_ids)
+    mfv = MultiFeatureVec.from_mats(data.mats, data.ids, fset_ids=data.fset_ids)
 
     with subtests.test(ids="a", fset_ids="Features1"):
         assert mfv.get_features("a", "Features1").tolist() == [data.mat1[0].tolist()]

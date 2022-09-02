@@ -1,3 +1,4 @@
+"""Multi modality feature objects."""
 from itertools import chain
 
 import numpy as np
@@ -8,13 +9,16 @@ from NLEval.util.idhandler import IDmap
 
 
 class MultiFeatureVec(BaseFeature):
+    """MultiFeatureVec object."""
+
     def __init__(
         self,
         log_level: LogLevel = "INFO",
         verbose: bool = False,
     ):
+        """Initialize MultiFeatureVec."""
         super().__init__(log_level=log_level, verbose=verbose)
-        self.indptr = None
+        self.indptr = np.array([], dtype=np.uint32)
         self.fset_idmap = IDmap()
 
     @property
@@ -42,7 +46,7 @@ class MultiFeatureVec(BaseFeature):
             fset_slice = slice(indptr[fset_idx], indptr[fset_idx + 1])
         else:
             fset_slices = [list(range(indptr[i], indptr[i + 1])) for i in fset_idx]
-            fset_slice = list(chain(*fset_slices))
+            fset_slice = list(chain(*fset_slices))  # type: ignore
 
         return self.mat[idx][:, fset_slice]
 
@@ -78,21 +82,23 @@ class MultiFeatureVec(BaseFeature):
     def from_mat(
         cls,
         mat: np.ndarray,
+        ids: Optional[Union[Iterable[str], IDmap]] = None,
+        *,
         indptr: Optional[np.ndarray] = None,
-        ids: Optional[Union[List[str], IDmap]] = None,
-        fset_ids: Optional[Union[List[str], IDmap]] = None,
+        fset_ids: Optional[Union[Iterable[str], IDmap]] = None,
+        **kwargs,
     ):
         """Construct MultiFeatureVec object.
 
         Args:
             mat (:obj:`numpy.ndarray`): concatenated feature vector matrix.
+            ids (list of str or :obj:`IDmap`, optional): node IDs, if not
+                specified, use the default ordering as node IDs.
             indptr (:obj:`numpy.ndarray`, optional): index pointers indicating
                 the start and the end of each feature set (columns). If set to
                 None, and the dimension of fset_ids matches the number of
                 columns in the input matrix, then automatically set indptr
                 to corresponding to all ones.
-            ids (list of str or :obj:`IDmap`, optional): node IDs, if not
-                specified, use the default ordering as node IDs.
             fset_ids (list of str or :obj:`IDmap`, optional): feature set IDs,
                 if not specified, use the default ordering as feature set IDs.
 
@@ -100,10 +106,10 @@ class MultiFeatureVec(BaseFeature):
         if indptr is None:
             if fset_ids is None:
                 raise ValueError("Cannot set both indptr and fset_ids to None.")
-            if len(fset_ids) != mat.shape[1]:
+            if (num_fsets := len(fset_ids)) != mat.shape[1]:  # type: ignore
                 raise ValueError(
                     "Cannot asign indptr automatically because the  dimension "
-                    f"of fset_ids ({len(fset_ids)}) does not match the number "
+                    f"of fset_ids ({num_fsets}) does not match the number "
                     f"of columsn in the input matrix ({mat.shape[1]}). Please "
                     "specify fset_ids",
                 )
@@ -124,7 +130,7 @@ class MultiFeatureVec(BaseFeature):
         else:
             fset_idmap = IDmap.from_list(fset_ids)
 
-        feat = super().from_mat(mat, ids)
+        feat = super().from_mat(mat, ids, **kwargs)
         feat.indptr = indptr  # TODO: check indptr
         feat.idmap = idmap
         feat.fset_idmap = fset_idmap
@@ -136,7 +142,9 @@ class MultiFeatureVec(BaseFeature):
         cls,
         mats: List[np.ndarray],
         ids: Optional[Union[List[str], IDmap]] = None,
+        *,
         fset_ids: Optional[Union[List[str], IDmap]] = None,
+        **kwargs,
     ):
         """Construct MultiFeatureVec object from list of matrices.
 
@@ -152,4 +160,5 @@ class MultiFeatureVec(BaseFeature):
         dims = [mat.shape[1] for mat in mats]
         indptr = np.zeros(len(mats) + 1, dtype=np.uint32)
         indptr[1:] = np.cumsum(dims)
-        return cls.from_mat(np.hstack(mats), indptr, ids, fset_ids)
+        mat = np.hstack(mats)
+        return cls.from_mat(mat, ids, indptr=indptr, fset_ids=fset_ids, **kwargs)
