@@ -1,4 +1,6 @@
 import logging
+import os
+import shutil
 from functools import wraps
 from itertools import chain
 
@@ -16,8 +18,38 @@ from torch_geometric.graphgym.train import train_epoch
 from torch_geometric.graphgym.utils.comp_budget import params_count
 from torch_geometric.graphgym.utils.device import auto_select_device
 
-from NLEval.typing import Any, Dict, List, Optional
 from NLEval.model_trainer.gnn import GNNTrainer
+from NLEval.typing import Any, Dict, List, Optional
+
+
+def _patch_gg_makedirs_rm_exist(dir_):  # patch for PyG<2.1.0
+    if os.path.isdir(dir_):
+        shutil.rmtree(dir_)
+    os.makedirs(dir_, exist_ok=True)
+
+
+def _patch_gg_set_out_dir(out_dir, fname):  # patch for PyG<2.1.0
+    fname = fname.split("/")[-1]
+    if fname.endswith(".yaml"):
+        fname = fname[:-5]
+    elif fname.endswith(".yml"):
+        fname = fname[:-4]
+
+    cfg_gg.out_dir = os.path.join(out_dir, fname)
+    # Make output directory
+    if cfg_gg.train.auto_resume:
+        os.makedirs(cfg_gg.out_dir, exist_ok=True)
+    else:
+        _patch_gg_makedirs_rm_exist(cfg_gg.out_dir)
+
+
+def _patch_gg_set_run_dir(out_dir):  # patch for PyG<2.1.0
+    cfg_gg.run_dir = os.path.join(out_dir, str(cfg_gg.seed))
+    # Make output directory
+    if cfg_gg.train.auto_resume:
+        os.makedirs(cfg_gg.run_dir, exist_ok=True)
+    else:
+        _patch_gg_makedirs_rm_exist(cfg_gg.run_dir)
 
 
 class GraphGymTrainer(GNNTrainer):
@@ -63,9 +95,13 @@ class GraphGymTrainer(GNNTrainer):
         # Only support multilabel classification
         cfg_gg.dataset.task_type = "classification"
 
-        pyg_gg.set_out_dir(cfg_gg.out_dir, cfg_file)
+        try:
+            pyg_gg.set_out_dir(cfg_gg.out_dir, cfg_file)
+            pyg_gg.set_run_dir(cfg_gg.out_dir)
+        except AttributeError:
+            _patch_gg_set_out_dir(cfg_gg.out_dir, cfg_file)
+            _patch_gg_set_run_dir(cfg_gg.out_dir)
         dump_cfg(cfg_gg)
-        pyg_gg.set_run_dir(cfg_gg.out_dir)
         pyg_gg.set_printing()  # TODO: remove log file? Use only for training..
 
         seed_everything(cfg_gg.seed)
