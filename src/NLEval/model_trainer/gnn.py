@@ -2,11 +2,9 @@ from copy import deepcopy
 
 import numpy as np
 import torch
-from torch_geometric.data import Data
-from torch_geometric.transforms import Constant
 
-from NLEval.typing import Any, Dict, List, LogLevel, Optional, Tuple
 from NLEval.model_trainer.base import BaseTrainer
+from NLEval.typing import Any, Dict, List, LogLevel, Optional, Tuple
 
 
 class GNNTrainer(BaseTrainer):
@@ -15,8 +13,6 @@ class GNNTrainer(BaseTrainer):
     def __init__(
         self,
         metrics,
-        graph,
-        features=None,
         train_on="train",
         val_on: str = "val",
         device: str = "cpu",
@@ -41,8 +37,6 @@ class GNNTrainer(BaseTrainer):
         """
         super().__init__(
             metrics,
-            graph=graph,
-            features=features,
             train_on=train_on,
             log_level=log_level,
         )
@@ -52,21 +46,6 @@ class GNNTrainer(BaseTrainer):
         self.lr = lr
         self.epochs = epochs
         self.eval_steps = eval_steps
-
-        edge_index, edge_weight = graph.to_pyg_edges()
-        self.data = Data(
-            num_nodes=graph.size,
-            edge_index=torch.from_numpy(edge_index),
-            edge_weight=torch.from_numpy(edge_weight),
-        )
-
-        # Use trivial feature if not available
-        if features is not None:
-            self.data.x = torch.from_numpy(features.to_pyg_x())
-        else:
-            Constant(cat=False)(self.data)
-
-        self.data.to(device)
         self.device = device
 
     @property
@@ -144,26 +123,6 @@ class GNNTrainer(BaseTrainer):
         for i, j in new_results.items():
             stats[i].append(j)
 
-    def export_pyg_data(
-        self,
-        y: np.ndarray,
-        masks: Dict[str, np.ndarray],
-        mask_suffix: str = "_mask",
-    ) -> Data:
-        """Export PyTorch Geometric Data object.
-
-        Args:
-            y: Label array.
-            masks: Dictionary of masks.
-            mask_suffix (str): Mask name suffix.
-
-        """
-        data = self.data.clone().detach().cpu()
-        data.y = torch.Tensor(y).float()
-        for mask_name, mask in masks.items():
-            setattr(data, mask_name + mask_suffix, torch.from_numpy(mask))
-        return data
-
     def is_eval_epoch(self, cur_epoch: int) -> bool:
         """Return true if current epoch is eval epoch."""
         return cur_epoch % self.eval_steps == 0
@@ -187,10 +146,10 @@ class SimpleGNNTrainer(GNNTrainer):
         return loss.item()
 
     @torch.no_grad()
-    def evaluate(self, model, y, masks, split_idx):
+    def evaluate(self, model, data, y, masks, split_idx):
         """Evaluate current model."""
         model.eval()
-        args = (self.data.x, self.data.edge_index, self.data.edge_weight)
+        args = (data.x, data.edge_index, data.edge_weight)
         y_pred = model(*args).detach().cpu().numpy()
 
         results = {}
@@ -202,10 +161,10 @@ class SimpleGNNTrainer(GNNTrainer):
 
         return results
 
-    def train(self, model, y, masks, split_idx=0):
+    def train(self, model, dataset, y, masks, split_idx=0):
         """Train the GNN model."""
         model.to(self.device)
-        data = self.data
+        data = dataset.to_pyg_data(self.device)
         optimizer = torch.optim.Adam(model.parameters(), lr=self.lr)
         train_mask = self.get_mask(masks, self.train_on, split_idx)
         y_torch = torch.from_numpy(y.astype(float)).to(self.device)
@@ -215,7 +174,7 @@ class SimpleGNNTrainer(GNNTrainer):
             loss = self.train_epoch(model, data, y_torch, train_mask, optimizer)
 
             if self.is_eval_epoch(cur_epoch):
-                new_results = self.evaluate(model, y, masks, split_idx)
+                new_results = self.evaluate(model, data, y, masks, split_idx)
                 self.update_stats(
                     model,
                     stats,

@@ -1,8 +1,7 @@
 import numpy as np
 
-from NLEval.typing import Any, Dict, LogLevel, Optional
-from NLEval.util.checkers import checkNumpyArrayShape
 from NLEval.model_trainer.base import BaseTrainer
+from NLEval.typing import Any, Dict, LogLevel, Optional
 
 
 class SupervisedLearningTrainer(BaseTrainer):
@@ -25,7 +24,6 @@ class SupervisedLearningTrainer(BaseTrainer):
     def __init__(
         self,
         metrics,
-        features,
         train_on="train",
         log_level: LogLevel = "WARNING",
     ):
@@ -39,7 +37,6 @@ class SupervisedLearningTrainer(BaseTrainer):
         """
         super().__init__(
             metrics,
-            features=features,
             train_on=train_on,
             log_level=log_level,
         )
@@ -47,6 +44,7 @@ class SupervisedLearningTrainer(BaseTrainer):
     def train(
         self,
         model: Any,
+        dataset,
         y: np.ndarray,
         masks: Dict[str, np.ndarray],
         split_idx: int = 0,
@@ -62,14 +60,14 @@ class SupervisedLearningTrainer(BaseTrainer):
         # Train model using the training set
         train_mask = self.get_mask(masks, self.train_on, split_idx)
         # TODO: log time and other useful stats (maybe use the decorator?)
-        model.fit(self.get_x_from_mask(train_mask), y[train_mask])
+        model.fit(dataset.get_feat(train_mask, mode="mask"), y[train_mask])
 
         # Evaluate the trained model using the specified metrics
         results = {}
         for metric_name, metric_func in self.metrics.items():
             for mask_name in masks:
                 mask = self.get_mask(masks, mask_name, split_idx)
-                y_pred = model.decision_function(self.get_x_from_mask(mask))
+                y_pred = model.decision_function(dataset.get_feat(mask, mode="mask"))
                 score = metric_func(y[mask], y_pred)
                 results[f"{mask_name}_{metric_name}"] = score
 
@@ -86,7 +84,6 @@ class MultiSupervisedLearningTrainer(SupervisedLearningTrainer):
     def __init__(
         self,
         metrics,
-        features,
         train_on="train",
         val_on: str = "val",
         metric_best: Optional[str] = None,
@@ -95,7 +92,6 @@ class MultiSupervisedLearningTrainer(SupervisedLearningTrainer):
         """Initialize MultiSupervisedLearningTrainer."""
         super().__init__(
             metrics,
-            features=features,
             train_on=train_on,
             log_level=log_level,
         )
@@ -106,27 +102,14 @@ class MultiSupervisedLearningTrainer(SupervisedLearningTrainer):
         else:
             self.metric_best = metric_best
 
-    def get_x_from_mask(self, mask):
-        """Obtain features of specific nodes from a specific feature set.
-
-        In each iteraction, use one single feature set, indicated by
-        ``self._curr_fset_name``, which updated within the for loop in the
-        ``train`` method below.
-
-        """
-        checkNumpyArrayShape("mask", len(self.idmap), mask)
-        idx = np.where(mask)[0]
-        fset_idx = self.features.fset_idmap[self._curr_fset_name]
-        return self.features.get_features_from_idx(idx, fset_idx)
-
-    def train(self, model, y, masks, split_idx=0):
+    def train(self, model, dataset, y, masks, split_idx=0):
         """Train a supervised learning mode and select based on validation."""
         best_results = None
         best_val_score = 0
         val_mask_name = f"{self.val_on}_{self.metric_best}"
 
         val_scores = []
-        for fset_name in self.features.fset_idmap.lst:
+        for fset_name in dataset.feature.fset_idmap.lst:
             self._curr_fset_name = fset_name
             results = super().train(model, y, masks, split_idx)
             val_score = results[val_mask_name]

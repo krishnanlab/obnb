@@ -1,24 +1,20 @@
 import numpy as np
 
-from NLEval.typing import Any, Dict
 from NLEval.model_trainer.base import BaseTrainer
+from NLEval.typing import Any, Dict
 
 
 class LabelPropagationTrainer(BaseTrainer):
     """Label propagation trainer."""
 
-    def __init__(self, metrics, graph, train_on="train"):
-        """Initialize LabelPropagationTrainer.
-
-        Note:
-            Only takes graph as input.
-
-        """
-        super().__init__(metrics, graph=graph, train_on=train_on)
+    def __init__(self, metrics, train_on="train"):
+        """Initialize LabelPropagationTrainer."""
+        super().__init__(metrics, train_on=train_on)
 
     def train(
         self,
         model: Any,
+        dataset,
         y: np.ndarray,
         masks: Dict[str, np.ndarray],
         split_idx: int = 0,
@@ -32,7 +28,7 @@ class LabelPropagationTrainer(BaseTrainer):
         """
         # Train model using the training set
         train_mask = self.get_mask(masks, self.train_on, split_idx)
-        y_pred = model(self.graph, y * train_mask)
+        y_pred = model(dataset.graph, y * train_mask)
 
         # Evaluate the prediction using the specified metrics
         results = {}
