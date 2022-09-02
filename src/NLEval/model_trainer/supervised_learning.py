@@ -27,7 +27,6 @@ class SupervisedLearningTrainer(BaseTrainer):
         metrics,
         features,
         train_on="train",
-        dual=False,
         log_level: LogLevel = "WARNING",
     ):
         """Initialize SupervisedLearningTrainer.
@@ -42,7 +41,6 @@ class SupervisedLearningTrainer(BaseTrainer):
             metrics,
             features=features,
             train_on=train_on,
-            dual=dual,
             log_level=log_level,
         )
 

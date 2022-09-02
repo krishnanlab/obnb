@@ -691,8 +691,8 @@ class SparseGraph(BaseGraph):
                 mat[src_node, dst_node] = src_nbrs[dst_node]
         return mat
 
-    def to_pyg_edges(self):
-        """Convert to Pytorch Geometric edge_index and edge_weight."""
+    def to_coo(self):
+        """Convert to edge_index and edge_weight."""
         num_edges = self.num_edges
         edge_index = np.zeros((2, num_edges), dtype=int)
         edge_weight = np.zeros(num_edges, dtype=np.float32)

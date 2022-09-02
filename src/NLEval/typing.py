@@ -22,10 +22,12 @@ import numpy as np
 try:
     from torch import Tensor
 except ModuleNotFoundError:
-    import warnings
-
-    warnings.warn("PyTorch not installed, some functionalities may be limited")
     Tensor = Any
+
+try:
+    from torch_geometric.data import Data as PyG_Data
+except ModuleNotFoundError:
+    PyG_Data = Any
 
 INT_TYPE = (int, np.int32, np.int64)
 FLOAT_TYPE = (float, np.float32, np.float64, np.float128)
@@ -49,21 +51,22 @@ __all__ = [
     "Dict",
     "EdgeData",
     "EdgeDir",
+    "FLOAT_TYPE",
+    "INT_TYPE",
     "Iterable",
     "List",
     "Literal",
+    "LogLevel",
     "Mapping",
+    "Metric",
+    "NUMERIC_TYPE",
     "Optional",
+    "PyG_Data",
     "Sequence",
     "Set",
+    "Splitter",
+    "Term",
     "TextIO",
     "Tuple",
     "Union",
-    "INT_TYPE",
-    "FLOAT_TYPE",
-    "NUMERIC_TYPE",
-    "LogLevel",
-    "Metric",
-    "Term",
-    "Splitter",
 ]

@@ -3,6 +3,7 @@ import logging
 import numpy as np
 
 from NLEval.exception import IDNotExistError
+from NLEval.feature import FeatureVec
 from NLEval.graph.base import BaseGraph
 from NLEval.graph.sparse import SparseGraph
 from NLEval.typing import EdgeDir, List, LogLevel, Optional, Union
@@ -222,3 +223,11 @@ class DenseGraph(BaseGraph):
     def to_sparse_graph(self):
         """Convert DenseGraphh to a SparseGraph."""
         return SparseGraph.from_mat(self.mat, self.idmap)
+
+    def to_coo(self):
+        """Convert DenseGraph to edge_index and edge_weight"""
+        return self.to_sparse_graph().to_coo()
+
+    def to_feature(self):
+        """Convert DenseGraph to a FeatureVec."""
+        return FeatureVec.from_mat(self.mat, self.idmap)
