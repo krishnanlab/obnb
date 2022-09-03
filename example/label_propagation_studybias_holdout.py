@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.metrics import roc_auc_score as auroc
-from utils import load_data
+from utils import load_data, print_expected
 
 from NLEval import Dataset
 from NLEval.label.split import RatioPartition
@@ -36,12 +36,4 @@ for label_id in lsc.label_ids:
     print(f"Train: {train_score:.4f}\tTest: {test_score:.4f}\t{label_id}")
 
 print(f"Average test score = {np.mean(scores):.4f}, std = {np.std(scores):.4f}")
-
-print(
-    """
-Expected outcome
---------------------------------------------------------------------------------
-Average test score = 0.5503, std = 0.0508
---------------------------------------------------------------------------------
-""",
-)
+print_expected("Average test score = 0.5503, std = 0.0508")

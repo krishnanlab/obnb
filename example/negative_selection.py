@@ -1,3 +1,5 @@
+from utils import print_expected
+
 from NLEval.data import GOBP
 from NLEval.label import filters
 
@@ -29,12 +31,4 @@ for label_id in lsc.label_ids:
     )
 
 print(f"Average diff = {sum(diff_list) / len(diff_list):.2f}")
-
-print(
-    """
-Expected outcome
---------------------------------------------------------------------------------
-Average diff = -175.93
---------------------------------------------------------------------------------
-""",
-)
+print_expected("Average diff = -175.93")

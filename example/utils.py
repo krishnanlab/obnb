@@ -62,6 +62,12 @@ def load_data(
     return g, lsc
 
 
+def print_expected(*to_print, header: str = "Expected outcome", width: int = 80):
+    break_line = "-" * width
+    print()
+    print("\n".join([header, break_line, *to_print, break_line]))
+
+
 if __name__ == "__main__":
     load_data(log_level="DEBUG")
     load_data(progress_bar=True)

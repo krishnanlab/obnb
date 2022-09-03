@@ -1,5 +1,3 @@
-import os.path as osp
-
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
 from utils import load_data

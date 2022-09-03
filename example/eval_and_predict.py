@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
-from utils import load_data
+from utils import load_data, print_expected
 
 from NLEval import Dataset
 from NLEval.label.split import RatioPartition
@@ -55,12 +55,7 @@ print(
     f"std = {np.std(test_scores):.4f}",
 )
 
-print(
-    """
-Expected outcome
---------------------------------------------------------------------------------
-Average training score = 0.9958, std = 0.0021
-Average testing score = 0.6119, std = 0.0808
---------------------------------------------------------------------------------
-""",
+print_expected(
+    "Average training score = 0.9958, std = 0.0021",
+    "Average testing score = 0.6119, std = 0.0808",
 )
