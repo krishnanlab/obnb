@@ -8,7 +8,6 @@ from NLEval.model_trainer.graphgym import GraphGymTrainer, graphgym_model_wrappe
 
 # Load dataset (with sparse graph)
 g, lsc = load_data("STRING-EXP", "KEGGBP", sparse=True, filter_negative=False)
-dataset = Dataset(graph=g)
 
 # 3/2 train/test split using genes with higher PubMed Count for training
 splitter = RatioPartition(0.6, 0.2, 0.2, ascending=False)
@@ -48,8 +47,9 @@ y, masks = lsc.split(
     target_ids=g.node_ids,
     property_name="PubMed Count",
 )
+dataset = Dataset(graph=g, y=y, masks=masks)
 
-results = trainer.train(mdl, dataset, y, masks)
+results = trainer.train(mdl, dataset)
 print(f"\nBest results:\n{results}\n")
 
 # Check to see if the model is rewinded back to the best model correctly

@@ -1,5 +1,3 @@
-import numpy as np
-
 from NLEval.model_trainer.base import BaseTrainer
 from NLEval.typing import Any, Dict
 
@@ -15,8 +13,6 @@ class LabelPropagationTrainer(BaseTrainer):
         self,
         model: Any,
         dataset,
-        y: np.ndarray,
-        masks: Dict[str, np.ndarray],
         split_idx: int = 0,
     ) -> Dict[str, float]:
         """Propagate labels.
@@ -27,15 +23,15 @@ class LabelPropagationTrainer(BaseTrainer):
 
         """
         # Train model using the training set
-        train_mask = self.get_mask(masks, self.train_on, split_idx)
-        y_pred = model(dataset.graph, y * train_mask)
+        train_mask = dataset.get_mask(self.train_on, split_idx)
+        y_pred = model(dataset.graph, dataset.y * train_mask)
 
         # Evaluate the prediction using the specified metrics
         results = {}
         for metric_name, metric_func in self.metrics.items():
-            for mask_name in masks:
-                mask = self.get_mask(masks, mask_name, split_idx)
-                score = metric_func(y[mask], y_pred[mask])
+            for mask_name in dataset.masks:
+                mask = dataset.get_mask(mask_name, split_idx)
+                score = metric_func(dataset.y[mask], y_pred[mask])
                 results[f"{mask_name}_{metric_name}"] = score
 
         return results

@@ -131,7 +131,7 @@ class GraphGymTrainer(GNNTrainer):
         cfg_gg.params = params_count(mdl)
         return mdl
 
-    def get_loaders(self, dataset, y, masks, split_idx) -> List[DataLoader]:
+    def get_loaders(self, dataset, split_idx: int) -> List[DataLoader]:
         """Obtain GraphGym data loaders.
 
         Two loaders are set, one is for training and the other is for 'all'.
@@ -143,16 +143,17 @@ class GraphGymTrainer(GNNTrainer):
 
         """
         # Create a copy of the data used for evaluation
-        data = dataset.to_pyg_data().clone().detach().cpu()
-        data.y = torch.Tensor(y).float()
+        # Store at CPU by default, device management done by graphgym
+        data = dataset.to_pyg_data(device="cpu", mask_suffix=self.mask_suffix)
 
-        # Set training mask
-        train_mask = self.get_mask(masks, "train", split_idx)
-        data.train_mask = torch.Tensor(train_mask).bool()
+        # Setting masks for GraphGym, which has to be one dimensional
+        for mask_name in data.masks:
+            data[mask_name] = data[mask_name][:, split_idx]
+        data.train_mask = data[self.train_on + self.mask_suffix]
 
         # Add 'all_mask' to eliminate redundant model executions during the
-        # evaluation setp in the transductive node classification setting.
-        data.all_mask = torch.ones(train_mask.shape, dtype=bool)
+        # evaluation step in the transductive node classification setting.
+        data.all_mask = data.train_mask.new_tensor([1] * data.train_mask.shape[0])
         logging.info(data)
 
         # Two loaders, one for train and one for all. Note that the shuffle
@@ -165,7 +166,7 @@ class GraphGymTrainer(GNNTrainer):
         return loaders
 
     @torch.no_grad()
-    def evaluate(self, loaders, model, masks):
+    def evaluate(self, loaders, model, masks: List[str]):
         """Evaluate the model performance at a specific epoch.
 
         First obtain the prediction values using the 'all_mask'. Then compute
@@ -185,13 +186,14 @@ class GraphGymTrainer(GNNTrainer):
         results = {}
         for metric_name, metric_func in self.metrics.items():
             for mask_name in masks:
-                mask = self.get_mask(masks, mask_name, split_idx=0)
+                mask = batch[mask_name].detach().cpu().numpy()
                 score = metric_func(true[mask], pred[mask])
-                results[f"{mask_name}_{metric_name}"] = score
+                score_name = f"{mask_name.split(self.mask_suffix)[0]}_{metric_name}"
+                results[score_name] = score
 
         return results
 
-    def train(self, model, dataset, y, masks, split_idx=0):
+    def train(self, model, dataset, split_idx=0):
         """Train model using GraphGym.
 
         Note that becuase NLEval only concerns transductive node classification
@@ -199,8 +201,10 @@ class GraphGymTrainer(GNNTrainer):
         for the sake of runtime performance.
 
         """
+        masks = [mask_name + self.mask_suffix for mask_name in dataset.masks]
+
         logger_gg = Logger_gg(name="train")
-        loaders = self.get_loaders(dataset, y, masks, split_idx)
+        loaders = self.get_loaders(dataset, split_idx)
 
         optimizer = pyg_gg.create_optimizer(model.parameters(), cfg_gg.optim)
         scheduler = pyg_gg.create_scheduler(optimizer, cfg_gg.optim)

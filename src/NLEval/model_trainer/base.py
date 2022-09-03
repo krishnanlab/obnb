@@ -39,21 +39,10 @@ class BaseTrainer:
             base_logger="NLEval_brief",
         )
 
-    @staticmethod
-    def get_mask(
-        masks: Dict[str, np.ndarray],
-        mask_name: str,
-        split_idx: int,
-    ) -> np.ndarray:
-        """Return a specific mask."""
-        return masks[mask_name][:, split_idx]
-
     def train(
         self,
         model: Any,
         dataset,
-        y: np.ndarray,
-        masks: Dict[str, np.ndarray],
         split_idx: int = 0,
     ):
         """Train model and return metrics.

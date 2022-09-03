@@ -54,6 +54,7 @@ __all__ = [
     "FLOAT_TYPE",
     "INT_TYPE",
     "Iterable",
+    "Iterator",
     "List",
     "Literal",
     "LogLevel",

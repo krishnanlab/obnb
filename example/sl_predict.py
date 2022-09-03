@@ -22,7 +22,6 @@ g = DenseGraph.from_edglst(GRAPH_FP, weighted=True, directed=False)
 lsc = LabelsetCollection.from_gmt(LABEL_FP)
 lsc.iapply(filters.EntityExistenceFilter(g.idmap.lst))
 lsc.iapply(filters.LabelsetRangeFilterSize(min_val=50))
-dataset = Dataset(feature=g.to_feature())
 
 # initialize model
 mdl = LogisticRegression(penalty="l2", solver="liblinear")
@@ -44,10 +43,11 @@ y, masks = lsc.split(
     labelset_name=label_id,
     mask_names=("train",),
 )
+dataset = Dataset(feature=g.to_feature(), y=y, masks=masks)
 
 metrics = {"auroc": auroc}
 trainer = SupervisedLearningTrainer(metrics)
-trainer.train(mdl, dataset, y, masks)
+trainer.train(mdl, dataset)
 score_dict = {i: j for i, j in zip(g.node_ids, mdl.decision_function(g.mat))}
 
 # print top ranked genes and its intersection with known ones

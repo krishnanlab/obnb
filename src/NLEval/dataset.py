@@ -4,7 +4,16 @@ import numpy as np
 from NLEval.feature import MultiFeatureVec
 from NLEval.feature.base import BaseFeature
 from NLEval.graph.base import BaseGraph
-from NLEval.typing import Iterable, Literal, Optional, PyG_Data, Union
+from NLEval.typing import (
+    Dict,
+    Iterable,
+    Iterator,
+    Literal,
+    Optional,
+    PyG_Data,
+    Tuple,
+    Union,
+)
 from NLEval.util.checkers import checkLiteral, checkNumpyArrayShape, checkType
 from NLEval.util.idhandler import IDmap
 
@@ -17,12 +26,16 @@ class Dataset:
         *,
         graph: Optional[BaseGraph] = None,
         feature: Optional[BaseFeature] = None,
+        y: Optional[np.ndarray] = None,
+        masks: Optional[Dict[str, np.ndarray]] = None,
         dual: bool = False,
     ):
         """Initialize Dataset."""
         self.set_idmap(graph, feature)
         self.graph = graph
         self.feature = feature
+        self.y = y
+        self.masks = masks
 
     @property
     def idmap(self) -> IDmap:
@@ -65,6 +78,16 @@ class Dataset:
             self._idmap = feature.idmap.copy()
         else:
             raise ValueError("Must specify either graph or feature.")
+
+    @property
+    def y(self) -> Optional[np.ndarray]:
+        return self._y
+
+    @y.setter
+    def y(self, y: Optional[np.ndarray]):
+        if y is not None and y.shape[0] != self.size:
+            raise ValueError(f"Incorrect shape {y.shape=}")
+        self._y = y
 
     @property
     def dual(self):
@@ -182,18 +205,45 @@ class Dataset:
         idxs = np.where(mask)[0]
         return self._get_feat_from_idxs(idxs)
 
-    def get_mask(self):
-        # TODO: get from lsc split?
-        raise NotImplementedError
+    def get_mask(self, name: str, split_idx: int) -> np.ndarray:
+        """Return the mask given name and split index."""
+        if self.masks is None:
+            raise ValueError("Masks not set.")
+        return self.masks[name][:, split_idx]
 
-    def to_pyg_data(self, device: str = "cpu") -> PyG_Data:
+    def get_split(self, name: str, split_idx: int) -> Tuple[np.ndarray, np.ndarray]:
+        """Return feature and label pair given the split name and index."""
+        if self.feature is None or self.y is None:
+            raise ValueError("Both feature and y must be set.")
+        mask = self.get_mask(name, split_idx)
+        x = self.get_feat(mask, mode="mask")
+        y = self.y[mask]
+        return x, y
+
+    def splits(
+        self,
+        split_idx: int,
+    ) -> Iterator[Tuple[str, Tuple[np.ndarray, np.ndarray]]]:
+        """Iterate over all masks and return the mask name along with split."""
+        if self.masks is None:
+            raise ValueError("Masks not set.")
+        for mask_name in self.masks:
+            yield mask_name, self.get_split(mask_name, split_idx)
+
+    def to_pyg_data(
+        self,
+        *,
+        device: str = "cpu",
+        mask_suffix: str = "_mask",
+    ) -> PyG_Data:
+        """Convert dataset into PyG data."""
         # TODO: dense option
         import torch
         from torch_geometric.data import Data
 
         device = torch.device(device)
-
         num_nodes = self.size
+
         # Use trivial feature if feature not available
         x = np.ones((num_nodes, 1)) if self.feature is None else self.feature.mat
         edge_index, edge_weight = self.graph.to_coo()  # TODO: empty graph?
@@ -207,42 +257,17 @@ class Dataset:
             edge_index=edge_index,
             edge_weight=edge_weight,
             x=x,
-            device=device,
         )
+
+        if self.y is not None:
+            data.y = torch.FloatTensor(self.y)
+
+        if self.masks is not None:
+            data.masks = []
+            for mask_name, mask in self.masks.items():
+                data.masks.append(attrname := mask_name + mask_suffix)
+                setattr(data, attrname, torch.BoolTensor(mask))
+
         data.to(device)
+
         return data
-
-    # XXX: combine the following with Dataset.to_pyg_data
-    # def export_pyg_data(
-    #     self,
-    #     y: np.ndarray,
-    #     masks: Dict[str, np.ndarray],
-    #     mask_suffix: str = "_mask",
-    # ) -> Data:
-    #     """Export PyTorch Geometric Data object.
-
-    #     Args:
-    #         y: Label array.
-    #         masks: Dictionary of masks.
-    #         mask_suffix (str): Mask name suffix.
-
-    #     """
-    #     data = self.data.clone().detach().cpu()
-    #     data.y = torch.Tensor(y).float()
-    #     for mask_name, mask in masks.items():
-    #         setattr(data, mask_name + mask_suffix, torch.from_numpy(mask))
-    #     return data
-
-    # XXX: implement
-    # def get_x_from_mask(self, mask):
-    #     """Obtain features of specific nodes from a specific feature set.
-
-    #     In each iteraction, use one single feature set, indicated by
-    #     ``self._curr_fset_name``, which updated within the for loop in the
-    #     ``train`` method below.
-
-    #     """
-    #     checkNumpyArrayShape("mask", len(self.idmap), mask)
-    #     idx = np.where(mask)[0]
-    #     fset_idx = self.features.fset_idmap[self._curr_fset_name]
-    #     return self.features.get_features_from_idx(idx, fset_idx)
