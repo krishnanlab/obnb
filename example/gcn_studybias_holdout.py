@@ -1,7 +1,7 @@
 import torch
-from load_data import load_data
 from sklearn.metrics import roc_auc_score as auroc
 from torch_geometric.nn import GCN
+from utils import load_data
 
 from NLEval import Dataset
 from NLEval.label.filters import LabelsetRangeFilterSplit

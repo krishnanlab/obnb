@@ -1,6 +1,6 @@
 import numpy as np
-from load_data import load_data
 from sklearn.metrics import roc_auc_score as auroc
+from utils import load_data
 
 from NLEval import Dataset
 from NLEval.label.split import RatioPartition

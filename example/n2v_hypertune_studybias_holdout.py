@@ -4,9 +4,9 @@ import subprocess
 import tempfile
 
 import numpy as np
-from load_data import load_data
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
+from utils import load_data
 
 from NLEval.feature import FeatureVec, MultiFeatureVec
 from NLEval.label.filters import LabelsetRangeFilterSplit

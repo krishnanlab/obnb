@@ -1,4 +1,4 @@
-from load_data import load_data
+from utils import load_data
 
 from NLEval import Dataset
 from NLEval.label.filters import LabelsetRangeFilterSplit
