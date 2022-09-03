@@ -53,19 +53,15 @@ class SupervisedLearningTrainer(BaseTrainer):
         ``sklearn.linear_model.LogisticRegression`` for example.
 
         """
-        y, masks = dataset.y, dataset.masks
-        # Train model using the training set
-        train_mask = self.get_mask(masks, self.train_on, split_idx)
         # TODO: log time and other useful stats (maybe use the decorator?)
-        model.fit(dataset.get_feat(train_mask, mode="mask"), y[train_mask])
+        model.fit(*dataset.get_split(self.train_on, split_idx))
 
         # Evaluate the trained model using the specified metrics
         results = {}
         for metric_name, metric_func in self.metrics.items():
-            for mask_name in masks:
-                mask = self.get_mask(masks, mask_name, split_idx)
-                y_pred = model.decision_function(dataset.get_feat(mask, mode="mask"))
-                score = metric_func(y[mask], y_pred)
+            for mask_name, (x, y) in dataset.splits(split_idx):
+                y_pred = model.decision_function(x)
+                score = metric_func(y, y_pred)
                 results[f"{mask_name}_{metric_name}"] = score
 
         return results

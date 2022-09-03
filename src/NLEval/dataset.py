@@ -4,7 +4,16 @@ import numpy as np
 from NLEval.feature import MultiFeatureVec
 from NLEval.feature.base import BaseFeature
 from NLEval.graph.base import BaseGraph
-from NLEval.typing import Dict, Iterable, Literal, Optional, PyG_Data, Union
+from NLEval.typing import (
+    Dict,
+    Iterable,
+    Iterator,
+    Literal,
+    Optional,
+    PyG_Data,
+    Tuple,
+    Union,
+)
 from NLEval.util.checkers import checkLiteral, checkNumpyArrayShape, checkType
 from NLEval.util.idhandler import IDmap
 
@@ -196,9 +205,26 @@ class Dataset:
         idxs = np.where(mask)[0]
         return self._get_feat_from_idxs(idxs)
 
-    def get_mask(self):
-        # TODO: get from lsc split?
-        raise NotImplementedError
+    def get_mask(self, name: str, split_idx: int) -> np.ndarray:
+        """Return the mask given name and split index."""
+        # TODO: check name
+        # TODO: check index range
+        return self.masks[name][:, split_idx]
+
+    def get_split(self, name: str, split_idx: int) -> Tuple[np.ndarray, np.ndarray]:
+        """Return feature and label pair given the split name and index."""
+        mask = self.get_mask(name, split_idx)
+        x = self.get_feat(mask, mode="mask")
+        y = self.y[mask]
+        return x, y
+
+    def splits(
+        self,
+        split_idx: int,
+    ) -> Iterator[Tuple[str, Tuple[np.ndarray, np.ndarray]]]:
+        """Iterate over all masks and return the mask name along with split."""
+        for mask_name in self.masks:
+            yield mask_name, self.get_split(mask_name, split_idx)
 
     def to_pyg_data(self, device: str = "cpu") -> PyG_Data:
         # TODO: dense option
