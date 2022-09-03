@@ -1,6 +1,5 @@
 from copy import deepcopy
 
-import numpy as np
 import torch
 
 from NLEval.model_trainer.base import BaseTrainer
@@ -15,6 +14,7 @@ class GNNTrainer(BaseTrainer):
         metrics,
         train_on="train",
         val_on: str = "val",
+        mask_suffix: str = "_mask",
         device: str = "cpu",
         metric_best: Optional[str] = None,
         lr: float = 0.01,
@@ -42,6 +42,7 @@ class GNNTrainer(BaseTrainer):
         )
 
         self.val_on = val_on
+        self.mask_suffix = mask_suffix
         self.metric_best = metric_best
         self.lr = lr
         self.epochs = epochs
@@ -77,7 +78,7 @@ class GNNTrainer(BaseTrainer):
 
     def new_stats(
         self,
-        masks: Dict[str, np.ndarray],
+        masks: List[str],
     ) -> Tuple[Dict[str, List], Dict[str, float], Dict[str, torch.Tensor]]:
         """Create new stats for tracking model performance."""
         stats: Dict[str, List] = {"epoch": [], "loss": []}
@@ -86,9 +87,9 @@ class GNNTrainer(BaseTrainer):
 
         for mask_name in masks:
             for metric_name in self.metrics:
-                name = f"{mask_name}_{metric_name}"
-                stats[name] = []
-                best_stats[name] = 0.0
+                score_name = f"{mask_name.split(self.mask_suffix)[0]}_{metric_name}"
+                stats[score_name] = []
+                best_stats[score_name] = 0.0
 
         return stats, best_stats, best_model_state
 
@@ -131,51 +132,51 @@ class GNNTrainer(BaseTrainer):
 class SimpleGNNTrainer(GNNTrainer):
     """Simple GNN trainer using Adam with fixed learning rate."""
 
-    @staticmethod
-    def train_epoch(model, data, y, train_mask, optimizer):
+    def train_epoch(self, model, data, split_idx, optimizer):
         """Train a single epoch."""
         model.train()
         criterion = torch.nn.BCEWithLogitsLoss()
-
         optimizer.zero_grad()
-        out = model(data.x, data.edge_index, data.edge_weight)[train_mask]
-        loss = criterion(out, y[train_mask])
+
+        train_mask = data[self.train_on + self.mask_suffix][:, split_idx]
+        out = model(data.x, data.edge_index, data.edge_weight)
+        loss = criterion(out[train_mask], data.y[train_mask])
         loss.backward()
         optimizer.step()
 
         return loss.item()
 
     @torch.no_grad()
-    def evaluate(self, model, data, y, masks, split_idx):
+    def evaluate(self, model, data, split_idx):
         """Evaluate current model."""
         model.eval()
         args = (data.x, data.edge_index, data.edge_weight)
         y_pred = model(*args).detach().cpu().numpy()
+        y_true = data.y.detach().cpu().numpy()
 
         results = {}
         for metric_name, metric_func in self.metrics.items():
-            for mask_name in masks:
-                mask = self.get_mask(masks, mask_name, split_idx)
-                score = metric_func(y[mask], y_pred[mask])
-                results[f"{mask_name}_{metric_name}"] = score
+            for mask_name in data.masks:
+                mask = data[mask_name][:, split_idx].detach().cpu().numpy()
+                score_name = f"{mask_name.split(self.mask_suffix)[0]}_{metric_name}"
+                print(f"{score_name=}")
+                score = metric_func(y_true[mask], y_pred[mask])
+                results[score_name] = score
 
         return results
 
-    def train(self, model, dataset, split_idx=0):
+    def train(self, model, dataset, split_idx: int = 0):
         """Train the GNN model."""
-        y, masks = dataset.y, dataset.masks
         model.to(self.device)
-        data = dataset.to_pyg_data(self.device)
+        data = dataset.to_pyg_data(device=self.device, mask_suffix=self.mask_suffix)
         optimizer = torch.optim.Adam(model.parameters(), lr=self.lr)
-        train_mask = self.get_mask(masks, self.train_on, split_idx)
-        y_torch = torch.from_numpy(y.astype(float)).to(self.device)
 
-        stats, best_stats, best_model_state = self.new_stats(masks)
+        stats, best_stats, best_model_state = self.new_stats(data.masks)
         for cur_epoch in range(self.epochs):
-            loss = self.train_epoch(model, data, y_torch, train_mask, optimizer)
+            loss = self.train_epoch(model, data, split_idx, optimizer)
 
             if self.is_eval_epoch(cur_epoch):
-                new_results = self.evaluate(model, data, y, masks, split_idx)
+                new_results = self.evaluate(model, data, split_idx)
                 self.update_stats(
                     model,
                     stats,

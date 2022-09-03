@@ -257,40 +257,17 @@ class Dataset:
             x=x,
             device=device,
         )
+
+        if self.y is not None:
+            setattr(data, "y", torch.FloatTensor(self.y))
+
+        if self.masks is not None:
+            mask_name_list = []
+            for mask_name, mask in self.masks.items():
+                mask_name_list.append(attrname := mask_name + mask_suffix)
+                setattr(data, attrname, torch.BoolTensor(mask))
+            setattr(data, "masks", mask_name_list)
+
         data.to(device)
+
         return data
-
-    # XXX: combine the following with Dataset.to_pyg_data
-    # def export_pyg_data(
-    #     self,
-    #     y: np.ndarray,
-    #     masks: Dict[str, np.ndarray],
-    #     mask_suffix: str = "_mask",
-    # ) -> Data:
-    #     """Export PyTorch Geometric Data object.
-
-    #     Args:
-    #         y: Label array.
-    #         masks: Dictionary of masks.
-    #         mask_suffix (str): Mask name suffix.
-
-    #     """
-    #     data = self.data.clone().detach().cpu()
-    #     data.y = torch.Tensor(y).float()
-    #     for mask_name, mask in masks.items():
-    #         setattr(data, mask_name + mask_suffix, torch.from_numpy(mask))
-    #     return data
-
-    # XXX: implement
-    # def get_x_from_mask(self, mask):
-    #     """Obtain features of specific nodes from a specific feature set.
-
-    #     In each iteraction, use one single feature set, indicated by
-    #     ``self._curr_fset_name``, which updated within the for loop in the
-    #     ``train`` method below.
-
-    #     """
-    #     checkNumpyArrayShape("mask", len(self.idmap), mask)
-    #     idx = np.where(mask)[0]
-    #     fset_idx = self.features.fset_idmap[self._curr_fset_name]
-    #     return self.features.get_features_from_idx(idx, fset_idx)
