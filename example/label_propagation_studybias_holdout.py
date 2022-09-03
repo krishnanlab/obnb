@@ -1,6 +1,6 @@
 import numpy as np
-from load_data import load_data
 from sklearn.metrics import roc_auc_score as auroc
+from utils import load_data, print_expected
 
 from NLEval import Dataset
 from NLEval.label.split import RatioPartition
@@ -8,7 +8,7 @@ from NLEval.model.label_propagation import OneHopPropagation
 from NLEval.model_trainer import LabelPropagationTrainer
 
 # Load dataset
-g, lsc = load_data("STRING-EXP", "KEGGBP")
+g, lsc = load_data()
 
 # 3/2 train/test split using genes with higher PubMed Count for training
 splitter = RatioPartition(0.6, 0.4, ascending=False)
@@ -36,16 +36,4 @@ for label_id in lsc.label_ids:
     print(f"Train: {train_score:.4f}\tTest: {test_score:.4f}\t{label_id}")
 
 print(f"Average test score = {np.mean(scores):.4f}, std = {np.std(scores):.4f}")
-
-print(
-    """
-Expected outcome
---------------------------------------------------------------------------------
-NETWORK='STRING-EXP'
-LABEL='KEGGBP'
-Number of labelsets before filtering: 139
-Number of labelsets after filtering: 54
-Average test score = 0.7513, std = 0.1181
---------------------------------------------------------------------------------
-""",
-)
+print_expected("Average test score = 0.5503, std = 0.0508")

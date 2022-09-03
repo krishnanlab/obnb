@@ -1,8 +1,8 @@
 import os.path as osp
 
-from NLEval.graph import DenseGraph, SparseGraph
-from NLEval.label import LabelsetCollection
+import NLEval.data
 from NLEval.label.filters import (
+    Compose,
     EntityExistenceFilter,
     LabelsetRangeFilterSize,
     NegativeGeneratorHypergeom,
@@ -11,8 +11,8 @@ from NLEval.typing import LogLevel
 
 
 def load_data(
-    network: str = "STRING-EXP",
-    label: str = "KEGGBP",
+    network: str = "BioPlex",
+    label: str = "GOBP",
     sparse: bool = False,
     filter_negative: bool = True,
     log_level: LogLevel = "WARNING",
@@ -29,40 +29,43 @@ def load_data(
             on hypergeometric test (default: :obj:`True`).
 
     """
-    data_dir = osp.join(osp.pardir, "data")
-    graph_path = osp.join(data_dir, "networks", f"{network}.edg")
-    label_path = osp.join(data_dir, "labels", f"{label}.gmt")
-    property_path = osp.join(data_dir, "properties", "PubMedCount.txt")
-
+    data_version = "nledata-v0.1.0-dev"
+    save_dir = "datasets"
     print(f"{network=}\n{label=}")
 
     # Load data
-    graph_factory = SparseGraph if sparse else DenseGraph
-    g = graph_factory.from_edglst(graph_path, weighted=True, directed=False)
-    lsc = LabelsetCollection.from_gmt(label_path)
+    g = getattr(NLEval.data, network)(save_dir, version=data_version)
+    if not sparse:
+        g = g.to_dense_graph()
 
-    # Filter labels
-    print(f"Number of labelsets before filtering: {len(lsc.label_ids)}")
-    lsc.iapply(
-        EntityExistenceFilter(g.idmap.lst, log_level=log_level),
-        progress_bar=progress_bar,
-    )
-    lsc.iapply(
-        LabelsetRangeFilterSize(min_val=50, log_level=log_level),
-        progress_bar=progress_bar,
-    )
+    filter_list = [
+        EntityExistenceFilter(list(g.node_ids), log_level=log_level),
+        LabelsetRangeFilterSize(min_val=50, max_val=200, log_level=log_level),
+    ]
+
     if filter_negative:
-        lsc.iapply(
+        filter_list.append(
             NegativeGeneratorHypergeom(p_thresh=0.05, log_level=log_level),
-            progress_bar=progress_bar,
         )
-    print(f"Number of labelsets after filtering: {len(lsc.label_ids)}")
+
+    lsc = getattr(NLEval.data, label)(
+        save_dir,
+        version=data_version,
+        transform=Compose(*filter_list, log_level=log_level),
+    )
 
     # Load gene properties for study-bias holdout
     # Note: wait after filtering is done to reduce time for filtering
+    property_path = osp.join(osp.pardir, "data", "properties", "PubMedCount.txt")
     lsc.load_entity_properties(property_path, "PubMed Count", 0, int)
 
     return g, lsc
+
+
+def print_expected(*to_print, header: str = "Expected outcome", width: int = 80):
+    break_line = "-" * width
+    print()
+    print("\n".join([header, break_line, *to_print, break_line]))
 
 
 if __name__ == "__main__":

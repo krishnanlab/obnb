@@ -1,4 +1,4 @@
-from load_data import load_data
+from utils import load_data
 
 from NLEval import Dataset
 from NLEval.label.filters import LabelsetRangeFilterSplit
@@ -7,7 +7,7 @@ from NLEval.metric import auroc
 from NLEval.model_trainer.graphgym import GraphGymTrainer, graphgym_model_wrapper
 
 # Load dataset (with sparse graph)
-g, lsc = load_data("STRING-EXP", "KEGGBP", sparse=True, filter_negative=False)
+g, lsc = load_data(sparse=True, filter_negative=False)
 
 # 3/2 train/test split using genes with higher PubMed Count for training
 splitter = RatioPartition(0.6, 0.2, 0.2, ascending=False)

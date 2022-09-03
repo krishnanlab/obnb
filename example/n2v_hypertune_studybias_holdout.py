@@ -4,9 +4,9 @@ import subprocess
 import tempfile
 
 import numpy as np
-from load_data import load_data
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
+from utils import load_data
 
 from NLEval.feature import FeatureVec, MultiFeatureVec
 from NLEval.label.filters import LabelsetRangeFilterSplit
@@ -16,6 +16,7 @@ from NLEval.model_trainer import (
     SupervisedLearningTrainer,
 )
 
+raise NotImplementedError("NEED TO FIX")
 TEMP_DIR = tempfile.mkdtemp()
 NETWORK = "STRING-EXP"
 GRAPH_FP = osp.join(osp.pardir, "data", "networks", f"{NETWORK}.edg")

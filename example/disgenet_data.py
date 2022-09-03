@@ -2,6 +2,7 @@ import os.path as osp
 
 import pandas as pd
 from tqdm import tqdm
+from utils import print_expected
 
 from NLEval.data import DisGeNet
 from NLEval.exception import IDNotExistError
@@ -35,12 +36,7 @@ node_attr_sizes = [len(g.get_node_attr(i) or []) for i in g.node_ids]
 avg_node_attr_size = sum(node_attr_sizes) / g.size
 print(f"Average node attribute size (propagated) = {avg_node_attr_size:.2f}")
 
-print(
-    """
-Expected outcome
---------------------------------------------------------------------------------
-Average node attribute size (raw) = 35.44
-Average node attribute size (propagated) = 107.31
---------------------------------------------------------------------------------
-""",
+print_expected(
+    "Average node attribute size (raw) = 35.44",
+    "Average node attribute size (propagated) = 107.31",
 )

@@ -1,27 +1,16 @@
-import os.path as osp
-
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
+from utils import load_data
 
 from NLEval import Dataset
-from NLEval.graph import DenseGraph
-from NLEval.label import filters
-from NLEval.label.collection import LabelsetCollection
 from NLEval.label.split import AllHoldout
 from NLEval.model_trainer import SupervisedLearningTrainer
-
-DATA_DIR = osp.join(osp.pardir, "data")
-GRAPH_FP = osp.join(DATA_DIR, "networks", "STRING-EXP.edg")
-LABEL_FP = osp.join(DATA_DIR, "labels", "KEGGBP.gmt")
 
 i = 24  # index of labelset
 k = 50  # numbers of top genes to display
 
 # load graph and labelset collection
-g = DenseGraph.from_edglst(GRAPH_FP, weighted=True, directed=False)
-lsc = LabelsetCollection.from_gmt(LABEL_FP)
-lsc.iapply(filters.EntityExistenceFilter(g.idmap.lst))
-lsc.iapply(filters.LabelsetRangeFilterSize(min_val=50))
+g, lsc = load_data()
 
 # initialize model
 mdl = LogisticRegression(penalty="l2", solver="liblinear")
@@ -33,7 +22,7 @@ print("")
 
 # get label_id
 label_id = lsc.label_ids[i]
-print(label_id)
+print(f"{label_id}\t{lsc.get_info(label_id)}")
 
 # train and get genome wide prediction
 y, masks = lsc.split(
@@ -55,4 +44,4 @@ top_list = sorted(score_dict, key=score_dict.get, reverse=True)[:k]
 intersection = sorted(set(top_list) & lsc.get_labelset(label_id))
 
 print(f"Top {k} genes: {repr(top_list)}")
-print(f"Known genes in top {k}: {repr(intersection)}")
+print(f"{len(intersection)} known genes in top {k}: {repr(intersection)}")
