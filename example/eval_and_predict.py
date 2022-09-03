@@ -8,16 +8,16 @@ from NLEval.label.split import RatioPartition
 from NLEval.model_trainer import SupervisedLearningTrainer
 from NLEval.util.parallel import ParDatMap
 
-progressbar = True
+progressbar = False
 
 # Load dataset
-g, lsc = load_data("STRING-EXP", "KEGGBP")
+g, lsc = load_data()
 
 # 3/2 train/test split using genes with higher PubMed Count for training
-splitter = RatioPartition(0.6, 0.4, ascending=False)
+splitter = RatioPartition(0.5, 0.5, ascending=False)
 
 # Select model
-mdl = LogisticRegression(penalty="l2", solver="lbfgs")
+mdl = LogisticRegression(penalty="l2", solver="lbfgs", max_iter=500)
 
 # Setup trainer, use auroc as the evaluation metric
 metrics = {"auroc": auroc}
@@ -38,12 +38,12 @@ def predict_all_labelsets(label_id):
     )
     dataset = Dataset(feature=g.to_feature(), y=y, masks=masks)
     results = trainer.train(mdl, dataset)
-    tr_score, ts_score = results["train_auroc"], results["test_auroc"]
+    train_score, test_score = results["train_auroc"], results["test_auroc"]
 
     if not progressbar:
-        print(f"Train: {tr_score:>3.2f} Test: {ts_score:>3.2f} {label_id:<60}")
+        print(f"Train: {train_score:.4f}\tTest: {test_score:.4f}\t{label_id}")
 
-    return tr_score, ts_score
+    return train_score, test_score
 
 
 train_scores, test_scores = zip(*predict_all_labelsets())
@@ -57,10 +57,10 @@ print(
 
 print(
     """
-Expected outcome (TODO: this does not seem correct, check against logreg ex)
+Expected outcome
 --------------------------------------------------------------------------------
-Average training score = 0.9999, std = 0.0003
-Average testing score = 0.8579, std = 0.0941
+Average training score = 0.9958, std = 0.0021
+Average testing score = 0.6119, std = 0.0808
 --------------------------------------------------------------------------------
 """,
 )

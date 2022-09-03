@@ -16,6 +16,7 @@ from NLEval.model_trainer import (
     SupervisedLearningTrainer,
 )
 
+raise NotImplementedError("NEED TO FIX")
 TEMP_DIR = tempfile.mkdtemp()
 NETWORK = "STRING-EXP"
 GRAPH_FP = osp.join(osp.pardir, "data", "networks", f"{NETWORK}.edg")

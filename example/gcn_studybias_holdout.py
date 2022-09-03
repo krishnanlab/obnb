@@ -9,7 +9,7 @@ from NLEval.label.split import RatioPartition
 from NLEval.model_trainer.gnn import SimpleGNNTrainer
 
 # Load dataset (with sparse graph)
-g, lsc = load_data("STRING-EXP", "KEGGBP", sparse=True, filter_negative=False)
+g, lsc = load_data(sparse=True, filter_negative=False)
 
 # 3/2 train/test split using genes with higher PubMed Count for training
 splitter = RatioPartition(0.6, 0.2, 0.2, ascending=False)

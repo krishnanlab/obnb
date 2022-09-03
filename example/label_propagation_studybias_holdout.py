@@ -8,7 +8,7 @@ from NLEval.model.label_propagation import OneHopPropagation
 from NLEval.model_trainer import LabelPropagationTrainer
 
 # Load dataset
-g, lsc = load_data("STRING-EXP", "KEGGBP")
+g, lsc = load_data()
 
 # 3/2 train/test split using genes with higher PubMed Count for training
 splitter = RatioPartition(0.6, 0.4, ascending=False)
@@ -41,11 +41,7 @@ print(
     """
 Expected outcome
 --------------------------------------------------------------------------------
-NETWORK='STRING-EXP'
-LABEL='KEGGBP'
-Number of labelsets before filtering: 139
-Number of labelsets after filtering: 54
-Average test score = 0.7513, std = 0.1181
+Average test score = 0.5503, std = 0.0508
 --------------------------------------------------------------------------------
 """,
 )

@@ -8,7 +8,7 @@ from NLEval.label.split import RatioPartition
 from NLEval.model_trainer import SupervisedLearningTrainer
 
 # Load dataset
-g, lsc = load_data("STRING-EXP", "KEGGBP")
+g, lsc = load_data()
 
 # 3/2 train/test split using genes with higher PubMed Count for training
 splitter = RatioPartition(0.6, 0.4, ascending=False)
@@ -41,11 +41,7 @@ print(
     """
 Expected outcome
 --------------------------------------------------------------------------------
-NETWORK='STRING-EXP'
-LABEL='KEGGBP'
-Number of labelsets before filtering: 139
-Number of labelsets after filtering: 54
-Average test score = 0.8672, std = 0.0941
+Average test score = 0.6342, std = 0.0773
 --------------------------------------------------------------------------------
 """,
 )

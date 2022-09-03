@@ -10,7 +10,7 @@ from NLEval.model.label_propagation import OneHopPropagation
 from NLEval.model_trainer import LabelPropagationTrainer
 
 # Load daatset
-g, lsc = load_data("STRING-EXP", "KEGGBP")
+g, lsc = load_data()
 
 # 3/2 train/test split using genes with higher PubMed Count for training
 splitter = RatioPartition(0.6, 0.4, ascending=False)
