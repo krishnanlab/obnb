@@ -26,8 +26,8 @@ class Dataset:
         *,
         graph: Optional[BaseGraph] = None,
         feature: Optional[BaseFeature] = None,
-        y: np.ndarray,
-        masks: Dict[str, np.ndarray],
+        y: Optional[np.ndarray] = None,
+        masks: Optional[Dict[str, np.ndarray]] = None,
         dual: bool = False,
     ):
         """Initialize Dataset."""
@@ -80,12 +80,12 @@ class Dataset:
             raise ValueError("Must specify either graph or feature.")
 
     @property
-    def y(self) -> np.ndarray:
+    def y(self) -> Optional[np.ndarray]:
         return self._y
 
     @y.setter
-    def y(self, y: np.ndarray):
-        if y.shape[0] != self.size:
+    def y(self, y: Optional[np.ndarray]):
+        if y is not None and y.shape[0] != self.size:
             raise ValueError(f"Incorrect shape {y.shape=}")
         self._y = y
 
@@ -213,6 +213,8 @@ class Dataset:
 
     def get_split(self, name: str, split_idx: int) -> Tuple[np.ndarray, np.ndarray]:
         """Return feature and label pair given the split name and index."""
+        if self.feature is None or self.y is None:
+            raise ValueError("Both feature and y must be set.")
         mask = self.get_mask(name, split_idx)
         x = self.get_feat(mask, mode="mask")
         y = self.y[mask]
@@ -226,14 +228,20 @@ class Dataset:
         for mask_name in self.masks:
             yield mask_name, self.get_split(mask_name, split_idx)
 
-    def to_pyg_data(self, device: str = "cpu") -> PyG_Data:
+    def to_pyg_data(
+        self,
+        *,
+        device: str = "cpu",
+        mask_suffix: str = "_mask",
+    ) -> PyG_Data:
+        """Convert dataset into PyG data."""
         # TODO: dense option
         import torch
         from torch_geometric.data import Data
 
         device = torch.device(device)
-
         num_nodes = self.size
+
         # Use trivial feature if feature not available
         x = np.ones((num_nodes, 1)) if self.feature is None else self.feature.mat
         edge_index, edge_weight = self.graph.to_coo()  # TODO: empty graph?
