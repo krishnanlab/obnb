@@ -27,6 +27,7 @@ class BaseConverter:
         self.save_cache = save_cache
 
         self._convert_map: Dict[str, Optional[str]] = {}
+        self._load_cache()
 
     @property
     def root(self) -> Optional[str]:
@@ -65,23 +66,26 @@ class BaseConverter:
         """Iterate over genes converted."""
         yield from self._convert_map
 
-    def _load_cache(self):
+    def _load_cache(self) -> bool:
+        """Load cache file and return True if successfully loaded cache."""
         if not self.use_cache:
-            return
+            return False
 
         if self.root is None:
             self.logger.warning(
                 "load_cache option set but root directory not defined, "
                 "skipping cache loading.",
             )
-            return
+            return False
 
         try:
             with open(self.cache_path, "r") as f:
                 self._convert_map = json.load(f)
             self.logger.info(f"Loaded gene conversion cache {self.cache_path}")
+            return True
         except FileNotFoundError:
-            self.logger.info(f"Cache file not yet available {self.cache_path}")
+            self.logger.debug(f"Cache file not yet available {self.cache_path}")
+            return False
 
     def _save_cache(self):
         if not self.save_cache:
@@ -188,8 +192,6 @@ class MyGeneInfoConverter(BaseConverter):
         ids: List[str],
     ):
         """Query gene IDs in bulk for performnace."""
-        self._load_cache()
-
         ids_set = set(ids)
         ids_to_query = ids_set.difference(self._convert_map)
         self.logger.info(
