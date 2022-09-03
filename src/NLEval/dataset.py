@@ -250,7 +250,7 @@ class Dataset:
 
         x = torch.FloatTensor(x)
         edge_index = torch.LongTensor(edge_index)
-        edge_weight = torch.FloatTensor(edge_weight)
+        edge_weight = None if edge_weight is None else torch.FloatTensor(edge_weight)
 
         data = Data(
             num_nodes=num_nodes,
