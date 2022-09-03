@@ -21,8 +21,8 @@ class TestMyGeneInfoConverter(unittest.TestCase):
             use_cache=False,
             save_cache=False,
         )
-        mgc.convert_map["a"] = "A"
-        mgc.convert_map["b"] = "B"
+        mgc._convert_map["a"] = "A"
+        mgc._convert_map["b"] = "B"
 
         self.assertEqual(len(mgc), 2)
         self.assertEqual(mgc["a"], "A")
@@ -34,8 +34,8 @@ class TestMyGeneInfoConverter(unittest.TestCase):
             root=self.tmpdir,
             log_level="DEBUG",
         )
-        mgc.convert_map["a"] = "A"
-        mgc.convert_map["b"] = "B"
+        mgc._convert_map["a"] = "A"
+        mgc._convert_map["b"] = "B"
         mgc._save_cache()
 
         mgc2 = converter.MyGeneInfoConverter(
@@ -43,4 +43,4 @@ class TestMyGeneInfoConverter(unittest.TestCase):
             log_level="DEBUG",
         )
         mgc2._load_cache()
-        self.assertEqual(mgc.convert_map, mgc2.convert_map)
+        self.assertEqual(mgc._convert_map, mgc2._convert_map)
