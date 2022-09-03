@@ -257,7 +257,6 @@ class Dataset:
             edge_index=edge_index,
             edge_weight=edge_weight,
             x=x,
-            device=device,
         )
 
         if self.y is not None:
