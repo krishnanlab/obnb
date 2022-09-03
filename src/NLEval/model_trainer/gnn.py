@@ -159,7 +159,6 @@ class SimpleGNNTrainer(GNNTrainer):
             for mask_name in data.masks:
                 mask = data[mask_name][:, split_idx].detach().cpu().numpy()
                 score_name = f"{mask_name.split(self.mask_suffix)[0]}_{metric_name}"
-                print(f"{score_name=}")
                 score = metric_func(y_true[mask], y_pred[mask])
                 results[score_name] = score
 
