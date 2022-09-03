@@ -207,8 +207,8 @@ class Dataset:
 
     def get_mask(self, name: str, split_idx: int) -> np.ndarray:
         """Return the mask given name and split index."""
-        # TODO: check name
-        # TODO: check index range
+        if self.masks is None:
+            raise ValueError("Masks not set.")
         return self.masks[name][:, split_idx]
 
     def get_split(self, name: str, split_idx: int) -> Tuple[np.ndarray, np.ndarray]:
@@ -225,6 +225,8 @@ class Dataset:
         split_idx: int,
     ) -> Iterator[Tuple[str, Tuple[np.ndarray, np.ndarray]]]:
         """Iterate over all masks and return the mask name along with split."""
+        if self.masks is None:
+            raise ValueError("Masks not set.")
         for mask_name in self.masks:
             yield mask_name, self.get_split(mask_name, split_idx)
 
@@ -259,14 +261,13 @@ class Dataset:
         )
 
         if self.y is not None:
-            setattr(data, "y", torch.FloatTensor(self.y))
+            data.y = torch.FloatTensor(self.y)
 
         if self.masks is not None:
-            mask_name_list = []
+            data.masks = []
             for mask_name, mask in self.masks.items():
-                mask_name_list.append(attrname := mask_name + mask_suffix)
+                data.masks.append(attrname := mask_name + mask_suffix)
                 setattr(data, attrname, torch.BoolTensor(mask))
-            setattr(data, "masks", mask_name_list)
 
         data.to(device)
 
