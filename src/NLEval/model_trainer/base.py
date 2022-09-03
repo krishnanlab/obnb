@@ -52,8 +52,6 @@ class BaseTrainer:
         self,
         model: Any,
         dataset,
-        y: np.ndarray,
-        masks: Dict[str, np.ndarray],
         split_idx: int = 0,
     ):
         """Train model and return metrics.

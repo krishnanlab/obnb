@@ -1,5 +1,3 @@
-import numpy as np
-
 from NLEval.model_trainer.base import BaseTrainer
 from NLEval.typing import Any, Dict, LogLevel, Optional
 
@@ -45,8 +43,6 @@ class SupervisedLearningTrainer(BaseTrainer):
         self,
         model: Any,
         dataset,
-        y: np.ndarray,
-        masks: Dict[str, np.ndarray],
         split_idx: int = 0,
     ) -> Dict[str, float]:
         """Train a supervised learning model.
@@ -57,6 +53,7 @@ class SupervisedLearningTrainer(BaseTrainer):
         ``sklearn.linear_model.LogisticRegression`` for example.
 
         """
+        y, masks = dataset.y, dataset.masks
         # Train model using the training set
         train_mask = self.get_mask(masks, self.train_on, split_idx)
         # TODO: log time and other useful stats (maybe use the decorator?)

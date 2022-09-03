@@ -161,8 +161,9 @@ class SimpleGNNTrainer(GNNTrainer):
 
         return results
 
-    def train(self, model, dataset, y, masks, split_idx=0):
+    def train(self, model, dataset, split_idx=0):
         """Train the GNN model."""
+        y, masks = dataset.y, dataset.masks
         model.to(self.device)
         data = dataset.to_pyg_data(self.device)
         optimizer = torch.optim.Adam(model.parameters(), lr=self.lr)

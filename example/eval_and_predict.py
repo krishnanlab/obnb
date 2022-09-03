@@ -12,7 +12,6 @@ progressbar = True
 
 # Load dataset
 g, lsc = load_data("STRING-EXP", "KEGGBP")
-dataset = Dataset(feature=g.to_feature())
 
 # 3/2 train/test split using genes with higher PubMed Count for training
 splitter = RatioPartition(0.6, 0.4, ascending=False)
@@ -37,7 +36,8 @@ def predict_all_labelsets(label_id):
         property_name="PubMed Count",
         consider_negative=True,
     )
-    results = trainer.train(mdl, dataset, y, masks)
+    dataset = Dataset(feature=g.to_feature(), y=y, masks=masks)
+    results = trainer.train(mdl, dataset)
     tr_score, ts_score = results["train_auroc"], results["test_auroc"]
 
     if not progressbar:

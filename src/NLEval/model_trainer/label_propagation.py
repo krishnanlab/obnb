@@ -1,5 +1,3 @@
-import numpy as np
-
 from NLEval.model_trainer.base import BaseTrainer
 from NLEval.typing import Any, Dict
 
@@ -15,8 +13,6 @@ class LabelPropagationTrainer(BaseTrainer):
         self,
         model: Any,
         dataset,
-        y: np.ndarray,
-        masks: Dict[str, np.ndarray],
         split_idx: int = 0,
     ) -> Dict[str, float]:
         """Propagate labels.
@@ -26,6 +22,7 @@ class LabelPropagationTrainer(BaseTrainer):
             scheme simply propagate the seed nodes across the network.
 
         """
+        y, masks = dataset.y, dataset.masks
         # Train model using the training set
         train_mask = self.get_mask(masks, self.train_on, split_idx)
         y_pred = model(dataset.graph, y * train_mask)

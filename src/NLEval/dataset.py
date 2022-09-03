@@ -4,7 +4,7 @@ import numpy as np
 from NLEval.feature import MultiFeatureVec
 from NLEval.feature.base import BaseFeature
 from NLEval.graph.base import BaseGraph
-from NLEval.typing import Iterable, Literal, Optional, PyG_Data, Union
+from NLEval.typing import Dict, Iterable, Literal, Optional, PyG_Data, Union
 from NLEval.util.checkers import checkLiteral, checkNumpyArrayShape, checkType
 from NLEval.util.idhandler import IDmap
 
@@ -17,12 +17,16 @@ class Dataset:
         *,
         graph: Optional[BaseGraph] = None,
         feature: Optional[BaseFeature] = None,
+        y: np.ndarray,
+        masks: Dict[str, np.ndarray],
         dual: bool = False,
     ):
         """Initialize Dataset."""
         self.set_idmap(graph, feature)
         self.graph = graph
         self.feature = feature
+        self.y = y
+        self.masks = masks
 
     @property
     def idmap(self) -> IDmap:
@@ -65,6 +69,16 @@ class Dataset:
             self._idmap = feature.idmap.copy()
         else:
             raise ValueError("Must specify either graph or feature.")
+
+    @property
+    def y(self) -> np.ndarray:
+        return self._y
+
+    @y.setter
+    def y(self, y: np.ndarray):
+        if y.shape[0] != self.size:
+            raise ValueError(f"Incorrect shape {y.shape=}")
+        self._y = y
 
     @property
     def dual(self):

@@ -191,7 +191,7 @@ class GraphGymTrainer(GNNTrainer):
 
         return results
 
-    def train(self, model, dataset, y, masks, split_idx=0):
+    def train(self, model, dataset, split_idx=0):
         """Train model using GraphGym.
 
         Note that becuase NLEval only concerns transductive node classification
@@ -199,6 +199,8 @@ class GraphGymTrainer(GNNTrainer):
         for the sake of runtime performance.
 
         """
+        y, masks = dataset.y, dataset.masks
+
         logger_gg = Logger_gg(name="train")
         loaders = self.get_loaders(dataset, y, masks, split_idx)
 
