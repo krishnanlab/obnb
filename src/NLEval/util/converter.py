@@ -1,20 +1,131 @@
+import gzip
 import json
 import os
+import os.path as osp
+from ftplib import FTP
+from io import BytesIO
 
 import mygene
+import pandas as pd
 
-from NLEval.typing import Dict, Iterator, List, LogLevel, Optional
+from NLEval.typing import Any, Dict, Iterator, List, LogLevel, Optional
 from NLEval.util.checkers import checkType
 from NLEval.util.logger import get_logger
 
 
-class MyGeneInfoConverter:
+class BaseConverter:
+    """BaseConverter object."""
+
+    def __init__(
+        self,
+        root: Optional[str] = None,
+        *,
+        use_cache: bool = True,
+        save_cache: bool = True,
+        log_level: LogLevel = "INFO",
+    ):
+        """Initialize BaseConverter."""
+        self.root = root
+        self.logger = get_logger(self.__class__.__name__, log_level=log_level)
+
+        self.use_cache = use_cache
+        self.save_cache = save_cache
+
+        self._convert_map: Dict[str, Optional[str]] = {}
+        self._load_cache()
+
+    @property
+    def root(self) -> Optional[str]:
+        """Cache data directory."""
+        return self._root
+
+    @root.setter
+    def root(self, root: Optional[str]):
+        if root is not None:
+            cache_dir = osp.join(root, ".cache")
+            os.makedirs(cache_dir, exist_ok=True)
+            root = cache_dir
+        self._root = root
+
+    @property
+    def cache_path(self) -> Optional[str]:
+        """Cached gene conversion file path."""
+        return None if self.root is None else osp.join(self.root, self.cache_file_name)
+
+    @property
+    def cache_file_name(self) -> str:
+        """Cache file name."""
+        raise NotImplementedError
+
+    def __getitem__(self, query_id: str) -> Any:
+        """Return converted value given query ID."""
+        raise NotImplementedError
+
+    def __len__(self) -> int:
+        """Number of genes converted."""
+        return len(self._convert_map)
+
+    def __iter__(self) -> Iterator[Optional[str]]:
+        """Iterate over genes converted."""
+        yield from self._convert_map
+
+    def _load_cache(self) -> bool:
+        """Load cache file and return True if successfully loaded cache."""
+        if not self.use_cache:
+            return False
+
+        if self.cache_path is None:
+            self.logger.warning(
+                "load_cache option set but root directory not defined, "
+                "skipping cache loading.",
+            )
+            return False
+
+        try:
+            with open(self.cache_path, "r") as f:
+                self._convert_map = json.load(f)
+            self.logger.info(f"Loaded gene conversion cache {self.cache_path}")
+            return True
+        except FileNotFoundError:
+            self.logger.debug(f"Cache file not yet available {self.cache_path}")
+            return False
+
+    def _save_cache(self):
+        if not self.save_cache:
+            return
+
+        if self.root is None:
+            self.logger.warning(
+                "save_cache option set but root directory not defined, "
+                "skipping cache saving.",
+            )
+            return
+
+        full_convert_map = {}
+        if osp.isfile(self.cache_path):
+            with open(self.cache_path, "r") as f:
+                full_convert_map = json.load(f)
+
+        for i, j in self._convert_map.items():
+            if i in full_convert_map and j != full_convert_map[i]:
+                self.logger.error(
+                    f"Conflicting mapping for {i!r}, previously mapped to"
+                    f"{full_convert_map[i]!r}, overwritting to {j!r})",
+                )
+            full_convert_map[i] = j
+
+        with open(self.cache_path, "w") as f:
+            json.dump(full_convert_map, f, indent=4, sort_keys=True)
+        self.logger.info(f"Gene conversion cache saved {self.cache_path}")
+
+
+class MyGeneInfoConverter(BaseConverter):
     """Gene ID conversion via MyGeneInfo."""
 
     def __init__(
         self,
-        *,
         root: Optional[str] = None,
+        *,
         use_cache: bool = True,
         save_cache: bool = True,
         log_level: LogLevel = "INFO",
@@ -40,125 +151,52 @@ class MyGeneInfoConverter:
                 mygene.MyGeneInfo.querymany
 
         """
-        self.client = mygene.MyGeneInfo()
-        self.convert_map: Dict[str, Optional[str]] = {}
+        super().__init__(
+            root,
+            use_cache=use_cache,
+            save_cache=save_cache,
+            log_level=log_level,
+        )
 
-        self.root = root
-        self.use_cache = use_cache
-        self.save_cache = save_cache
-        self.logger = get_logger(self.__class__.__name__, log_level=log_level)
+        self.client = mygene.MyGeneInfo()
 
         self.remove_multimap = remove_multimap
         self.species = species
         self.query_kwargs = query_kwargs
 
     @property
-    def root(self) -> Optional[str]:
-        """Cache data directory."""
-        return self._root
+    def cache_file_name(self) -> str:
+        return "mygene_convert.json"
 
-    @root.setter
-    def root(self, root: Optional[str]):
-        if root is not None:
-            cache_dir = os.path.join(root, ".cache")
-            os.makedirs(cache_dir, exist_ok=True)
-            root = cache_dir
-        self._root = root
-
-    @property
-    def cache_path(self) -> Optional[str]:
-        """Cached gene conversion file path."""
-        return (
-            None
-            if self.root is None
-            else os.path.join(self.root, "mygene_convert.json")
-        )
-
-    def __getitem__(self, old_id: str) -> Optional[str]:
+    def __getitem__(self, query_id: str) -> Optional[str]:
         """Convert an ID to entrez gene ID.
 
         Args:
-            old_id (str): gene/protein ID to be converted.
+            query_id (str): gene/protein ID to be converted.
 
         Returns:
             str: Entrez gene ID, or None if not available.
 
         """
         try:
-            new_id = self.convert_map[old_id]
+            new_id = self._convert_map[query_id]
         except KeyError:
-            info = self.client.getgene(old_id, fields="entrezgene")
+            info = self.client.getgene(query_id, fields="entrezgene")
             new_id = (
                 info["entrezgene"]
                 if info is not None and "entrezgene" in info
                 else None
             )
-            self.convert_map[old_id] = new_id
+            self._convert_map[query_id] = new_id
         return new_id
-
-    def __len__(self) -> int:
-        """Number of genes converted."""
-        return len(self.convert_map)
-
-    def __iter__(self) -> Iterator[Optional[str]]:
-        """Iterate over genes converted."""
-        yield from self.convert_map
-
-    def _load_cache(self):
-        if not self.use_cache:
-            return
-
-        if self.root is None:
-            self.logger.warning(
-                "load_cache option set but root directory not defined, "
-                "skipping cache loading.",
-            )
-            return
-
-        try:
-            with open(self.cache_path, "r") as f:
-                self.convert_map = json.load(f)
-            self.logger.info(f"Loaded gene conversion cache {self.cache_path}")
-        except FileNotFoundError:
-            self.logger.info(f"Cache file not yet available {self.cache_path}")
-
-    def _save_cache(self):
-        if not self.save_cache:
-            return
-
-        if self.root is None:
-            self.logger.warning(
-                "save_cache option set but root directory not defined, "
-                "skipping cache saving.",
-            )
-            return
-
-        full_convert_map = {}
-        if os.path.isfile(self.cache_path):
-            with open(self.cache_path, "r") as f:
-                full_convert_map = json.load(f)
-
-        for i, j in self.convert_map.items():
-            if i in full_convert_map and j != full_convert_map[i]:
-                self.logger.error(
-                    f"Conflicting mapping for {i!r}, previously mapped to"
-                    f"{full_convert_map[i]!r}, overwritting to {j!r})",
-                )
-            full_convert_map[i] = j
-
-        with open(self.cache_path, "w") as f:
-            json.dump(full_convert_map, f, indent=4, sort_keys=True)
-        self.logger.info(f"Gene conversion cache saved {self.cache_path}")
 
     def query_bulk(
         self,
         ids: List[str],
     ):
         """Query gene IDs in bulk for performnace."""
-        self._load_cache()
-
         ids_set = set(ids)
-        ids_to_query = ids_set.difference(self.convert_map)
+        ids_to_query = ids_set.difference(self._convert_map)
         self.logger.info(
             f"Total number of genes: {len(ids):,} ({len(ids_set):,} unique)",
         )
@@ -178,20 +216,20 @@ class MyGeneInfoConverter:
             for query in queries:
                 gene = query["query"]
                 gene_id = query.get("entrezgene")
-                if gene in self.convert_map:
+                if gene in self._convert_map:
                     if self.remove_multimap:
-                        self.convert_map[gene] = None
+                        self._convert_map[gene] = None
                         self.logger.info(
                             f"Removing {gene} due to multiple entrez mapping.",
                         )
                         continue
 
-                    old_gene_id = self.convert_map[gene]
+                    old_gene_id = self._convert_map[gene]
                     self.logger.warning(
                         f"Overwriting {gene} -> {old_gene_id} to "
                         f"{gene} -> {gene_id}",
                     )
-                self.convert_map[gene] = gene_id
+                self._convert_map[gene] = gene_id
 
             self._save_cache()
 
@@ -218,3 +256,78 @@ class MyGeneInfoConverter:
             raise ValueError(f"Unknown converter {name!r}.")
 
         return converter
+
+
+class GenePropertyConverter(BaseConverter):
+    """Gene property data obtained from NCBI."""
+
+    host: str = "ftp.ncbi.nlm.nih.gov"
+
+    def __init__(
+        self,
+        root: Optional[str] = None,
+        name: str = "gene2pubmed",
+        *,
+        use_cache: bool = True,
+        save_cache: bool = True,
+        log_level: LogLevel = "INFO",
+    ):
+        """Initialize GenePropertyConverter.
+
+        Args:
+            root: Root data directory for caching gene ID conversion mapping.
+                If None, do not save cache.
+            name: Name of the property to use.
+            use_cache: If set to True, then use cached gene conversion, which
+                is found under <root>/.cache/mygene_convert.json
+            save_cache: If set to True, then save cache after query_bulk is
+                called. The conversion mappings are merged with existing cache
+                if available.
+            log_level: Logging level.
+
+        """
+        self.name = name
+        super().__init__(
+            root,
+            use_cache=use_cache,
+            save_cache=save_cache,
+            log_level=log_level,
+        )
+
+    @property
+    def name(self) -> str:
+        """Name of the propery."""
+        return self._name
+
+    @name.setter
+    def name(self, name: str):
+        if name not in ["gene2pubmed"]:
+            raise NotImplementedError(f"{name} gene property unavailable yet.")
+        self._name = name
+
+    @property
+    def cache_file_name(self) -> str:
+        return f"geneprop_convert-{self.name}.json"
+
+    def _load_cache(self):
+        if not super()._load_cache():
+            self._get_data()
+            self._save_cache()
+
+    def _get_data(self):
+        with FTP(self.host) as ftp:
+            self.logger.info(f"Retrieving data for {self.name} from {self.host}")
+            ftp.login()
+            buf = BytesIO()
+            ftp.retrbinary(f"RETR gene/DATA/{self.name}.gz", buf.write)
+
+        self.logger.info(f"Decompressing and loading {self.name}")
+        buf.seek(0)
+        decomp = BytesIO(gzip.decompress(buf.read()))
+        df = pd.read_csv(decomp, sep="\t")
+
+        self._convert_map = df["GeneID"].astype(str).value_counts().to_dict()
+        self.logger.info(f"Finished processing {self.name}")
+
+    def __getitem__(self, query_id: str):
+        pass
