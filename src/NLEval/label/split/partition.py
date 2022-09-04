@@ -119,7 +119,7 @@ class ThresholdPartition(BasePartition):
             thresholds: Thresholds used to determine the splits.
 
         """
-        super().__init__(property_converter=property_converter, ascendingo=ascending)
+        super().__init__(property_converter=property_converter, ascending=ascending)
         self.thresholds = thresholds
 
     @property
@@ -153,8 +153,11 @@ class ThresholdPartition(BasePartition):
         idx = [0] * (len(self.thresholds) + 2)
         idx[-1] = x_size
         for i, threshold in enumerate(self.thresholds):
-            threshold = threshold if self.ascending else -threshold
-            where = np.where(x_sorted_val >= threshold)[0]
+            where = (
+                np.where(x_sorted_val >= threshold)[0]
+                if self.ascending
+                else np.where(x_sorted_val <= threshold)[0]
+            )
             idx[i + 1] = x_size if where.size == 0 else where[0]
         return idx
 

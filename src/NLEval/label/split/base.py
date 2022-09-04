@@ -90,7 +90,11 @@ class BaseSortedSplit(BaseSplit):
             x: properties of the entities as an 1-dimensional array.
 
         """
-        x_val = list(map(self.property_converter.__getitem__, ids))
+        try:
+            x_val = list(map(self.property_converter.__getitem__, ids))
+        except AttributeError:
+            x_val = list(map(self.property_converter, ids))
+
         x_sorted_idx = sorted(
             range(len(ids)),
             key=x_val.__getitem__,
@@ -130,21 +134,17 @@ class BaseRandomSplit(BaseSortedSplit):
                 the data points (default: :obj:`None`)
 
         """
-        super().__init__(*args)
         self.shuffle = shuffle
         self.random_state = random_state
+        super().__init__(
+            *args,
+            property_converter=self._get_random_map(shuffle, random_state),
+        )
 
-    def __call__(self, x, y):
-        """Split dataset based on random node properties."""
-        random_x = self.get_random_x(y)
-        yield next(super().__call__(random_x, y))
-
-    def get_random_x(self, y: np.ndarray) -> np.ndarray:
-        """Generate random node properties."""
-        n = y.shape[0]
-        if not self.shuffle:
-            x = np.arange(n)
+    @staticmethod
+    def _get_random_map(shuffle: bool, random_state: Optional[int]):
+        if shuffle:
+            rng = np.random.default_rng(random_state)
+            return lambda id_: rng.random()
         else:
-            np.random.seed(self.random_state)
-            x = np.random.choice(n, size=n, replace=False)
-        return x
+            return lambda id_: 1
