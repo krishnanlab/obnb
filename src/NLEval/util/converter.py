@@ -266,10 +266,11 @@ class GenePropertyConverter(BaseConverter):
     def __init__(
         self,
         root: Optional[str] = None,
-        name: str = "gene2pubmed",
+        name: str = "PubMedCount",
         *,
         use_cache: bool = True,
         save_cache: bool = True,
+        default_value: Any = "default",
         log_level: LogLevel = "INFO",
     ):
         """Initialize GenePropertyConverter.
@@ -283,9 +284,13 @@ class GenePropertyConverter(BaseConverter):
             save_cache: If set to True, then save cache after query_bulk is
                 called. The conversion mappings are merged with existing cache
                 if available.
+            default_value: Default value to return if the property is
+                unavilable for a particular entity. If set to 'default', will
+                use the default value determined beforehand.
             log_level: Logging level.
 
         """
+        self._default = default_value
         self.name = name
         super().__init__(
             root,
@@ -293,17 +298,6 @@ class GenePropertyConverter(BaseConverter):
             save_cache=save_cache,
             log_level=log_level,
         )
-
-    @property
-    def name(self) -> str:
-        """Name of the propery."""
-        return self._name
-
-    @name.setter
-    def name(self, name: str):
-        if name not in ["gene2pubmed"]:
-            raise NotImplementedError(f"{name} gene property unavailable yet.")
-        self._name = name
 
     @property
     def cache_file_name(self) -> str:
@@ -314,20 +308,35 @@ class GenePropertyConverter(BaseConverter):
             self._get_data()
             self._save_cache()
 
+    @property
+    def name(self) -> str:
+        """Name of the propery."""
+        return self._name
+
+    @name.setter
+    def name(self, name: str):
+        if name == "PubMedCount":
+            self._proc = lambda df: df["GeneID"].astype(str).value_counts().to_dict()
+            self._raw_data_name = "gene2pubmed"
+            self._default = 0 if self._default == "default" else self._default
+        else:
+            raise NotImplementedError(f"{name} gene property unavailable yet.")
+        self._name = name
+
     def _get_data(self):
         with FTP(self.host) as ftp:
-            self.logger.info(f"Retrieving data for {self.name} from {self.host}")
+            self.logger.info(f"Retrieving {self._raw_data_name} from {self.host}")
             ftp.login()
             buf = BytesIO()
-            ftp.retrbinary(f"RETR gene/DATA/{self.name}.gz", buf.write)
+            ftp.retrbinary(f"RETR gene/DATA/{self._raw_data_name}.gz", buf.write)
 
-        self.logger.info(f"Decompressing and loading {self.name}")
+        self.logger.info(f"Decompressing and loading {self._raw_data_name}")
         buf.seek(0)
         decomp = BytesIO(gzip.decompress(buf.read()))
         df = pd.read_csv(decomp, sep="\t")
 
-        self._convert_map = df["GeneID"].astype(str).value_counts().to_dict()
+        self._convert_map = self._proc(df)
         self.logger.info(f"Finished processing {self.name}")
 
     def __getitem__(self, query_id: str):
-        pass
+        return self._convert_map.get(query_id) or self._default
