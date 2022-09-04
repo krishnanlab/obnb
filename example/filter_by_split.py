@@ -2,18 +2,20 @@ from time import perf_counter
 
 import numpy as np
 from sklearn.metrics import roc_auc_score as auroc
-from utils import load_data
+from utils import load_data, print_expected
 
 from NLEval.label.filters import LabelsetRangeFilterSplit
 from NLEval.label.split import RatioPartition
 from NLEval.model.label_propagation import OneHopPropagation
 from NLEval.model_trainer import LabelPropagationTrainer
+from NLEval.util.converter import GenePropertyConverter
 
 # Load daatset
-g, lsc = load_data()
+g, lsc = load_data(sparse=True)
 
 # 3/2 train/test split using genes with higher PubMed Count for training
-splitter = RatioPartition(0.6, 0.4, ascending=False)
+pmdcnt = GenePropertyConverter(name="PubMedCount", log_level="INFO")
+splitter = RatioPartition(0.6, 0.4, ascending=False, property_converter=pmdcnt)
 
 # Select model
 mdl = OneHopPropagation()
@@ -46,9 +48,8 @@ print(f"{'START FILTERING BY SPLITS':-^80}")
 elapsed = perf_counter()
 lsc.iapply(
     LabelsetRangeFilterSplit(
-        10,  # required minimum number of positives in each split
+        30,  # required minimum number of positives in each split
         splitter,
-        property_name="PubMed Count",
         verbose=True,
     ),
 )
@@ -58,3 +59,11 @@ print(f"{endstr:-^80}\n")
 
 # Check minimum number of positives in each split after filtering
 print_split_stats(lsc, "after")
+
+print_expected(
+    "Number of labelsets after split-filtering: 24",
+    "train:\n\tMinimum number of positives = 32",
+    "\tAverage number of positives = 74.54",
+    "test:\n\tMinimum number of positives = 34",
+    "\tAverage number of positives = 42.83",
+)
