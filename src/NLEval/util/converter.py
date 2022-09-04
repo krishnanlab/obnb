@@ -1,7 +1,12 @@
+import gzip
 import json
 import os
+import os.path as osp
+from ftplib import FTP
+from io import BytesIO
 
 import mygene
+import pandas as pd
 
 from NLEval.typing import Any, Dict, Iterator, List, LogLevel, Optional
 from NLEval.util.checkers import checkType
@@ -37,7 +42,7 @@ class BaseConverter:
     @root.setter
     def root(self, root: Optional[str]):
         if root is not None:
-            cache_dir = os.path.join(root, ".cache")
+            cache_dir = osp.join(root, ".cache")
             os.makedirs(cache_dir, exist_ok=True)
             root = cache_dir
         self._root = root
@@ -45,9 +50,7 @@ class BaseConverter:
     @property
     def cache_path(self) -> Optional[str]:
         """Cached gene conversion file path."""
-        return (
-            None if self.root is None else os.path.join(self.root, self.cache_file_name)
-        )
+        return None if self.root is None else osp.join(self.root, self.cache_file_name)
 
     @property
     def cache_file_name(self) -> str:
@@ -71,7 +74,7 @@ class BaseConverter:
         if not self.use_cache:
             return False
 
-        if self.root is None:
+        if self.cache_path is None:
             self.logger.warning(
                 "load_cache option set but root directory not defined, "
                 "skipping cache loading.",
@@ -99,7 +102,7 @@ class BaseConverter:
             return
 
         full_convert_map = {}
-        if os.path.isfile(self.cache_path):
+        if osp.isfile(self.cache_path):
             with open(self.cache_path, "r") as f:
                 full_convert_map = json.load(f)
 
@@ -253,3 +256,78 @@ class MyGeneInfoConverter(BaseConverter):
             raise ValueError(f"Unknown converter {name!r}.")
 
         return converter
+
+
+class GenePropertyConverter(BaseConverter):
+    """Gene property data obtained from NCBI."""
+
+    host: str = "ftp.ncbi.nlm.nih.gov"
+
+    def __init__(
+        self,
+        root: Optional[str] = None,
+        name: str = "gene2pubmed",
+        *,
+        use_cache: bool = True,
+        save_cache: bool = True,
+        log_level: LogLevel = "INFO",
+    ):
+        """Initialize GenePropertyConverter.
+
+        Args:
+            root: Root data directory for caching gene ID conversion mapping.
+                If None, do not save cache.
+            name: Name of the property to use.
+            use_cache: If set to True, then use cached gene conversion, which
+                is found under <root>/.cache/mygene_convert.json
+            save_cache: If set to True, then save cache after query_bulk is
+                called. The conversion mappings are merged with existing cache
+                if available.
+            log_level: Logging level.
+
+        """
+        self.name = name
+        super().__init__(
+            root,
+            use_cache=use_cache,
+            save_cache=save_cache,
+            log_level=log_level,
+        )
+
+    @property
+    def name(self) -> str:
+        """Name of the propery."""
+        return self._name
+
+    @name.setter
+    def name(self, name: str):
+        if name not in ["gene2pubmed"]:
+            raise NotImplementedError(f"{name} gene property unavailable yet.")
+        self._name = name
+
+    @property
+    def cache_file_name(self) -> str:
+        return f"geneprop_convert-{self.name}.json"
+
+    def _load_cache(self):
+        if not super()._load_cache():
+            self._get_data()
+            self._save_cache()
+
+    def _get_data(self):
+        with FTP(self.host) as ftp:
+            self.logger.info(f"Retrieving data for {self.name} from {self.host}")
+            ftp.login()
+            buf = BytesIO()
+            ftp.retrbinary(f"RETR gene/DATA/{self.name}.gz", buf.write)
+
+        self.logger.info(f"Decompressing and loading {self.name}")
+        buf.seek(0)
+        decomp = BytesIO(gzip.decompress(buf.read()))
+        df = pd.read_csv(decomp, sep="\t")
+
+        self._convert_map = df["GeneID"].astype(str).value_counts().to_dict()
+        self.logger.info(f"Finished processing {self.name}")
+
+    def __getitem__(self, query_id: str):
+        pass
