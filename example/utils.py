@@ -80,10 +80,16 @@ def load_data(
     return g, lsc
 
 
-def print_expected(*to_print, header: str = "Expected outcome", width: int = 80):
-    break_line = "-" * width
-    print()
-    print("\n".join([header, break_line, *to_print, break_line]))
+def print_expected(
+    *to_print,
+    header: str = "Expected outcome",
+    width: int = 80,
+    blank_lines: int = 2,
+):
+    head_line = f"{header:=^{width}}"
+    end_line = "=" * width
+    _ = [print() for i in range(blank_lines)]
+    print("\n".join([head_line, *to_print, end_line]))
 
 
 if __name__ == "__main__":
