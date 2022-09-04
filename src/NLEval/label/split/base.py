@@ -1,3 +1,5 @@
+import typing
+
 import numpy as np
 
 from NLEval.typing import Any, Iterator, List, Mapping, Optional, Tuple
@@ -14,6 +16,7 @@ class BaseSplit:
 
     """
 
+    @typing.no_type_check
     def __repr__(self) -> str:
         """Representation of the labelset split object."""
         attrs = [
@@ -91,9 +94,9 @@ class BaseSortedSplit(BaseSplit):
 
         """
         try:
-            x_val = list(map(self.property_converter.__getitem__, ids))
+            x_val = list(map(self.property_converter.__getitem__, ids))  # type: ignore
         except AttributeError:
-            x_val = list(map(self.property_converter, ids))
+            x_val = list(map(self.property_converter, ids))  # type: ignore
 
         x_sorted_idx = sorted(
             range(len(ids)),
