@@ -8,14 +8,12 @@ from NLEval.label.filters import LabelsetRangeFilterSplit
 from NLEval.label.split import RatioPartition
 from NLEval.model.label_propagation import OneHopPropagation
 from NLEval.model_trainer import LabelPropagationTrainer
-from NLEval.util.converter import GenePropertyConverter
 
 # Load daatset
-g, lsc = load_data(sparse=True)
+g, lsc, converter = load_data(sparse=True)
 
 # 3/2 train/test split using genes with higher PubMed Count for training
-pmdcnt = GenePropertyConverter(name="PubMedCount", log_level="INFO")
-splitter = RatioPartition(0.6, 0.4, ascending=False, property_converter=pmdcnt)
+splitter = RatioPartition(0.6, 0.4, ascending=False, property_converter=converter)
 
 # Select model
 mdl = OneHopPropagation()

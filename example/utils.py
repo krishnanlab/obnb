@@ -53,12 +53,12 @@ def load_data(
             NegativeGeneratorHypergeom(p_thresh=0.05, log_level=log_level),
         )
 
+    pmdcnt_converter = GenePropertyConverter(
+        root=save_dir,
+        name="PubMedCount",
+        log_level=log_level,
+    )
     if filter_holdout_split:
-        pmdcnt_converter = GenePropertyConverter(
-            root=save_dir,
-            name="PubMedCount",
-            log_level=log_level,
-        )
         splitter = RatioPartition(
             *(0.6, 0.2, 0.2),
             ascending=False,
@@ -77,7 +77,7 @@ def load_data(
     property_path = osp.join(osp.pardir, "data", "properties", "PubMedCount.txt")
     lsc.load_entity_properties(property_path, "PubMed Count", 0, int)
 
-    return g, lsc
+    return g, lsc, pmdcnt_converter
 
 
 def print_expected(
