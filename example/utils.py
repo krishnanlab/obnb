@@ -72,11 +72,6 @@ def load_data(
         transform=Compose(*filter_list, log_level=log_level),
     )
 
-    # Load gene properties for study-bias holdout
-    # Note: wait after filtering is done to reduce time for filtering
-    property_path = osp.join(osp.pardir, "data", "properties", "PubMedCount.txt")
-    lsc.load_entity_properties(property_path, "PubMed Count", 0, int)
-
     return g, lsc, pmdcnt_converter
 
 
