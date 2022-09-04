@@ -2,9 +2,9 @@ from collections import Counter
 
 import numpy as np
 
-from NLEval.typing import List, Tuple
-from NLEval.util.checkers import checkTypesInIterableErrEmpty
 from NLEval.label.split.base import BaseRandomSplit, BaseSortedSplit
+from NLEval.typing import Any, List, Mapping, Tuple
+from NLEval.util.checkers import checkTypesInIterableErrEmpty
 
 
 class BasePartition(BaseSortedSplit):
@@ -37,14 +37,19 @@ class RatioPartition(BasePartition):
 
     """
 
-    def __init__(self, *ratios: float, ascending: bool = True) -> None:
+    def __init__(
+        self,
+        *ratios: float,
+        property_converter: Mapping[str, Any],
+        ascending: bool = True,
+    ) -> None:
         """Initialize the RatioPartition object.
 
         Ags:
             ratios: Ratio of each split.
 
         """
-        super().__init__(ascending)
+        super().__init__(property_converter=property_converter, ascending=ascending)
         self.ratios = ratios
 
     @property
@@ -102,14 +107,19 @@ class ThresholdPartition(BasePartition):
 
     """
 
-    def __init__(self, *thresholds: float, ascending: bool = True) -> None:
+    def __init__(
+        self,
+        *thresholds: float,
+        property_converter: Mapping[str, Any],
+        ascending: bool = True,
+    ) -> None:
         """Initialize the ThresholdPartition object.
 
         Args:
             thresholds: Thresholds used to determine the splits.
 
         """
-        super().__init__(ascending)
+        super().__init__(property_converter=property_converter, ascending=ascending)
         self.thresholds = thresholds
 
     @property
@@ -143,8 +153,11 @@ class ThresholdPartition(BasePartition):
         idx = [0] * (len(self.thresholds) + 2)
         idx[-1] = x_size
         for i, threshold in enumerate(self.thresholds):
-            threshold = threshold if self.ascending else -threshold
-            where = np.where(x_sorted_val >= threshold)[0]
+            where = (
+                np.where(x_sorted_val >= threshold)[0]
+                if self.ascending
+                else np.where(x_sorted_val <= threshold)[0]
+            )
             idx[i + 1] = x_size if where.size == 0 else where[0]
         return idx
 

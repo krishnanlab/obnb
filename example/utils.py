@@ -5,9 +5,12 @@ from NLEval.label.filters import (
     Compose,
     EntityExistenceFilter,
     LabelsetRangeFilterSize,
+    LabelsetRangeFilterSplit,
     NegativeGeneratorHypergeom,
 )
+from NLEval.label.split import RatioPartition
 from NLEval.typing import LogLevel
+from NLEval.util.converter import GenePropertyConverter
 
 
 def load_data(
@@ -15,6 +18,7 @@ def load_data(
     label: str = "GOBP",
     sparse: bool = False,
     filter_negative: bool = True,
+    filter_holdout_split: bool = False,
     log_level: LogLevel = "WARNING",
     progress_bar: bool = False,
 ):
@@ -33,11 +37,12 @@ def load_data(
     save_dir = "datasets"
     print(f"{network=}\n{label=}")
 
-    # Load data
+    # Load graph data
     g = getattr(NLEval.data, network)(save_dir, version=data_version)
     if not sparse:
         g = g.to_dense_graph()
 
+    # Construct filters for processing label set collection
     filter_list = [
         EntityExistenceFilter(list(g.node_ids), log_level=log_level),
         LabelsetRangeFilterSize(min_val=50, max_val=200, log_level=log_level),
@@ -48,26 +53,41 @@ def load_data(
             NegativeGeneratorHypergeom(p_thresh=0.05, log_level=log_level),
         )
 
+    pmdcnt_converter = GenePropertyConverter(
+        root=save_dir,
+        name="PubMedCount",
+        log_level=log_level,
+    )
+    if filter_holdout_split:
+        splitter = RatioPartition(
+            *(0.6, 0.2, 0.2),
+            ascending=False,
+            property_converter=pmdcnt_converter,
+        )
+        filter_list.append(LabelsetRangeFilterSplit(min_val=20, splitter=splitter))
+
     lsc = getattr(NLEval.data, label)(
         save_dir,
         version=data_version,
         transform=Compose(*filter_list, log_level=log_level),
     )
 
-    # Load gene properties for study-bias holdout
-    # Note: wait after filtering is done to reduce time for filtering
-    property_path = osp.join(osp.pardir, "data", "properties", "PubMedCount.txt")
-    lsc.load_entity_properties(property_path, "PubMed Count", 0, int)
-
-    return g, lsc
+    return g, lsc, pmdcnt_converter
 
 
-def print_expected(*to_print, header: str = "Expected outcome", width: int = 80):
-    break_line = "-" * width
-    print()
-    print("\n".join([header, break_line, *to_print, break_line]))
+def print_expected(
+    *to_print,
+    header: str = "Expected outcome",
+    width: int = 80,
+    blank_lines: int = 2,
+):
+    head_line = f"{header:=^{width}}"
+    end_line = "=" * width
+    _ = [print() for i in range(blank_lines)]
+    print("\n".join([head_line, *to_print, end_line]))
 
 
 if __name__ == "__main__":
-    load_data(log_level="DEBUG")
     load_data(progress_bar=True)
+    load_data(log_level="DEBUG")
+    load_data(log_level="INFO", filter_negative=False, filter_holdout_split=True)

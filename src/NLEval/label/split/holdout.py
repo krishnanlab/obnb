@@ -1,8 +1,8 @@
 import numpy as np
 
-from NLEval.typing import Tuple
-from NLEval.util.checkers import checkType
 from NLEval.label.split.base import BaseRandomSplit, BaseSortedSplit
+from NLEval.typing import Any, Mapping, Tuple
+from NLEval.util.checkers import checkType
 
 
 class BaseHoldout(BaseSortedSplit):
@@ -33,14 +33,20 @@ class RatioHoldout(BaseHoldout):
 
     """
 
-    def __init__(self, ratio: float, ascending: bool = True) -> None:
+    def __init__(
+        self,
+        ratio: float,
+        *,
+        property_converter: Mapping[str, Any],
+        ascending: bool = True,
+    ) -> None:
         """Initialize the RatioHoldout object.
 
         Ags:
             ratio: Ratio of holdout.
 
         """
-        super().__init__(ascending)
+        super().__init__(property_converter=property_converter, ascending=ascending)
         self.ratio = ratio
 
     @property
@@ -93,14 +99,20 @@ class ThresholdHoldout(BaseHoldout):
 
     """
 
-    def __init__(self, threshold: float, ascending: bool = True) -> None:
+    def __init__(
+        self,
+        threshold: float,
+        *,
+        property_converter: Mapping[str, Any],
+        ascending: bool = True,
+    ) -> None:
         """Initialize the ThresholdHoldout object.
 
         Args:
             threshold: Threshold used to determine the splits.
 
         """
-        super().__init__(ascending)
+        super().__init__(property_converter=property_converter, ascending=ascending)
         self.threshold = threshold
 
     @property
@@ -122,8 +134,11 @@ class ThresholdHoldout(BaseHoldout):
     def get_split_idx(self, x_sorted_val: np.ndarray) -> int:
         """Return the split index based on the cut threshold."""
         x_size = x_sorted_val.size
-        threshold = self.threshold if self.ascending else -self.threshold
-        where = np.where(x_sorted_val >= threshold)[0]
+        where = (
+            np.where(x_sorted_val >= self.threshold)[0]
+            if self.ascending
+            else np.where(x_sorted_val <= self.threshold)[0]
+        )
         idx = x_size if where.size == 0 else where[0]
         return idx
 
@@ -131,7 +146,7 @@ class ThresholdHoldout(BaseHoldout):
 class RandomRatioHoldout(BaseRandomSplit, RatioHoldout):
     """Randomly holdout some ratio of the dataset."""
 
-    def __init__(self, ratio, shuffle=True, random_state=None):
+    def __init__(self, ratio, *, shuffle=True, random_state=None):
         """Initialize RandomRatioHoldout."""
         super().__init__(ratio, shuffle=shuffle, random_state=random_state)
 
@@ -139,6 +154,6 @@ class RandomRatioHoldout(BaseRandomSplit, RatioHoldout):
 class AllHoldout(RandomRatioHoldout):
     """Holdout all available data points."""
 
-    def __init__(self, shuffle=False, random_state=None):
+    def __init__(self, *, shuffle=False, random_state=None):
         """Initialize the AllHoldout object."""
         super().__init__(1.0, shuffle=shuffle, random_state=random_state)

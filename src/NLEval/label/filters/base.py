@@ -64,9 +64,11 @@ class BaseFilter:
 
     def to_config(self) -> Dict[str, Any]:
         """Turn into a config dict."""
+        # XXX: has to use repr for now to make splitter display nicely, need to
+        # come up with a better solution in the future.
         return {
             self.__class__.__name__: {
-                param: getattr(self, param) for param in self.all_params
+                param: repr(getattr(self, param)) for param in self.all_params
             },
         }
 

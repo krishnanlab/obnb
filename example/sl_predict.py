@@ -10,7 +10,7 @@ i = 24  # index of labelset
 k = 50  # numbers of top genes to display
 
 # load graph and labelset collection
-g, lsc = load_data()
+g, lsc, _ = load_data()
 
 # initialize model
 mdl = LogisticRegression(penalty="l2", solver="liblinear")

@@ -8,10 +8,10 @@ from NLEval.model.label_propagation import OneHopPropagation
 from NLEval.model_trainer import LabelPropagationTrainer
 
 # Load dataset
-g, lsc = load_data()
+g, lsc, converter = load_data()
 
 # 3/2 train/test split using genes with higher PubMed Count for training
-splitter = RatioPartition(0.6, 0.4, ascending=False)
+splitter = RatioPartition(0.6, 0.4, ascending=False, property_converter=converter)
 
 # Select model
 mdl = OneHopPropagation()
