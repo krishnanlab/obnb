@@ -200,6 +200,7 @@ class DenseGraph(BaseGraph):
     @classmethod
     def from_npy(cls, path_to_npy, **kwargs):
         """Read numpy array from .npy file and construct BaseGraph."""
+        # TODO: add options, e.g., npz, name column.
         mat = np.load(path_to_npy, **kwargs)
         return cls.from_mat(mat)
 
