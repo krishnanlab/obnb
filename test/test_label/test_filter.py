@@ -421,20 +421,22 @@ class TestFilter(unittest.TestCase):
     def test_LabelsetRangeFilterSplit(self):
         # Setup mock properties for generating splits
         self.lsc.entity.new_property("test_property", 0, int)
-        for i, j in enumerate(["a", "b", "c", "d", "e", "f", "g", "h"]):
-            self.lsc.entity.set_property(j, "test_property", i)
+        split_opts = {
+            "property_converter": {
+                j: i for i, j in enumerate(sorted(self.lsc.entity_ids))
+            },
+        }
         log_level = "INFO"
 
         # Train = [a, b], Test = [c, d, e, f, g, h], Group3 does not have any
         # postives in the training split, hence should be removed
-        splitter = split.ThresholdPartition(2)
+        splitter = split.ThresholdPartition(2, **split_opts)
         with self.subTest(splitter=splitter):
             lsc = self.lsc.apply(
                 filters.LabelsetRangeFilterSplit(
                     1,
                     splitter,
                     count_negatives=False,
-                    property_name="test_property",
                     log_level=log_level,
                 ),
             )
@@ -445,14 +447,13 @@ class TestFilter(unittest.TestCase):
 
         # Same as above, but take into acount of negatives. Group1 is removed
         # due to the lack of negatives (all negatives in training set)
-        splitter = split.ThresholdPartition(2)
+        splitter = split.ThresholdPartition(2, **split_opts)
         with self.subTest(splitter=splitter):
             lsc = self.lsc.apply(
                 filters.LabelsetRangeFilterSplit(
                     1,
                     splitter,
                     count_negatives=True,
-                    property_name="test_property",
                     log_level=log_level,
                 ),
             )
@@ -463,14 +464,13 @@ class TestFilter(unittest.TestCase):
 
         # Train = [a], Test = [b, c, d, e, f, g, h], Both Group2 and Group3 do
         # not have any postives in the training split, hence should be removed
-        splitter = split.ThresholdPartition(1)
+        splitter = split.ThresholdPartition(1, **split_opts)
         with self.subTest(splitter=splitter):
             lsc = self.lsc.apply(
                 filters.LabelsetRangeFilterSplit(
                     1,
                     splitter,
                     count_negatives=False,
-                    property_name="test_property",
                     log_level=log_level,
                 ),
             )
@@ -479,7 +479,7 @@ class TestFilter(unittest.TestCase):
                 ["Group1", "Group4", "Group5"],
             )
 
-        splitter = split.RatioPartition(0.25, 0.75)
+        splitter = split.RatioPartition(0.25, 0.75, **split_opts)
         with self.subTest(splitter=splitter):
             """Iteratively apply ratio filter until nothing changes.
 
@@ -546,7 +546,6 @@ class TestFilter(unittest.TestCase):
                         1,
                         splitter,
                         count_negatives=False,
-                        property_name="test_property",
                         log_level=log_level,
                     ),
                 )

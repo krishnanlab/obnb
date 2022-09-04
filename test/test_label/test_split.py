@@ -31,14 +31,6 @@ class TestSplit(unittest.TestCase):
             property_name=None,
         )
 
-    def test_raise_property_name(self):
-        self.assertRaises(
-            IDNotExistError,
-            self.lsc.split,
-            KFold(n_splits=2).split,
-            property_name="something",
-        )
-
     def test_reorder(self):
         y, _ = self.lsc.split(KFold(n_splits=2).split, property_name=None)
         self.assertEqual(y.T.tolist(), [[1, 1, 1, 0], [0, 1, 0, 1]])
@@ -136,8 +128,11 @@ class TestLabelsetSplit(unittest.TestCase):
         self.lsc.add_labelset(["b", "d"], "Labelset2", "Description2")
         self.lsc.add_labelset(["e", "f", "g", "h"], "Labelset3")
         self.lsc.entity.new_property("test_property", 0, int)
-        for i, j in enumerate(["a", "b", "c", "d", "e", "f", "g", "h"]):
-            self.lsc.entity.set_property(j, "test_property", i)
+        self.split_opts = {
+            "property_converter": {
+                j: i for i, j in enumerate(sorted(self.lsc.entity_ids))
+            },
+        }
 
         self.y_t_list = [
             [1, 1, 1, 0, 0, 0, 0, 0],
@@ -148,21 +143,19 @@ class TestLabelsetSplit(unittest.TestCase):
     def test_threshold_holdout_repr(self):
         for threshold in [-4, 0.1, 4, 10.31]:
             with self.subTest(threshold):
-                splitter = split.ThresholdHoldout(threshold)
+                splitter = split.ThresholdHoldout(threshold, **self.split_opts)
                 self.assertEqual(
                     repr(splitter),
-                    f"ThresholdHoldout(ascending=True, threshold={threshold})",
+                    "ThresholdHoldout(property_converter=CustomConverter, "
+                    f"ascending=True, threshold={threshold})",
                 )
 
     def test_threshold_holdout_raises(self):
-        self.assertRaises(TypeError, split.ThresholdHoldout, "6")
+        self.assertRaises(TypeError, split.ThresholdHoldout, "6", **self.split_opts)
 
     def test_threshold_holdout(self):
         with self.subTest(threshold=4):
-            y, masks = self.lsc.split(
-                split.ThresholdHoldout(4),
-                property_name="test_property",
-            )
+            y, masks = self.lsc.split(split.ThresholdHoldout(4, **self.split_opts))
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(list(masks), ["test"])
             self.assertEqual(
@@ -172,8 +165,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
         with self.subTest(threshold=2, ascending=False):
             y, masks = self.lsc.split(
-                split.ThresholdHoldout(2, ascending=False),
-                property_name="test_property",
+                split.ThresholdHoldout(2, ascending=False, **self.split_opts),
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(list(masks), ["test"])
@@ -190,16 +182,14 @@ class TestLabelsetSplit(unittest.TestCase):
         self.assertRaises(
             ValueError,
             self.lsc.split,
-            split.ThresholdHoldout(4),
-            property_name="test_property",
+            split.ThresholdHoldout(4, **self.split_opts),
             consider_negative=True,
         )
 
         with self.subTest(threshold=4, labelset_name="Labelset1"):
             y, masks = self.lsc.split(
-                split.ThresholdHoldout(4),
+                split.ThresholdHoldout(4, **self.split_opts),
                 labelset_name="Labelset1",
-                property_name="test_property",
                 consider_negative=True,
             )
             self.assertEqual(y.T.tolist(), self.y_t_list[0])
@@ -210,9 +200,8 @@ class TestLabelsetSplit(unittest.TestCase):
 
         with self.subTest(threshold=4, labelset_name="Labelset2"):
             y, masks = self.lsc.split(
-                split.ThresholdHoldout(4),
+                split.ThresholdHoldout(4, **self.split_opts),
                 labelset_name="Labelset2",
-                property_name="test_property",
                 consider_negative=True,
             )
             self.assertEqual(y.T.tolist(), self.y_t_list[1])
@@ -224,9 +213,8 @@ class TestLabelsetSplit(unittest.TestCase):
         # If negatives are not set explicitly, use what's not positives
         with self.subTest(threshold=4, labelset_name="Labelset3"):
             y, masks = self.lsc.split(
-                split.ThresholdHoldout(4),
+                split.ThresholdHoldout(4, **self.split_opts),
                 labelset_name="Labelset3",
-                property_name="test_property",
                 consider_negative=True,
             )
             self.assertEqual(y.T.tolist(), self.y_t_list[2])
@@ -236,27 +224,18 @@ class TestLabelsetSplit(unittest.TestCase):
             )
 
     def test_threshold_holdout_raises_target_ids(self):
-        splitter = split.ThresholdHoldout(4)
+        splitter = split.ThresholdHoldout(4, **self.split_opts)
 
         # target_ids contains all ids in the labelset, should work
-        self.lsc.split(
-            splitter,
-            target_ids=("a", "b", "c", "d", "e", "f", "g", "h"),
-            property_name="test_property",
-        )
+        self.lsc.split(splitter, target_ids=("a", "b", "c", "d", "e", "f", "g", "h"))
         self.lsc.split(
             splitter,
             target_ids=("a", "c", "b", "o", "k", "d", "e", "f", "g", "h"),
-            property_name="test_property",
         )
 
         # Missting "g"
         with self.assertRaises(ValueError) as context:
-            self.lsc.split(
-                splitter,
-                target_ids=("a", "b", "c", "d", "e", "f", "h"),
-                property_name="test_property",
-            )
+            self.lsc.split(splitter, target_ids=("a", "b", "c", "d", "e", "f", "h"))
         self.assertEqual(
             str(context.exception),
             "target_ids must contain all of entity_ids, but 'g' is missing",
@@ -265,18 +244,16 @@ class TestLabelsetSplit(unittest.TestCase):
     def test_ratio_holdout_repr(self):
         for ratio in [0.1, 0.5, 0.9]:
             with self.subTest(ratio=ratio):
-                splitter = split.RatioHoldout(ratio)
+                splitter = split.RatioHoldout(ratio, **self.split_opts)
                 self.assertEqual(
                     repr(splitter),
-                    f"RatioHoldout(ascending=True, ratio={ratio})",
+                    "RatioHoldout(property_converter=CustomConverter, "
+                    f"ascending=True, ratio={ratio})",
                 )
 
     def test_ratio_holdout(self):
         with self.subTest(ratio=0.2):
-            y, masks = self.lsc.split(
-                split.RatioHoldout(0.2),
-                property_name="test_property",
-            )
+            y, masks = self.lsc.split(split.RatioHoldout(0.2, **self.split_opts))
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(list(masks), ["test"])
             self.assertEqual(
@@ -286,8 +263,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
         with self.subTest(ratio=0.2, ascending=False):
             y, masks = self.lsc.split(
-                split.RatioHoldout(0.2, ascending=False),
-                property_name="test_property",
+                split.RatioHoldout(0.2, ascending=False, **self.split_opts),
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(list(masks), ["test"])
@@ -297,10 +273,7 @@ class TestLabelsetSplit(unittest.TestCase):
             )
 
         with self.subTest(ratio=0.5):
-            y, masks = self.lsc.split(
-                split.RatioHoldout(0.5),
-                property_name="test_property",
-            )
+            y, masks = self.lsc.split(split.RatioHoldout(0.5, **self.split_opts))
             self.assertEqual(
                 masks["test"].T.tolist(),
                 [[1, 1, 1, 1, 0, 0, 0, 0]],
@@ -308,36 +281,44 @@ class TestLabelsetSplit(unittest.TestCase):
 
     def test_threshold_partition_repr(self):
         with self.subTest(thresholds=(4,)):
-            splitter = split.ThresholdPartition(4)
+            splitter = split.ThresholdPartition(4, **self.split_opts)
             self.assertEqual(
                 repr(splitter),
-                "ThresholdPartition(ascending=True, thresholds=(4,))",
+                "ThresholdPartition(property_converter=CustomConverter, "
+                "ascending=True, thresholds=(4,))",
             )
 
         with self.subTest(thresholds=(2, 7)):
-            splitter = split.ThresholdPartition(2, 7)
+            splitter = split.ThresholdPartition(2, 7, **self.split_opts)
             self.assertEqual(
                 repr(splitter),
-                "ThresholdPartition(ascending=True, thresholds=(2, 7))",
+                "ThresholdPartition(property_converter=CustomConverter, "
+                "ascending=True, thresholds=(2, 7))",
             )
 
         with self.subTest(thresholds=(6, 1, 2)):
-            splitter = split.ThresholdPartition(6, 1, 2)
+            splitter = split.ThresholdPartition(6, 1, 2, **self.split_opts)
             self.assertEqual(
                 repr(splitter),
-                "ThresholdPartition(ascending=True, thresholds=(1, 2, 6))",
+                "ThresholdPartition(property_converter=CustomConverter, "
+                "ascending=True, thresholds=(1, 2, 6))",
             )
 
         with self.subTest(thresholds=(6, 1, 2), ascending=False):
-            splitter = split.ThresholdPartition(6, 1, 2, ascending=False)
+            splitter = split.ThresholdPartition(
+                *(6, 1, 2),
+                **self.split_opts,
+                ascending=False,
+            )
             self.assertEqual(
                 repr(splitter),
-                "ThresholdPartition(ascending=False, thresholds=(6, 2, 1))",
+                "ThresholdPartition(property_converter=CustomConverter, "
+                "ascending=False, thresholds=(6, 2, 1))",
             )
 
     def test_threshold_partition_raises(self):
         with self.assertRaises(ValueError) as context:
-            split.ThresholdPartition(5, 4, 5)
+            split.ThresholdPartition(5, 4, 5, **self.split_opts)
         self.assertEqual(
             str(context.exception),
             "Cannot have duplicated thresholds: 5 occured 2 times from "
@@ -345,21 +326,14 @@ class TestLabelsetSplit(unittest.TestCase):
         )
 
         with self.assertRaises(ValueError) as context:
-            split.ThresholdPartition()
+            split.ThresholdPartition(**self.split_opts)
         self.assertEqual(str(context.exception), "No thresholds specified")
 
-        self.assertRaises(
-            TypeError,
-            split.ThresholdPartition,
-            "6",
-        )
+        self.assertRaises(TypeError, split.ThresholdPartition, "6", **self.split_opts)
 
     def test_threshold_partition(self):
         with self.subTest(thresholds=(4,)):
-            y, masks = self.lsc.split(
-                split.ThresholdPartition(4),
-                property_name="test_property",
-            )
+            y, masks = self.lsc.split(split.ThresholdPartition(4, **self.split_opts))
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(
                 masks["train"].T.tolist(),
@@ -372,8 +346,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
         with self.subTest(thresholds=(2, 7)):
             y, masks = self.lsc.split(
-                split.ThresholdPartition(2, 7),
-                property_name="test_property",
+                split.ThresholdPartition(2, 7, **self.split_opts),
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(
@@ -391,8 +364,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
         with self.subTest(thresholds=(6, 1, 2)):
             y, masks = self.lsc.split(
-                split.ThresholdPartition(6, 1, 2),
-                property_name="test_property",
+                split.ThresholdPartition(6, 1, 2, **self.split_opts),
                 mask_names=("mask1", "mask2", "mask3", "mask4"),
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
@@ -415,8 +387,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
         with self.subTest(thresholds=(5, 10, 20)):
             y, masks = self.lsc.split(
-                split.ThresholdPartition(5, 10, 20),
-                property_name="test_property",
+                split.ThresholdPartition(5, 10, 20, **self.split_opts),
                 mask_names=("mask1", "mask2", "mask3", "mask4"),
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
@@ -439,8 +410,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
         with self.subTest(thresholds=(-1)):
             y, masks = self.lsc.split(
-                split.ThresholdPartition(-1),
-                property_name="test_property",
+                split.ThresholdPartition(-1, **self.split_opts),
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(
@@ -454,8 +424,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
         with self.subTest(thresholds=(2, 7)):
             y, masks = self.lsc.split(
-                split.ThresholdPartition(2, 7),
-                property_name="test_property",
+                split.ThresholdPartition(2, 7, **self.split_opts),
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(
@@ -473,8 +442,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
         with self.subTest(thresholds=(5, 10, 20), ascending=False):
             y, masks = self.lsc.split(
-                split.ThresholdPartition(5, 10, 20, ascending=False),
-                property_name="test_property",
+                split.ThresholdPartition(5, 10, 20, ascending=False, **self.split_opts),
                 mask_names=("mask1", "mask2", "mask3", "mask4"),
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
@@ -496,16 +464,22 @@ class TestLabelsetSplit(unittest.TestCase):
             )
 
     def test_ratio_partition_repr(self):
-        splitter = split.RatioPartition(0.5, 0.5)
+        splitter = split.RatioPartition(0.5, 0.5, **self.split_opts)
         self.assertEqual(
             repr(splitter),
-            "RatioPartition(ascending=True, ratios=(0.5, 0.5))",
+            "RatioPartition(property_converter=CustomConverter, "
+            "ascending=True, ratios=(0.5, 0.5))",
         )
 
-        splitter = split.RatioPartition(0.6, 0.2, 0.2, ascending=False)
+        splitter = split.RatioPartition(
+            *(0.6, 0.2, 0.2),
+            ascending=False,
+            **self.split_opts,
+        )
         self.assertEqual(
             repr(splitter),
-            "RatioPartition(ascending=False, ratios=(0.6, 0.2, 0.2))",
+            "RatioPartition(property_converter=CustomConverter, "
+            "ascending=False, ratios=(0.6, 0.2, 0.2))",
         )
 
     def test_ratio_partition_raises(self):
@@ -513,14 +487,14 @@ class TestLabelsetSplit(unittest.TestCase):
         for ratio in [0.0, 1.000001, 2.4]:
             with self.subTest(ratio=ratio):
                 with self.assertRaises(ValueError) as context:
-                    split.RatioHoldout(ratio)
+                    split.RatioHoldout(ratio, **self.split_opts)
                 self.assertEqual(
                     str(context.exception),
                     f"{template} {ratio}",
                 )
 
         with self.assertRaises(ValueError) as context:
-            split.RatioPartition(0.2, 0.5)
+            split.RatioPartition(0.2, 0.5, **self.split_opts)
         self.assertEqual(
             str(context.exception),
             "Ratios must sum up to 1, specified ratios (0.2, 0.5) sum up "
@@ -528,14 +502,14 @@ class TestLabelsetSplit(unittest.TestCase):
         )
 
         with self.assertRaises(ValueError) as context:
-            split.RatioPartition(0.2, 0.8, 0)
+            split.RatioPartition(0.2, 0.8, 0, **self.split_opts)
         self.assertEqual(
             str(context.exception),
             "Ratios must be strictly positive: got (0.2, 0.8, 0)",
         )
 
         with self.assertRaises(ValueError) as context:
-            split.RatioPartition(0.2, 0.9, -0.1)
+            split.RatioPartition(0.2, 0.9, -0.1, **self.split_opts)
         self.assertEqual(
             str(context.exception),
             "Ratios must be strictly positive: got (0.2, 0.9, -0.1)",
@@ -544,8 +518,7 @@ class TestLabelsetSplit(unittest.TestCase):
     def test_ratio_partition(self):
         with self.subTest(ratios=(0.5, 0.5)):
             y, masks = self.lsc.split(
-                split.RatioPartition(0.5, 0.5),
-                property_name="test_property",
+                split.RatioPartition(0.5, 0.5, **self.split_opts),
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(
@@ -559,8 +532,7 @@ class TestLabelsetSplit(unittest.TestCase):
 
         with self.subTest(ratios=(0.6, 0.2, 0.2)):
             y, masks = self.lsc.split(
-                split.RatioPartition(0.6, 0.2, 0.2),
-                property_name="test_property",
+                split.RatioPartition(0.6, 0.2, 0.2, **self.split_opts),
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(
@@ -578,8 +550,11 @@ class TestLabelsetSplit(unittest.TestCase):
 
         with self.subTest(ratios=(0.6, 0.2, 0.2), ascending=False):
             y, masks = self.lsc.split(
-                split.RatioPartition(0.6, 0.2, 0.2, ascending=False),
-                property_name="test_property",
+                split.RatioPartition(
+                    *(0.6, 0.2, 0.2),
+                    ascending=False,
+                    **self.split_opts,
+                ),
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(
@@ -599,7 +574,6 @@ class TestLabelsetSplit(unittest.TestCase):
         with self.subTest(ratios=(0.5, 0.5), shuffle=False):
             y, masks = self.lsc.split(
                 split.RandomRatioPartition(0.5, 0.5, shuffle=False),
-                property_name=None,
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(list(masks), ["train", "test"])
@@ -615,17 +589,11 @@ class TestLabelsetSplit(unittest.TestCase):
         for random_state in [0, 32, 60]:
             with self.subTest(ratios=(0.5, 0.5), random_state=random_state):
                 y, masks = self.lsc.split(
-                    split.RandomRatioPartition(
-                        0.5,
-                        0.5,
-                        random_state=random_state,
-                    ),
-                    property_name=None,
+                    split.RandomRatioPartition(0.5, 0.5, random_state=random_state),
                 )
 
                 # Manually compute expected random mask
-                np.random.seed(random_state)
-                random_x = np.random.choice(8, size=8, replace=False)
+                random_x = np.random.default_rng(random_state).random(8)
                 mask = np.zeros(8, dtype=bool)
                 mask[random_x.argsort()[:4]] = 1
 
@@ -638,7 +606,6 @@ class TestLabelsetSplit(unittest.TestCase):
         with self.subTest(ratio=0.5, shuffle=False):
             y, masks = self.lsc.split(
                 split.RandomRatioHoldout(0.5, shuffle=False),
-                property_name=None,
             )
             self.assertEqual(y.T.tolist(), self.y_t_list)
             self.assertEqual(list(masks), ["test"])
@@ -650,16 +617,11 @@ class TestLabelsetSplit(unittest.TestCase):
         for random_state in [0, 32, 60]:
             with self.subTest(ratios=(0.5, 0.5), random_state=random_state):
                 y, masks = self.lsc.split(
-                    split.RandomRatioHoldout(
-                        0.5,
-                        random_state=random_state,
-                    ),
-                    property_name=None,
+                    split.RandomRatioHoldout(0.5, random_state=random_state),
                 )
 
                 # Manually compute expected random mask
-                np.random.seed(random_state)
-                random_x = np.random.choice(8, size=8, replace=False)
+                random_x = np.random.default_rng(random_state).random(8)
                 mask = np.zeros(8, dtype=bool)
                 mask[random_x.argsort()[:4]] = 1
 
@@ -667,13 +629,10 @@ class TestLabelsetSplit(unittest.TestCase):
                 self.assertEqual(masks["test"].T.tolist(), [mask.tolist()])
 
     def test_all_holdout(self):
-        y, masks = self.lsc.split(split.AllHoldout(), property_name=None)
+        y, masks = self.lsc.split(split.AllHoldout())
         self.assertEqual(y.T.tolist(), self.y_t_list)
         self.assertEqual(list(masks), ["test"])
-        self.assertEqual(
-            masks["test"].T.tolist(),
-            [[1, 1, 1, 1, 1, 1, 1, 1]],
-        )
+        self.assertEqual(masks["test"].T.tolist(), [[1, 1, 1, 1, 1, 1, 1, 1]])
 
 
 if __name__ == "__main__":
