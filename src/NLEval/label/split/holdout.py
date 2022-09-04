@@ -1,8 +1,8 @@
 import numpy as np
 
-from NLEval.typing import Tuple
-from NLEval.util.checkers import checkType
 from NLEval.label.split.base import BaseRandomSplit, BaseSortedSplit
+from NLEval.typing import Any, Mapping, Tuple
+from NLEval.util.checkers import checkType
 
 
 class BaseHoldout(BaseSortedSplit):
@@ -33,14 +33,20 @@ class RatioHoldout(BaseHoldout):
 
     """
 
-    def __init__(self, ratio: float, ascending: bool = True) -> None:
+    def __init__(
+        self,
+        ratio: float,
+        *,
+        property_converter: Mapping[str, Any],
+        ascending: bool = True,
+    ) -> None:
         """Initialize the RatioHoldout object.
 
         Ags:
             ratio: Ratio of holdout.
 
         """
-        super().__init__(ascending)
+        super().__init__(property_converter=property_converter, ascending=ascending)
         self.ratio = ratio
 
     @property
@@ -93,14 +99,20 @@ class ThresholdHoldout(BaseHoldout):
 
     """
 
-    def __init__(self, threshold: float, ascending: bool = True) -> None:
+    def __init__(
+        self,
+        threshold: float,
+        *,
+        property_converter: Mapping[str, Any],
+        ascending: bool = True,
+    ) -> None:
         """Initialize the ThresholdHoldout object.
 
         Args:
             threshold: Threshold used to determine the splits.
 
         """
-        super().__init__(ascending)
+        super().__init__(property_converter=property_converter, ascending=ascending)
         self.threshold = threshold
 
     @property
