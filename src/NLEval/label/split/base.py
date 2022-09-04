@@ -1,6 +1,7 @@
 import numpy as np
 
 from NLEval.typing import Any, Iterator, List, Mapping, Optional, Tuple
+from NLEval.util.converter import BaseConverter
 
 
 class BaseSplit:
@@ -15,10 +16,22 @@ class BaseSplit:
 
     def __repr__(self) -> str:
         """Representation of the labelset split object."""
-        name = self.__class__.__name__
-        attrs = [f"{i.lstrip('_')}={j!r}" for i, j in self.__dict__.items()]
-        attrstr = ", ".join(attrs)
-        return f"{name}({attrstr})"
+        attrs = [
+            f"{i.lstrip('_')}={j!r}"
+            for i, j in self.__dict__.items()
+            if i != "property_converter"
+        ]
+
+        try:
+            if isinstance(self.property_converter, BaseConverter):
+                property_converter_repr = repr(self.property_converter)
+            else:
+                property_converter_repr = "CustomConverter"
+            attrs = [f"property_converter={property_converter_repr}"] + attrs
+        except AttributeError:
+            pass
+
+        return f"{self.__class__.__name__}({', '.join(attrs)})"
 
 
 class BaseSortedSplit(BaseSplit):
