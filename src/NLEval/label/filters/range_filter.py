@@ -1,8 +1,8 @@
 import numpy as np
 
-from NLEval.typing import List, Optional
 from NLEval.label.collection import Splitter
 from NLEval.label.filters.base import BaseFilter
+from NLEval.typing import List, Optional
 
 
 class BaseRangeFilter(BaseFilter):
@@ -143,6 +143,11 @@ class LabelsetRangeFilterSplit(BaseRangeFilter):
         self.splitter = splitter
         self.count_negatives = count_negatives
         self.kwargs = kwargs
+
+    @property
+    def params(self) -> List[str]:
+        """Parameter list."""
+        return ["splitter", "min_val", "count_negatives"]
 
     @property
     def mod_name(self):
