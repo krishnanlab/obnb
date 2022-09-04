@@ -299,6 +299,9 @@ class GenePropertyConverter(BaseConverter):
             log_level=log_level,
         )
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(name={self.name!r})"
+
     @property
     def cache_file_name(self) -> str:
         return f"geneprop_convert-{self.name}.json"

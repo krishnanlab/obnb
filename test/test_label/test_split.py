@@ -5,6 +5,28 @@ from sklearn.model_selection import KFold
 
 from NLEval.exception import IDNotExistError
 from NLEval.label import LabelsetCollection, split
+from NLEval.label.split.base import BaseSplit
+from NLEval.util.converter import GenePropertyConverter
+
+
+def test_base_split_repr(mocker):
+    a = BaseSplit()
+    assert repr(a) == "BaseSplit()"
+
+    a.property_converter = {}
+    assert repr(a) == "BaseSplit(property_converter=CustomConverter)"
+
+    mocker.patch("NLEval.util.converter.GenePropertyConverter._load_cache")
+    a.property_converter = GenePropertyConverter(name="PubMedCount")
+    assert repr(a) == (
+        "BaseSplit(property_converter=GenePropertyConverter(name='PubMedCount'))"
+    )
+
+    a.some_attr = "abc"
+    assert repr(a) == (
+        "BaseSplit(property_converter=GenePropertyConverter(name='PubMedCount'), "
+        "some_attr='abc')"
+    )
 
 
 class TestSplit(unittest.TestCase):
