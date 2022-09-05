@@ -338,7 +338,7 @@ class BaseData:
         else:
             shutil.rmtree(cache_dir)
 
-    def get_data_url(self, version: str) -> str:
+    def get_data_url(self, version: str, cache: bool = False) -> str:
         """Obtain archive data URL.
 
         The URL is constructed by joining the base archive data URL corresponds
@@ -347,6 +347,7 @@ class BaseData:
 
         Args:
             version: Archival version.
+            cache: If set to True, then get the cache URL instead.
 
         Returns:
             str: URL to download the archive data.
@@ -359,10 +360,12 @@ class BaseData:
                 f"following versions:\n{pformat(versions)}",
             )
 
-        data_url = urllib.parse.urljoin(base_url, f"{self.classname}.zip")
+        name = ".cache" if cache else self.classname
+        data_url = urllib.parse.urljoin(base_url, f"{name}.zip")
         try:
             with urllib.request.urlopen(data_url):
                 self.plogger.debug("Connection successul")
+            self.plogger.info(f"Download URL: {data_url}")
         except urllib.error.HTTPError:
             reason = f"{self.classname} is unavailable in version: {version}"
             self.plogger.error(reason)
@@ -370,7 +373,7 @@ class BaseData:
 
         return data_url
 
-    def download_archive(self, version: str):
+    def download_archive(self, version: str, download_cache: bool = True):
         """Load data from archived version that ensures reproducibility.
 
         Note:
@@ -379,14 +382,17 @@ class BaseData:
 
         Args:
             version: Archival verion.
+            download_cache: If set to True, then check to see if <root>/.cache
+                exists, and if not, pull the cache from versioned archive.
 
         """
-        data_url = self.get_data_url(version)
         self.plogger.info(f"Loading {self.classname} ({version=})...")
-        self.plogger.info(f"Download URL: {data_url}")
-
-        # WARNING: assumes zip file
+        data_url = self.get_data_url(version)
         download_unzip(data_url, self.root, logger=self.plogger)
+
+        if not osp.isdir(osp.join(self.root, ".cache")):
+            cache_url = self.get_data_url(version, cache=True)
+            download_unzip(cache_url, self.root, logger=self.plogger)
 
     def _download_archive(self):
         """Check if files data set up and download the archive if not."""
