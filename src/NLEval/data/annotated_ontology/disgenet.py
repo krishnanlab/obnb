@@ -1,8 +1,4 @@
-import gzip
-import os.path as osp
-
 import pandas as pd
-import requests
 from tqdm import tqdm
 
 from NLEval.data.annotated_ontology.base import BaseAnnotatedOntologyData
@@ -51,7 +47,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
         max_size: int = 600,
         overlap: float = 0.7,
         jaccard: float = 0.5,
-        data_sources: Optional[List[str]] = None,
+        data_sources: Union[List[str], str] = "default",
         gene_id_converter: Optional[Union[Mapping[str, str], str]] = None,
         **kwargs,
     ):
@@ -66,9 +62,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
 
     @property
     def data_sources(self) -> List[str]:
-        if self._data_sources is not None:
-            return self._data_sources
-        else:
+        if self._data_sources == "default":
             return [
                 "CGI",
                 "CLINGEN",
@@ -79,6 +73,8 @@ class DisGeNet(BaseAnnotatedOntologyData):
                 "PSYGENET",
                 "UNIPROT",
             ]
+        else:
+            return self._data_sources
 
     @property
     def _default_pre_transform(self):
@@ -89,13 +85,6 @@ class DisGeNet(BaseAnnotatedOntologyData):
             LabelsetRangeFilterSize(min_val=self.min_size),
             log_level=self.log_level,
         )
-
-    def download_annotations(self):
-        self.plogger.info(f"Download annotation from: {self.annotation_url}")
-        resp = requests.get(self.annotation_url)
-        annotation_file_name = self.annotation_file_name
-        with open(osp.join(self.raw_dir, annotation_file_name), "wb") as f:
-            f.write(gzip.decompress(resp.content))
 
     def process(self):
         g = OntologyGraph()
