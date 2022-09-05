@@ -43,11 +43,11 @@ class DisGeNet(BaseAnnotatedOntologyData):
     def __init__(
         self,
         root: str,
-        dsi_threshold: float = 0.6,
+        dsi_threshold: float = 0.5,
         min_size: int = 10,
         max_size: int = 600,
-        jaccard: float = 0.5,
         overlap: float = 0.7,
+        jaccard: float = 0.5,
         **kwargs,
     ):
         """Initialize the DisGeNet data object."""
@@ -62,8 +62,8 @@ class DisGeNet(BaseAnnotatedOntologyData):
     def _default_pre_transform(self):
         return Compose(
             LabelsetRangeFilterSize(max_val=self.max_size),
-            LabelsetNonRedFilterJaccard(self.jaccard),
             LabelsetNonRedFilterOverlap(self.overlap),
+            LabelsetNonRedFilterJaccard(self.jaccard),
             LabelsetRangeFilterSize(min_val=self.min_size),
             log_level=self.log_level,
         )
