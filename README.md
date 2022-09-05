@@ -100,36 +100,41 @@ gcn_mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=n_ta
 gcn_results = SimpleGNNTrainer(metrics, device="cuda", metric_best="auroc").train(mdl, dataset)
 ```
 
-## Contributing
+## Dev notes
 
-### Additional packages used for dev
-
-* [tox](https://tox.wiki/en/latest/index.html)
-* [pytest](https://docs.pytest.org/en/6.2.x/)
-* [pytest-cov](https://pypi.org/project/pytest-cov/)
-* [pytest-subtest](https://pypi.org/project/pytest-subtests/)
-* [pre-commit](https://github.com/pre-commit/pre-commit)
-
-See ``requirements-dev.txt``. Run the following to install all dev dependencies
+### Dev installation
 
 ```bash
-$ pip install -r requirements-dev.txt
+pip install -r requirements.txt  # install dependencies with pinned version
+pip install -e ".[dev]"  # install extra dependencies for dev
 ```
 
 ### Testing
 
-Simply run ``pytest`` to run all tests
+Run ``pytest`` to run all tests
 
 ```bash
-$ pytest
-```
-
-Alternatively, can also show the coverage report
-```bash
-$ pytest --cov src/NLEval
+pytest
 ```
 
 Run type checks and coding style checks using mypy and flake8 via tox:
+
 ```bash
 $ tox -e mypy,flake8
 ```
+
+### Data preparation and releasing
+
+First, bump data version in ``__init__.py`` to the next data release version, e.g., ``nledata-v0.1.0 -> nledata-v0.1.1-dev``.
+Then, download and process all latest data by running
+
+```bash
+python script/release_data.py
+```
+
+By default, the data ready to be uploaded (e.g., to [Zenodo](zenodo.org)) is saved under ``data_release/archived``.
+After some necessary inspection and checking, if everything looks good, upload and publish the new archived data.
+
+**Note:** ``dev`` data should be uploaded to the [sandbox](https://sandbox.zenodo.org/record/1097545#.YxYrqezMJzV) instead.
+
+Finally, commit and push the bumped version.
