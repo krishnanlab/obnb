@@ -7,15 +7,15 @@
 
 ## Installation
 
-Clone the repository first and then install via ``pip``
+Clone the repository first and then install via `pip`
 
 ```bash
 git clone https://github.com/krishnanlab/NetworkLearningEval && cd NetworkLearningEval
 pip install -e .
 ```
 
-The ``-e`` option means 'editable', i.e. no need to reinstall the library if you make changes to the source code.
-Feel free to not use the ``-e`` option and simply do ``pip install .`` if you do not plan on modifying the source code.
+The `-e` option means 'editable', i.e. no need to reinstall the library if you make changes to the source code.
+Feel free to not use the `-e` option and simply do `pip install .` if you do not plan on modifying the source code.
 
 ### Optional Pytorch Geometric installation
 
@@ -111,7 +111,7 @@ pip install -e ".[dev]"  # install extra dependencies for dev
 
 ### Testing
 
-Run ``pytest`` to run all tests
+Run `pytest` to run all tests
 
 ```bash
 pytest
@@ -125,16 +125,16 @@ $ tox -e mypy,flake8
 
 ### Data preparation and releasing
 
-First, bump data version in ``__init__.py`` to the next data release version, e.g., ``nledata-v0.1.0 -> nledata-v0.1.1-dev``.
+First, bump data version in `__init__.py` to the next data release version, e.g., `nledata-v0.1.0 -> nledata-v0.1.1-dev`.
 Then, download and process all latest data by running
 
 ```bash
 python script/release_data.py
 ```
 
-By default, the data ready to be uploaded (e.g., to [Zenodo](zenodo.org)) is saved under ``data_release/archived``.
+By default, the data ready to be uploaded (e.g., to [Zenodo](zenodo.org)) is saved under `data_release/archived`.
 After some necessary inspection and checking, if everything looks good, upload and publish the new archived data.
 
-**Note:** ``dev`` data should be uploaded to the [sandbox](https://sandbox.zenodo.org/record/1097545#.YxYrqezMJzV) instead.
+**Note:** `dev` data should be uploaded to the [sandbox](https://sandbox.zenodo.org/record/1097545#.YxYrqezMJzV) instead.
 
 Finally, commit and push the bumped version.
