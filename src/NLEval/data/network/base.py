@@ -3,7 +3,6 @@ import ndex2
 from NLEval.data.base import BaseData
 from NLEval.graph import SparseGraph
 from NLEval.typing import Any, Dict, List, Mapping, Optional, Union
-from NLEval.util.converter import MyGeneInfoConverter
 
 
 class BaseNdexData(BaseData, SparseGraph):
@@ -28,7 +27,7 @@ class BaseNdexData(BaseData, SparseGraph):
         weighted: bool,
         directed: bool,
         largest_comp: bool = False,
-        node_id_converter: Optional[Union[Mapping[str, str], str]] = "HumanEntrez",
+        gene_id_converter: Optional[Union[Mapping[str, str], str]] = "HumanEntrez",
         cx_kwargs: Optional[Dict[str, Any]] = None,
         **kwargs,
     ):
@@ -40,20 +39,16 @@ class BaseNdexData(BaseData, SparseGraph):
             undirected (bool): Whether the network is undirected or not.
             largest_comp (bool): If set to True, then only take the largest
                 connected component of the graph.
-            node_id_converter (Union[Mapping[str, str], str], optional): A
-                mapping object that maps a given node ID to a new node ID of
-                interest. Or the name of a predefined MygeneInfoConverter
-                object as a string.
             cx_kwargs: Keyword arguments used for reading the cx file.
 
         """
         self.largest_comp = largest_comp
-        self.node_id_converter = node_id_converter  # type: ignore
         self.cx_kwargs: Dict[str, Any] = cx_kwargs or {}
         super().__init__(
             root,
             weighted=weighted,
             directed=directed,
+            gene_id_converter=gene_id_converter,
             **kwargs,
         )
 
@@ -64,23 +59,6 @@ class BaseNdexData(BaseData, SparseGraph):
     @property
     def processed_files(self) -> List[str]:
         return ["data.npz"]
-
-    @property
-    def node_id_converter(self) -> Mapping[str, str]:
-        if self._node_id_converter is None:
-            return {}
-        elif isinstance(self._node_id_converter, str):
-            return MyGeneInfoConverter.construct(
-                self._node_id_converter,
-                root=self.root,
-                log_level=self.log_level,
-            )
-        else:
-            return self._node_id_converter
-
-    @node_id_converter.setter
-    def node_id_converter(self, node_id_converter):
-        self._node_id_converter = node_id_converter
 
     def download(self):
         """Download data from NDEX via ndex2 client."""
@@ -100,7 +78,7 @@ class BaseNdexData(BaseData, SparseGraph):
         )
         cx_graph.read_cx_stream_file(
             self.raw_file_path(0),
-            node_id_converter=self.node_id_converter,
+            node_id_converter=self.get_gene_id_converter(),
             **self.cx_kwargs,
         )
         if self.largest_comp:

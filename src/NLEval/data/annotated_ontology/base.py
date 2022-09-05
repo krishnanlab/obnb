@@ -1,3 +1,4 @@
+import gzip
 import os.path as osp
 
 import requests
@@ -64,7 +65,11 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
 
     def download_annotations(self):
         """Download annotations."""
-        raise NotImplementedError
+        self.plogger.info(f"Download annotation from: {self.annotation_url}")
+        resp = requests.get(self.annotation_url)
+        annotation_file_name = self.annotation_file_name
+        with open(osp.join(self.raw_dir, annotation_file_name), "wb") as f:
+            f.write(gzip.decompress(resp.content))
 
     def download(self):
         """Download the ontology and annotations."""

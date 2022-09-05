@@ -12,8 +12,9 @@ import yaml
 import NLEval
 from NLEval.config import NLEDATA_URL_DICT, NLEDATA_URL_DICT_STABLE
 from NLEval.exception import DataNotFoundError
-from NLEval.typing import Any, Dict, List, LogLevel, Optional
+from NLEval.typing import Any, Dict, List, LogLevel, Mapping, Optional, Union
 from NLEval.util.checkers import checkConfig
+from NLEval.util.converter import MyGeneInfoConverter
 from NLEval.util.download import download_unzip
 from NLEval.util.logger import get_logger, log_file_context
 from NLEval.util.path import cleandir, hexdigest
@@ -29,7 +30,7 @@ class BaseData:
 
     """
 
-    CONFIG_KEYS: List[str] = ["version"]
+    CONFIG_KEYS: List[str] = ["version", "gene_id_converter"]
 
     # Set to new data release name when preparing data for new release
     _new_data_release: Optional[str] = None
@@ -46,6 +47,7 @@ class BaseData:
         pre_transform: Any = "default",
         transform: Optional[Any] = None,
         cache_transform: bool = True,
+        gene_id_converter: Optional[Union[Mapping[str, str], str]] = "HumanEntrez",
         **kwargs,
     ):
         """Initialize BaseData object.
@@ -66,6 +68,10 @@ class BaseData:
             cache_transform: Whether or not to cache the transformed data. The
                 cached transformed data will be saved under
                 `<data_root_directory>/processed/.cache/`.
+            gene_id_converter (Union[Mapping[str, str], str], optional): A
+                mapping object that maps a given node ID to a new node ID of
+                interest. Or the name of a predefined MygeneInfoConverter
+                object as a string.
 
         Note:
             The `pre_transform` option is only valid when `version` is set to
@@ -78,6 +84,7 @@ class BaseData:
         self.version = version
         self.log_level = log_level
         self.cache_transform = cache_transform
+        self.gene_id_converter = gene_id_converter
 
         self.pre_transform = pre_transform
         self._setup_redos(redownload, reprocess, retransform)
@@ -131,6 +138,18 @@ class BaseData:
             base_logger="NLEval_precise",
             log_level=self.log_level,
         )
+
+    def get_gene_id_converter(self) -> Mapping[str, str]:
+        if self.gene_id_converter is None:
+            return {}
+        elif isinstance(self.gene_id_converter, str):
+            return MyGeneInfoConverter.construct(
+                self.gene_id_converter,
+                root=self.root,
+                log_level=self.log_level,
+            )
+        else:
+            return self.gene_id_converter
 
     @property
     def _default_pre_transform(self) -> Any:

@@ -1,8 +1,4 @@
-import gzip
-import os.path as osp
-
 import pandas as pd
-import requests
 from tqdm import tqdm
 
 from NLEval.data.annotated_ontology.base import BaseAnnotatedOntologyData
@@ -15,7 +11,7 @@ from NLEval.label.filters import (
     LabelsetNonRedFilterOverlap,
     LabelsetRangeFilterSize,
 )
-from NLEval.typing import List, Optional
+from NLEval.typing import List, Mapping, Optional, Union
 from NLEval.util.logger import display_pbar
 
 
@@ -51,7 +47,8 @@ class DisGeNet(BaseAnnotatedOntologyData):
         max_size: int = 600,
         overlap: float = 0.7,
         jaccard: float = 0.5,
-        data_sources: Optional[List[str]] = None,
+        data_sources: Union[List[str], str] = "default",
+        gene_id_converter: Optional[Union[Mapping[str, str], str]] = None,
         **kwargs,
     ):
         """Initialize the DisGeNet data object."""
@@ -61,23 +58,23 @@ class DisGeNet(BaseAnnotatedOntologyData):
         self.jaccard = jaccard
         self.overlap = overlap
         self._data_sources = data_sources
-        super().__init__(root, **kwargs)
+        super().__init__(root, gene_id_converter=gene_id_converter, **kwargs)
 
     @property
     def data_sources(self) -> List[str]:
-        if self._data_sources is not None:
-            return self._data_sources
-        else:
+        if self._data_sources == "default":
             return [
-                "CGI",
-                "CLINGEN",
-                "CTD_human",
-                "GENOMICS_ENGLAND",
-                "HPO",
-                "ORPHANET",
-                "PSYGENET",
-                "UNIPROT",
+                "CGI",  # Cancer Genome Interpreter
+                "CLINGEN",  # Clinical Genome Resource
+                "CTD_human",  # Comparative Toxicogenomics Database (Human)
+                "GENOMICS_ENGLAND",  # Genomics England PanelApp
+                "HPO",  # Human Phenotype Ontology
+                "ORPHANET",  # Orphan drugs and rare diseases
+                "PSYGENET",  # Psychiatric disorders gene association network
+                "UNIPROT",  # UniProt/SwissProt data base
             ]
+        else:
+            return self._data_sources  # type: ignore
 
     @property
     def _default_pre_transform(self):
@@ -88,13 +85,6 @@ class DisGeNet(BaseAnnotatedOntologyData):
             LabelsetRangeFilterSize(min_val=self.min_size),
             log_level=self.log_level,
         )
-
-    def download_annotations(self):
-        self.plogger.info(f"Download annotation from: {self.annotation_url}")
-        resp = requests.get(self.annotation_url)
-        annotation_file_name = self.annotation_file_name
-        with open(osp.join(self.raw_dir, annotation_file_name), "wb") as f:
-            f.write(gzip.decompress(resp.content))
 
     def process(self):
         g = OntologyGraph()
@@ -117,7 +107,10 @@ class DisGeNet(BaseAnnotatedOntologyData):
                 try:
                     g._update_node_attr_partial(doid, str(gene_id))
                 except IDNotExistError:
-                    continue
+                    self.plogger.debug(
+                        f"Skipping {disease_id}({doid})-{gene_id} because "
+                        f"{doid} is not available in the DO graph.",
+                    )
         g._update_node_attr_finalize()
 
         # Propagate annotations and show progress

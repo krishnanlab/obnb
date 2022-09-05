@@ -13,7 +13,7 @@ class PCNet(BaseNdexData):
             weighted=False,
             directed=False,
             largest_comp=True,
-            node_id_converter="HumanEntrez",
+            gene_id_converter="HumanEntrez",
             cx_kwargs={
                 "interaction_types": ["neighbor-of"],
                 "node_id_entry": "n",
