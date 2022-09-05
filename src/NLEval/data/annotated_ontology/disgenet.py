@@ -15,7 +15,7 @@ from NLEval.label.filters import (
     LabelsetNonRedFilterOverlap,
     LabelsetRangeFilterSize,
 )
-from NLEval.typing import List, Optional
+from NLEval.typing import List, Mapping, Optional, Union
 from NLEval.util.logger import display_pbar
 
 
@@ -52,6 +52,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
         overlap: float = 0.7,
         jaccard: float = 0.5,
         data_sources: Optional[List[str]] = None,
+        gene_id_converter: Optional[Union[Mapping[str, str], str]] = None,
         **kwargs,
     ):
         """Initialize the DisGeNet data object."""
@@ -61,7 +62,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
         self.jaccard = jaccard
         self.overlap = overlap
         self._data_sources = data_sources
-        super().__init__(root, **kwargs)
+        super().__init__(root, gene_id_converter=gene_id_converter, **kwargs)
 
     @property
     def data_sources(self) -> List[str]:

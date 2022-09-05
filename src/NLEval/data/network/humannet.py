@@ -13,7 +13,7 @@ class HumanNet(BaseNdexData):
             weighted=True,
             directed=False,
             largest_comp=True,
-            node_id_converter="HumanEntrez",
+            gene_id_converter="HumanEntrez",
             cx_kwargs={
                 "interaction_types": ["associates-with"],
                 "node_id_prefix": "ncbigene",

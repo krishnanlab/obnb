@@ -10,6 +10,7 @@ from NLEval.label.filters import (
     LabelsetNonRedFilterOverlap,
     LabelsetRangeFilterSize,
 )
+from NLEval.typing import Mapping, Optional, Union
 from NLEval.util.logger import display_pbar
 
 
@@ -26,6 +27,7 @@ class GeneOntology(BaseAnnotatedOntologyData):
         max_size: int = 500,
         jaccard: float = 0.5,
         overlap: float = 0.7,
+        gene_id_converter: Optional[Union[Mapping[str, str], str]] = "HumanEntrez",
         **kwargs,
     ):
         """Initialize the GOBP data object."""
@@ -33,7 +35,7 @@ class GeneOntology(BaseAnnotatedOntologyData):
         self.max_size = max_size
         self.jaccard = jaccard
         self.overlap = overlap
-        super().__init__(root, **kwargs)
+        super().__init__(root, gene_id_converter=gene_id_converter, **kwargs)
 
     @property
     def _default_pre_transform(self):
