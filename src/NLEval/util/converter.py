@@ -203,7 +203,7 @@ class MyGeneInfoConverter(BaseConverter):
 
         if ids_to_query:
             self.logger.info(
-                f"Number of genes to be queried: {len(ids_to_query)}",
+                f"Number of genes to be queried: {len(ids_to_query):,}",
             )
             queries = self.client.querymany(
                 ids_to_query,
@@ -213,25 +213,30 @@ class MyGeneInfoConverter(BaseConverter):
                 **self.query_kwargs,
             )
 
+            num_mod = 0
             for query in queries:
                 gene = query["query"]
                 gene_id = query.get("entrezgene")
                 if gene in self._convert_map:
                     if self.remove_multimap:
                         self._convert_map[gene] = None
-                        self.logger.info(
+                        self.logger.debug(
                             f"Removing {gene} due to multiple entrez mapping.",
                         )
-                        continue
-
-                    old_gene_id = self._convert_map[gene]
-                    self.logger.warning(
-                        f"Overwriting {gene} -> {old_gene_id} to "
-                        f"{gene} -> {gene_id}",
-                    )
+                    else:
+                        old_gene_id = self._convert_map[gene]
+                        self.logger.warning(
+                            f"Overwriting {gene} -> {old_gene_id} to "
+                            f"{gene} -> {gene_id}",
+                        )
+                    num_mod += 1
                 self._convert_map[gene] = gene_id
 
             self._save_cache()
+
+            if num_mod > 0:
+                mod_name = "removed" if self.remove_multimap else "overwritten"
+                self.logger.info(f"{num_mod} mappings {mod_name} during this update.")
 
         else:
             self.logger.info("No query needed.")
@@ -248,7 +253,7 @@ class MyGeneInfoConverter(BaseConverter):
         checkType("Name of converter", str, name)
         if name == "HumanEntrez":
             converter = cls(
-                scopes="entrezgene,ensemblgene,symbol",
+                scopes="all",
                 species="human",
                 **kwargs,
             )
