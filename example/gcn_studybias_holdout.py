@@ -34,7 +34,6 @@ trainer = SimpleGNNTrainer(
 y, masks = lsc.split(
     splitter,
     target_ids=g.node_ids,
-    property_name="PubMed Count",
 )
 dataset = Dataset(graph=g, y=y, masks=masks)
 

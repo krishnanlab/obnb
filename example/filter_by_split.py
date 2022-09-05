@@ -24,11 +24,7 @@ trainer = LabelPropagationTrainer(metrics, g)
 
 
 def print_split_stats(lsc, name):
-    y, masks = lsc.split(
-        splitter,
-        target_ids=g.node_ids,
-        property_name="PubMed Count",
-    )
+    y, masks = lsc.split(splitter, target_ids=g.node_ids)
     print(f"\nNumber of labelsets {name} split-filtering: {len(lsc.label_ids)}")
     for name, mask in masks.items():
         num_pos = y[mask[:, 0]].sum(0)

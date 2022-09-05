@@ -1,5 +1,3 @@
-import os.path as osp
-
 import NLEval.data
 from NLEval.label.filters import (
     Compose,

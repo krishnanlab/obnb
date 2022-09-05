@@ -14,7 +14,7 @@ g, lsc, converter = load_data()
 splitter = RatioPartition(0.6, 0.4, ascending=False, property_converter=converter)
 
 # Select model
-mdl = LogisticRegression(penalty="l2", solver="lbfgs", n_jobs=1)
+mdl = LogisticRegression(penalty="l2", solver="lbfgs", n_jobs=1, max_iter=500)
 
 # Setup trainer, use auroc as the evaluation metric
 metrics = {"auroc": auroc}
@@ -26,7 +26,6 @@ for label_id in lsc.label_ids:
         splitter,
         target_ids=g.node_ids,
         labelset_name=label_id,
-        property_name="PubMed Count",
         consider_negative=True,
     )
     dataset = Dataset(feature=g.to_feature(), y=y, masks=masks)
