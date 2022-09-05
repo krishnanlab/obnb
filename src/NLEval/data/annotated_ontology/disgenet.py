@@ -64,14 +64,14 @@ class DisGeNet(BaseAnnotatedOntologyData):
     def data_sources(self) -> List[str]:
         if self._data_sources == "default":
             return [
-                "CGI",
-                "CLINGEN",
-                "CTD_human",
-                "GENOMICS_ENGLAND",
-                "HPO",
-                "ORPHANET",
-                "PSYGENET",
-                "UNIPROT",
+                "CGI",  # Cancer Genome Interpreter
+                "CLINGEN",  # Clinical Genome Resource
+                "CTD_human",  # Comparative Toxicogenomics Database (Human)
+                "GENOMICS_ENGLAND",  # Genomics England PanelApp
+                "HPO",  # Human Phenotype Ontology
+                "ORPHANET",  # Orphan drugs and rare diseases
+                "PSYGENET",  # Psychiatric disorders gene association network
+                "UNIPROT",  # UniProt/SwissProt data base
             ]
         else:
             return self._data_sources
@@ -107,7 +107,10 @@ class DisGeNet(BaseAnnotatedOntologyData):
                 try:
                     g._update_node_attr_partial(doid, str(gene_id))
                 except IDNotExistError:
-                    continue
+                    self.plogger.debug(
+                        f"Skipping {disease_id}({doid})-{gene_id} because "
+                        f"{doid} is not available in the DO graph.",
+                    )
         g._update_node_attr_finalize()
 
         # Propagate annotations and show progress
