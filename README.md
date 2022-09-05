@@ -10,8 +10,7 @@
 Clone the repository first and then install via ``pip``
 
 ```bash
-git clone https://github.com/krishnanlab/NetworkLearningEval
-cd NetworkLearningEval
+git clone https://github.com/krishnanlab/NetworkLearningEval && cd NetworkLearningEval
 pip install -e .
 ```
 
@@ -20,30 +19,20 @@ Feel free to not use the ``-e`` option and simply do ``pip install .`` if you do
 
 ### Optional Pytorch Geometric installation
 
-One can install [Pytorch Geomtric](https://github.com/pyg-team/pytorch_geometric) to enable some GNN related features.
+User need to install [Pytorch Geomtric](https://github.com/pyg-team/pytorch_geometric) to enable some GNN related features.
 To install PyG, first need to install [PyTorch](https://pytorch.org).
 For full details about installation instructions, visit the links above.
 Assuming the system has Python3.8 or above installed, with CUDA10.2, use the following to install both PyTorch and PyG.
 
 ```bash
-conda install pytorch=1.9 torchvision torchaudio cudatoolkit=10.2 -c pytorch
-conda install pyg -c pyg -c conda-forge
+conda install pytorch=1.12.1 torchvision cudatoolkit=10.2 -c pytorch
+pip install torch-geometric==2.0.4 torch-scatter torch-sparse torch-cluster -f https://data.pyg.org/whl/torch-1.12.1+cu102.html
 ```
 
-Note: To support some new features in PyG that are not yet released, need to install from the repo directly:
-```bash
-pip install git+https://github.com/pyg-team/pytorch_geometric.git#egg=torch-geometric[full]
-```
-
-### Full dev installation
+### Quick install using the installatino script
 
 ```bash
-conda create -n nle-dev-pyg python=3.9 -y && conda activate nle-dev-pyg
-pip install -e .[dev]
-conda install pytorch=1.11.0 torchvision=0.12.0 cudatoolkit=10.2 -c pytorch -y
-pip install torch-scatter torch-sparse torch-cluster -f https://data.pyg.org/whl/torch-1.11.0+cu102.html
-pip install git+https://github.com/pyg-team/pytorch_geometric.git#egg=torch-geometric[full]
-conda clean --all -y
+source install.sh cu102  # other options are [cpu,cu113]
 ```
 
 ## Quick Demonstration
