@@ -44,13 +44,7 @@ g, lsc = load_data(NETWORK, "KEGGBP", sparse=True)
 
 # 3/2 train/test split using genes with higher PubMed Count for training
 splitter = RatioPartition(0.6, 0.2, 0.2, ascending=False)
-lsc.iapply(
-    LabelsetRangeFilterSplit(
-        10,
-        splitter,
-        property_name="PubMed Count",
-    ),
-)
+lsc.iapply(LabelsetRangeFilterSplit(10, splitter))
 print(f"Number of labelsets after split filtering: {len(lsc.label_ids)}")
 
 # Select model
@@ -78,7 +72,6 @@ for label_id in lsc.label_ids:
         splitter,
         target_ids=g.node_ids,
         labelset_name=label_id,
-        property_name="PubMed Count",
         consider_negative=True,
     )
     results = trainer.train(mdl, y, masks)
@@ -99,7 +92,6 @@ for q, fvec in zip(qs, fvecs):
             splitter,
             target_ids=g.node_ids,
             labelset_name=label_id,
-            property_name="PubMed Count",
             consider_negative=True,
         )
         results = trainer.train(mdl, y, masks)

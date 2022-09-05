@@ -27,7 +27,6 @@ print(f"{label_id}\t{lsc.get_info(label_id)}")
 # train and get genome wide prediction
 y, masks = lsc.split(
     AllHoldout(),
-    property_name=None,
     target_ids=g.node_ids,
     labelset_name=label_id,
     mask_names=("train",),

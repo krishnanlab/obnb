@@ -33,7 +33,6 @@ def predict_all_labelsets(label_id):
         splitter,
         target_ids=g.node_ids,
         labelset_name=label_id,
-        property_name="PubMed Count",
         consider_negative=True,
     )
     dataset = Dataset(feature=g.to_feature(), y=y, masks=masks)

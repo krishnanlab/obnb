@@ -26,7 +26,6 @@ for label_id in lsc.label_ids:
         splitter,
         target_ids=g.node_ids,
         labelset_name=label_id,
-        property_name="PubMed Count",
         consider_negative=True,
     )
     dataset = Dataset(graph=g, y=y, masks=masks)

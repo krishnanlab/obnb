@@ -37,11 +37,7 @@ trainer = GraphGymTrainer(
 
 mdl = trainer.create_model(dim_in=1, dim_out=n_tasks)
 
-y, masks = lsc.split(
-    splitter,
-    target_ids=g.node_ids,
-    property_name="PubMed Count",
-)
+y, masks = lsc.split(splitter, target_ids=g.node_ids)
 dataset = Dataset(graph=g, y=y, masks=masks)
 
 results = trainer.train(mdl, dataset)
