@@ -8,16 +8,16 @@ from urllib.parse import urljoin
 import pytest
 from parameterized import parameterized
 
-import NLEval
-import NLEval.data
-from NLEval.config import NLEDATA_URL_DICT
-from NLEval.exception import DataNotFoundError
-from NLEval.util.download import download_unzip
-from NLEval.util.timer import Timeout
+import nleval
+import nleval.data
+from nleval.config import NLEDATA_URL_DICT
+from nleval.exception import DataNotFoundError
+from nleval.util.download import download_unzip
+from nleval.util.timer import Timeout
 
 opts = {
     "log_level": "DEBUG",
-    "version": NLEval.__data_version__,
+    "version": nleval.__data_version__,
 }
 # Name, reprocess, redownload
 full_data_test_param = [
@@ -41,7 +41,7 @@ class TestData(unittest.TestCase):
             f"{cls.tmp_dir_preserve}",
         )
 
-        data_url = urljoin(NLEDATA_URL_DICT[NLEval.__data_version__], ".cache.zip")
+        data_url = urljoin(NLEDATA_URL_DICT[nleval.__data_version__], ".cache.zip")
         download_unzip(data_url, cls.tmp_dir_preserve)
 
     @classmethod
@@ -63,7 +63,7 @@ class TestData(unittest.TestCase):
 
     @pytest.mark.longruns
     def test_biogrid(self):
-        self.graph = NLEval.data.BioGRID(self.tmp_dir, **opts)
+        self.graph = nleval.data.BioGRID(self.tmp_dir, **opts)
         self.assertEqual(self.graph.size, 19263)
         self.assertEqual(self.graph.num_edges, 1099756)
 
@@ -71,7 +71,7 @@ class TestData(unittest.TestCase):
     @pytest.mark.mediumruns
     def test_bioplex(self, name, reprocess, redownload):
         with self.subTest(name):
-            self.graph = NLEval.data.BioPlex(
+            self.graph = nleval.data.BioPlex(
                 self.tmp_dir_preserve,
                 reprocess=reprocess,
                 redownload=redownload,
@@ -83,11 +83,11 @@ class TestData(unittest.TestCase):
     @pytest.mark.mediumruns
     def test_disgenet(self):
         with Timeout(600):
-            self.lsc = NLEval.data.DisGeNet(self.tmp_dir, **opts)
+            self.lsc = nleval.data.DisGeNet(self.tmp_dir, **opts)
 
     @pytest.mark.longruns
     def test_funcoup(self):
-        self.graph = NLEval.data.FunCoup(self.tmp_dir, **opts)
+        self.graph = nleval.data.FunCoup(self.tmp_dir, **opts)
         self.assertEqual(self.graph.size, 17905)
         self.assertEqual(self.graph.num_edges, 10042420)
 
@@ -95,30 +95,30 @@ class TestData(unittest.TestCase):
     @pytest.mark.longruns
     def test_go(self, name):
         with self.subTest(name):
-            self.lsc = getattr(NLEval.data, name)(self.tmp_dir, **opts)
+            self.lsc = getattr(nleval.data, name)(self.tmp_dir, **opts)
 
     @pytest.mark.longruns
     def test_hippie(self):
-        self.graph = NLEval.data.HIPPIE(self.tmp_dir, **opts)
+        self.graph = nleval.data.HIPPIE(self.tmp_dir, **opts)
         self.assertEqual(self.graph.size, 17830)
         self.assertEqual(self.graph.num_edges, 767644)
 
     @pytest.mark.longruns
     def test_humannet(self):
-        self.graph = NLEval.data.HumanNet(self.tmp_dir, **opts)
+        self.graph = nleval.data.HumanNet(self.tmp_dir, **opts)
         self.assertEqual(self.graph.size, 17739)
         self.assertEqual(self.graph.num_edges, 848414)
 
     @pytest.mark.longruns
     def test_pcnet(self):
-        self.graph = NLEval.data.PCNet(self.tmp_dir, **opts)
+        self.graph = nleval.data.PCNet(self.tmp_dir, **opts)
         self.assertEqual(self.graph.size, 18256)
         self.assertEqual(self.graph.num_edges, 5190378)
 
     @pytest.mark.longruns
     @pytest.mark.highmemory
     def test_string(self):
-        self.graph = NLEval.data.STRING(self.tmp_dir, **opts)
+        self.graph = nleval.data.STRING(self.tmp_dir, **opts)
         self.assertEqual(self.graph.size, 18480)
         self.assertEqual(self.graph.num_edges, 11019492)
 
@@ -127,13 +127,13 @@ class TestData(unittest.TestCase):
 def test_archive_data_v1(tmpdir):
     print(tmpdir)
     with pytest.raises(ValueError):
-        g = NLEval.data.BioGRID(tmpdir, version="nledata-vDNE-test")
+        g = nleval.data.BioGRID(tmpdir, version="nledata-vDNE-test")
 
     with pytest.raises(DataNotFoundError):
-        g = NLEval.data.HIPPIE(tmpdir, version="nledata-v1.0-test")
+        g = nleval.data.HIPPIE(tmpdir, version="nledata-v1.0-test")
 
     # TODO: check changed version redownload
-    g = NLEval.data.BioGRID(tmpdir, version="nledata-v1.0-test")
+    g = nleval.data.BioGRID(tmpdir, version="nledata-v1.0-test")
     assert g.size == 19276
     assert g.num_edges == 1100282
 

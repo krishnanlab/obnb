@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from NLEval.feature import MultiFeatureVec
+from nleval.feature import MultiFeatureVec
 
 
 class Data:

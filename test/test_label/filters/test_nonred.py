@@ -1,7 +1,7 @@
 import pytest
 
-from NLEval.label import LabelsetCollection
-from NLEval.label.filters.nonred import (
+from nleval.label import LabelsetCollection
+from nleval.label.filters.nonred import (
     BaseLabelsetNonRedFilter,
     LabelsetNonRedFilterJaccard,
     LabelsetNonRedFilterOverlap,

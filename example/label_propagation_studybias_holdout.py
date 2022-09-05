@@ -2,10 +2,10 @@ import numpy as np
 from sklearn.metrics import roc_auc_score as auroc
 from utils import load_data, print_expected
 
-from NLEval import Dataset
-from NLEval.label.split import RatioPartition
-from NLEval.model.label_propagation import OneHopPropagation
-from NLEval.model_trainer import LabelPropagationTrainer
+from nleval import Dataset
+from nleval.label.split import RatioPartition
+from nleval.model.label_propagation import OneHopPropagation
+from nleval.model_trainer import LabelPropagationTrainer
 
 # Load dataset
 g, lsc, converter = load_data()

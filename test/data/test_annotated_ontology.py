@@ -3,10 +3,10 @@ import os.path as osp
 import pytest
 import yaml
 
-import NLEval
-from NLEval.data.annotated_ontology.disgenet import DisGeNet
-from NLEval.label.filters import LabelsetRangeFilterSize
-from NLEval.util.path import hexdigest
+import nleval
+from nleval.data.annotated_ontology.disgenet import DisGeNet
+from nleval.label.filters import LabelsetRangeFilterSize
+from nleval.util.path import hexdigest
 
 
 @pytest.mark.mediumruns
@@ -16,7 +16,7 @@ def test_disgenet(tmpdir, caplog, mocker, subtests):
     hexhash = hexdigest(yaml.dump(filter_.to_config()))
     config_path = osp.join(datadir, "processed", ".cache", hexhash, "config.yaml")
     spy = mocker.spy(
-        NLEval.data.annotated_ontology.disgenet.DisGeNet,
+        nleval.data.annotated_ontology.disgenet.DisGeNet,
         "apply_transform",
     )
     transform_called = 0

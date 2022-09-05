@@ -2,8 +2,8 @@ import unittest
 
 import numpy as np
 
-from NLEval.graph import DenseGraph, SparseGraph
-from NLEval.model import label_propagation
+from nleval.graph import DenseGraph, SparseGraph
+from nleval.model import label_propagation
 
 
 class TestLabelPropagation(unittest.TestCase):

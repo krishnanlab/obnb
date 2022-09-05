@@ -2,7 +2,7 @@ import shutil
 import tempfile
 import unittest
 
-from NLEval.util import converter
+from nleval.util import converter
 
 
 class TestMyGeneInfoConverter(unittest.TestCase):

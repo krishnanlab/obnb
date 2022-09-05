@@ -1,9 +1,9 @@
 from utils import load_data
 
-from NLEval import Dataset
-from NLEval.label.split import RatioPartition
-from NLEval.metric import auroc
-from NLEval.model_trainer.graphgym import GraphGymTrainer, graphgym_model_wrapper
+from nleval import Dataset
+from nleval.label.split import RatioPartition
+from nleval.metric import auroc
+from nleval.model_trainer.graphgym import GraphGymTrainer, graphgym_model_wrapper
 
 # Load dataset (with sparse graph)
 g, lsc, converter = load_data(

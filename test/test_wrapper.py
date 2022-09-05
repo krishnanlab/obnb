@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 
-from NLEval.util.parallel import ParDat, ParDatMap
+from nleval.util.parallel import ParDat, ParDatMap
 
 
 class TestParDatLogReg(unittest.TestCase):

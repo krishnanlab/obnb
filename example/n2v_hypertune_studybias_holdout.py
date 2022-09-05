@@ -8,10 +8,10 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
 from utils import load_data
 
-from NLEval.feature import FeatureVec, MultiFeatureVec
-from NLEval.label.filters import LabelsetRangeFilterSplit
-from NLEval.label.split import RatioPartition
-from NLEval.model_trainer import (
+from nleval.feature import FeatureVec, MultiFeatureVec
+from nleval.label.filters import LabelsetRangeFilterSplit
+from nleval.label.split import RatioPartition
+from nleval.model_trainer import (
     MultiSupervisedLearningTrainer,
     SupervisedLearningTrainer,
 )

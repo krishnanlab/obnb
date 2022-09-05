@@ -4,9 +4,9 @@ import pandas as pd
 from tqdm import tqdm
 from utils import print_expected
 
-from NLEval.data import DisGeNet
-from NLEval.exception import IDNotExistError
-from NLEval.graph import OntologyGraph
+from nleval.data import DisGeNet
+from nleval.exception import IDNotExistError
+from nleval.graph import OntologyGraph
 
 data_root_dir = osp.join(osp.pardir, "datasets")
 DisGeNet(data_root_dir)  # download DisGeNet data

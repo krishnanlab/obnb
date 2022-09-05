@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from NLEval.feature import FeatureVec
-from NLEval.util.idhandler import IDmap
+from nleval.feature import FeatureVec
+from nleval.util.idhandler import IDmap
 
 
 class Data:

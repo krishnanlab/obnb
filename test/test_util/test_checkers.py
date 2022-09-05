@@ -2,8 +2,8 @@ import unittest
 
 import numpy as np
 
-from NLEval.typing import FLOAT_TYPE, INT_TYPE, Iterable
-from NLEval.util import checkers
+from nleval.typing import FLOAT_TYPE, INT_TYPE, Iterable
+from nleval.util import checkers
 
 
 class TestCheckers(unittest.TestCase):

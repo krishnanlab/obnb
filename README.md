@@ -40,7 +40,7 @@ source install.sh cu102  # other options are [cpu,cu113]
 ### Load network and labels
 
 ```python
-from NLEval import data
+from nleval import data
 
 root = "datasets"  # save dataset and cache under the datasets/ directory
 
@@ -55,9 +55,9 @@ lsc = data.DisGeNet(root, version="latest")
 ### Setting up data and splits
 
 ```python
-from NLEval import Dataset
-from NLEval.util.converter import GenePropertyConverter
-from NLEval.label.split import RatioHoldout
+from nleval import Dataset
+from nleval.util.converter import GenePropertyConverter
+from nleval.label.split import RatioHoldout
 
 # Load PubMed count gene propery converter and use it to set up study-bias holdout split
 pubmedcnt_converter = GenePropertyConverter(root, name="PubMedCount")
@@ -73,8 +73,8 @@ dataset = Dataset(graph=g, feature=g.to_dense_graph().to_feature(), y=y, masks=m
 ```python
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
-from NLEval.model.label_propagation import OneHopPropagation
-from NLEval.model_trainer import SupervisedLearningTrainer, LabelPropagationTrainer
+from nleval.model.label_propagation import OneHopPropagation
+from nleval.model_trainer import SupervisedLearningTrainer, LabelPropagationTrainer
 
 # Specify model(s) and metrics
 sl_mdl = LogisticRegression(penalty="l2", solver="lbfgs")
@@ -89,7 +89,7 @@ lp_results = LabelPropagationTrainer(metrics).train(lp_mdl, dataset)
 
 ```python
 from torch_geometric.nn import GCN
-from NLEval.model_trainer.gnn import SimpleGNNTrainer
+from nleval.model_trainer.gnn import SimpleGNNTrainer
 
 # Prepare study-bias holdout split on the whole geneset collection, do not consider defined negatives
 y, masks = lsc.split(splitter, target_ids=g.node_ids, consider_negative=False)

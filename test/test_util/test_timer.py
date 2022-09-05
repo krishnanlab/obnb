@@ -1,7 +1,7 @@
 import unittest
 from time import sleep
 
-from NLEval.util import timer
+from nleval.util import timer
 
 
 class TestTimer(unittest.TestCase):

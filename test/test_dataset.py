@@ -1,10 +1,10 @@
 import numpy as np
 import pytest
 
-from NLEval.dataset import Dataset
-from NLEval.exception import IDNotExistError
-from NLEval.feature import MultiFeatureVec
-from NLEval.graph.dense import DenseGraph
+from nleval.dataset import Dataset
+from nleval.exception import IDNotExistError
+from nleval.feature import MultiFeatureVec
+from nleval.graph.dense import DenseGraph
 
 
 class Data:
@@ -184,7 +184,7 @@ def test_get_feat_fraom_idxs_dual(subtests, data):
     with pytest.raises(
         TypeError,
         match="'dual' mode only works when the feature is of type MultiFeatureVec, "
-        "but received type <class 'NLEval.graph.dense.DenseGraph'>",
+        "but received type <class 'nleval.graph.dense.DenseGraph'>",
     ):
         dataset = Dataset(feature=data.graph.to_feature(), dual=True)
 

@@ -3,9 +3,9 @@ from sklearn.metrics import roc_auc_score as auroc
 from torch_geometric.nn import GCN
 from utils import load_data
 
-from NLEval import Dataset
-from NLEval.label.split import RatioPartition
-from NLEval.model_trainer.gnn import SimpleGNNTrainer
+from nleval import Dataset
+from nleval.label.split import RatioPartition
+from nleval.model_trainer.gnn import SimpleGNNTrainer
 
 # Load dataset (with sparse graph)
 g, lsc, converter = load_data(

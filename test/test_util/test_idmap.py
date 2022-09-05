@@ -2,9 +2,9 @@ import unittest
 
 import numpy as np
 
-from NLEval.exception import IDExistsError, IDNotExistError
-from NLEval.feature import FeatureVec
-from NLEval.util import idhandler
+from nleval.exception import IDExistsError, IDNotExistError
+from nleval.feature import FeatureVec
+from nleval.util import idhandler
 
 
 class TestIDmap(unittest.TestCase):

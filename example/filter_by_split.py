@@ -4,10 +4,10 @@ import numpy as np
 from sklearn.metrics import roc_auc_score as auroc
 from utils import load_data, print_expected
 
-from NLEval.label.filters import LabelsetRangeFilterSplit
-from NLEval.label.split import RatioPartition
-from NLEval.model.label_propagation import OneHopPropagation
-from NLEval.model_trainer import LabelPropagationTrainer
+from nleval.label.filters import LabelsetRangeFilterSplit
+from nleval.label.split import RatioPartition
+from nleval.model.label_propagation import OneHopPropagation
+from nleval.model_trainer import LabelPropagationTrainer
 
 # Load daatset
 g, lsc, converter = load_data(sparse=True)

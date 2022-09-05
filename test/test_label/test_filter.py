@@ -1,6 +1,6 @@
 import unittest
 
-from NLEval.label import LabelsetCollection, filters, split
+from nleval.label import LabelsetCollection, filters, split
 
 
 class TestFilter(unittest.TestCase):

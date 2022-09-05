@@ -3,9 +3,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
 from utils import load_data, print_expected
 
-from NLEval import Dataset
-from NLEval.label.split import RatioPartition
-from NLEval.model_trainer import SupervisedLearningTrainer
+from nleval import Dataset
+from nleval.label.split import RatioPartition
+from nleval.model_trainer import SupervisedLearningTrainer
 
 # Load dataset
 g, lsc, converter = load_data()

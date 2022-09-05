@@ -13,9 +13,9 @@ line_length = 88
 ignore_missing_imports = true
 follow_imports = "skip"
 exclude = [
-    "src/NLEval/graph/",
-    "src/NLEval/valsplit/",
-    "src/NLEval/metrics.py",
+    "src/nleval/graph/",
+    "src/nleval/valsplit/",
+    "src/nleval/metrics.py",
 ]
 
 [[tool.mypy.overrides]]

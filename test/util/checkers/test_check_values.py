@@ -1,7 +1,7 @@
 import pytest
 
-from NLEval.typing import Literal
-from NLEval.util.checkers import checkLiteral
+from nleval.typing import Literal
+from nleval.util.checkers import checkLiteral
 
 
 def test_check_literal():

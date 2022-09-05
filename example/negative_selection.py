@@ -1,7 +1,7 @@
 from utils import print_expected
 
-from NLEval.data import GOBP
-from NLEval.label import filters
+from nleval.data import GOBP
+from nleval.label import filters
 
 # specify p-val threshold
 p_thresh = 0.05

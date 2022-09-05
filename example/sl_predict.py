@@ -2,9 +2,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score as auroc
 from utils import load_data
 
-from NLEval import Dataset
-from NLEval.label.split import AllHoldout
-from NLEval.model_trainer import SupervisedLearningTrainer
+from nleval import Dataset
+from nleval.label.split import AllHoldout
+from nleval.model_trainer import SupervisedLearningTrainer
 
 i = 24  # index of labelset
 k = 50  # numbers of top genes to display
