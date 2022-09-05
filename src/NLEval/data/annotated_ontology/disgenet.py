@@ -74,7 +74,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
                 "UNIPROT",  # UniProt/SwissProt data base
             ]
         else:
-            return self._data_sources
+            return self._data_sources  # type: ignore
 
     @property
     def _default_pre_transform(self):

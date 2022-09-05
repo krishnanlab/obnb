@@ -63,7 +63,7 @@ class GeneOntology(BaseAnnotatedOntologyData):
                 "IC",  # Inferred by Curator
             ]
         else:
-            return self._data_sources
+            return self._data_sources  # type: ignore
 
     @property
     def qualifiers(self) -> List[str]:
@@ -84,7 +84,7 @@ class GeneOntology(BaseAnnotatedOntologyData):
                 "part_of",
             ]
         else:
-            return self._data_sources
+            return self._data_sources  # type: ignore
 
     @property
     def _default_pre_transform(self):
