@@ -31,7 +31,7 @@ def load_data(
             on hypergeometric test (default: :obj:`True`).
 
     """
-    data_version = "nledata-v0.1.0-dev"
+    data_version = "nledata-v0.1.0-dev1"
     save_dir = "datasets"
     print(f"{network=}\n{label=}")
 

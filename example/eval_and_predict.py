@@ -55,6 +55,6 @@ print(
 )
 
 print_expected(
-    "Average training score = 0.9958, std = 0.0021",
-    "Average testing score = 0.6119, std = 0.0808",
+    "Average training score = 0.9955, std = 0.0018",
+    "Average testing score = 0.6308, std = 0.0887",
 )
