@@ -32,3 +32,11 @@ repos:
     hooks:
       - id: black
         args: ["--safe"]
+
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.14
+    hooks:
+      - id: mdformat
+        name: Format markdown
+        additional_dependencies:
+          - mdformat-gfm
