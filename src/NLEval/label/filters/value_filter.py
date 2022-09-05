@@ -1,5 +1,5 @@
-from NLEval.typing import List
 from NLEval.label.filters.base import BaseFilter
+from NLEval.typing import List
 
 
 class BaseValueFilter(BaseFilter):

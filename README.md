@@ -7,153 +7,134 @@
 
 ## Installation
 
-Clone the repository first and then install via ``pip``
+Clone the repository first and then install via `pip`
 
 ```bash
-git clone https://github.com/krishnanlab/NetworkLearningEval
-cd NetworkLearningEval
+git clone https://github.com/krishnanlab/NetworkLearningEval && cd NetworkLearningEval
 pip install -e .
 ```
 
-The ``-e`` option means 'editable', i.e. no need to reinstall the library if you make changes to the source code.
-Feel free to not use the ``-e`` option and simply do ``pip install .`` if you do not plan on modifying the source code.
+The `-e` option means 'editable', i.e. no need to reinstall the library if you make changes to the source code.
+Feel free to not use the `-e` option and simply do `pip install .` if you do not plan on modifying the source code.
 
 ### Optional Pytorch Geometric installation
 
-One can install [Pytorch Geomtric](https://github.com/pyg-team/pytorch_geometric) to enable some GNN related features.
+User need to install [Pytorch Geomtric](https://github.com/pyg-team/pytorch_geometric) to enable some GNN related features.
 To install PyG, first need to install [PyTorch](https://pytorch.org).
 For full details about installation instructions, visit the links above.
 Assuming the system has Python3.8 or above installed, with CUDA10.2, use the following to install both PyTorch and PyG.
 
 ```bash
-conda install pytorch=1.9 torchvision torchaudio cudatoolkit=10.2 -c pytorch
-conda install pyg -c pyg -c conda-forge
+conda install pytorch=1.12.1 torchvision cudatoolkit=10.2 -c pytorch
+pip install torch-geometric==2.0.4 torch-scatter torch-sparse torch-cluster -f https://data.pyg.org/whl/torch-1.12.1+cu102.html
 ```
 
-Note: To support some new features in PyG that are not yet released, need to install from the repo directly:
-```bash
-pip install git+https://github.com/pyg-team/pytorch_geometric.git#egg=torch-geometric[full]
-```
-
-### Full dev installation
+### Quick install using the installatino script
 
 ```bash
-conda create -n nle-dev-pyg python=3.9 -y && conda activate nle-dev-pyg
-pip install -e .[dev]
-conda install pytorch=1.11.0 torchvision=0.12.0 cudatoolkit=10.2 -c pytorch -y
-pip install torch-scatter torch-sparse torch-cluster -f https://data.pyg.org/whl/torch-1.11.0+cu102.html
-pip install git+https://github.com/pyg-team/pytorch_geometric.git#egg=torch-geometric[full]
-conda clean --all -y
+source install.sh cu102  # other options are [cpu,cu113]
 ```
 
 ## Quick Demonstration
 
 ### Load network and labels
 
-Directly load the network and labels from online resouces.
-Once it is processed and saved to the specified root directory, next execution would use the saved processed files directly.
-
 ```python
 from NLEval import data
 
-root = "datasets/"
+root = "datasets"  # save dataset and cache under the datasets/ directory
 
-# Load BioGRID and save to datasets/
-g = data.BioGRID(root)
+# Load processed BioGRID data from archive.
+# Alternatively, set version="latest" to get and process the newest data from scratch.
+g = data.BioGRID(root, version="nledata-v0.1.0-dev1")
 
-# Load DisGeNet and save to datasets/
-lsc = data.DisGeNet(root)
+# Load DisGeNet gene set collections.
+lsc = data.DisGeNet(root, version="latest")
 ```
-
-Alternatively, could load from local files as shown in the following examplse.
 
 ### Setting up data and splits
 
 ```python
-from NLEval import graph, label, model_trainer
+from NLEval import Dataset
+from NLEval.util.converter import GenePropertyConverter
+from NLEval.label.split import RatioHoldout
 
-# Load a weighted undirected graph from an edge list file
-g = graph.DenseGraph.from_edglst("data/networks/STRING-EXP.edg", weighted=True, directed=False)
+# Load PubMed count gene propery converter and use it to set up study-bias holdout split
+pubmedcnt_converter = GenePropertyConverter(root, name="PubMedCount")
+splitter = RatioHoldout(0.6, 0.4, ascending=False, property_converter=pubmedcnt_converter)
+y, masks = lsc.split(splitter, target_ids=g.node_ids, labelset_name=label_id, consider_negative=True)
 
-# Load geneset collection from a GMT file
-lsc = label.LabelsetCollection.from_gmt("data/labels/KEGGBP.gmt")
-
-# Remove genes not present in the network from the geneset collection
-lsc.iapply(label.filters.EntityExistenceFilter(g.node_ids))
-
-# Remove small genesets
-lsc.iapply(label.filters.LabelsetRangeFilterSize(min_val=50))
-
-# Generate negatives via hypergeometric test
-lsc.iapply(label.filters.NegativeGeneratorHypergeom(p_thresh=0.05))
-
-# Load PubMed count and use it to setup study-bias holdout split
-lsc.load_entity_properties("data/properties/PubMedCount.txt", "PubMed Count", 0, int)
-splitter = RatioHoldout(0.6, 0.4, ascending=False)
+# Combine everything into a dataset object
+dataset = Dataset(graph=g, feature=g.to_dense_graph().to_feature(), y=y, masks=masks)
 ```
 
 ### Evaluating models on the processed dataset
+
 ```python
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 from NLEval.model.label_propagation import OneHopPropagation
 from NLEval.model_trainer import SupervisedLearningTrainer, LabelPropagationTrainer
 
-# Prepare study-bias holdout split on a specific geneset, taking into account of defined negatives
-y, masks = lsc.split(splitter, target_ids=g.node_ids, labelset_name=label_id, property_name="PubMedCount", consider_negative=True)
-
 # Specify model(s) and metrics
 sl_mdl = LogisticRegression(penalty="l2", solver="lbfgs")
 lp_mdl = OneHopPropagation()
 metrics = {"auroc": roc_auc_score}
 
-sl_results = SupervisedLearningTrainer(metrics, g).train(sl_mdl, y, masks)
-lp_results = LabelPropagationTrainer(metrics, g).train(lp_mdl, y, masks)
+sl_results = SupervisedLearningTrainer(metrics).train(sl_mdl, dataset)
+lp_results = LabelPropagationTrainer(metrics).train(lp_mdl, dataset)
 ```
 
 ### Evaluating GNN models on the processed dataset
+
 ```python
 from torch_geometric.nn import GCN
 from NLEval.model_trainer.gnn import SimpleGNNTrainer
 
 # Prepare study-bias holdout split on the whole geneset collection, do not consider defined negatives
-y, masks = lsc.split(splitter, target_ids=g.node_ids, property_name="PubMedCount")
+y, masks = lsc.split(splitter, target_ids=g.node_ids, consider_negative=False)
+dataset = Dataset(graph=g, feature=g.to_dense_graph().to_feature(), y=y, masks=masks)
 
 # Evaluate GCN on the whole geneset collection
 gcn_mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=n_tasks)
-gcn_results = SimpleGNNTrainer(metrics, g, device="cuda", metric_best="auroc").train(mdl, y, masks)
+gcn_results = SimpleGNNTrainer(metrics, device="cuda", metric_best="auroc").train(mdl, dataset)
 ```
 
-## Contributing
+## Dev notes
 
-### Additional packages used for dev
-
-* [tox](https://tox.wiki/en/latest/index.html)
-* [pytest](https://docs.pytest.org/en/6.2.x/)
-* [pytest-cov](https://pypi.org/project/pytest-cov/)
-* [pytest-subtest](https://pypi.org/project/pytest-subtests/)
-* [pre-commit](https://github.com/pre-commit/pre-commit)
-
-See ``requirements-dev.txt``. Run the following to install all dev dependencies
+### Dev installation
 
 ```bash
-$ pip install -r requirements-dev.txt
+pip install -r requirements.txt  # install dependencies with pinned version
+pip install -e ".[dev]"  # install extra dependencies for dev
 ```
 
 ### Testing
 
-Simply run ``pytest`` to run all tests
+Run `pytest` to run all tests
 
 ```bash
-$ pytest
-```
-
-Alternatively, can also show the coverage report
-```bash
-$ pytest --cov src/NLEval
+pytest
 ```
 
 Run type checks and coding style checks using mypy and flake8 via tox:
+
 ```bash
 $ tox -e mypy,flake8
 ```
+
+### Data preparation and releasing
+
+First, bump data version in `__init__.py` to the next data release version, e.g., `nledata-v0.1.0 -> nledata-v0.1.1-dev`.
+Then, download and process all latest data by running
+
+```bash
+python script/release_data.py
+```
+
+By default, the data ready to be uploaded (e.g., to [Zenodo](zenodo.org)) is saved under `data_release/archived`.
+After some necessary inspection and checking, if everything looks good, upload and publish the new archived data.
+
+**Note:** `dev` data should be uploaded to the [sandbox](https://sandbox.zenodo.org/record/1097545#.YxYrqezMJzV) instead.
+
+Finally, commit and push the bumped version.

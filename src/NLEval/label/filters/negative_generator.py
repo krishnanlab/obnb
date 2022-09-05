@@ -4,8 +4,8 @@ import numpy as np
 from scipy.stats import hypergeom
 from tqdm import tqdm
 
-from NLEval.typing import List
 from NLEval.label.filters.base import BaseFilter
+from NLEval.typing import List
 
 
 class NegativeGeneratorHypergeom(BaseFilter):
