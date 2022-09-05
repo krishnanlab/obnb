@@ -50,78 +50,65 @@ conda clean --all -y
 
 ### Load network and labels
 
-Directly load the network and labels from online resouces.
-Once it is processed and saved to the specified root directory, next execution would use the saved processed files directly.
-
 ```python
 from NLEval import data
 
-root = "datasets/"
+root = "datasets"  # save dataset and cache under the datasets/ directory
 
-# Load BioGRID and save to datasets/
-g = data.BioGRID(root)
+# Load processed BioGRID data from archive.
+# Alternatively, set version="latest" to get and process the newest data from scratch.
+g = data.BioGRID(root, version="nledata-v0.1.0-dev1")
 
-# Load DisGeNet and save to datasets/
-lsc = data.DisGeNet(root)
+# Load DisGeNet gene set collections.
+lsc = data.DisGeNet(root, version="latest")
 ```
-
-Alternatively, could load from local files as shown in the following examplse.
 
 ### Setting up data and splits
 
 ```python
-from NLEval import graph, label, model_trainer
+from NLEval import Dataset
+from NLEval.util.converter import GenePropertyConverter
+from NLEval.label.split import RatioHoldout
 
-# Load a weighted undirected graph from an edge list file
-g = graph.DenseGraph.from_edglst("data/networks/STRING-EXP.edg", weighted=True, directed=False)
+# Load PubMed count gene propery converter and use it to set up study-bias holdout split
+pubmedcnt_converter = GenePropertyConverter(root, name="PubMedCount")
+splitter = RatioHoldout(0.6, 0.4, ascending=False, property_converter=pubmedcnt_converter)
+y, masks = lsc.split(splitter, target_ids=g.node_ids, labelset_name=label_id, consider_negative=True)
 
-# Load geneset collection from a GMT file
-lsc = label.LabelsetCollection.from_gmt("data/labels/KEGGBP.gmt")
-
-# Remove genes not present in the network from the geneset collection
-lsc.iapply(label.filters.EntityExistenceFilter(g.node_ids))
-
-# Remove small genesets
-lsc.iapply(label.filters.LabelsetRangeFilterSize(min_val=50))
-
-# Generate negatives via hypergeometric test
-lsc.iapply(label.filters.NegativeGeneratorHypergeom(p_thresh=0.05))
-
-# Load PubMed count and use it to setup study-bias holdout split
-lsc.load_entity_properties("data/properties/PubMedCount.txt", "PubMed Count", 0, int)
-splitter = RatioHoldout(0.6, 0.4, ascending=False)
+# Combine everything into a dataset object
+dataset = Dataset(graph=g, feature=g.to_dense_graph().to_feature(), y=y, masks=masks)
 ```
 
 ### Evaluating models on the processed dataset
+
 ```python
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 from NLEval.model.label_propagation import OneHopPropagation
 from NLEval.model_trainer import SupervisedLearningTrainer, LabelPropagationTrainer
 
-# Prepare study-bias holdout split on a specific geneset, taking into account of defined negatives
-y, masks = lsc.split(splitter, target_ids=g.node_ids, labelset_name=label_id, property_name="PubMedCount", consider_negative=True)
-
 # Specify model(s) and metrics
 sl_mdl = LogisticRegression(penalty="l2", solver="lbfgs")
 lp_mdl = OneHopPropagation()
 metrics = {"auroc": roc_auc_score}
 
-sl_results = SupervisedLearningTrainer(metrics, g).train(sl_mdl, y, masks)
-lp_results = LabelPropagationTrainer(metrics, g).train(lp_mdl, y, masks)
+sl_results = SupervisedLearningTrainer(metrics).train(sl_mdl, dataset)
+lp_results = LabelPropagationTrainer(metrics).train(lp_mdl, dataset)
 ```
 
 ### Evaluating GNN models on the processed dataset
+
 ```python
 from torch_geometric.nn import GCN
 from NLEval.model_trainer.gnn import SimpleGNNTrainer
 
 # Prepare study-bias holdout split on the whole geneset collection, do not consider defined negatives
-y, masks = lsc.split(splitter, target_ids=g.node_ids, property_name="PubMedCount")
+y, masks = lsc.split(splitter, target_ids=g.node_ids, consider_negative=False)
+dataset = Dataset(graph=g, feature=g.to_dense_graph().to_feature(), y=y, masks=masks)
 
 # Evaluate GCN on the whole geneset collection
 gcn_mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=n_tasks)
-gcn_results = SimpleGNNTrainer(metrics, g, device="cuda", metric_best="auroc").train(mdl, y, masks)
+gcn_results = SimpleGNNTrainer(metrics, device="cuda", metric_best="auroc").train(mdl, dataset)
 ```
 
 ## Contributing
