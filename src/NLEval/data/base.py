@@ -84,7 +84,7 @@ class BaseData:
         self.version = version
         self.log_level = log_level
         self.cache_transform = cache_transform
-        self._set_gene_id_converter(gene_id_converter)
+        self.gene_id_converter = gene_id_converter
 
         self.pre_transform = pre_transform
         self._setup_redos(redownload, reprocess, retransform)
@@ -139,21 +139,17 @@ class BaseData:
             log_level=self.log_level,
         )
 
-    @property
-    def gene_id_converter(self) -> Mapping[str, str]:
-        return self._gene_id_converter
-
-    def _set_gene_id_converter(self, gene_id_converter):
-        if gene_id_converter is None:
-            self._gene_id_converter = {}
-        elif isinstance(gene_id_converter, str):
-            self._gene_id_converter = MyGeneInfoConverter.construct(
-                gene_id_converter,
+    def get_gene_id_converter(self) -> Mapping[str, str]:
+        if self.gene_id_converter is None:
+            return {}
+        elif isinstance(self.gene_id_converter, str):
+            return MyGeneInfoConverter.construct(
+                self.gene_id_converter,
                 root=self.root,
                 log_level=self.log_level,
             )
         else:
-            self._gene_id_converter = gene_id_converter
+            return self.gene_id_converter
 
     @property
     def _default_pre_transform(self) -> Any:

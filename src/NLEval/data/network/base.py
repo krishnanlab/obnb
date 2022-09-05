@@ -78,7 +78,7 @@ class BaseNdexData(BaseData, SparseGraph):
         )
         cx_graph.read_cx_stream_file(
             self.raw_file_path(0),
-            node_id_converter=self.gene_id_converter,
+            node_id_converter=self.get_gene_id_converter(),
             **self.cx_kwargs,
         )
         if self.largest_comp:
