@@ -127,13 +127,21 @@ class TestData(unittest.TestCase):
 def test_archive_data_v1(tmpdir):
     print(tmpdir)
     with pytest.raises(ValueError):
-        g = nleval.data.BioGRID(tmpdir, version="nledata-vDNE-test")
+        g = nleval.data.BioGRID(
+            tmpdir,
+            version="nledata-vDNE-test",
+            download_cache=False,
+        )
 
     with pytest.raises(DataNotFoundError):
-        g = nleval.data.HIPPIE(tmpdir, version="nledata-v1.0-test")
+        g = nleval.data.HIPPIE(
+            tmpdir,
+            version="nledata-v1.0-test",
+            download_cache=False,
+        )
 
     # TODO: check changed version redownload
-    g = nleval.data.BioGRID(tmpdir, version="nledata-v1.0-test")
+    g = nleval.data.BioGRID(tmpdir, version="nledata-v1.0-test", download_cache=False)
     assert g.size == 19276
     assert g.num_edges == 1100282
 

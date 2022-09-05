@@ -47,6 +47,7 @@ class BaseData:
         pre_transform: Any = "default",
         transform: Optional[Any] = None,
         cache_transform: bool = True,
+        download_cache: bool = True,
         gene_id_converter: Optional[Union[Mapping[str, str], str]] = "HumanEntrez",
         **kwargs,
     ):
@@ -68,6 +69,8 @@ class BaseData:
             cache_transform: Whether or not to cache the transformed data. The
                 cached transformed data will be saved under
                 `<data_root_directory>/processed/.cache/`.
+            download_cache: If set to True, then check to see if <root>/.cache
+                exists, and if not, pull the cache from versioned archive.
             gene_id_converter (Union[Mapping[str, str], str], optional): A
                 mapping object that maps a given node ID to a new node ID of
                 interest. Or the name of a predefined MygeneInfoConverter
@@ -84,6 +87,7 @@ class BaseData:
         self.version = version
         self.log_level = log_level
         self.cache_transform = cache_transform
+        self.download_cache = download_cache
         self.gene_id_converter = gene_id_converter
 
         self.pre_transform = pre_transform
@@ -392,7 +396,7 @@ class BaseData:
 
         return data_url
 
-    def download_archive(self, version: str, download_cache: bool = True):
+    def download_archive(self, version: str):
         """Load data from archived version that ensures reproducibility.
 
         Note:
@@ -401,15 +405,13 @@ class BaseData:
 
         Args:
             version: Archival verion.
-            download_cache: If set to True, then check to see if <root>/.cache
-                exists, and if not, pull the cache from versioned archive.
 
         """
         self.plogger.info(f"Loading {self.classname} ({version=})...")
         data_url = self.get_data_url(version)
         download_unzip(data_url, self.root, logger=self.plogger)
 
-        if not osp.isdir(osp.join(self.root, ".cache")):
+        if self.download_cache and not osp.isdir(osp.join(self.root, ".cache")):
             cache_url = self.get_data_url(version, cache=True)
             download_unzip(cache_url, self.root, logger=self.plogger)
 
