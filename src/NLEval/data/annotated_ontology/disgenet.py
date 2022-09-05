@@ -15,7 +15,7 @@ from NLEval.label.filters import (
     LabelsetNonRedFilterOverlap,
     LabelsetRangeFilterSize,
 )
-from NLEval.typing import List
+from NLEval.typing import List, Optional
 from NLEval.util.logger import display_pbar
 
 
@@ -34,7 +34,10 @@ class DisGeNet(BaseAnnotatedOntologyData):
 
     """
 
-    CONFIG_KEYS: List[str] = BaseAnnotatedOntologyData.CONFIG_KEYS + ["dsi_threshold"]
+    CONFIG_KEYS: List[str] = BaseAnnotatedOntologyData.CONFIG_KEYS + [
+        "dsi_threshold",
+        "data_sources",
+    ]
     ontology_url = "http://purl.obolibrary.org/obo/doid.obo"
     annotation_url = "https://www.disgenet.org/static/disgenet_ap1/files/downloads/all_gene_disease_associations.tsv.gz"
     ontology_file_name = "doid.obo"
@@ -48,6 +51,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
         max_size: int = 600,
         overlap: float = 0.7,
         jaccard: float = 0.5,
+        data_sources: Optional[List[str]] = None,
         **kwargs,
     ):
         """Initialize the DisGeNet data object."""
@@ -56,7 +60,24 @@ class DisGeNet(BaseAnnotatedOntologyData):
         self.max_size = max_size
         self.jaccard = jaccard
         self.overlap = overlap
+        self._data_sources = data_sources
         super().__init__(root, **kwargs)
+
+    @property
+    def data_sources(self) -> List[str]:
+        if self._data_sources is not None:
+            return self._data_sources
+        else:
+            return [
+                "CGI",
+                "CLINGEN",
+                "CTD_human",
+                "GENOMICS_ENGLAND",
+                "HPO",
+                "ORPHANET",
+                "PSYGENET",
+                "UNIPROT",
+            ]
 
     @property
     def _default_pre_transform(self):
@@ -81,11 +102,15 @@ class DisGeNet(BaseAnnotatedOntologyData):
             self.ontology_file_path,
             xref_prefix="UMLS_CUI",
         )
-        annot_df = pd.read_csv(self.annotation_file_path, sep="\t")
 
-        sub_df = annot_df[annot_df["DSI"] >= self.dsi_threshold]
+        annot_df = pd.read_csv(self.annotation_file_path, sep="\t")
+        annot_df = annot_df[
+            annot_df.source.str.split(";", expand=True).isin(self.data_sources).any(1)
+            & (annot_df["DSI"] >= self.dsi_threshold)
+        ]
+
         enable_pbar = display_pbar(self.log_level)
-        pbar = tqdm(sub_df[["geneId", "diseaseId"]].values, disable=not enable_pbar)
+        pbar = tqdm(annot_df[["geneId", "diseaseId"]].values, disable=not enable_pbar)
         pbar.set_description("Annotating DOIDs")
         for gene_id, disease_id in pbar:
             for doid in umls_to_doid[disease_id]:
