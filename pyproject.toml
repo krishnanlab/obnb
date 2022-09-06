@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nleval"
-version = "0.1.0-dev2"
+version = "0.1.0-dev3"
 description = "A Python toolkit for biological network learning evaluation"
 readme = "README.md"
 
