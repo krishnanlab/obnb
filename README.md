@@ -29,7 +29,7 @@ conda install pytorch=1.12.1 torchvision cudatoolkit=10.2 -c pytorch
 pip install torch-geometric==2.0.4 torch-scatter torch-sparse torch-cluster -f https://data.pyg.org/whl/torch-1.12.1+cu102.html
 ```
 
-### Quick install using the installatino script
+### Quick install using the installation script
 
 ```bash
 source install.sh cu102  # other options are [cpu,cu113]
