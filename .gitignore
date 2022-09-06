@@ -1,15 +1,17 @@
+# Build
+build/
+dist/
+*.egg-info/
+
+# System
 __pycache__
 *.DS_Store
 .ipynb_checkpoints/
 ._*.py
 .vs
-
-*.egg-info/
-
-# vim buffer
 *.swp
 
-# Unit test / coverage reports
+# Test caches
 htmlcov/
 .tox/
 .coverage
