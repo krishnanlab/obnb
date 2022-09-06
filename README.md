@@ -93,7 +93,7 @@ from nleval.model_trainer.gnn import SimpleGNNTrainer
 
 # Prepare study-bias holdout split on the whole geneset collection, do not consider defined negatives
 y, masks = lsc.split(splitter, target_ids=g.node_ids, consider_negative=False)
-dataset = Dataset(graph=g, feature=g.to_dense_graph().to_feature(), y=y, masks=masks)
+dataset = Dataset(graph=g, y=y, masks=masks)  # use 1-d trivial node feature if feature is not set
 
 # Evaluate GCN on the whole geneset collection
 gcn_mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=n_tasks)
