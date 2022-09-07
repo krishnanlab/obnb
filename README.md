@@ -100,7 +100,7 @@ dataset = Dataset(graph=g, y=y, masks=masks)  # use 1-d trivial node feature if 
 
 # Evaluate GCN on the whole geneset collection
 gcn_mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=n_tasks)
-gcn_results = SimpleGNNTrainer(metrics, device="cuda", metric_best="auroc").train(mdl, dataset)
+gcn_results = SimpleGNNTrainer(metrics, device="cuda", metric_best="auroc").train(gcn_mdl, dataset)
 ```
 
 ## Dev notes
