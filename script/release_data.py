@@ -1,7 +1,7 @@
 import os.path as osp
 from pathlib import Path
 from pprint import pformat
-from shutil import make_archive
+from shutil import make_archive, rmtree
 
 import nleval
 import nleval.data
@@ -29,8 +29,20 @@ logger.info(
     f"{new_data_release!r}:\n{pformat(all_data)}",
 )
 
-# TODO: clean up existing data directory
+# Clean up old data
+while osp.isdir(datadir):
+    # TODO: make --allow-dirty option
+    ans = input(f"Release data dir already exists ({datadir}), remove now? [yes/no]")
+    if ans == "yes":
+        logger.info(f"Removing old archives in {datadir}")
+        rmtree(datadir)
+        break
+    elif ans == "no":
+        exit()
+    else:
+        logger.error(f"Unknown option {ans!r}, please answer 'yes' or 'no'")
 
+# Download, process, and archive all data
 for name in all_data:
     getattr(nleval.data, name)(datadir)
     # TODO: validate data and print stats (# ndoes&edges for networks; stats() for lsc)
