@@ -8,7 +8,7 @@ from nleval.data import DisGeNet
 from nleval.exception import IDNotExistError
 from nleval.graph import OntologyGraph
 
-data_root_dir = osp.join(osp.pardir, "datasets")
+data_root_dir = "datasets_disgenet"
 DisGeNet(data_root_dir)  # download DisGeNet data
 
 data_dir = osp.join(data_root_dir, "DisGeNet", "raw")
