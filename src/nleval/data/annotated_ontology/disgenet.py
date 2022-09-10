@@ -5,12 +5,7 @@ from nleval.data.annotated_ontology.base import BaseAnnotatedOntologyData
 from nleval.exception import IDNotExistError
 from nleval.graph import OntologyGraph
 from nleval.label import LabelsetCollection
-from nleval.label.filters import (
-    Compose,
-    LabelsetNonRedFilterJaccard,
-    LabelsetNonRedFilterOverlap,
-    LabelsetRangeFilterSize,
-)
+from nleval.label.filters import Compose, LabelsetNonRedFilter, LabelsetRangeFilterSize
 from nleval.typing import List, Mapping, Optional, Union
 from nleval.util.logger import display_pbar
 
@@ -80,8 +75,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
     def _default_pre_transform(self):
         return Compose(
             LabelsetRangeFilterSize(max_val=self.max_size),
-            LabelsetNonRedFilterOverlap(self.overlap),
-            LabelsetNonRedFilterJaccard(self.jaccard),
+            LabelsetNonRedFilter(self.jaccard, self.overlap),
             LabelsetRangeFilterSize(min_val=self.min_size),
             log_level=self.log_level,
         )
