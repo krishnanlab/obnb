@@ -55,9 +55,9 @@ print(f"{endstr:-^80}\n")
 print_split_stats(lsc, "after")
 
 print_expected(
-    "Number of labelsets after split-filtering: 43",
-    "train:\n\tMinimum number of positives = 33",
-    "\tAverage number of positives = 92.88",
-    "test:\n\tMinimum number of positives = 30",
-    "\tAverage number of positives = 47.93",
+    "Number of labelsets after split-filtering: 17",
+    "train:\n\tMinimum number of positives = 50",
+    "\tAverage number of positives = 72.65",
+    "test:\n\tMinimum number of positives = 29",
+    "\tAverage number of positives = 44.24",
 )

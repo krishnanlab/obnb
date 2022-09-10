@@ -37,6 +37,6 @@ avg_node_attr_size = sum(node_attr_sizes) / g.size
 print(f"Average node attribute size (propagated) = {avg_node_attr_size:.2f}")
 
 print_expected(
-    "Average node attribute size (raw) = 35.44",
-    "Average node attribute size (propagated) = 107.31",
+    "Average node attribute size (raw) = 34.87",
+    "Average node attribute size (propagated) = 103.82",
 )

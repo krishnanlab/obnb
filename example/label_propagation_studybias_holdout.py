@@ -35,4 +35,4 @@ for label_id in lsc.label_ids:
     print(f"Train: {train_score:.4f}\tTest: {test_score:.4f}\t{label_id}")
 
 print(f"Average test score = {np.mean(scores):.4f}, std = {np.std(scores):.4f}")
-print_expected("Average test score = 0.5632, std = 0.0748")
+print_expected("Average test score = 0.6149, std = 0.0997")

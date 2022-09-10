@@ -31,7 +31,7 @@ def load_data(
             on hypergeometric test (default: :obj:`True`).
 
     """
-    data_version = "nledata-v0.1.0-dev1"
+    data_version = "nledata-v0.1.0-dev2"
     save_dir = "datasets"
     print(f"{network=}\n{label=}")
 
@@ -41,9 +41,10 @@ def load_data(
         g = g.to_dense_graph()
 
     # Construct filters for processing label set collection
+    # TODO: EntityExistenceFilter convert to list using property
     filter_list = [
         EntityExistenceFilter(list(g.node_ids), log_level=log_level),
-        LabelsetRangeFilterSize(min_val=50, max_val=200, log_level=log_level),
+        LabelsetRangeFilterSize(min_val=100, max_val=200, log_level=log_level),
     ]
 
     if filter_negative:
