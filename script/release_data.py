@@ -1,12 +1,13 @@
 import os.path as osp
 from pathlib import Path
 from pprint import pformat
-from shutil import make_archive
+from shutil import make_archive, rmtree
 
 import nleval
 import nleval.data
 from nleval.config import NLEDATA_URL_DICT
 from nleval.data.base import BaseData
+from nleval.util.converter import GenePropertyConverter
 
 homedir = Path(".").resolve()
 datadir = osp.join(homedir, "data_release")
@@ -28,13 +29,29 @@ logger.info(
     f"{new_data_release!r}:\n{pformat(all_data)}",
 )
 
-# TODO: clean up existing data directory
+# Clean up old data
+while osp.isdir(datadir):
+    # TODO: make --allow-dirty option
+    ans = input(f"Release data dir already exists ({datadir}), remove now? [yes/no]")
+    if ans == "yes":
+        logger.info(f"Removing old archives in {datadir}")
+        rmtree(datadir)
+        break
+    elif ans == "no":
+        exit()
+    else:
+        logger.error(f"Unknown option {ans!r}, please answer 'yes' or 'no'")
 
+# Download, process, and archive all data
 for name in all_data:
     getattr(nleval.data, name)(datadir)
     # TODO: validate data and print stats (# ndoes&edges for networks; stats() for lsc)
     make_archive(osp.join(archdir, name), "zip", datadir, name, logger=logger)
 
+# Download and process gene property data
+GenePropertyConverter(datadir, name="PubMedCount")
+
+# Archive cache
 make_archive(osp.join(archdir, ".cache"), "zip", datadir, ".cache", logger=logger)
 
 # TODO: validation summaries -> # of datasets, whih one of them failed/succeeded
