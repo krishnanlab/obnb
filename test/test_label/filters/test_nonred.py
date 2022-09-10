@@ -37,18 +37,18 @@ def case1():
 
 
 def test_nonred_jaccard(case1):
-    filter_ = LabelsetNonRedFilter(0.3, 0, log_level=LOG_LEVEL)
+    filter_ = LabelsetNonRedFilter(0.3, 0.0, log_level=LOG_LEVEL)
     assert set(case1.apply(filter_).label_ids) == {"lb0", "lb3"}
 
-    filter_ = LabelsetNonRedFilter(0.5, 0, log_level=LOG_LEVEL)
+    filter_ = LabelsetNonRedFilter(0.5, 0.0, log_level=LOG_LEVEL)
     assert set(case1.apply(filter_).label_ids) == {"lb0", "lb1", "lb2", "lb3"}
 
 
 def test_nonred_overlap(case1):
-    filter_ = LabelsetNonRedFilter(0, 0.49, log_level=LOG_LEVEL)
+    filter_ = LabelsetNonRedFilter(0.0, 0.49, log_level=LOG_LEVEL)
     assert set(case1.apply(filter_).label_ids) == {"lb0", "lb3"}
 
-    filter_ = LabelsetNonRedFilter(0, 0.5, log_level=LOG_LEVEL)
+    filter_ = LabelsetNonRedFilter(0.0, 0.5, log_level=LOG_LEVEL)
     assert set(case1.apply(filter_).label_ids) == {"lb0", "lb1", "lb2", "lb3"}
 
 
