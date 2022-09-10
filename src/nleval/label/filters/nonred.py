@@ -95,8 +95,14 @@ class LabelsetNonRedFilter(BaseFilter):
         return g
 
     @staticmethod
-    def _get_redundant_ratio(labelsets: List[Set[str]], idx: int) -> float:
-        """Compute the ratio of elements in a set that is in some other sets."""
+    def _get_repr_score(labelsets: List[Set[str]], idx: int) -> float:
+        """Compute the representative score of a gene set in the component.
+
+        For a given gene set in the component of gene sets, the representative
+        score is the sum of the ratios of genes in any other gene sets that
+        are contained in this gene set.
+
+        """
         current_labelset = labelsets[idx]
         all_execpt_current = [labelsets[i] for i in range(len(labelsets)) if i != idx]
         return sum(len(current_labelset & i) / len(i) for i in all_execpt_current)
@@ -131,8 +137,8 @@ class LabelsetNonRedFilter(BaseFilter):
             else:
                 # Determine the representative labelset to use
                 labelsets = list(map(lsc.get_labelset, component))
-                get_redundant_ratio = partial(self._get_redundant_ratio, labelsets)
-                r = list(map(get_redundant_ratio, range(comp_size)))
+                get_repr_score = partial(self._get_repr_score, labelsets)
+                r = list(map(get_repr_score, range(comp_size)))
                 self.logger.debug(f"Redundant ratios {r=!r}")
 
                 # Sort by redundant ratios first, then labelset sizes
