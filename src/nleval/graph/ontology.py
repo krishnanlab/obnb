@@ -261,7 +261,11 @@ class OntologyGraph(DirectedSparseGraph):
 
     @staticmethod
     def parse_stanza_simplified(stanza_lines: Iterable[str]) -> Term:
-        """Return an OBO term (id, name, xref, is_a) from the stanza.
+        """Parse OBO term from the stanza.
+
+        Parse unique id and name per ontology. Parse list of xref, is_a, and
+        part_of relationships (other relationships, e.g., regulates, are
+        ignored).
 
         Note:
             term_xrefs and term_parents can be None if such information is not
@@ -284,15 +288,20 @@ class OntologyGraph(DirectedSparseGraph):
         term_id = term_name = None
         term_xrefs, term_parents = [], []
 
+        def strip_key(line: str, key: str) -> str:
+            return line.strip()[len(key) :]
+
         for line in stanza_lines:
-            if line.startswith("id: "):
-                term_id = line.strip()[4:]
-            elif line.startswith("name: "):
-                term_name = line.strip()[6:]
-            elif line.startswith("xref: "):
-                term_xrefs.append(line.strip()[6:])
-            elif line.startswith("is_a: "):
-                term_parents.append(line.strip()[6:].split(" ! ")[0])
+            if line.startswith(key := "id: "):
+                term_id = strip_key(line, key)
+            elif line.startswith(key := "name: "):
+                term_name = strip_key(line, key)
+            elif line.startswith(key := "xref: "):
+                term_xrefs.append(strip_key(line, key))
+            elif line.startswith(key := "is_a: "):
+                term_parents.append(strip_key(line, key).split(" ! ")[0])
+            elif line.startswith(key := "relationship: part_of "):
+                term_parents.append(strip_key(line, key).split(" ! ")[0])
 
         if term_id is None or term_name is None:
             raise OboTermIncompleteError

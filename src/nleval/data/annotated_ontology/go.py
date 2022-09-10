@@ -26,7 +26,7 @@ class GeneOntology(BaseAnnotatedOntologyData):
         self,
         root: str,
         min_size: int = 10,
-        max_size: int = 500,
+        max_size: int = 200,
         overlap: float = 0.7,
         jaccard: float = 0.5,
         data_sources: Union[List[str], str] = "default",
