@@ -9,7 +9,7 @@ p_thresh = 0.05
 # construct labelset_collection object from KEGGBP.gmt
 lsc_orig = GOBP(
     "datasets",
-    transform=filters.LabelsetRangeFilterSize(min_val=50, max_val=100),
+    transform=filters.LabelsetRangeFilterSize(min_val=90, max_val=100),
 )
 
 # apply negative selection filter
@@ -31,4 +31,4 @@ for label_id in lsc.label_ids:
     )
 
 print(f"Average diff = {sum(diff_list) / len(diff_list):.2f}")
-print_expected("Average diff = -175.93")
+print_expected("Average diff = -192.03")

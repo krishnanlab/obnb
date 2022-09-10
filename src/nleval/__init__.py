@@ -4,7 +4,7 @@ from nleval.dataset import Dataset
 from nleval.util.logger import config_logger, get_logger
 
 __version__ = "0.1.0-dev4"
-__data_version__ = "nledata-v0.1.0-dev1"
+__data_version__ = "nledata-v0.1.0-dev2"
 __all__ = ["Dataset", "graph", "label", "model_trainer"]
 
 # Configure logger setting and create global logger

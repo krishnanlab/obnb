@@ -64,8 +64,8 @@ class TestData(unittest.TestCase):
     @pytest.mark.longruns
     def test_biogrid(self):
         self.graph = nleval.data.BioGRID(self.tmp_dir, **opts)
-        self.assertEqual(self.graph.size, 18948)
-        self.assertEqual(self.graph.num_edges, 1103272)
+        self.assertEqual(self.graph.size, 18951)
+        self.assertEqual(self.graph.num_edges, 1103298)
 
     @parameterized.expand(full_data_test_param)
     @pytest.mark.mediumruns
@@ -77,7 +77,7 @@ class TestData(unittest.TestCase):
                 redownload=redownload,
                 **opts,
             )
-            self.assertEqual(self.graph.size, 8043)
+            self.assertEqual(self.graph.size, 8044)
             self.assertEqual(self.graph.num_edges, 71084)
 
     @pytest.mark.mediumruns
@@ -100,27 +100,27 @@ class TestData(unittest.TestCase):
     @pytest.mark.longruns
     def test_hippie(self):
         self.graph = nleval.data.HIPPIE(self.tmp_dir, **opts)
-        self.assertEqual(self.graph.size, 17360)
+        self.assertEqual(self.graph.size, 17364)
         self.assertEqual(self.graph.num_edges, 768654)
 
     @pytest.mark.longruns
     def test_humannet(self):
         self.graph = nleval.data.HumanNet(self.tmp_dir, **opts)
-        self.assertEqual(self.graph.size, 17206)
-        self.assertEqual(self.graph.num_edges, 847098)
+        self.assertEqual(self.graph.size, 17211)
+        self.assertEqual(self.graph.num_edges, 847104)
 
     @pytest.mark.longruns
     def test_pcnet(self):
         self.graph = nleval.data.PCNet(self.tmp_dir, **opts)
-        self.assertEqual(self.graph.size, 16971)
-        self.assertEqual(self.graph.num_edges, 5049344)
+        self.assertEqual(self.graph.size, 16968)
+        self.assertEqual(self.graph.num_edges, 5047854)
 
     @pytest.mark.longruns
     @pytest.mark.highmemory
     def test_string(self):
         self.graph = nleval.data.STRING(self.tmp_dir, **opts)
-        self.assertEqual(self.graph.size, 17938)
-        self.assertEqual(self.graph.num_edges, 10950160)
+        self.assertEqual(self.graph.size, 17942)
+        self.assertEqual(self.graph.num_edges, 10951202)
 
 
 @pytest.mark.mediumruns
