@@ -130,7 +130,12 @@ class GNNTrainer(BaseTrainer):
 
 
 class SimpleGNNTrainer(GNNTrainer):
-    """Simple GNN trainer using Adam with fixed learning rate."""
+    """Simple GNN trainer using Adam with fixed learning rate.
+
+    Note:
+        Do not take into account of edge weights/attrs.
+
+    """
 
     def train_epoch(self, model, data, split_idx, optimizer):
         """Train a single epoch."""
@@ -139,7 +144,7 @@ class SimpleGNNTrainer(GNNTrainer):
         optimizer.zero_grad()
 
         train_mask = data[self.train_on + self.mask_suffix][:, split_idx]
-        out = model(data.x, data.edge_index, data.edge_weight)
+        out = model(data.x, data.edge_index)
         loss = criterion(out[train_mask], data.y[train_mask])
         loss.backward()
         optimizer.step()
@@ -150,8 +155,7 @@ class SimpleGNNTrainer(GNNTrainer):
     def evaluate(self, model, data, split_idx):
         """Evaluate current model."""
         model.eval()
-        args = (data.x, data.edge_index, data.edge_weight)
-        y_pred = model(*args).detach().cpu().numpy()
+        y_pred = model(data.x, data.edge_index).detach().cpu().numpy()
         y_true = data.y.detach().cpu().numpy()
 
         results = {}
