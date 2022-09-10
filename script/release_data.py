@@ -7,6 +7,7 @@ import nleval
 import nleval.data
 from nleval.config import NLEDATA_URL_DICT
 from nleval.data.base import BaseData
+from nleval.util.converter import GenePropertyConverter
 
 homedir = Path(".").resolve()
 datadir = osp.join(homedir, "data_release")
@@ -35,6 +36,10 @@ for name in all_data:
     # TODO: validate data and print stats (# ndoes&edges for networks; stats() for lsc)
     make_archive(osp.join(archdir, name), "zip", datadir, name, logger=logger)
 
+# Download and process gene property data
+GenePropertyConverter(datadir, name="PubMedCount")
+
+# Archive cache
 make_archive(osp.join(archdir, ".cache"), "zip", datadir, ".cache", logger=logger)
 
 # TODO: validation summaries -> # of datasets, whih one of them failed/succeeded
