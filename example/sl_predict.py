@@ -25,13 +25,14 @@ label_id = lsc.label_ids[i]
 print(f"{label_id}\t{lsc.get_info(label_id)}")
 
 # train and get genome wide prediction
-y, masks = lsc.split(
-    AllHoldout(),
-    target_ids=g.node_ids,
-    labelset_name=label_id,
+dataset = Dataset(
+    feature=g.to_feature(),
+    label=lsc,
+    labelset_name=label_id,  # specify a single gene set to run as an example
+    # AllHoldout creates one split, named 'test' by default, rename it to 'train' here
+    splitter=AllHoldout(),
     mask_names=("train",),
 )
-dataset = Dataset(feature=g.to_feature(), y=y, masks=masks)
 
 metrics = {"auroc": auroc}
 trainer = SupervisedLearningTrainer(metrics)
