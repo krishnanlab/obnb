@@ -5,6 +5,7 @@ from nleval.dataset import Dataset
 from nleval.exception import IDNotExistError
 from nleval.feature import MultiFeatureVec
 from nleval.graph.dense import DenseGraph
+from nleval.label.collection import LabelsetCollection
 
 
 class Data:
@@ -49,6 +50,9 @@ class Data:
     )
     graph = DenseGraph.from_mat(adj_mat, ids)
 
+    lsc = LabelsetCollection()
+    lsc.add_labelset(ids, "labelset1")
+
 
 @pytest.fixture
 def data():
@@ -57,44 +61,45 @@ def data():
 
 def test_set_idmap(data):
     # Test construction
-    Dataset(graph=data.graph)
-    Dataset(feature=data.feature)
-    Dataset(feature=data.graph.to_feature())
-    pytest.raises(TypeError, Dataset, data.graph)  # only takes kwargs
+    Dataset(graph=data.graph, label=data.lsc)
+    Dataset(feature=data.feature, label=data.lsc)
+    Dataset(feature=data.graph.to_feature(), label=data.lsc)
+    pytest.raises(ValueError, Dataset, graph=data.graph)  # requires label
+    pytest.raises(TypeError, Dataset, data.graph, label=data.lsc)  # only takes kwargs
 
     # Test set IDmap
-    dataset = Dataset(graph=data.graph, feature=data.feature)
+    dataset = Dataset(graph=data.graph, feature=data.feature, label=data.lsc)
     assert dataset.idmap.lst == data.graph.idmap.lst
     assert dataset.idmap.lst == data.feature.idmap.lst
 
     # Wrong types
-    pytest.raises(TypeError, Dataset, featuer=data.graph)
-    pytest.raises(TypeError, Dataset, graph=data.feature)
+    pytest.raises(TypeError, Dataset, feature=data.graph, label=data.lsc)
+    pytest.raises(TypeError, Dataset, graph=data.feature, label=data.lsc)
 
-    dataset = Dataset(graph=data.graph)
+    dataset = Dataset(graph=data.graph, label=data.lsc)
     assert dataset.idmap.lst == data.graph.idmap.lst
 
-    dataset = Dataset(feature=data.graph.to_feature())
+    dataset = Dataset(feature=data.graph.to_feature(), label=data.lsc)
     assert dataset.idmap.lst == data.graph.idmap.lst
 
-    dataset = Dataset(feature=data.feature)
+    dataset = Dataset(feature=data.feature, label=data.lsc)
     assert dataset.idmap.lst == data.feature.idmap.lst
 
     # Remove "d"
     data.graph.idmap.pop_id("d")
     assert data.graph.idmap.lst == ["a", "b", "c", "e"]
     with pytest.raises(ValueError, match="Misaligned IDs between graph and feature"):
-        Dataset(graph=data.graph, feature=data.feature)
+        Dataset(graph=data.graph, feature=data.feature, label=data.lsc)
 
     # Reorder ids to ["a", "b", "c", "e", "d"]
     data.graph.idmap.add_id("d")
     assert data.graph.idmap.lst == ["a", "b", "c", "e", "d"]
     with pytest.raises(ValueError, match="Misaligned IDs between graph and feature"):
-        Dataset(graph=data.graph, feature=data.feature)
+        Dataset(graph=data.graph, feature=data.feature, label=data.lsc)
 
 
 def test_get_feat_from_idxs(subtests, data):
-    dataset = Dataset(feature=data.feature)
+    dataset = Dataset(feature=data.feature, label=data.lsc)
 
     # Test get multiple featvecs
     test_list = [[0, 2], [3], [0, 1, 2, 3, 4]]
@@ -112,13 +117,13 @@ def test_get_feat_from_idxs(subtests, data):
     # Index out of range
     pytest.raises(IndexError, dataset.get_feat, [3, 5])
 
-    dataset = Dataset(graph=data.graph)
+    dataset = Dataset(graph=data.graph, label=data.lsc)
     with pytest.raises(ValueError, match="feature not set"):
         dataset.get_feat([0, 1])
 
 
 def test_get_feat_from_ids(subtests, data):
-    dataset = Dataset(feature=data.feature)
+    dataset = Dataset(feature=data.feature, label=data.lsc)
     test_list = [["a", "c"], ["d"], ["a", "b", "c", "d", "e"]]
 
     # Test get multiple featvecs
@@ -138,7 +143,7 @@ def test_get_feat_from_ids(subtests, data):
 
 
 def test_get_feat_from_mask(subtests, data):
-    dataset = Dataset(feature=data.feature)
+    dataset = Dataset(feature=data.feature, label=data.lsc)
     test_list = [[1, 0, 1, 0, 0], [0, 0, 0, 1, 0], [1, 1, 1, 1, 1]]
     for mask in test_list:
         with subtests.test(mask=mask):
@@ -152,7 +157,7 @@ def test_get_feat_from_mask(subtests, data):
 
 
 def test_get_feat_auto(data):
-    dataset = Dataset(feature=data.feature)
+    dataset = Dataset(feature=data.feature, label=data.lsc)
     idx = 0
     id_ = data.ids[idx]
     mask = np.zeros(len(data.ids))
@@ -170,7 +175,7 @@ def test_get_feat_auto(data):
 
 @pytest.mark.xfail
 def test_get_feat_fraom_idxs_dual(subtests, data):
-    dataset = Dataset(feature=data.feature, dual=True)
+    dataset = Dataset(feature=data.feature, dual=True, label=data.lsc)
     test_list = [[0, 2], [1], [0, 1, 2]]
     for idx in test_list:
         ans = [data.feature.mat[:, i].tolist() for i in idx]
@@ -186,13 +191,13 @@ def test_get_feat_fraom_idxs_dual(subtests, data):
         match="'dual' mode only works when the feature is of type MultiFeatureVec, "
         "but received type <class 'nleval.graph.dense.DenseGraph'>",
     ):
-        dataset = Dataset(feature=data.graph.to_feature(), dual=True)
+        dataset = Dataset(feature=data.graph.to_feature(), dual=True, label=data.lsc)
 
     # Dual mode should only work when all feature sets are one-dimensioanl
     fvec = MultiFeatureVec.from_mats(
         [np.random.random((10, 1)), np.random.random((10, 1))],
     )
-    dataset = Dataset(feature=fvec, dual=True)
+    dataset = Dataset(feature=fvec, dual=True, label=data.lsc)
     with pytest.raises(
         ValueError,
         match="'dual' mode only works when the MultiFeatureVec only contains "
@@ -201,12 +206,12 @@ def test_get_feat_fraom_idxs_dual(subtests, data):
         fvec = MultiFeatureVec.from_mats(
             [np.random.random((10, 1)), np.random.random((10, 2))],
         )
-        dataset = Dataset(feature=fvec, dual=True)
+        dataset = Dataset(feature=fvec, dual=True, label=data.lsc)
 
 
 @pytest.mark.xfail
 def test_get_feat_from_ids_dual(subtests, data):
-    dataset = Dataset(feature=data.feature, dual=True)
+    dataset = Dataset(feature=data.feature, dual=True, label=data.lsc)
     test_ids_list = [["f1", "f2"], ["f1"], ["f1", "f2", "f3"]]
     test_idx_list = [[0, 1], [0], [0, 1, 2]]
     for ids, idx in zip(test_ids_list, test_idx_list):
@@ -220,7 +225,7 @@ def test_get_feat_from_ids_dual(subtests, data):
 
 @pytest.mark.xfail
 def test_get_feat_from_mask_dual(subtests, data):
-    dataset = Dataset(feature=data.feature, dual=True)
+    dataset = Dataset(feature=data.feature, dual=True, label=data.lsc)
     test_list = [[1, 0, 0], [1, 0, 1], [1, 1, 1]]
     fmat = data.feature.mat
     for mask in test_list:

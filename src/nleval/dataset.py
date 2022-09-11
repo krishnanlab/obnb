@@ -4,16 +4,9 @@ import numpy as np
 from nleval.feature import MultiFeatureVec
 from nleval.feature.base import BaseFeature
 from nleval.graph.base import BaseGraph
-from nleval.typing import (
-    Dict,
-    Iterable,
-    Iterator,
-    Literal,
-    Optional,
-    PyG_Data,
-    Tuple,
-    Union,
-)
+from nleval.label.collection import LabelsetCollection
+from nleval.label.split.base import BaseSplit
+from nleval.typing import Iterable, Iterator, Literal, Optional, PyG_Data, Tuple, Union
 from nleval.util.checkers import checkLiteral, checkNumpyArrayShape, checkType
 from nleval.util.idhandler import IDmap
 
@@ -26,16 +19,27 @@ class Dataset:
         *,
         graph: Optional[BaseGraph] = None,
         feature: Optional[BaseFeature] = None,
-        y: Optional[np.ndarray] = None,
-        masks: Optional[Dict[str, np.ndarray]] = None,
+        label: Optional[LabelsetCollection] = None,
         dual: bool = False,
+        splitter: Optional[BaseSplit] = None,
+        **split_kwargs,
     ):
         """Initialize Dataset."""
         self.set_idmap(graph, feature)
         self.graph = graph
         self.feature = feature
-        self.y = y
-        self.masks = masks
+
+        if label is None:
+            raise ValueError("Missing required kwarg 'label'")
+        elif splitter is None:
+            self.y = label.get_y(target_ids=tuple(self.idmap.lst))
+            self.masks = None
+        else:
+            self.y, self.masks = label.split(
+                splitter,
+                target_ids=tuple(self.idmap.lst),
+                **split_kwargs,
+            )
 
     @property
     def idmap(self) -> IDmap:

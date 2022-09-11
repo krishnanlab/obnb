@@ -404,7 +404,7 @@ class LabelsetCollection(idhandler.IDprop):
                 negatives = self.get_negative(labelset_name)
                 to_remove = set(self.entity_ids).difference(positives | negatives)
                 if len(to_remove) > 0:  # skip if nothing to be removed
-                    idx_to_remove = entity_idmap[to_remove]
+                    idx_to_remove = list(map(entity_idmap.get, to_remove))
                     for mask in masks.values():
                         mask[idx_to_remove] = False
 
