@@ -13,10 +13,7 @@ lsc_orig = GOBP(
 )
 
 # apply negative selection filter
-lsc = lsc_orig.apply(
-    filters.NegativeGeneratorHypergeom(p_thresh, log_level="DEBUG"),
-    progress_bar=True,
-)
+lsc = lsc_orig.apply(filters.NegativeGeneratorHypergeom(p_thresh, log_level="DEBUG"))
 
 print(f"p-val threshold = {p_thresh:.2f}")
 print("Compring the number of negatives before and after filtering")

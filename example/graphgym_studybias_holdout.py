@@ -34,18 +34,15 @@ trainer = GraphGymTrainer(
         "train.skip_train_eval": True,
     },
 )
-
 mdl = trainer.create_model(dim_in=1, dim_out=n_tasks)
 
-y, masks = lsc.split(splitter, target_ids=g.node_ids)
-dataset = Dataset(graph=g, y=y, masks=masks)
-
+dataset = Dataset(graph=g, label=lsc, splitter=splitter)
 results = trainer.train(mdl, dataset)
 print(f"\nBest results:\n{results}\n")
 
 # Check to see if the model is rewinded back to the best model correctly
 data = dataset.to_pyg_data(device=trainer.device)
-y_pred, y_true = graphgym_model_wrapper(mdl)(data, y)
+y_pred, y_true = graphgym_model_wrapper(mdl)(data, dataset.y)
 for split in "train", "val", "test":
-    mask = masks[split][:, 0]
+    mask = dataset.masks[split][:, 0]
     print(f"{split:>5}: {auroc(y_true[mask], y_pred[mask])}")

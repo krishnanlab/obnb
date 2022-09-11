@@ -9,6 +9,7 @@ from nleval.model_trainer import SupervisedLearningTrainer
 
 # Load dataset
 g, lsc, converter = load_data()
+feature = g.to_feature()
 
 # 3/2 train/test split using genes with higher PubMed Count for training
 splitter = RatioPartition(0.6, 0.4, ascending=False, property_converter=converter)
@@ -22,13 +23,13 @@ trainer = SupervisedLearningTrainer(metrics)
 
 scores = []
 for label_id in lsc.label_ids:
-    y, masks = lsc.split(
-        splitter,
-        target_ids=g.node_ids,
+    dataset = Dataset(
+        feature=feature,
+        label=lsc,
+        splitter=splitter,
         labelset_name=label_id,
         consider_negative=True,
     )
-    dataset = Dataset(feature=g.to_feature(), y=y, masks=masks)
     results = trainer.train(mdl, dataset)
     scores.append(results["test_auroc"])
     train_score, test_score = results["train_auroc"], results["test_auroc"]

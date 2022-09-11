@@ -31,19 +31,13 @@ trainer = SimpleGNNTrainer(
     lr=0.1,
 )
 
-y, masks = lsc.split(
-    splitter,
-    target_ids=g.node_ids,
-)
-dataset = Dataset(graph=g, y=y, masks=masks)
-
+dataset = Dataset(graph=g, label=lsc, splitter=splitter)
 results = trainer.train(mdl, dataset)
 print(f"\nBest results:\n{results}\n")
 
 # Check to see if the model is rewinded back to the best model correctly
 data = dataset.to_pyg_data(device=device)
-args = (data.x, data.edge_index, data.edge_weight)
-y_pred = mdl(*args).detach().cpu().numpy()
+y_pred = mdl(data.x, data.edge_index).detach().cpu().numpy()
 for mask_name in "train", "val", "test":
-    mask = masks[mask_name][:, 0]
-    print(f"{mask_name:>5}: {auroc(y[mask], y_pred[mask])}")
+    mask = dataset.masks[mask_name][:, 0]
+    print(f"{mask_name:>5}: {auroc(dataset.y[mask], y_pred[mask])}")

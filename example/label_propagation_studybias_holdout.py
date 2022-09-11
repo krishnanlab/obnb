@@ -22,13 +22,13 @@ trainer = LabelPropagationTrainer(metrics)
 
 scores = []
 for label_id in lsc.label_ids:
-    y, masks = lsc.split(
-        splitter,
-        target_ids=g.node_ids,
+    dataset = Dataset(
+        graph=g,
+        label=lsc,
+        splitter=splitter,
         labelset_name=label_id,
         consider_negative=True,
     )
-    dataset = Dataset(graph=g, y=y, masks=masks)
     results = trainer.train(mdl, dataset)
     scores.append(results["test_auroc"])
     train_score, test_score = results["train_auroc"], results["test_auroc"]
