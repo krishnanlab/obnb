@@ -402,13 +402,11 @@ class LabelsetCollection(idhandler.IDprop):
             else:
                 positives = self.get_labelset(labelset_name)
                 negatives = self.get_negative(labelset_name)
-                to_remove = set(self.entity_ids) - (positives | negatives)
+                to_remove = set(self.entity_ids).difference(positives | negatives)
                 if len(to_remove) > 0:  # skip if nothing to be removed
-                    target_idx_to_remove = to_target_idx[
-                        list(map(entity_idmap.get, to_remove))
-                    ]
+                    idx_to_remove = entity_idmap[to_remove]
                     for mask in masks.values():
-                        mask[target_idx_to_remove] = False
+                        mask[idx_to_remove] = False
 
         # Map back to the order of target_ids
         if labelset_name is not None or len(y.shape) == 1:
