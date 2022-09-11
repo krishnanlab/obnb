@@ -29,6 +29,8 @@ class Dataset:
         self.graph = graph
         self.feature = feature
 
+        self.label = label
+        self.splitter = splitter
         if label is None:
             raise ValueError("Missing required kwarg 'label'")
         elif splitter is None:
@@ -136,11 +138,6 @@ class Dataset:
         if graph is not None:
             checkType("graph", BaseGraph, graph)
         self._graph = graph
-
-    @property
-    def label(self):
-        # XXX:
-        return None
 
     def get_feat(
         self,

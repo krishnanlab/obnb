@@ -1,3 +1,5 @@
+import numpy as np
+
 from nleval.model_trainer.base import BaseTrainer
 from nleval.typing import Any, Dict, LogLevel, Optional
 
@@ -62,6 +64,53 @@ class SupervisedLearningTrainer(BaseTrainer):
             for mask_name, (x, y) in dataset.splits(split_idx):
                 y_pred = model.decision_function(x)
                 score = metric_func(y, y_pred)
+                results[f"{mask_name}_{metric_name}"] = score
+
+        return results
+
+    def train_multi(
+        self,
+        model: Any,
+        dataset,
+        split_idx: int = 0,
+        consider_negative: bool = False,
+    ) -> Dict[str, float]:
+        x = dataset.feature.mat
+
+        # Initialize y dictionary: mask_name -> y_pred/true (2d arrays)
+        y_pred_dict: Dict[str, np.ndarray] = {}
+        y_true_dict: Dict[str, np.ndarray] = {}
+        for mask_name, (_, y) in dataset.splits(split_idx):
+            y_pred_dict[mask_name] = np.zeros(y.shape)
+            y_true_dict[mask_name] = np.zeros(y.shape)
+
+        for i, label_id in enumerate(dataset.label.label_ids):
+            y, masks = dataset.label.split(
+                splitter=dataset.splitter,
+                target_ids=tuple(dataset.idmap.lst),
+                labelset_name=label_id,
+                consider_negative=consider_negative,
+            )
+
+            train_mask = masks[self.train_on][:, split_idx]
+            model.fit(x[train_mask], y[train_mask])
+
+            intermediate_results = {}
+            for mask_name in masks:
+                mask = masks[mask_name][:, split_idx]
+                y_pred = y_pred_dict[mask_name][:, i] = model.decision_function(x[mask])
+                y_true = y_true_dict[mask_name][:, i] = y[mask]
+
+                for metric_name, metric_func in self.metrics.items():
+                    score = metric_func(y_true, y_pred)
+                    intermediate_results[f"{mask_name}_{metric_name}"] = score
+
+            self.logger.info(f"{label_id:<20}{intermediate_results}")
+
+        results = {}
+        for metric_name, metric_func in self.metrics.items():
+            for mask_name in dataset.masks:
+                score = metric_func(y_true_dict[mask_name], y_pred_dict[mask_name])
                 results[f"{mask_name}_{metric_name}"] = score
 
         return results
