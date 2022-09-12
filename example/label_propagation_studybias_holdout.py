@@ -1,4 +1,3 @@
-import numpy as np
 from sklearn.metrics import roc_auc_score as auroc
 from utils import load_data, print_expected
 
@@ -18,21 +17,22 @@ mdl = OneHopPropagation()
 
 # Setup trainer, use auroc as the evaluation metric
 metrics = {"auroc": auroc}
-trainer = LabelPropagationTrainer(metrics)
+trainer = LabelPropagationTrainer(metrics, log_level="INFO")
 
-scores = []
-for label_id in lsc.label_ids:
-    dataset = Dataset(
-        graph=g,
-        label=lsc,
-        splitter=splitter,
-        labelset_name=label_id,
-        consider_negative=True,
-    )
-    results = trainer.train(mdl, dataset)
-    scores.append(results["test_auroc"])
-    train_score, test_score = results["train_auroc"], results["test_auroc"]
-    print(f"Train: {train_score:.4f}\tTest: {test_score:.4f}\t{label_id}")
+# Evaluate the model for a single task
+dataset = Dataset(
+    graph=g,
+    label=lsc,
+    splitter=splitter,
+    labelset_name=lsc.label_ids[0],
+    consider_negative=True,
+)
+print(trainer.train(mdl, dataset))
 
-print(f"Average test score = {np.mean(scores):.4f}, std = {np.std(scores):.4f}")
-print_expected("Average test score = 0.6149, std = 0.0997")
+# Evaluate the model for all tasks
+dataset = Dataset(graph=g, label=lsc, splitter=splitter)
+results = trainer.eval_multi_ovr(mdl, dataset, consider_negative=True)
+print(f"Average train score = {results['train_auroc']:.4f}")
+print(f"Average test score = {results['test_auroc']:.4f}")
+
+print_expected("Average test score = 0.6506", "Average test score = 0.6142")
