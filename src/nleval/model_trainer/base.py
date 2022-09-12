@@ -99,6 +99,7 @@ class StandardTrainer(BaseTrainer):
         dataset,
         split_idx: int = 0,
         consider_negative: bool = False,
+        reduce: str = "none",
     ) -> Dict[str, float]:
         """Evaluate the model in a multiclass setting.
 
@@ -127,7 +128,7 @@ class StandardTrainer(BaseTrainer):
             intermediate_results = compute_results(masks, label_idx=i)
             self.logger.info(f"{label_id}\t{intermediate_results}")
 
-        results = compute_results(dataset.masks)
+        results = compute_results(dataset.masks, reduce=reduce)
 
         return results
 
@@ -145,6 +146,7 @@ class StandardTrainer(BaseTrainer):
         def compute_results(
             masks,
             label_idx: Optional[int] = None,
+            reduce: str = "mean",
         ) -> Dict[str, float]:
             # Set up results compute function using the y dicts and the metrics
             results = {}
@@ -156,7 +158,7 @@ class StandardTrainer(BaseTrainer):
                         y_true = y_true[:, label_idx]
                         y_pred = y_pred[:, label_idx]
 
-                    score = metric_func(y_true, y_pred)
+                    score = metric_func(y_true, y_pred, reduce=reduce)
                     results[f"{mask_name}_{metric_name}"] = score
 
             return results
