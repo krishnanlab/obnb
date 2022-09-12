@@ -40,7 +40,78 @@ source install.sh cu102  # other options are [cpu,cu113]
 
 ## Quick Demonstration
 
-### Load network and labels
+### Construct default datasets
+
+We provide a high-level dataset constructor to help user effortlessly set up a ML-ready dataset
+for a combination of network and label. In particular, the dataset will be set up with study-bias
+holdout split (6/2/2), where 60% of the most well studied genes according to the number of
+associated PubMed publications are used for training, 20% of the least studied genes are used for
+testing, and rest of the 20% genes are used for validation. For more customizable data loading
+and processing options, see the [customized dataset construction](#customized-dataset-construction)
+section below.
+
+```python
+from nleval.util.dataset_constructors import default_constructor
+
+root = "datasets"  # save dataset and cache under the datasets/ directory
+version = "nledata-v0.1.0-dev2"  # archive data version, use 'latest' to pull latest data from source instead
+
+# Download and process network/label data. Use the adjacency matrix as the ML feature
+dataset = default_constructor(root=root, version=version, graph_name="BioGRID", label_name="DisGeNet",
+                              graph_as_feature=True, use_dense_graph=True)
+```
+
+### Evaluating standard models
+
+Evaluation of simple machine learning methods such as logistic regression and label propagation
+can be done easily using the trainer objects. The trainer objects take a dictionary of metrics
+as input for evaluating the models' performances, and can be set up as follows.
+
+```python
+from nleval.metric import auroc
+from nleval.model_trainer import SupervisedLearningTrainer, LabelPropagationTrainer
+
+metrics = {"auroc": auroc}  # use AUROC as our default evaluation metric
+sl_trainer = SupervisedLearningTrainer(metrics)
+lp_trainer = LabelPropagationTrainer(metrics)
+```
+
+Then, use the `eval_multi_ovr` method of the trainer to evaluate a given ML model over all tasks
+in a one-vs-rest setting.
+
+```python
+from sklearn.linear_model import LogisticRegression
+from nleval.model.label_propagation import OneHopPropagation
+
+# Initialize models
+sl_mdl = LogisticRegression(penalty="l2", solver="lbfgs")
+lp_mdl = OneHopPropagation()
+
+# Evaluate the models over all tasks
+sl_results = sl_trainer.eval_multi_ovr(sl_mdl, dataset)
+lp_results = lp_trainer.eval_multi_ovr(lp_mdl, dataset)
+```
+
+### Evaluating GNN models
+
+Training and evalution of Graph Neural Network (GNN) models can be done in a very similar fashion.
+
+```python
+from torch_geometric.nn import GCN
+from nleval.model_trainer.gnn import SimpleGNNTrainer
+
+# Use 1-dimensional trivial node feature
+dataset = default_constructor(root=root, version=version, graph_name="BioGRID", label_name="DisGeNet")
+
+# Train and evaluate a GCN
+gcn_mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=n_tasks)
+gcn_trainer = SimpleGNNTrainer(metrics, device="cuda", metric_best="auroc")
+gcn_results = gcn_trainer.train(gcn_mdl, dataset)
+```
+
+### Customized dataset construction
+
+#### Load network and labels
 
 ```python
 from nleval import data
@@ -49,55 +120,44 @@ root = "datasets"  # save dataset and cache under the datasets/ directory
 
 # Load processed BioGRID data from archive.
 # Alternatively, set version="latest" to get and process the newest data from scratch.
-g = data.BioGRID(root, version="nledata-v0.1.0-dev1")
+g = data.BioGRID(root, version="nledata-v0.1.0-dev2")
 
 # Load DisGeNet gene set collections.
 lsc = data.DisGeNet(root, version="latest")
 ```
 
-### Setting up data and splits
+#### Setting up data and splits
 
 ```python
-from nleval import Dataset
 from nleval.util.converter import GenePropertyConverter
 from nleval.label.split import RatioHoldout
 
 # Load PubMed count gene propery converter and use it to set up study-bias holdout split
 pubmedcnt_converter = GenePropertyConverter(root, name="PubMedCount")
 splitter = RatioHoldout(0.6, 0.4, ascending=False, property_converter=pubmedcnt_converter)
+```
 
-# Combine everything into a dataset object
+#### Filter labeled data based on network genes and splits
+
+```python
+# Apply in-place filters to the labelset collection
+lsc.iapply(
+    filters.Compose(
+        # Only use genes that are present in the network
+        filters.EntityExistenceFilter(list(g.node_ids)),
+        # Remove any labelsets with less than 50 network genes
+        filters.LabelsetRangeFilterSize(min_val=50),
+        # Make sure each split has at least 10 positive examples
+        filters.LabelsetRangeFilterSplit(min_val=10, splitter=splitter),
+    ),
+)
+```
+
+#### Combine into dataset
+
+```python
+from nleval import Dataset
 dataset = Dataset(graph=g, feature=g.to_dense_graph().to_feature(), label=lsc, splitter=splitter)
-```
-
-### Evaluating models on the processed dataset
-
-```python
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import roc_auc_score
-from nleval.model.label_propagation import OneHopPropagation
-from nleval.model_trainer import SupervisedLearningTrainer, LabelPropagationTrainer
-
-# Specify model(s) and metrics
-sl_mdl = LogisticRegression(penalty="l2", solver="lbfgs")
-lp_mdl = OneHopPropagation()
-metrics = {"auroc": roc_auc_score}
-
-sl_results = SupervisedLearningTrainer(metrics).train(sl_mdl, dataset)
-lp_results = LabelPropagationTrainer(metrics).train(lp_mdl, dataset)
-```
-
-### Evaluating GNN models on the processed dataset
-
-```python
-from torch_geometric.nn import GCN
-from nleval.model_trainer.gnn import SimpleGNNTrainer
-
-dataset = Dataset(graph=g, label=lsc, splitter=splitter)  # use 1-d trivial node feature if feature is not set
-
-# Evaluate GCN on the whole geneset collection
-gcn_mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=n_tasks)
-gcn_results = SimpleGNNTrainer(metrics, device="cuda", metric_best="auroc").train(gcn_mdl, dataset)
 ```
 
 ## Dev notes
