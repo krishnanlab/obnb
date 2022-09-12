@@ -22,7 +22,7 @@ trainer = SupervisedLearningTrainer(metrics, log_level="INFO")
 
 y, masks = lsc.split(splitter, target_ids=g.node_ids)
 dataset = Dataset(feature=feature, label=lsc, splitter=splitter)
-results = trainer.train_multi(mdl, dataset, consider_negative=True)
+results = trainer.eval_multi_ovr(mdl, dataset, consider_negative=True)
 print(f"Average train score = {results['train_auroc']:.4f}")
 print(f"Average test score = {results['test_auroc']:.4f}")
 
