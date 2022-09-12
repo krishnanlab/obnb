@@ -1,7 +1,7 @@
 import numpy as np
 
 from nleval.label.split.base import BaseRandomSplit, BaseSortedSplit
-from nleval.typing import Any, Mapping, Tuple
+from nleval.typing import Tuple
 from nleval.util.checkers import checkType
 
 
@@ -37,7 +37,7 @@ class RatioHoldout(BaseHoldout):
         self,
         ratio: float,
         *,
-        property_converter: Mapping[str, Any],
+        property_converter,
         ascending: bool = True,
     ) -> None:
         """Initialize the RatioHoldout object.
@@ -103,7 +103,7 @@ class ThresholdHoldout(BaseHoldout):
         self,
         threshold: float,
         *,
-        property_converter: Mapping[str, Any],
+        property_converter,
         ascending: bool = True,
     ) -> None:
         """Initialize the ThresholdHoldout object.

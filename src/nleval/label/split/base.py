@@ -2,7 +2,7 @@ import typing
 
 import numpy as np
 
-from nleval.typing import Any, Iterator, List, Mapping, Optional, Tuple
+from nleval.typing import Any, Iterator, List, Mapping, Optional, Tuple, Union
 from nleval.util.converter import BaseConverter
 
 
@@ -43,7 +43,7 @@ class BaseSortedSplit(BaseSplit):
     def __init__(
         self,
         *,
-        property_converter: Mapping[str, Any],
+        property_converter: Union[Mapping[str, Any], BaseConverter],
         ascending: bool = True,
     ) -> None:
         """Initialize BaseSortedSplit object.

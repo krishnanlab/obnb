@@ -3,6 +3,7 @@ import os
 import shutil
 import tempfile
 import unittest
+from itertools import product
 from urllib.parse import urljoin
 
 import pytest
@@ -10,8 +11,11 @@ from parameterized import parameterized
 
 import nleval
 import nleval.data
+import nleval.graph
 from nleval.config import NLEDATA_URL_DICT
 from nleval.exception import DataNotFoundError
+from nleval.feature.base import BaseFeature
+from nleval.util.dataset_constructors import default_constructor
 from nleval.util.download import download_unzip
 from nleval.util.timer import Timeout
 
@@ -125,7 +129,7 @@ class TestData(unittest.TestCase):
 
 @pytest.mark.mediumruns
 def test_archive_data_v1(tmpdir):
-    print(tmpdir)
+    nleval.logger.info(f"{tmpdir=}")
     with pytest.raises(ValueError):
         g = nleval.data.BioGRID(
             tmpdir,
@@ -146,5 +150,31 @@ def test_archive_data_v1(tmpdir):
     assert g.num_edges == 1100282
 
 
-if __name__ == "__main__":
-    unittest.main()
+@pytest.mark.mediumruns
+def test_dataset_constructor(subtests, tmpdir):
+    nleval.logger.info(f"{tmpdir=}")
+    datadir = tmpdir / "datasets"
+
+    for graph_as_feature, use_dense_graph in product([True, False], [True, False]):
+        with subtests.test(
+            graph_as_feature=graph_as_feature,
+            use_dense_graph=use_dense_graph,
+        ):
+            dataset = default_constructor(
+                root=datadir,
+                graph_name="BioGRID",
+                label_name="DisGeNet",
+                graph_as_feature=graph_as_feature,
+                use_dense_graph=use_dense_graph,
+                **opts,
+            )
+
+            if graph_as_feature:
+                assert isinstance(dataset.feature, BaseFeature)
+            else:
+                assert dataset.feature is None
+
+            if use_dense_graph:
+                assert isinstance(dataset.graph, nleval.graph.DenseGraph)
+            else:
+                assert isinstance(dataset.graph, nleval.graph.SparseGraph)
