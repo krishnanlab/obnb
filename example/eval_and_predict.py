@@ -1,10 +1,10 @@
 import numpy as np
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import roc_auc_score as auroc
 from utils import load_data, print_expected
 
 from nleval import Dataset
 from nleval.label.split import RatioPartition
+from nleval.metric import auroc
 from nleval.model_trainer import SupervisedLearningTrainer
 from nleval.util.parallel import ParDatMap
 

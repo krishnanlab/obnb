@@ -1,9 +1,9 @@
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import roc_auc_score as auroc
 from utils import load_data
 
 from nleval import Dataset
 from nleval.label.split import AllHoldout
+from nleval.metric import auroc
 from nleval.model_trainer import SupervisedLearningTrainer
 
 i = 24  # index of labelset

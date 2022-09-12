@@ -1,10 +1,10 @@
 import torch
-from sklearn.metrics import roc_auc_score as auroc
 from torch_geometric.nn import GCN
 from utils import load_data
 
 from nleval import Dataset
 from nleval.label.split import RatioPartition
+from nleval.metric import auroc
 from nleval.model_trainer.gnn import SimpleGNNTrainer
 
 # Load dataset (with sparse graph)

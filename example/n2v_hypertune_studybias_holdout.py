@@ -5,12 +5,12 @@ import tempfile
 
 import numpy as np
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import roc_auc_score as auroc
 from utils import load_data
 
 from nleval.feature import FeatureVec, MultiFeatureVec
 from nleval.label.filters import LabelsetRangeFilterSplit
 from nleval.label.split import RatioPartition
+from nleval.metric import auroc
 from nleval.model_trainer import (
     MultiSupervisedLearningTrainer,
     SupervisedLearningTrainer,
