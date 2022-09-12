@@ -21,7 +21,7 @@ def download_unzip(url: str, root: str, *, logger: Optional[Logger] = None):
     """
     logger = logger or native_logger
 
-    logger.info(f"Donwloading zip archive from {url}")
+    logger.info(f"Downloading zip archive from {url}")
     r = requests.get(url)
     if not r.ok:
         logger.error(f"Download filed: {r} {r.reason}")
