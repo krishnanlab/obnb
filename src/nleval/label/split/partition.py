@@ -3,7 +3,7 @@ from collections import Counter
 import numpy as np
 
 from nleval.label.split.base import BaseRandomSplit, BaseSortedSplit
-from nleval.typing import Any, List, Mapping, Tuple
+from nleval.typing import List, Tuple
 from nleval.util.checkers import checkTypesInIterableErrEmpty
 
 
@@ -40,7 +40,7 @@ class RatioPartition(BasePartition):
     def __init__(
         self,
         *ratios: float,
-        property_converter: Mapping[str, Any],
+        property_converter,
         ascending: bool = True,
     ) -> None:
         """Initialize the RatioPartition object.
@@ -110,7 +110,7 @@ class ThresholdPartition(BasePartition):
     def __init__(
         self,
         *thresholds: float,
-        property_converter: Mapping[str, Any],
+        property_converter,
         ascending: bool = True,
     ) -> None:
         """Initialize the ThresholdPartition object.
