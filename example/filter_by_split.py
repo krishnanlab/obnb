@@ -1,11 +1,11 @@
 from time import perf_counter
 
 import numpy as np
-from sklearn.metrics import roc_auc_score as auroc
 from utils import load_data, print_expected
 
 from nleval.label.filters import LabelsetRangeFilterSplit
 from nleval.label.split import RatioPartition
+from nleval.metric import auroc
 from nleval.model.label_propagation import OneHopPropagation
 from nleval.model_trainer import LabelPropagationTrainer
 

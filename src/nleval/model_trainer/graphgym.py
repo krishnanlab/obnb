@@ -237,13 +237,12 @@ class GraphGymTrainer(GNNTrainer):
 
 
 def graphgym_model_wrapper(model):
-    """Wrap a GraphGym model to take data and y as input."""
+    """Wrap a GraphGym model to take PyG data as input."""
 
     @wraps(model)
-    def wrapped_model(data, y):
+    def wrapped_model(data):
         batch = Batch.from_data_list([data])
-        batch.y = torch.Tensor(y)
-        batch.all_mask = torch.ones(y.shape[0], dtype=bool)
+        batch.all_mask = torch.ones(data.y.shape[0], dtype=bool)
         batch.split = "all"
         pred, true = model(batch)
         return pred.detach().cpu().numpy(), true.detach().cpu().numpy()

@@ -1,8 +1,8 @@
-from sklearn.metrics import roc_auc_score as auroc
 from utils import load_data, print_expected
 
 from nleval import Dataset
 from nleval.label.split import RatioPartition
+from nleval.metric import auroc
 from nleval.model.label_propagation import OneHopPropagation
 from nleval.model_trainer import LabelPropagationTrainer
 
@@ -31,7 +31,7 @@ print(trainer.train(mdl, dataset))
 
 # Evaluate the model for all tasks
 dataset = Dataset(graph=g, label=lsc, splitter=splitter)
-results = trainer.eval_multi_ovr(mdl, dataset, consider_negative=True)
+results = trainer.eval_multi_ovr(mdl, dataset, consider_negative=True, reduce="mean")
 print(f"Average train score = {results['train_auroc']:.4f}")
 print(f"Average test score = {results['test_auroc']:.4f}")
 
