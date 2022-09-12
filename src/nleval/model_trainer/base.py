@@ -1,4 +1,4 @@
-from functools import partial
+from copy import deepcopy
 
 import numpy as np
 
@@ -65,44 +65,122 @@ class BaseTrainer:
 
 
 class StandardTrainer(BaseTrainer):
+    def train(
+        self,
+        model: Any,
+        dataset,
+        split_idx: int = 0,
+    ) -> Dict[str, float]:
+        """Train a supervised learning model.
+
+        The ``model`` in this case is a  upervised learning model that has a
+        ``fit`` method for training the model, and a ``decision_function`` that
+        returns the predict confidence scores given some features. See
+        ``sklearn.linear_model.LogisticRegression`` for example.
+
+        """
+        g = dataset.graph
+        x = None if dataset.feature is None else dataset.feature.mat
+        y = dataset.y
+
+        # TODO: log time and other useful stats (maybe use the decorator?)
+        train_mask = dataset.masks[self.train_on][:, split_idx]
+        self._model_train(model, g, x, y, train_mask)
+
+        _, _, get_predictions, compute_results = self._setup(dataset, split_idx)
+        get_predictions(model, x, y, dataset.masks)
+        results = compute_results(dataset.masks)
+
+        return results
+
+    def eval_multi_ovr(
+        self,
+        model: Any,
+        dataset,
+        split_idx: int = 0,
+        consider_negative: bool = False,
+    ) -> Dict[str, float]:
+        """Evaluate the model in a multiclass setting.
+
+        Note:
+            The original model is not trained. For each task, a deep copy of
+            the model is craeted and it is evaluted via one-vs-rest.
+
+        """
+        g = dataset.graph
+        x = None if dataset.feature is None else dataset.feature.mat
+
+        _, _, get_predictions, compute_results = self._setup(dataset, split_idx)
+        for i, label_id in enumerate(dataset.label.label_ids):
+            y, masks = dataset.label.split(
+                splitter=dataset.splitter,
+                target_ids=tuple(dataset.idmap.lst),
+                labelset_name=label_id,
+                consider_negative=consider_negative,
+            )
+
+            train_mask = masks[self.train_on][:, split_idx]
+            model_copy = deepcopy(model)
+            self._model_train(model_copy, g, x, y, train_mask)
+
+            get_predictions(model_copy, x, y, masks, i)
+            intermediate_results = compute_results(masks, label_idx=i)
+            self.logger.info(f"{label_id}\t{intermediate_results}")
+
+        results = compute_results(dataset.masks)
+
+        return results
+
     def _setup(self, dataset, split_idx):
         # Initialize y dictionary: mask_name -> y_pred/true (2d arrays)
-        # Set up results compute function using the y dicts and the metrics
         y_pred_dict: Dict[str, np.ndarray] = {}
         y_true_dict: Dict[str, np.ndarray] = {}
+        num_classes = 1 if len(dataset.y.shape) == 1 else dataset.y.shape[1]
         for mask_name in dataset.masks:
             num_examples = dataset.masks[mask_name][:, split_idx].sum()
-            num_classes = 1 if len(dataset.y.shape) == 1 else dataset.y.shape[1]
             shape = (num_examples, num_classes)
             y_pred_dict[mask_name] = np.zeros(shape)
             y_true_dict[mask_name] = np.zeros(shape)
 
-        compute_results = partial(
-            self._compute_results,
-            y_true_dict,
-            y_pred_dict,
-            metrics=self.metrics,
-        )
+        def compute_results(
+            masks,
+            label_idx: Optional[int] = None,
+        ) -> Dict[str, float]:
+            # Set up results compute function using the y dicts and the metrics
+            results = {}
+            for metric_name, metric_func in self.metrics.items():
+                for mask_name in masks:
+                    y_true = y_true_dict[mask_name]
+                    y_pred = y_pred_dict[mask_name]
+                    if label_idx is not None:
+                        y_true = y_true[:, label_idx]
+                        y_pred = y_pred[:, label_idx]
 
-        return y_true_dict, y_pred_dict, compute_results
+                    score = metric_func(y_true, y_pred)
+                    results[f"{mask_name}_{metric_name}"] = score
+
+            return results
+
+        def get_predictions(model, x, y, masks, label_idx: Optional[int] = None):
+            # Function to fill in y_pred_dict and y_true_dict given trained model
+            for mask_name in masks:
+                mask = masks[mask_name][:, split_idx]
+                y_true = y[mask]
+                y_pred = self._model_predict(model, x, mask)
+
+                if label_idx is None:
+                    y_true_dict[mask_name] = y_true
+                    y_pred_dict[mask_name] = y_pred
+                else:  # only fill in the column that corresponds to the task
+                    y_true_dict[mask_name][:, label_idx] = y_true
+                    y_pred_dict[mask_name][:, label_idx] = y_pred
+
+        return y_true_dict, y_pred_dict, get_predictions, compute_results
 
     @staticmethod
-    def _compute_results(
-        y_true_dict,
-        y_pred_dict,
-        masks,
-        metrics,
-        label_idx: Optional[str] = None,
-    ):
-        results = {}
-        for metric_name, metric_func in metrics.items():
-            for mask_name in masks:
-                y_true = y_true_dict[mask_name]
-                y_pred = y_pred_dict[mask_name]
-                if label_idx is not None:
-                    y_true, y_pred = y_true[:, label_idx], y_pred[:, label_idx]
+    def _model_predict(model, x, mask):
+        raise NotImplementedError
 
-                score = metric_func(y_true, y_pred)
-                results[f"{mask_name}_{metric_name}"] = score
-
-        return results
+    @staticmethod
+    def _model_train(model, g, x, y, mask):
+        raise NotImplementedError

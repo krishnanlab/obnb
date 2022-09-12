@@ -40,6 +40,7 @@ class IterativePropagation:
         self.tol = tol
         self.max_iter = max_iter
         self.warn = warn
+        self._predictions = None
 
     @property
     def tol(self) -> float:
@@ -62,6 +63,16 @@ class IterativePropagation:
         """Setter for :attr:`max_iter`."""
         checkValuePositive("max_iter", val)
         self._max_iter = val
+
+    @property
+    def predictions(self) -> np.ndarray:
+        if self._predictions is None:
+            raise ValueError(
+                "The label propagation model has not been fitted yet, "
+                "need to call fit() first to register the predictions.",
+            )
+
+        return self._predictions
 
     def __call__(self, graph: BaseGraph, seed: np.ndarray) -> np.ndarray:
         """Propagate the seed information over the network.
@@ -91,6 +102,10 @@ class IterativePropagation:
             )
 
         return y_pred
+
+    def fit(self, graph: BaseGraph, seed: np.ndarray):
+        """Propagate seeds and save propagated values to predictions."""
+        self._predictions = self(graph, seed)
 
 
 class KHopPropagation(IterativePropagation):
