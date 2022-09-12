@@ -42,7 +42,7 @@ print(f"\nBest results:\n{results}\n")
 
 # Check to see if the model is rewinded back to the best model correctly
 data = dataset.to_pyg_data(device=trainer.device)
-y_pred, y_true = graphgym_model_wrapper(mdl)(data, dataset.y)
+y_pred, y_true = graphgym_model_wrapper(mdl)(data)
 for split in "train", "val", "test":
     mask = dataset.masks[split][:, 0]
     print(f"{split:>5}: {auroc(y_true[mask], y_pred[mask])}")
