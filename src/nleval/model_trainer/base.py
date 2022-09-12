@@ -158,7 +158,7 @@ class StandardTrainer(BaseTrainer):
                         y_true = y_true[:, label_idx]
                         y_pred = y_pred[:, label_idx]
 
-                    score = metric_func(y_true, y_pred, reduce=reduce)
+                    score = metric_func(y_true, y_pred, reduce=reduce)  # type: ignore
                     results[f"{mask_name}_{metric_name}"] = score
 
             return results
