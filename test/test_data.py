@@ -162,7 +162,7 @@ def test_dataset_constructor(subtests, tmpdir):
         ):
             dataset = default_constructor(
                 root=datadir,
-                graph_name="BioGRID",
+                graph_name="BioPlex",
                 label_name="DisGeNet",
                 graph_as_feature=graph_as_feature,
                 use_dense_graph=use_dense_graph,
