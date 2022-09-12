@@ -85,13 +85,7 @@ class SupervisedLearningTrainer(StandardTrainer):
         """
         x = dataset.feature.mat
 
-        y_true_dict, y_pred_dict = self._get_y_dict(dataset, split_idx)
-        compute_results = partial(
-            self._compute_results,
-            y_true_dict,
-            y_pred_dict,
-            metrics=self.metrics,
-        )
+        y_true_dict, y_pred_dict, compute_results = self._setup(dataset, split_idx)
         for i, label_id in enumerate(dataset.label.label_ids):
             y, masks = dataset.label.split(
                 splitter=dataset.splitter,

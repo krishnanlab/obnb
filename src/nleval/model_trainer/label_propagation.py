@@ -26,12 +26,12 @@ class LabelPropagationTrainer(BaseTrainer):
         train_mask = dataset.get_mask(self.train_on, split_idx)
         y_pred = model(dataset.graph, dataset.y * train_mask)
 
-        # Evaluate the prediction using the specified metrics
-        results = {}
-        for metric_name, metric_func in self.metrics.items():
-            for mask_name in dataset.masks:
-                mask = dataset.get_mask(mask_name, split_idx)
-                score = metric_func(dataset.y[mask], y_pred[mask])
-                results[f"{mask_name}_{metric_name}"] = score
+        y_true_dict, y_pred_dict, compute_results = self._setup(dataset, split_idx)
+        for mask_name in dataset.masks:
+            mask = dataset.get_mask(mask_name, split_idx)
+            y_true_dict[mask_name] = dataset.y[mask]
+            y_pred_dict[mask_name] = y_pred[mask]
+
+        results = compute_results(dataset.masks)
 
         return results

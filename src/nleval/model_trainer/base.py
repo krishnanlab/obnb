@@ -1,3 +1,5 @@
+from functools import partial
+
 import numpy as np
 
 from nleval.typing import Any, Callable, Dict, LogLevel, Optional
@@ -63,16 +65,26 @@ class BaseTrainer:
 
 
 class StandardTrainer(BaseTrainer):
-    @staticmethod
-    def _get_y_dict(dataset, split_idx):
+    def _setup(self, dataset, split_idx):
         # Initialize y dictionary: mask_name -> y_pred/true (2d arrays)
+        # Set up results compute function using the y dicts and the metrics
         y_pred_dict: Dict[str, np.ndarray] = {}
         y_true_dict: Dict[str, np.ndarray] = {}
-        for mask_name, (_, y) in dataset.splits(split_idx):
-            y_pred_dict[mask_name] = np.zeros(y.shape)
-            y_true_dict[mask_name] = np.zeros(y.shape)
+        for mask_name in dataset.masks:
+            num_examples = dataset.masks[mask_name][:, split_idx].sum()
+            num_classes = 1 if len(dataset.y.shape) == 1 else dataset.y.shape[1]
+            shape = (num_examples, num_classes)
+            y_pred_dict[mask_name] = np.zeros(shape)
+            y_true_dict[mask_name] = np.zeros(shape)
 
-        return y_true_dict, y_pred_dict
+        compute_results = partial(
+            self._compute_results,
+            y_true_dict,
+            y_pred_dict,
+            metrics=self.metrics,
+        )
+
+        return y_true_dict, y_pred_dict, compute_results
 
     @staticmethod
     def _compute_results(
