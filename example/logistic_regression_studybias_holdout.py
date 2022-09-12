@@ -20,13 +20,20 @@ mdl = LogisticRegression(penalty="l2", solver="lbfgs", n_jobs=1, max_iter=500)
 metrics = {"auroc": auroc}
 trainer = SupervisedLearningTrainer(metrics, log_level="INFO")
 
-y, masks = lsc.split(splitter, target_ids=g.node_ids)
+# Train a single model
+dataset = Dataset(
+    feature=feature,
+    label=lsc,
+    splitter=splitter,
+    labelset_name=lsc.label_ids[0],
+    consider_negative=True,
+)
+print(trainer.train(mdl, dataset))
+
+# Evaluate the model for all tasks
 dataset = Dataset(feature=feature, label=lsc, splitter=splitter)
 results = trainer.eval_multi_ovr(mdl, dataset, consider_negative=True)
 print(f"Average train score = {results['train_auroc']:.4f}")
 print(f"Average test score = {results['test_auroc']:.4f}")
 
-print_expected(
-    "Average train score = 0.9971",
-    "Average test score = 0.6986",
-)
+print_expected("Average train score = 0.9971", "Average test score = 0.6986")

@@ -1,5 +1,4 @@
 from copy import deepcopy
-from functools import partial
 
 from nleval.model_trainer.base import StandardTrainer
 from nleval.typing import Any, Dict, LogLevel, Optional
@@ -36,11 +35,7 @@ class SupervisedLearningTrainer(StandardTrainer):
             node features.
 
         """
-        super().__init__(
-            metrics,
-            train_on=train_on,
-            log_level=log_level,
-        )
+        super().__init__(metrics, train_on=train_on, log_level=log_level)
 
     def train(
         self,
@@ -59,13 +54,12 @@ class SupervisedLearningTrainer(StandardTrainer):
         # TODO: log time and other useful stats (maybe use the decorator?)
         model.fit(*dataset.get_split(self.train_on, split_idx))
 
-        # Evaluate the trained model using the specified metrics
-        results = {}
-        for metric_name, metric_func in self.metrics.items():
-            for mask_name, (x, y) in dataset.splits(split_idx):
-                y_pred = model.decision_function(x)
-                score = metric_func(y, y_pred)
-                results[f"{mask_name}_{metric_name}"] = score
+        y_true_dict, y_pred_dict, compute_results = self._setup(dataset, split_idx)
+        for mask_name, (x, y) in dataset.splits(split_idx):
+            y_true_dict[mask_name] = y
+            y_pred_dict[mask_name] = model.decision_function(x)
+
+        results = compute_results(dataset.masks)
 
         return results
 
