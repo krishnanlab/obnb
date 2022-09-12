@@ -65,10 +65,9 @@ from nleval.label.split import RatioHoldout
 # Load PubMed count gene propery converter and use it to set up study-bias holdout split
 pubmedcnt_converter = GenePropertyConverter(root, name="PubMedCount")
 splitter = RatioHoldout(0.6, 0.4, ascending=False, property_converter=pubmedcnt_converter)
-y, masks = lsc.split(splitter, target_ids=g.node_ids, labelset_name=label_id, consider_negative=True)
 
 # Combine everything into a dataset object
-dataset = Dataset(graph=g, feature=g.to_dense_graph().to_feature(), y=y, masks=masks)
+dataset = Dataset(graph=g, feature=g.to_dense_graph().to_feature(), label=lsc, splitter=splitter)
 ```
 
 ### Evaluating models on the processed dataset
@@ -94,9 +93,7 @@ lp_results = LabelPropagationTrainer(metrics).train(lp_mdl, dataset)
 from torch_geometric.nn import GCN
 from nleval.model_trainer.gnn import SimpleGNNTrainer
 
-# Prepare study-bias holdout split on the whole geneset collection, do not consider defined negatives
-y, masks = lsc.split(splitter, target_ids=g.node_ids, consider_negative=False)
-dataset = Dataset(graph=g, y=y, masks=masks)  # use 1-d trivial node feature if feature is not set
+dataset = Dataset(graph=g, label=lsc, splitter=splitter)  # use 1-d trivial node feature if feature is not set
 
 # Evaluate GCN on the whole geneset collection
 gcn_mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=n_tasks)

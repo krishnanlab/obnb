@@ -1,6 +1,8 @@
+from functools import partial
+
 import numpy as np
 
-from nleval.typing import Any, Callable, Dict, LogLevel
+from nleval.typing import Any, Callable, Dict, LogLevel, Optional
 from nleval.util.logger import get_logger
 
 
@@ -60,3 +62,47 @@ class BaseTrainer:
             f"{self.__class__.__name__} does not have functional ``train`` "
             f"method, use a derived class instead.",
         )
+
+
+class StandardTrainer(BaseTrainer):
+    def _setup(self, dataset, split_idx):
+        # Initialize y dictionary: mask_name -> y_pred/true (2d arrays)
+        # Set up results compute function using the y dicts and the metrics
+        y_pred_dict: Dict[str, np.ndarray] = {}
+        y_true_dict: Dict[str, np.ndarray] = {}
+        for mask_name in dataset.masks:
+            num_examples = dataset.masks[mask_name][:, split_idx].sum()
+            num_classes = 1 if len(dataset.y.shape) == 1 else dataset.y.shape[1]
+            shape = (num_examples, num_classes)
+            y_pred_dict[mask_name] = np.zeros(shape)
+            y_true_dict[mask_name] = np.zeros(shape)
+
+        compute_results = partial(
+            self._compute_results,
+            y_true_dict,
+            y_pred_dict,
+            metrics=self.metrics,
+        )
+
+        return y_true_dict, y_pred_dict, compute_results
+
+    @staticmethod
+    def _compute_results(
+        y_true_dict,
+        y_pred_dict,
+        masks,
+        metrics,
+        label_idx: Optional[str] = None,
+    ):
+        results = {}
+        for metric_name, metric_func in metrics.items():
+            for mask_name in masks:
+                y_true = y_true_dict[mask_name]
+                y_pred = y_pred_dict[mask_name]
+                if label_idx is not None:
+                    y_true, y_pred = y_true[:, label_idx], y_pred[:, label_idx]
+
+                score = metric_func(y_true, y_pred)
+                results[f"{mask_name}_{metric_name}"] = score
+
+        return results
