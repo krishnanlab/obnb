@@ -23,6 +23,7 @@ class DenseGraph(BaseGraph):
         """Initialize DenseGraph object."""
         super().__init__(log_level=log_level, verbose=verbose, logger=logger)
         self._mat = np.array([])
+        self._norm_mat = None
 
     def __getitem__(self, key):
         """Return slice of graph.
@@ -41,6 +42,13 @@ class DenseGraph(BaseGraph):
     def num_edges(self) -> int:
         """int: Number of edges."""
         return (self.mat != 0).sum()
+
+    @property
+    def norm_mat(self):
+        """Column normalized adjacency matrix."""
+        if self._norm_mat is None:
+            self._norm_mat = self._mat / self._mat.sum(axis=0)
+        return self._norm_mat
 
     @property
     def mat(self):
@@ -105,7 +113,7 @@ class DenseGraph(BaseGraph):
 
         """
         checkers.checkNumpyArrayShape("seed", self.size, seed)
-        return np.matmul(self.mat, seed)
+        return np.matmul(self.norm_mat, seed)
 
     def get_edge(self, node_id1, node_id2):
         """Return edge weight between node_id1 and node_id2.

@@ -1,6 +1,7 @@
 import unittest
 
 import numpy as np
+import pytest
 
 from nleval.graph import DenseGraph, SparseGraph
 from nleval.model import label_propagation
@@ -70,15 +71,13 @@ class TestLabelPropagation(unittest.TestCase):
                 y_pred = self.seed.copy()
                 for _ in range(k):
                     y_pred = np.matmul(self.lazyrw, y_pred)
-                self.assertEqual(
-                    mdl(self.dense_graph, self.seed).tolist(),
+                assert mdl(self.dense_graph, self.seed).tolist() == pytest.approx(
                     y_pred.tolist(),
                 )
 
     def test_onehop_propagation_dense(self):
         mdl = label_propagation.OneHopPropagation()
-        self.assertEqual(
-            mdl(self.dense_graph, self.seed).tolist(),
+        assert mdl(self.dense_graph, self.seed).tolist() == pytest.approx(
             np.matmul(self.lazyrw, self.seed).tolist(),
         )
 
