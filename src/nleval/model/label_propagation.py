@@ -19,6 +19,7 @@ class IterativePropagation:
 
     def __init__(
         self,
+        *,
         tol: float = 1e-6,
         max_iter: int = 200,
         warn: bool = True,
@@ -41,6 +42,7 @@ class IterativePropagation:
         self.max_iter = max_iter
         self.warn = warn
         self._predictions = None
+        self._beta = 0.0
 
     @property
     def tol(self) -> float:
@@ -74,6 +76,21 @@ class IterativePropagation:
 
         return self._predictions
 
+    def _propagate(
+        self,
+        graph: BaseGraph,
+        seed: np.ndarray,
+        first_step: bool = False,
+    ) -> np.ndarray:
+        if first_step:
+            self._orig_seed = seed.copy()
+
+        one_hop_prop = graph.propagate(seed)
+        if self._beta == 0.0:
+            return one_hop_prop
+        else:
+            return self._beta * self._orig_seed + (1 - self._beta) * one_hop_prop
+
     def __call__(self, graph: BaseGraph, seed: np.ndarray) -> np.ndarray:
         """Propagate the seed information over the network.
 
@@ -84,11 +101,11 @@ class IterativePropagation:
                 size of the number of nodes in the graph.
 
         """
-        y_pred_new = y_pred = graph.propagate(seed)
+        y_pred_new = y_pred = self._propagate(graph, seed / seed.sum(), True)
         converged = False
         # TODO: restart
         for _ in range(self.max_iter - 1):
-            y_pred_new = graph.propagate(y_pred)
+            y_pred_new = self._propagate(graph, y_pred)
             norm = np.linalg.norm(y_pred_new - y_pred)
             y_pred_new, y_pred = y_pred, y_pred_new  # switch pointers
             if norm < self.tol:
@@ -106,6 +123,44 @@ class IterativePropagation:
     def fit(self, graph: BaseGraph, seed: np.ndarray):
         """Propagate seeds and save propagated values to predictions."""
         self._predictions = self(graph, seed)
+
+
+class RandomWalkRestart(IterativePropagation):
+    """Random walk with restart model."""
+
+    def __init__(
+        self,
+        *,
+        tol: float = 1e-6,
+        max_iter: int = 200,
+        warn: bool = True,
+        beta: float = 0.85,
+    ):
+        """Initialize RandomWalkRestart.
+
+        Args:
+            beta: Restart propability.
+
+        Raises:
+            ValueError: If the value of :attr:`beta` is not within [0, 1].
+
+        """
+        super().__init__(tol=tol, max_iter=max_iter, warn=warn)
+        self.beta = beta
+
+    @property
+    def beta(self) -> float:
+        """float: restart parameter."""
+        return self._beta
+
+    @beta.setter
+    def beta(self, beta: float):
+        checkValuePositive("beta", beta)
+        if not 0 <= beta <= 1:
+            raise ValueError(
+                f"Restart parameter (beta) must be within [0, 1], got {beta}",
+            )
+        self._beta = beta
 
 
 class KHopPropagation(IterativePropagation):
