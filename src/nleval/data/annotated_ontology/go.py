@@ -164,7 +164,7 @@ class GeneOntology(BaseAnnotatedOntologyData):
         g._update_node_attr_finalize()
 
         # Propagate annotations and show progress
-        g.complete_node_attrs(pbar=enable_pbar)
+        g.propagate_node_attrs(pbar=enable_pbar)
 
         lsc = LabelsetCollection.from_ontology_graph(
             g,

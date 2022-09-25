@@ -31,7 +31,7 @@ node_attr_sizes = [len(g.get_node_attr(i) or []) for i in g.node_ids]
 avg_node_attr_size = sum(node_attr_sizes) / g.size
 print(f"Average node attribute size (raw) = {avg_node_attr_size:.2f}")
 
-g.complete_node_attrs()
+g.propagate_node_attrs()
 node_attr_sizes = [len(g.get_node_attr(i) or []) for i in g.node_ids]
 avg_node_attr_size = sum(node_attr_sizes) / g.size
 print(f"Average node attribute size (propagated) = {avg_node_attr_size:.2f}")
