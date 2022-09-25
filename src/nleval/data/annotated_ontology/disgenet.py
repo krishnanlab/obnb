@@ -108,7 +108,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
         g._update_node_attr_finalize()
 
         # Propagate annotations and show progress
-        g.complete_node_attrs(pbar=enable_pbar)
+        g.propagate_node_attrs(pbar=enable_pbar)
 
         lsc = LabelsetCollection.from_ontology_graph(g, min_size=self.min_size)
         lsc.export_gmt(self.processed_file_path(0))

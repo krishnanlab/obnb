@@ -218,8 +218,8 @@ class OntologyGraph(DirectedSparseGraph):
             node_attr = itertools.chain(*children_attrs, self_attrs)
         return sorted(set(node_attr))
 
-    def complete_node_attrs(self, pbar: bool = False):
-        """Node attribute completion by propagation upwards.
+    def propagate_node_attrs(self, pbar: bool = False):
+        """Propagate node attribute upwards the ontology.
 
         Starting from the leaf node, propagate the node attributes to its
         parent node so that the parent node contains all the node attributes
