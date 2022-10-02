@@ -22,7 +22,7 @@ native_logger = get_logger(None, log_level="INFO")
 
 def get_data_url(
     version: str,
-    name: str = False,
+    name: str,
     *,
     logger: Optional[Logger] = None,
 ) -> str:
