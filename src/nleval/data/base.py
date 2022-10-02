@@ -1,21 +1,16 @@
 import os
 import os.path as osp
 import shutil
-import urllib.error
-import urllib.parse
-import urllib.request
 from datetime import datetime
 from pprint import pformat
 
 import yaml
 
 import nleval
-from nleval.config import NLEDATA_URL_DICT, NLEDATA_URL_DICT_STABLE
-from nleval.exception import DataNotFoundError
 from nleval.typing import Any, Dict, List, LogLevel, Mapping, Optional, Union
 from nleval.util.checkers import checkConfig
 from nleval.util.converter import MyGeneInfoConverter
-from nleval.util.download import download_unzip
+from nleval.util.download import download_unzip, get_data_url
 from nleval.util.logger import get_logger, log_file_context
 from nleval.util.path import cleandir, hexdigest
 
@@ -100,6 +95,7 @@ class BaseData:
                 self._process()
         else:
             self._download_archive()
+            self._process()  # FIX:
 
         self.load_processed_data()
         self._apply_transform(transform)
@@ -170,6 +166,8 @@ class BaseData:
         elif isinstance(pre_transform, str):
             raise ValueError(f"Unknown pre_transform option {pre_transform}")
         elif self.version != "latest":
+            self._pre_transform = pre_transform
+            return  # FIX: allow custom pre_transform for archived version
             raise ValueError(
                 "pre_transform option is only valid when version='latest', "
                 f"got {self.version!r} instead",
@@ -361,41 +359,6 @@ class BaseData:
         else:
             shutil.rmtree(cache_dir)
 
-    def get_data_url(self, version: str, cache: bool = False) -> str:
-        """Obtain archive data URL.
-
-        The URL is constructed by joining the base archive data URL corresponds
-        to the specified version with the data object name, ending with the
-        '.zip' extension.
-
-        Args:
-            version: Archival version.
-            cache: If set to True, then get the cache URL instead.
-
-        Returns:
-            str: URL to download the archive data.
-
-        """
-        if (base_url := NLEDATA_URL_DICT.get(version)) is None:
-            versions = list(NLEDATA_URL_DICT_STABLE) + ["latest"]
-            raise ValueError(
-                f"Unrecognized version {version!r}, please choose from the "
-                f"following versions:\n{pformat(versions)}",
-            )
-
-        name = ".cache" if cache else self.classname
-        data_url = urllib.parse.urljoin(base_url, f"{name}.zip")
-        try:
-            with urllib.request.urlopen(data_url):
-                self.plogger.debug("Connection successul")
-            self.plogger.info(f"Download URL: {data_url}")
-        except urllib.error.HTTPError:
-            reason = f"{self.classname} is unavailable in version: {version}"
-            self.plogger.error(reason)
-            raise DataNotFoundError(reason)
-
-        return data_url
-
     def download_archive(self, version: str):
         """Load data from archived version that ensures reproducibility.
 
@@ -408,11 +371,11 @@ class BaseData:
 
         """
         self.plogger.info(f"Loading {self.classname} ({version=})...")
-        data_url = self.get_data_url(version)
+        data_url = get_data_url(version, self.classname, logger=self.plogger)
         download_unzip(data_url, self.root, logger=self.plogger)
 
         if self.download_cache and not osp.isdir(osp.join(self.root, ".cache")):
-            cache_url = self.get_data_url(version, cache=True)
+            cache_url = get_data_url(version, ".cache", logger=self.plogger)
             download_unzip(cache_url, self.root, logger=self.plogger)
 
     def _download_archive(self):

@@ -2,6 +2,10 @@ class DataNotFoundError(Exception):
     """Raised when an particular version of arvhival data is unavailable."""
 
 
+class ExceededMaxNumRetries(Exception):
+    """Raised when the number of download retries exceeds the limit."""
+
+
 class IDNotExistError(Exception):
     """Raised when query ID not exist."""
 
