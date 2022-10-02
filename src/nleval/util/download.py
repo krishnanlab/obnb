@@ -68,12 +68,31 @@ def download_unzip(url: str, root: str, *, logger: Optional[Logger] = None):
     logger = logger or native_logger
 
     logger.info(f"Downloading zip archive from {url}")
-    r = requests.get(url)
-    if not r.ok:
-        logger.error(f"Download filed: {r} {r.reason}")
-        raise requests.exceptions.RequestException(r)
 
-    logger.info("Download completed, start unpacking...")
-    zf = ZipFile(BytesIO(r.content))
-    zf.extractall(root)
-    logger.info("Done extracting")
+    num_tries = 0
+    while num_tries < MAX_DOWNLOAD_RETRIES:
+        num_tries += 1
+        r = requests.get(url)
+
+        if r.ok:
+            logger.info("Download completed, start unpacking...")
+            zf = ZipFile(BytesIO(r.content))
+            zf.extractall(root)
+            logger.info("Done extracting")
+            break
+        elif r.status_code in [429, 503]:  # Retry later
+            t = r.headers.get("Retry-after", DEFAULT_RETRY_DELAY)
+            logger.warning(f"Server temporarily unavailable, waiting for {t} sec")
+            time.sleep(int(t))
+        elif r.status_code == 404:
+            reason = f"{url} is unavailable, try using a more recent data version"
+            logger.error(reason)
+            raise DataNotFoundError(reason)
+        else:
+            logger.error(f"Failed to download {url}: {r} {r.reason}")
+            raise requests.exceptions.RequestException(r)
+
+    else:  # failed to download within the allowed number of retries
+        logger.error(f"Failed to download {url}")
+        reason = f"Max number of retries exceeded {MAX_DOWNLOAD_RETRIES=}"
+        raise ExceededMaxNumRetries(reason)

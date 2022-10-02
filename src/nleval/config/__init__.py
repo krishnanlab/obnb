@@ -2,10 +2,15 @@
 from nleval.typing import Dict
 
 __all__ = [
+    "DEFAULT_RETRY_DELAY",
+    "MAX_DOWNLOAD_RETRIES",
     "NLEDATA_URL_DICT",
     "NLEDATA_URL_DICT_DEV",
     "NLEDATA_URL_DICT_STABLE",
 ]
+
+DEFAULT_RETRY_DELAY = 5
+MAX_DOWNLOAD_RETRIES = 10
 
 NLEDATA_URL_DICT_STABLE: Dict[str, str] = {}
 NLEDATA_URL_DICT_DEV: Dict[str, str] = {
