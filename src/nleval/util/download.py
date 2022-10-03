@@ -6,16 +6,18 @@ from pprint import pformat
 from zipfile import ZipFile
 
 import requests
+from tqdm import tqdm
 
 from nleval.config import (
     DEFAULT_RETRY_DELAY,
     MAX_DOWNLOAD_RETRIES,
     NLEDATA_URL_DICT,
     NLEDATA_URL_DICT_STABLE,
+    STREAM_BLOCK_SIZE,
 )
 from nleval.exception import DataNotFoundError, ExceededMaxNumRetries
-from nleval.typing import Optional
-from nleval.util.logger import get_logger
+from nleval.typing import LogLevel, Optional, Tuple
+from nleval.util.logger import display_pbar, get_logger
 
 native_logger = get_logger(None, log_level="INFO")
 
@@ -69,14 +71,12 @@ def download_unzip(url: str, root: str, *, logger: Optional[Logger] = None):
 
     logger.info(f"Downloading zip archive from {url}")
 
-    num_tries = 0
-    while num_tries < MAX_DOWNLOAD_RETRIES:
-        num_tries += 1
-        r = requests.get(url)
+    for _ in range(MAX_DOWNLOAD_RETRIES):
+        r, content = stream_download(url)
 
         if r.ok:
             logger.info("Download completed, start unpacking...")
-            zf = ZipFile(BytesIO(r.content))
+            zf = ZipFile(BytesIO(content))
             zf.extractall(root)
             logger.info("Done extracting")
             break
@@ -96,3 +96,27 @@ def download_unzip(url: str, root: str, *, logger: Optional[Logger] = None):
         logger.error(f"Failed to download {url}")
         reason = f"Max number of retries exceeded {MAX_DOWNLOAD_RETRIES=}"
         raise ExceededMaxNumRetries(reason)
+
+
+def stream_download(
+    url: str,
+    log_level: LogLevel = "INFO",
+) -> Tuple[requests.Response, bytes]:
+    """Download content from url with option to display progress bar."""
+    r = requests.get(url, stream=True)
+    tot_bytes = int(r.headers.get("content-length", 0))
+    pbar = tqdm(
+        total=tot_bytes,
+        unit="B",
+        unit_scale=True,
+        unit_divisor=1024,
+        disable=not display_pbar(log_level),
+    )
+
+    with BytesIO() as b:
+        for data in r.iter_content(STREAM_BLOCK_SIZE):
+            pbar.update(len(data))
+            b.write(data)
+        content = b.getvalue()
+
+    return r, content
