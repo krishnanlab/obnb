@@ -89,7 +89,11 @@ class DisGeNet(BaseAnnotatedOntologyData):
 
         annot_df = pd.read_csv(self.annotation_file_path, sep="\t")
         annot_df = annot_df[
-            annot_df.source.str.split(";", expand=True).isin(self.data_sources).any(1)
+            (
+                annot_df.source.str.split(";", expand=True)
+                .isin(self.data_sources)
+                .any(axis=1)
+            )
             & (annot_df["DSI"] >= self.dsi_threshold)
         ]
 
