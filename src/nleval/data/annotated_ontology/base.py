@@ -6,6 +6,7 @@ import requests
 from nleval.data.base import BaseData
 from nleval.label import LabelsetCollection
 from nleval.typing import Any, List, Optional
+from nleval.util.download import stream_download
 from nleval.util.logger import display_pbar
 
 
@@ -59,17 +60,16 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
     def download_ontology(self):
         """Download ontology from obo foundary."""
         self.plogger.info(f"Download obo from: {self.ontology_url}")
-        resp = requests.get(self.ontology_url)
+        content = stream_download(self.ontology_url, log_level=self.log_level)[1]
         with open(self.ontology_file_path, "wb") as f:
-            f.write(resp.content)
+            f.write(content)
 
     def download_annotations(self):
         """Download annotations."""
         self.plogger.info(f"Download annotation from: {self.annotation_url}")
-        resp = requests.get(self.annotation_url)
-        annotation_file_name = self.annotation_file_name
-        with open(osp.join(self.raw_dir, annotation_file_name), "wb") as f:
-            f.write(gzip.decompress(resp.content))
+        content = stream_download(self.annotation_url, log_level=self.log_level)[1]
+        with open(osp.join(self.raw_dir, self.annotation_file_name), "wb") as f:
+            f.write(gzip.decompress(content))
 
     def download(self):
         """Download the ontology and annotations."""
