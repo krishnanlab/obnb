@@ -381,5 +381,9 @@ class BaseData:
     def _download_archive(self):
         """Check if files data set up and download the archive if not."""
         # TODO: check version in the config file to see if matches
-        if not self.download_completed() or not self.process_completed():
+        if (
+            self.redownload
+            or not self.download_completed()
+            or not self.process_completed()
+        ):
             self.download_archive(self.version)
