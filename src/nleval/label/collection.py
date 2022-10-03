@@ -1,6 +1,7 @@
 from functools import lru_cache
 
 import numpy as np
+import pandas as pd
 
 from nleval.exception import IDExistsError
 from nleval.graph import OntologyGraph
@@ -40,6 +41,26 @@ class LabelsetCollection(idhandler.IDprop):
     def __init__(self):
         """Initialize LabelsetCollection object."""
         super().__init__()
+
+    def to_df(self) -> pd.DataFrame:
+        """Construct label sets info dataframe.
+
+        The first three columns of the table correspond to the name, info, and
+        the numbe of positive examples for each labelset. The rest of the
+        columns contain the positive examples, padded with `None`.
+
+        """
+        label_info = list(map(self.get_info, self.label_ids))
+        label_sets = list(map(self.get_labelset, self.label_ids))
+        label_sizes = list(map(len, label_sets))
+
+        meta_df = pd.DataFrame(
+            zip(self.label_ids, label_info, label_sizes),
+            columns=["Name", "Info", "Size"],
+        )
+        lsc_df = pd.DataFrame(label_sets)
+
+        return pd.concat([meta_df, lsc_df], axis=1)
 
     def reset(self):
         """Reset all labelsets and entities."""
