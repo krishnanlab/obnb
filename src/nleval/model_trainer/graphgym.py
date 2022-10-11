@@ -191,6 +191,8 @@ class GraphGymTrainer(GNNTrainer):
                 score_name = f"{mask_name.split(self.mask_suffix)[0]}_{metric_name}"
                 results[score_name] = score
 
+        results["time_per_epoch"] = self._elapse() / self.eval_steps
+
         return results
 
     def train(self, model, dataset, split_idx=0):

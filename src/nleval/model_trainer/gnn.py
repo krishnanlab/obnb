@@ -81,8 +81,8 @@ class GNNTrainer(BaseTrainer):
         masks: List[str],
     ) -> Tuple[Dict[str, List], Dict[str, float], Dict[str, torch.Tensor]]:
         """Create new stats for tracking model performance."""
-        stats: Dict[str, List] = {"epoch": [], "loss": []}
-        best_stats: Dict[str, float] = {"epoch": 0, "loss": 1e12}
+        stats: Dict[str, List] = {"epoch": [], "loss": [], "time_per_epoch": []}
+        best_stats: Dict[str, float] = {"epoch": 0, "loss": 1e12, "time_per_epoch": 0.0}
         best_model_state: Dict[str, torch.Tensor] = {}
 
         for mask_name in masks:
@@ -165,6 +165,8 @@ class SimpleGNNTrainer(GNNTrainer):
                 score_name = f"{mask_name.split(self.mask_suffix)[0]}_{metric_name}"
                 score = metric_func(y_true[mask], y_pred[mask])
                 results[score_name] = score
+
+        results["time_per_epoch"] = self._elapse() / self.eval_steps
 
         return results
 
