@@ -5,7 +5,7 @@ import os
 from contextlib import contextmanager
 
 from nleval.config.logger_config import LOGGER_CONFIG
-from nleval.typing import LogLevel, Optional, Union
+from nleval.typing import List, LogLevel, Optional, Union
 
 
 def display_pbar(level: Union[int, str], threshold="INFO") -> bool:
@@ -69,7 +69,9 @@ def attach_file_handler(
 
     # Create file handler and use parent's formatter if formatter not set
     file_handler = logging.FileHandler(log_path)
-    file_handler.setFormatter(formatter or _get_eff_handlers(logger)[0].formatter)
+    if formatter is None:
+        formatter = _get_eff_handlers(logger)[0].formatter
+    file_handler.setFormatter(formatter)
 
     # Attach file handler
     logger.addHandler(file_handler)
@@ -77,7 +79,7 @@ def attach_file_handler(
     return file_handler
 
 
-def _get_eff_handlers(logger: logging.Logger) -> logging.Handler:
+def _get_eff_handlers(logger: Optional[logging.Logger]) -> List[logging.Handler]:
     while logger is not None:
         if logger.handlers:
             return logger.handlers
