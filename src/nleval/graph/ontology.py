@@ -323,7 +323,7 @@ class OntologyGraph(DirectedSparseGraph):
 
         """
         xref_to_term_id = None if xref_prefix is None else defaultdict(set)
-        with open(path, "r") as f:
+        with open(path) as f:
             for term in self.iter_terms(f):
                 term_id, term_name, term_xrefs, term_parents = term
 

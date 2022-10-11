@@ -571,7 +571,7 @@ class LabelsetCollection(idhandler.IDprop):
         """
         # TODO: option to skip non-existing entities
         self.entity.new_property(prop_name, default_val, default_type)
-        with open(path, "r") as f:
+        with open(path) as f:
             for i, line in enumerate(f):
                 if (i < skiprows) | line.startswith(comment):
                     continue
@@ -632,7 +632,7 @@ class LabelsetCollection(idhandler.IDprop):
         """
         if reload:
             self.reset()
-        with open(path, "r") as f:
+        with open(path) as f:
             for line in f:
                 label_id, label_info, *lst = line.strip().split(sep)
                 self.add_labelset(lst, label_id, label_info)

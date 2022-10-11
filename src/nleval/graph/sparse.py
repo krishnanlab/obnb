@@ -278,7 +278,7 @@ class SparseGraph(BaseGraph):
         weight)
 
         """
-        with open(edg_path, "r") as f:
+        with open(edg_path) as f:
             for line in f:
                 try:
                     node_id1, node_id2, weight = line.split("\t")
@@ -450,7 +450,7 @@ class SparseGraph(BaseGraph):
             raise ValueError(f"Unkown node ID entry {node_id_entry!r}")
 
         self.logger.info("Loading raw cx file")
-        with open(path, "r") as f:
+        with open(path) as f:
             cx_data = CXExplorer.from_cx_stream(json.load(f))
 
         # Load node IDs

@@ -268,7 +268,7 @@ class BaseFeature:
     def from_emd(cls, path_to_emd, **kwargs):
         fvec_lst = []
         idmap = IDmap()
-        with open(path_to_emd, "r") as f:
+        with open(path_to_emd) as f:
             f.readline()  # skip header
             for line in f:
                 terms = line.split(" ")
