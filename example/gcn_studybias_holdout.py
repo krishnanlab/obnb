@@ -29,6 +29,7 @@ trainer = SimpleGNNTrainer(
     metric_best="auroc",
     epochs=100,
     lr=0.1,
+    log_path="test_log/gcn/run.log",
 )
 
 dataset = Dataset(graph=g, label=lsc, splitter=splitter)

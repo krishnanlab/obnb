@@ -21,6 +21,7 @@ class GNNTrainer(BaseTrainer):
         epochs: int = 100,
         eval_steps: int = 10,
         log_level: LogLevel = "INFO",
+        log_path: Optional[str] = None,
     ):
         """Initialize GNNTrainer.
 
@@ -39,6 +40,7 @@ class GNNTrainer(BaseTrainer):
             metrics,
             train_on=train_on,
             log_level=log_level,
+            log_path=log_path,
         )
 
         self.val_on = val_on
