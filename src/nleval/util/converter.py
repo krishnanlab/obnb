@@ -82,7 +82,7 @@ class BaseConverter:
             return False
 
         try:
-            with open(self.cache_path, "r") as f:
+            with open(self.cache_path) as f:
                 self._convert_map = json.load(f)
             self.logger.info(f"Loaded gene conversion cache {self.cache_path}")
             return True
@@ -103,7 +103,7 @@ class BaseConverter:
 
         full_convert_map = {}
         if osp.isfile(self.cache_path):
-            with open(self.cache_path, "r") as f:
+            with open(self.cache_path) as f:
                 full_convert_map = json.load(f)
 
         for i, j in self._convert_map.items():

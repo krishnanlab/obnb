@@ -318,7 +318,7 @@ class BaseData:
         # Check if transformed data cache is available and load directly if so
         if osp.isfile(cache_file_path):
             # TODO: option to furthercheck if info matches (config.yaml)
-            with open(cache_config_path, "r") as f:
+            with open(cache_config_path) as f:
                 force_retransform = False
                 if (cache_config := yaml.safe_load(f)) != config:
                     self.plogger.warning(
