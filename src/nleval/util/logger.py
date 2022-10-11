@@ -1,6 +1,7 @@
 """Logger utils."""
 import logging
 import logging.config
+import os
 from contextlib import contextmanager
 
 from nleval.config.logger_config import LOGGER_CONFIG
@@ -49,6 +50,8 @@ def get_logger(
 def attach_file_handler(
     logger: logging.Logger,
     log_path: str,
+    *,
+    formatter: Optional[logging.Formatter] = None,
 ) -> logging.FileHandler:
     """Attach a file handler to a logger.
 
@@ -57,12 +60,30 @@ def attach_file_handler(
     Args:
         logger: The logger to which the file handler is attached.
         log_path: Path of the logged file.
+        formatter: Formatter for the file handler to use. Use that of the
+            logger's parent if not set.
 
     """
+    # Make sure directory to the log file exists
+    os.makedirs(os.path.split(log_path)[0], exist_ok=True)
+
+    # Create file handler and use parent's formatter if formatter not set
     file_handler = logging.FileHandler(log_path)
-    file_handler.setFormatter(logger.handlers[0].formatter)
+    file_handler.setFormatter(formatter or _get_eff_handlers(logger)[0].formatter)
+
+    # Attach file handler
     logger.addHandler(file_handler)
+
     return file_handler
+
+
+def _get_eff_handlers(logger: logging.Logger) -> logging.Handler:
+    while logger is not None:
+        if logger.handlers:
+            return logger.handlers
+        logger = logger.parent
+    else:
+        raise ValueError("No handler available.")
 
 
 @contextmanager
