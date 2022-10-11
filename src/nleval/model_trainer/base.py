@@ -1,3 +1,4 @@
+import time
 from copy import deepcopy
 
 import numpy as np
@@ -33,6 +34,7 @@ class BaseTrainer:
                 feature, i.e.  individual columns (default: :obj:`False`)
 
         """
+        self._tic: Optional[float] = None
         self.metrics = metrics
         self.train_on = train_on
         self.logger = get_logger(
@@ -62,6 +64,18 @@ class BaseTrainer:
             f"{self.__class__.__name__} does not have functional ``train`` "
             f"method, use a derived class instead.",
         )
+
+    def _elapse(self) -> float:
+        """Record the time difference between two consecutive calls.
+
+        Note:
+            The first call will return elapsed time of 0.
+
+        """
+        now = time.time()
+        elapsed = 0.0 if self._tic is None else now - self._tic
+        self._tic = now
+        return elapsed
 
 
 class StandardTrainer(BaseTrainer):
