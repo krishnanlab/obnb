@@ -4,7 +4,7 @@ from copy import deepcopy
 import numpy as np
 
 from nleval.typing import Any, Callable, Dict, LogLevel, Optional
-from nleval.util.logger import get_logger
+from nleval.util.logger import attach_file_handler, get_logger
 
 
 class BaseTrainer:
@@ -20,6 +20,7 @@ class BaseTrainer:
         metrics: Dict[str, Callable[[np.ndarray, np.ndarray], float]],
         train_on: str = "train",
         log_level: LogLevel = "INFO",
+        log_path: Optional[str] = None,
     ):
         """Initialize BaseTraining.
 
@@ -27,11 +28,9 @@ class BaseTrainer:
 
         Args:
             metrics: Dictionary of metrics used to train/evaluate the model.
-            graph: Optional graph object.
-            features: Optional node feature vectors.
             train_on: Which mask to use for training.
-            dual (bool): If set to true, predict the label of individual
-                feature, i.e.  individual columns (default: :obj:`False`)
+            log_level: Log level.
+            log_path: Log file path. If not set, then do not log to file.
 
         """
         self._tic: Optional[float] = None
@@ -42,6 +41,9 @@ class BaseTrainer:
             log_level=log_level,
             base_logger="nleval_brief",
         )
+
+        if log_path:
+            attach_file_handler(self.logger, log_path)
 
     def train(
         self,

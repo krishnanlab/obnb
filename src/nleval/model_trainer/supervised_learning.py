@@ -24,6 +24,7 @@ class SupervisedLearningTrainer(StandardTrainer):
         metrics,
         train_on="train",
         log_level: LogLevel = "WARNING",
+        log_path: Optional[str] = None,
     ):
         """Initialize SupervisedLearningTrainer.
 
@@ -33,7 +34,12 @@ class SupervisedLearningTrainer(StandardTrainer):
             node features.
 
         """
-        super().__init__(metrics, train_on=train_on, log_level=log_level)
+        super().__init__(
+            metrics,
+            train_on=train_on,
+            log_level=log_level,
+            log_path=log_path,
+        )
 
     @staticmethod
     def _model_predict(model, x, mask):
@@ -58,12 +64,14 @@ class MultiSupervisedLearningTrainer(SupervisedLearningTrainer):
         val_on: str = "val",
         metric_best: Optional[str] = None,
         log_level: LogLevel = "WARNING",
+        log_path: Optional[str] = None,
     ):
         """Initialize MultiSupervisedLearningTrainer."""
         super().__init__(
             metrics,
             train_on=train_on,
             log_level=log_level,
+            log_path=log_path,
         )
 
         self.val_on = val_on
