@@ -1,7 +1,7 @@
-from nleval.data.network.base import BaseNdexData
+from nleval.data.network.base import BaseNDExData
 
 
-class BioGRID(BaseNdexData):
+class BioGRID(BaseNDExData):
     """The BioGRID Protein Protein Interaction network."""
 
     cx_uuid = "ca656884-a17d-11ec-b3be-0ac135e8bacf"

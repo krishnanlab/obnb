@@ -10,7 +10,7 @@ from nleval.data.network import (
     PCNet,
 )
 
-__all__ = [
+__all__ = classes = [
     "BioGRID",
     "BioPlex",
     "DisGeNet",

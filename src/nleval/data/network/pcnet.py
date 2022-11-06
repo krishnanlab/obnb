@@ -1,7 +1,7 @@
-from nleval.data.network.base import BaseNdexData
+from nleval.data.network.base import BaseNDExData
 
 
-class PCNet(BaseNdexData):
+class PCNet(BaseNDExData):
     """The PCNet (v1.3) Parsimonious Composit human gene interaction network."""
 
     cx_uuid = "7a686aa6-c494-11ec-b397-0ac135e8bacf"

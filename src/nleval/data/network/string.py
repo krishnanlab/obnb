@@ -1,7 +1,7 @@
-from nleval.data.network.base import BaseNdexData
+from nleval.data.network.base import BaseNDExData
 
 
-class STRING(BaseNdexData):
+class STRING(BaseNDExData):
     """The STRING Human Protein Protein Interaction network."""
 
     cx_uuid = "03bdbc9e-a17e-11ec-b3be-0ac135e8bacf"

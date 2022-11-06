@@ -1,7 +1,7 @@
-from nleval.data.network.base import BaseNdexData
+from nleval.data.network.base import BaseNDExData
 
 
-class FunCoup(BaseNdexData):
+class FunCoup(BaseNDExData):
     """The FunCoup funcional asssociation network.
 
     The edge weights are PFC values, which is a probablistic estimation about

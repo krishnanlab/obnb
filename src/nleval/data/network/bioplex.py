@@ -1,7 +1,7 @@
-from nleval.data.network.base import BaseNdexData
+from nleval.data.network.base import BaseNDExData
 
 
-class BioPlex(BaseNdexData):
+class BioPlex(BaseNDExData):
     """The BioPlex3-shared Protein Protein Interaction network."""
 
     cx_uuid = "daab35d6-a17d-11ec-b3be-0ac135e8bacf"
