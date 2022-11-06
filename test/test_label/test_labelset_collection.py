@@ -34,8 +34,8 @@ class TestLabelsetCollection(unittest.TestCase):
         self.lsc.add_labelset(["b", "d"], "Labelset2", "Description2")
 
     def template_test_input_for_getters(self, fun):
-        """Template for testing inputs for methods with only one positional
-        argument as ID, i.e. `.get_info`, `get_labelset`, and `get_noccur`."""
+        """Template for testing inputs for methods with only one positional argument as
+        ID, i.e. `.get_info`, `get_labelset`, and `get_noccur`."""
         # input type other than str --> TypeError
         self.assertRaises(TypeError, fun, 1)
         self.assertRaises(TypeError, fun, ["1"])

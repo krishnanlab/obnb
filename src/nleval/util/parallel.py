@@ -47,6 +47,7 @@ class ParDat:
         coming back have the same order. To enforce the order, use ParDatMap,
         which return the results in a list with the same order as the input
         main arguments.
+
     """
 
     def __init__(
@@ -65,6 +66,7 @@ class ParDat:
             verbose: Show progress bar if set to true.
             bar_length: Progress bar length.
             log_steps: Log interval.
+
         """
         self.job_list = job_list
         self.n_workers = n_workers
@@ -115,6 +117,7 @@ class ParDat:
             func: Function to parallelize.
             func_args: Remaining positional arguments for the function.
             func_kwargs: Keyword arguments for the fucntion.
+
         """
         job_id = worker_id
         while job_id is not None:
@@ -168,8 +171,9 @@ class ParDat:
     def spawn(self, func, func_args, func_kwargs):
         """Spawn new child process.
 
-        Set up communication with the child process and set up the result
-        queue where the parent process can grab the results.
+        Set up communication with the child process and set up the result queue where
+        the parent process can grab the results.
+
         """
         # Setup parent child connection and start a child process
         parent_conn, child_conn = mp.Pipe()
@@ -198,6 +202,7 @@ class ParDat:
 
         Args:
             job_id: Index for next main argument to use.
+
         """
         worker_id, prev_job_id, result = self._q.get()
         self._parent_conn[worker_id].send(job_id)
@@ -225,6 +230,7 @@ class ParDatMap(ParDat):
         >>>
         >>> # Alternatively, wrap the function right before calling
         >>> results = ParDatMap(job_list=mylist)(func)(*args, **kwargs):
+
     """
 
     def __call__(self, func):
@@ -271,6 +277,7 @@ class ParDatExe(ParDat):
         >>>
         >>> # Alternatively, wrap the function right before calling
         >>> ParDatExe(job_list=mylist)(func)(*args, **kwargs):
+
     """
 
     def __call__(self, func):

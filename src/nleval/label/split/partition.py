@@ -31,9 +31,9 @@ class BasePartition(BaseSortedSplit):
 class RatioPartition(BasePartition):
     """Split the dataset into parts of size proportional to some ratio.
 
-    First sort the dataset entities (data points) based on a 1-dimensional
-    entity property parsed in as ``x``, either ascendingly or descendingly.
-    Then split the dataset based on the defined ratios.
+    First sort the dataset entities (data points) based on a 1-dimensional entity
+    property parsed in as ``x``, either ascendingly or descendingly. Then split the
+    dataset based on the defined ratios.
 
     """
 

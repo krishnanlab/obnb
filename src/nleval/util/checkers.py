@@ -1,8 +1,8 @@
-"""
-Type checking functions.
+"""Type checking functions.
 
-This module contains a collection of checkers to ensure that the input value
-to a function call is valid.
+This module contains a collection of checkers to ensure that the input value to a
+function call is valid.
+
 """
 from typing import get_args
 
@@ -74,7 +74,7 @@ def checkType(name, targetType, val):
 
 
 def checkTypesInIterable(name, targetType, val):
-    """Check the types of all elements in an iterable"""
+    """Check the types of all elements in an iterable."""
     for idx, i in enumerate(val):
         if not isinstance(i, targetType):
             raise TypeError(

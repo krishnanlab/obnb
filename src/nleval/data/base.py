@@ -18,10 +18,10 @@ from nleval.util.path import cleandir, hexdigest
 class BaseData:
     """BaseData object.
 
-    This is an abstract (mixin) class for constructing data objects. The main
-    methods are _download and _process, which are wrappers that download the
-    raw files and process the files into the final processed file if they are
-    not yet available. Otherwise, directly load the previously processed file.
+    This is an abstract (mixin) class for constructing data objects. The main methods
+    are _download and _process, which are wrappers that download the raw files and
+    process the files into the final processed file if they are not yet available.
+    Otherwise, directly load the previously processed file.
 
     """
 

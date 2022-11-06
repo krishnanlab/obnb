@@ -12,6 +12,7 @@ class Timeit:
 
         Args:
             verbose: whether or not to print timing info
+
         """
         self.verbose = verbose
 

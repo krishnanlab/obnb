@@ -17,26 +17,25 @@ class LabelsetCollection(idhandler.IDprop):
 
     Example GMT (Gene Matrix Transpose):
 
-        .. code-block:: none
+    .. code-block:: none
 
-            Geneset1    Description1    Gene1   Gene2   Gene3
-            Geneset2    Description2    Gene2   Gene4   Gene5   Gene6
+        Geneset1    Description1    Gene1   Gene2   Gene3
+        Geneset2    Description2    Gene2   Gene4   Gene5   Gene6
 
     Example internal data for a label collection with above GMT data:
 
-        .. code-block:: python
+    .. code-block:: python
 
-            self.entity_ids = ['Gene1', 'Gene2', 'Gene3', 'Gene4', 'Gene5', \
-'Gene6']
-            self.entity.prop = {'Noccur': [1, 2, 1, 1, 1, 1]}
-            self.label_ids = ['Geneset1', 'Geneset2']
-            self.prop = {
-                'Info':['Description1', 'Description2']
-                'Labelset':[
-                    {'Gene1', 'Gene2', 'Gene3'},
-                    {'Gene2', 'Gene4', 'Gene5', 'Gene6'}
-                ]
-            }
+        self.entity_ids = ['Gene1', 'Gene2', 'Gene3', 'Gene4', 'Gene5', 'Gene6']
+        self.entity.prop = {'Noccur': [1, 2, 1, 1, 1, 1]}
+        self.label_ids = ['Geneset1', 'Geneset2']
+        self.prop = {
+            'Info':['Description1', 'Description2']
+            'Labelset':[
+                {'Gene1', 'Gene2', 'Gene3'},
+                {'Gene2', 'Gene4', 'Gene5', 'Gene6'}
+            ]
+        }
 
     """
 
@@ -47,9 +46,9 @@ class LabelsetCollection(idhandler.IDprop):
     def to_df(self) -> pd.DataFrame:
         """Construct label sets info dataframe.
 
-        The first three columns of the table correspond to the name, info, and
-        the numbe of positive examples for each labelset. The rest of the
-        columns contain the positive examples, padded with `None`.
+        The first three columns of the table correspond to the name, info, and the numbe
+        of positive examples for each labelset. The rest of the columns contain the
+        positive examples, padded with `None`.
 
         """
         label_info = list(map(self.get_info, self.label_ids))
@@ -210,8 +209,8 @@ class LabelsetCollection(idhandler.IDprop):
     def reset_labelset(self, label_id):
         """Reset an existing labelset to an empty set.
 
-        Setting the labelset back to empty and deecrement `Noccur` of all
-        entites belonging to the labelset by 1.
+        Setting the labelset back to empty and deecrement `Noccur` of all entites
+        belonging to the labelset by 1.
 
         """
         lbset = self.get_labelset(label_id)
