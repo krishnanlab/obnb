@@ -121,7 +121,7 @@ class BaseGraph:
                 then return the node ID of the corresponding node index.
 
         Return:
-            str: Node ID.
+            Node ID.
 
         """
         return node if isinstance(node, str) else self.idmap.lst[node]
@@ -135,7 +135,7 @@ class BaseGraph:
                 then return the node index of the corresponding node ID.
 
         Return:
-            int: Node index.
+            Node index.
 
         """
         return node if isinstance(node, int) else self.idmap[node]
@@ -153,7 +153,7 @@ class BaseGraph:
                 ["in", "out", "both"], default is "both".
 
         Return:
-            List[str]: List of neighboring node IDs.
+            List of neighboring node IDs.
 
         """
         checkLiteral("direction", EdgeDir, direction)

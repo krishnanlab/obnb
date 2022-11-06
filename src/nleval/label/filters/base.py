@@ -13,12 +13,11 @@ class BaseFilter:
 
     Basic components (methods) needed for children filter classes:
 
-        * criterion: retrun true if the corresponding value of an instance
-          passesc the criterion
-        * get_ids: return list of IDs to scan through get_val_getter, which
-          returns a function that map ID of an instance to some corresponding
-          values
-        * get_mod_fun: return a function that modifies an instance
+    - criterion: retrun true if the corresponding value of an instance passesc the
+      criterion.
+    - get_ids: return list of IDs to scan through get_val_getter, which returns a
+      function that map ID of an instance to some corresponding values.
+    - get_mod_fun: return a function that modifies an instance.
 
     All three 'get' methods above take a `LabelsetCollection` object as input
 

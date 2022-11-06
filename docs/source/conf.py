@@ -38,6 +38,7 @@ extensions = [
     "sphinxcontrib.napoleon",
 ]
 
+autoclass_content = "both"
 autodoc_typehints = "description"
 
 simplify_optional_unions = False

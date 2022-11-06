@@ -49,27 +49,28 @@ class BaseData:
         """Initialize BaseData object.
 
         Args:
-            root (str): Root directory of the data files.
-            redownload (bool): If set to True, redownload the data even if all
-                raw files are downloaded (default: False).
-            reprocess (bool): If set to True, reprocess the data even if the
-                processed data is available (default: False).
-            retransform (bool): If set to tTrue, retransform the data even if
-                the cached transformation is available (default: False).
-            pre_transform: Optional pre_transformation to be applied to the
-                data object before saving as the final processed data object.
-                If set to 'default', will use the default pre_transformation.
+            root: Root directory of the data files.
+            version: Name of the version of the data to use, default setting 'latest'
+                will download and process the latest data from the source.
+            redownload: If set to True, redownload the data even if all raw files are
+                downloaded.
+            reprocess: If set to True, reprocess the data even if the processed data
+                is available.
+            retransform: If set to tTrue, retransform the data even if the cached
+                transformation is available.
+            pre_transform: Optional pre_transformation to be applied to the data object
+                before saving as the final processed data object. If set to 'default',
+                will use the default pre_transformation.
             transform: Optional transformation to be applied to the data
                 object.
-            cache_transform: Whether or not to cache the transformed data. The
-                cached transformed data will be saved under
+            cache_transform: Whether or not to cache the transformed data. The cached
+                transformed data will be saved under
                 `<data_root_directory>/processed/.cache/`.
-            download_cache: If set to True, then check to see if <root>/.cache
-                exists, and if not, pull the cache from versioned archive.
-            gene_id_converter (Union[Mapping[str, str], str], optional): A
-                mapping object that maps a given node ID to a new node ID of
-                interest. Or the name of a predefined MygeneInfoConverter
-                object as a string.
+            download_cache: If set to True, then check to see if <root>/.cache exists,
+                and if not, pull the cache from versioned archive.
+            gene_id_converter: A mapping object that maps a given node ID to a new node
+                ID of interest. Or the name of a predefined MygeneInfoConverter object
+                as a string.
 
         Note:
             The `pre_transform` option is only valid when `version` is set to
