@@ -17,6 +17,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
     to the disease ontology from obofoundry.org. The annotations are propagated
     upwards the ontology. Then, several filters are applied to reduce the
     redundancies between labelsets (disease genes):
+
     - Disease specificity index (DSI) filter
     - Max size filter
     - Min size filter

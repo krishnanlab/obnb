@@ -1,4 +1,4 @@
-"""Custom metrics comparible with GraphGym logger."""
+"""Custom metrics compatible with GraphGym logger."""
 from functools import wraps
 
 import torch

@@ -1,7 +1,7 @@
-from nleval.data.network.base import BaseNdexData
+from nleval.data.network.base import BaseNDExData
 
 
-class HumanNet(BaseNdexData):
+class HumanNet(BaseNDExData):
     """The HumanNet-FN functional interaction network."""
 
     cx_uuid = "fbc750ac-a17d-11ec-b3be-0ac135e8bacf"

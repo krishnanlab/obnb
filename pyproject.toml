@@ -59,6 +59,13 @@ dev = [
     "requests-mock",
     "tox",
 ]
+doc = [
+    "sphinx",
+    "sphinx-autodoc-typehints",
+    "sphinx_rtd_theme",
+    "sphinxcontrib-napoleon",
+    "yacs",
+]
 pyroe = [
     "pyroe",
     "scanpy",

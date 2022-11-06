@@ -55,9 +55,9 @@ def _patch_gg_set_run_dir(out_dir):  # patch for PyG<2.1.0
 class GraphGymTrainer(GNNTrainer):
     """Trainer built upon GraphGym.
 
-    Specify configurations either as file, or as kwargs. Then GrphGymTrainer
-    will use those configurations to set up GraphGym. One can then create the
-    model as specified in the configurations using the ``create_model`` method.
+    Specify configurations either as file, or as kwargs. Then GrphGymTrainer will use
+    those configurations to set up GraphGym. One can then create the model as specified
+    in the configurations using the ``create_model`` method.
 
     """
 
@@ -134,12 +134,12 @@ class GraphGymTrainer(GNNTrainer):
     def get_loaders(self, dataset, split_idx: int) -> List[DataLoader]:
         """Obtain GraphGym data loaders.
 
-        Two loaders are set, one is for training and the other is for 'all'.
-        The reason for using the 'all' loader is that in the transductive
-        node classification setting, the predictions between training stage and
-        inference stage are exactly the same. So there is no need to recompute
-        the predictions just for the sake the obtaining different masked
-        values. Instead, we can directly mask on the full predction values.
+        Two loaders are set, one is for training and the other is for 'all'. The reason
+        for using the 'all' loader is that in the transductive node classification
+        setting, the predictions between training stage and inference stage are exactly
+        the same. So there is no need to recompute the predictions just for the sake the
+        obtaining different masked values. Instead, we can directly mask on the full
+        predction values.
 
         """
         # Create a copy of the data used for evaluation
@@ -169,8 +169,8 @@ class GraphGymTrainer(GNNTrainer):
     def evaluate(self, loaders, model, masks: List[str]):
         """Evaluate the model performance at a specific epoch.
 
-        First obtain the prediction values using the 'all_mask'. Then compute
-        evaluation metric using a specific mask on the full predictions.
+        First obtain the prediction values using the 'all_mask'. Then compute evaluation
+        metric using a specific mask on the full predictions.
 
         """
         model.eval()
@@ -198,9 +198,9 @@ class GraphGymTrainer(GNNTrainer):
     def train(self, model, dataset, split_idx=0):
         """Train model using GraphGym.
 
-        Note that becuase nleval only concerns transductive node classification
-        (for now), the training procedure is reduced to this specific setting
-        for the sake of runtime performance.
+        Note that becuase nleval only concerns transductive node classification (for
+        now), the training procedure is reduced to this specific setting for the sake of
+        runtime performance.
 
         """
         masks = [mask_name + self.mask_suffix for mask_name in dataset.masks]

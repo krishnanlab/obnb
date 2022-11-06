@@ -5,7 +5,7 @@ from nleval.graph import SparseGraph
 from nleval.typing import Any, Dict, List, Mapping, Optional, Union
 
 
-class BaseNdexData(BaseData, SparseGraph):
+class BaseNDExData(BaseData, SparseGraph):
     """The BaseNdexData object for retrieving networks from NDEX.
 
     www.ndexbio.org

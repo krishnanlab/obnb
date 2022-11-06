@@ -1,7 +1,7 @@
-from nleval.data.network.base import BaseNdexData
+from nleval.data.network.base import BaseNDExData
 
 
-class HIPPIE(BaseNdexData):
+class HIPPIE(BaseNDExData):
     """The HIPPIE Human scored Protein Protein Interaction network.
 
     Note: the inferred PPI directionality is disregarded, i.e. the resulting

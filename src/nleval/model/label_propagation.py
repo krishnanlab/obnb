@@ -10,10 +10,10 @@ from nleval.util.checkers import checkValueNonnegative, checkValuePositive
 class IterativePropagation:
     """Iteratively propagate seed node information.
 
-    This class of method propagates the initial (or seed) node information
-    across the network iteratively until either convergence or the max allowed
-    iteration is reached. It relies mainly on the ``propagate`` method from
-    the graph objects to perform a single hop propagation.
+    This class of method propagates the initial (or seed) node information across the
+    network iteratively until either convergence or the max allowed iteration is
+    reached. It relies mainly on the ``propagate`` method from the graph objects to
+    perform a single hop propagation.
 
     """
 

@@ -11,7 +11,7 @@ from nleval.label.split.partition import (
     ThresholdPartition,
 )
 
-__all__ = [
+__all__ = classes = [
     "AllHoldout",
     "RandomRatioHoldout",
     "RatioHoldout",

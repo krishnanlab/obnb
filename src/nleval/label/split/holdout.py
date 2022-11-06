@@ -27,9 +27,9 @@ class BaseHoldout(BaseSortedSplit):
 class RatioHoldout(BaseHoldout):
     """Holdout a portion of the dataset.
 
-    First sort the dataset entities (data points) based on a 1-dimensional
-    entity property parsed in as ``x``, either ascendingly or descendingly.
-    Then take the top datapoints with portion defined by the ratio input.
+    First sort the dataset entities (data points) based on a 1-dimensional entity
+    property parsed in as ``x``, either ascendingly or descendingly. Then take the top
+    datapoints with portion defined by the ratio input.
 
     """
 

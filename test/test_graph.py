@@ -758,7 +758,7 @@ class TestDenseGraph(unittest.TestCase):
         cls.case = test_case1()
 
     def check_graph(self, graph):
-        """compare graph with data, true if identical"""
+        """compare graph with data, true if identical."""
         mat = self.case.data_mat[:, 1:]
         IDlst = [str(int(i)) for i in self.case.data_mat[:, 0]]
         for idx1, node_id1 in enumerate(IDlst):

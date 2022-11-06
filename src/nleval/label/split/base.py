@@ -9,10 +9,9 @@ from nleval.util.converter import BaseConverter
 class BaseSplit:
     """BaseSplit object for splitting dataset.
 
-    This is an abstract class for objects used for splitting the dataset
-    based on either the labels y and / or some properties of each entity,
-    passed in as an 1-dimensional array x. This abstract class only defines a
-    __repr__ magic method used for printing.
+    This is an abstract class for objects used for splitting the dataset based on either
+    the labels y and / or some properties of each entity, passed in as an 1-dimensional
+    array x. This abstract class only defines a __repr__ magic method used for printing.
 
     """
 
@@ -117,8 +116,8 @@ class BaseSortedSplit(BaseSplit):
 class BaseRandomSplit(BaseSortedSplit):
     """BaseRandomSpilt object for randomly splitting dataset.
 
-    Randomly generates the node properties, then use specific sorted split
-    to split the dataset based on the random node properties.
+    Randomly generates the node properties, then use specific sorted split to split the
+    dataset based on the random node properties.
 
     """
 

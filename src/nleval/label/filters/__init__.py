@@ -16,7 +16,7 @@ from nleval.label.filters.range_filter import (
     LabelsetRangeFilterSplit,
 )
 
-__all__ = [
+__all__ = classes = [
     "Compose",
     "EntityExistenceFilter",
     "EntityRangeFilterNoccur",

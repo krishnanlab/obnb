@@ -156,8 +156,8 @@ class LabelsetRangeFilterSplit(BaseRangeFilter):
     def get_val_getter(self, lsc):
         """Return the value getter.
 
-        The value getter finds the minimum number of positives for a labelset
-        across all the dataset splits.
+        The value getter finds the minimum number of positives for a labelset across all
+        the dataset splits.
 
         """
 

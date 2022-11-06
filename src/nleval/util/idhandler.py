@@ -12,7 +12,7 @@ __all__ = ["IDlst", "IDmap", "IDprop"]
 
 
 class IDlst:
-    """ID list object that stores a list of IDs"""
+    """ID list object that stores a list of IDs."""
 
     def __init__(self):
         self.reset()
@@ -22,7 +22,7 @@ class IDlst:
         self._lst = []
 
     def __iter__(self):
-        """Yield all IDs"""
+        """Yield all IDs."""
         return self._lst.__iter__()
 
     def __len__(self):
@@ -30,12 +30,12 @@ class IDlst:
         return self.size
 
     def __eq__(self, other):
-        """Return true if two IDlst have same set of IDs"""
+        """Return true if two IDlst have same set of IDs."""
         checkers.checkType("other", self.__class__, other)
         return set(self._lst) == set(other._lst)
 
     def __add__(self, other):
-        """Combine two ID list and return a copy"""
+        """Combine two ID list and return a copy."""
         checkers.checkType("other", self.__class__, other)
         new = self.copy()
         for identifier in other:
@@ -44,8 +44,8 @@ class IDlst:
         return new
 
     def __sub__(self, other):
-        """Return a copy of ID list that does not contain any
-        IDs from the `other` ID list"""
+        """Return a copy of ID list that does not contain any IDs from the `other` ID
+        list."""
         checkers.checkType("other", self.__class__, other)
         new = self.__class__()
         for identifier in self:
@@ -54,7 +54,7 @@ class IDlst:
         return new
 
     def __and__(self, other):
-        """Return a copy of ID list with IDs that exist in both lists"""
+        """Return a copy of ID list with IDs that exist in both lists."""
         checkers.checkType("other", self.__class__, other)
         new = self.__class__()
         for identifier in set(self._lst) & set(other._lst):
@@ -62,11 +62,11 @@ class IDlst:
         return new
 
     def __or__(self, other):
-        """Same as `__add__`"""
+        """Same as `__add__.`"""
         return self.__add__(other)
 
     def __xor__(self, other):
-        """Return a copy of ID list with IDs that are unique"""
+        """Return a copy of ID list with IDs that are unique."""
         checkers.checkType("other", self.__class__, other)
         new = self.__class__()
         for identifier in set(self._lst) ^ set(other._lst):
@@ -74,13 +74,13 @@ class IDlst:
         return new
 
     def __contains__(self, identifier):
-        """Return true if ID exist in current list"""
+        """Return true if ID exist in current list."""
         checkers.checkType("ID", str, identifier)
         return identifier in self._lst
 
     def __getitem__(self, identifier):
-        """Return single or multiple (as numpy array) indices of ID
-        depending on input type"""
+        """Return single or multiple (as numpy array) indices of ID depending on input
+        type."""
         if isinstance(identifier, str):
             return self._getitem_sinlge(identifier)
         elif isinstance(identifier, Iterable):
@@ -103,8 +103,8 @@ class IDlst:
         return np.array(idx_lst)
 
     def _check_ID_existence(self, identifier, existence):
-        """Check existence of ID and raise exceptions depending on
-        desired existence of ID"""
+        """Check existence of ID and raise exceptions depending on desired existence of
+        ID."""
         if (not existence) & (identifier in self):
             raise IDExistsError(f"Existing ID {identifier!r}")
         elif existence & (identifier not in self):
@@ -122,26 +122,26 @@ class IDlst:
 
     @property
     def size(self):
-        """int: number of IDs in list"""
+        """int: number of IDs in list."""
         return len(self._lst)
 
     def copy(self):
-        """Return a deepcopy of self"""
+        """Return a deepcopy of self."""
         return deepcopy(self)
 
     def isempty(self):
-        """Return true if ID list is empty"""
+        """Return true if ID list is empty."""
         return self.size == 0
 
     def pop_id(self, identifier):
-        """Pop an ID out of list of IDs"""
+        """Pop an ID out of list of IDs."""
         self._check_ID_existence(identifier, True)
         idx = self[identifier]
         self._lst.pop(idx)
         return idx
 
     def add_id(self, identifier):
-        """Add new ID to end of list
+        """Add new ID to end of list.
 
         Note: raises IDExistsError if ID exists
 
@@ -150,7 +150,8 @@ class IDlst:
         self._lst.append(identifier)
 
     def update(self, identifiers):
-        """Update ID list
+        """Update ID list.
+
         Loop over all IDs and add to list if not yet existed
 
         Args:
@@ -170,7 +171,7 @@ class IDlst:
         return n
 
     def get_id(self, idx: int) -> str:
-        """Return ID by its index"""
+        """Return ID by its index."""
         return self._lst[idx]
 
     def get_ids(self, idxs: Iterable[int]) -> List[str]:
@@ -187,8 +188,8 @@ class IDlst:
 
 
 class IDmap(IDlst):
-    """IDmap object that implements dictionary for more efficient mapping
-    from ID to index"""
+    """IDmap object that implements dictionary for more efficient mapping from ID to
+    index."""
 
     def __init__(self):
         super().__init__()
@@ -203,7 +204,7 @@ class IDmap(IDlst):
 
     @property
     def map(self):
-        """(dict of str:int): map from ID to index
+        """(dict of str:int): map from ID to index.
 
         Note: the returned dict is a copy of self._map to prevent userside
         maniputation on data, use `.add_id()` or `.pop_id()` to modify data
@@ -301,7 +302,7 @@ class IDmap(IDlst):
 
 
 class IDprop(IDmap):
-    """ID properties object that stores property information of IDs"""
+    """ID properties object that stores property information of IDs."""
 
     def __init__(self):
         super().__init__()
@@ -314,7 +315,7 @@ class IDprop(IDmap):
         self._prop = {}
 
     def __eq__(self, other):
-        """Return true if two object have same set of IDs with same properties"""
+        """Return true if two object have same set of IDs with same properties."""
         # check if two objects have same set of IDs
         if not super().__eq__(other):
             return False
@@ -332,16 +333,16 @@ class IDprop(IDmap):
         return True
 
     def __add__(self, other):
-        """Not Implemented"""
+        """Not Implemented."""
         raise NotImplementedError
 
     def __sub__(self, other):
-        """Not Implemented"""
+        """Not Implemented."""
         raise NotImplementedError
 
     def _check_prop_existence(self, prop_name, existence):
-        """Check existence of property name and raise exceptions depending
-        on desired existence of property name
+        """Check existence of property name and raise exceptions depending on desired
+        existence of property name.
 
         Raises:
             IDExistsError: if desired existence of `prop_name` int `self._prop`
@@ -358,8 +359,8 @@ class IDprop(IDmap):
 
     @property
     def prop_default_val(self):
-        """(dict of str:obj): dictionary mapping from property name to
-        default property value"""
+        """(dict of str:obj): dictionary mapping from property name to default property
+        value."""
         return self._prop_default_val.copy()
 
     @property
@@ -368,8 +369,8 @@ class IDprop(IDmap):
 
     @property
     def prop(self):
-        """(dict of str: :obj:`list` of :obj:): dictionary mapping from
-        property name to list of property values in the order of ID list
+        """(dict of str: :obj:`list` of :obj:): dictionary mapping from property name to
+        list of property values in the order of ID list.
 
         Note: the returned dict is a copy of self._prop to prevent userside
         maniputation on data, use `.set_property` to modify properties
@@ -379,11 +380,11 @@ class IDprop(IDmap):
 
     @property
     def properties(self):
-        """:obj:`list` of :obj:`str`: list of properties names"""
+        """:obj:`list` of :obj:`str`: list of properties names."""
         return list(self._prop)
 
     def new_property(self, prop_name, default_val=None, default_type=None):
-        """Create a new property
+        """Create a new property.
 
         Args:
             prop_name(str): name of property
@@ -427,7 +428,7 @@ class IDprop(IDmap):
         self._prop[prop_name][self[identifier]] = prop_val
 
     def get_property(self, identifier, prop_name):
-        """Return a specific properties associated with an ID
+        """Return a specific properties associated with an ID.
 
         Raises:
             IDNotExistError: if either ID or prop_name does not exist
@@ -439,14 +440,14 @@ class IDprop(IDmap):
         return self._prop[prop_name][self[identifier]]
 
     def remove_property(self, prop_name):
-        """Remove a property along with its default type and value"""
+        """Remove a property along with its default type and value."""
         self._check_prop_existence(prop_name, True)
         self._prop.pop(prop_name)
         self._prop_default_val.pop(prop_name)
         self._prop_default_type.pop(prop_name)
 
     def get_all_properties(self, identifier):
-        """Return all properties associated with an ID"""
+        """Return all properties associated with an ID."""
         return {i: self.get_property(identifier, i) for i in self.properties}
 
     def pop_id(self, identifier):
@@ -457,7 +458,7 @@ class IDprop(IDmap):
         return idx
 
     def add_id(self, identifier, prop=None):
-        """Add a new ID to list, optional input of properties
+        """Add a new ID to list, optional input of properties.
 
         Note: input properties must be one of the existing properties,
         `IDNotExistError` raised other wise. Use `.new_property()` to add new
