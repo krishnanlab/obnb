@@ -1,37 +1,17 @@
 nleval.feature
 ==============
 
-Submodules
-----------
+.. currentmodule:: nleval.feature
 
-nleval.feature.base module
---------------------------
+.. autosummary::
+   :nosignatures:
 
-.. automodule:: nleval.feature.base
+   nleval.feature.base.BaseFeature
+   FeatureVec
+   MultiFeatureVec
+
+.. autoclass:: nleval.feature.base.BaseFeature
    :members:
-   :undoc-members:
-   :show-inheritance:
-
-nleval.feature.multifeat module
--------------------------------
-
-.. automodule:: nleval.feature.multifeat
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-nleval.feature.singlefeat module
---------------------------------
-
-.. automodule:: nleval.feature.singlefeat
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
 
 .. automodule:: nleval.feature
    :members:
-   :undoc-members:
-   :show-inheritance:

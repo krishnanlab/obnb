@@ -1,29 +1,14 @@
 nleval.metric
 =============
 
-Submodules
-----------
-
-nleval.metric.graphgym\_metric module
--------------------------------------
-
-.. automodule:: nleval.metric.graphgym_metric
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-nleval.metric.standard module
------------------------------
+Standard metrics
+----------------
 
 .. automodule:: nleval.metric.standard
    :members:
-   :undoc-members:
-   :show-inheritance:
 
-Module contents
----------------
+GrpahGym patches
+----------------
 
-.. automodule:: nleval.metric
+.. automodule:: nleval.metric.graphgym_metric
    :members:
-   :undoc-members:
-   :show-inheritance:

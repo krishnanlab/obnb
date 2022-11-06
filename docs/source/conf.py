@@ -21,6 +21,7 @@ sys.path.insert(0, os.path.abspath("../../src"))
 project = "nleval"
 copyright = "2022, Remy Liu"
 author = "Remy Liu"
+release = "0.1.0"
 
 
 # -- General configuration ---------------------------------------------------
@@ -36,6 +37,10 @@ extensions = [
     "sphinx_autodoc_typehints",
     "sphinxcontrib.napoleon",
 ]
+
+autodoc_typehints = "description"
+
+simplify_optional_unions = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -53,12 +58,19 @@ exclude_patterns = []
 #
 html_theme = "sphinx_rtd_theme"
 
-autodoc_typehints = "description"
-
-simplify_optional_unions = False
-
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 # html_static_path = ['_static']
 html_static_path = []
+
+# Jinja template renderer
+import nleval
+
+
+def setup(app):
+    def rst_jinja_render(app, _, source):
+        rst_context = {"nleval": nleval}
+        source[0] = app.builder.templates.render_string(source[0], rst_context)
+
+    app.connect("source-read", rst_jinja_render)

@@ -1,45 +1,19 @@
 nleval.graph
 ============
 
-Submodules
-----------
+.. currentmodule:: nleval.graph
 
-nleval.graph.base module
-------------------------
+.. autosummary::
+   :nosignatures:
+
+   nleval.graph.base.BaseGraph
+   DenseGraph
+   SparseGraph
+   DirectedSparseGraph
+   OntologyGraph
 
 .. automodule:: nleval.graph.base
    :members:
-   :undoc-members:
-   :show-inheritance:
-
-nleval.graph.dense module
--------------------------
-
-.. automodule:: nleval.graph.dense
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-nleval.graph.ontology module
-----------------------------
-
-.. automodule:: nleval.graph.ontology
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-nleval.graph.sparse module
---------------------------
-
-.. automodule:: nleval.graph.sparse
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
 
 .. automodule:: nleval.graph
    :members:
-   :undoc-members:
-   :show-inheritance:

@@ -1,30 +1,40 @@
 nleval.label
 ============
 
-Subpackages
------------
+Labelset collection object
+--------------------------
 
-.. toctree::
-   :maxdepth: 4
+.. currentmodule:: nleval.label
 
-   nleval.label.filters
-   nleval.label.split
-
-Submodules
-----------
-
-nleval.label.collection module
-------------------------------
-
-.. automodule:: nleval.label.collection
+.. autoclass:: nleval.label.LabelsetCollection
    :members:
-   :undoc-members:
-   :show-inheritance:
 
-Module contents
----------------
+Labelset collection filters
+---------------------------
 
-.. automodule:: nleval.label
+.. currentmodule:: nleval.label.filters
+
+.. autosummary::
+   :nosignatures:
+
+   {% for cls in nleval.label.filters.classes %}
+     {{ cls }}
+   {% endfor %}
+
+.. automodule:: nleval.label.filters
    :members:
-   :undoc-members:
-   :show-inheritance:
+
+Labelset collection splits
+--------------------------
+
+.. currentmodule:: nleval.label.split
+
+.. autosummary::
+   :nosignatures:
+
+   {% for cls in nleval.label.split.classes %}
+     {{ cls }}
+   {% endfor %}
+
+.. automodule:: nleval.label.split
+   :members:

@@ -1,31 +1,36 @@
 nleval.data
 ===========
 
-Subpackages
------------
+.. currentmodule:: nleval.data
 
-.. toctree::
-   :maxdepth: 4
+.. autosummary::
+   :nosignatures:
 
-   nleval.data.annotated_ontology
-   nleval.data.experimental
-   nleval.data.network
+   {% for cls in nleval.data.classes %}
+     {{ cls }}
+   {% endfor %}
 
-Submodules
-----------
+Base data objects
+-----------------
 
-nleval.data.base module
------------------------
-
-.. automodule:: nleval.data.base
+.. autoclass:: nleval.data.base.BaseData
    :members:
-   :undoc-members:
-   :show-inheritance:
 
-Module contents
----------------
+.. autoclass:: nleval.data.network.base.BaseNDExData
+   :members:
+
+.. autoclass:: nleval.data.annotated_ontology.base.BaseAnnotatedOntologyData
+   :members:
+
+Data objects
+------------
 
 .. automodule:: nleval.data
    :members:
-   :undoc-members:
-   :show-inheritance:
+   :exclude-members: download, process
+
+Experimental features
+---------------------
+
+.. automodule:: nleval.data.experimental
+   :members:
