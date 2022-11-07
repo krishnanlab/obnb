@@ -4,14 +4,14 @@ import pandas as pd
 from tqdm import tqdm
 from utils import print_expected
 
-from nleval.data import DisGeNet
+from nleval.data import DisGeNET
 from nleval.exception import IDNotExistError
 from nleval.graph import OntologyGraph
 
 data_root_dir = "datasets_disgenet"
-DisGeNet(data_root_dir)  # download DisGeNet data
+DisGeNET(data_root_dir)  # download DisGeNET data
 
-data_dir = osp.join(data_root_dir, "DisGeNet", "raw")
+data_dir = osp.join(data_root_dir, "DisGeNET", "raw")
 do_path = osp.join(data_dir, "doid.obo")
 ga_path = osp.join(data_dir, "all_gene_disease_associations.tsv")
 

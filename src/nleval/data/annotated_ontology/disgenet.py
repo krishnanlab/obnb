@@ -10,8 +10,8 @@ from nleval.typing import List, Mapping, Optional, Union
 from nleval.util.logger import display_pbar
 
 
-class DisGeNet(BaseAnnotatedOntologyData):
-    """DisGeNet disease gene annotations.
+class DisGeNET(BaseAnnotatedOntologyData):
+    """DisGeNET disease gene annotations.
 
     Disease gene associations are retreived from disgenet.org and then mapped
     to the disease ontology from obofoundry.org. The annotations are propagated
@@ -47,7 +47,7 @@ class DisGeNet(BaseAnnotatedOntologyData):
         gene_id_converter: Optional[Union[Mapping[str, str], str]] = None,
         **kwargs,
     ):
-        """Initialize the DisGeNet data object."""
+        """Initialize the DisGeNET data object."""
         self.dsi_threshold = dsi_threshold
         self.min_size = min_size
         self.max_size = max_size

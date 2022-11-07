@@ -58,7 +58,7 @@ root = "datasets"  # save dataset and cache under the datasets/ directory
 version = "nledata-v0.1.0-dev2"  # archive data version, use 'latest' to pull latest data from source instead
 
 # Download and process network/label data. Use the adjacency matrix as the ML feature
-dataset = default_constructor(root=root, version=version, graph_name="BioGRID", label_name="DisGeNet",
+dataset = default_constructor(root=root, version=version, graph_name="BioGRID", label_name="DisGeNET",
                               graph_as_feature=True, use_dense_graph=True)
 ```
 
@@ -102,7 +102,7 @@ from torch_geometric.nn import GCN
 from nleval.model_trainer.gnn import SimpleGNNTrainer
 
 # Use 1-dimensional trivial node feature
-dataset = default_constructor(root=root, version=version, graph_name="BioGRID", label_name="DisGeNet")
+dataset = default_constructor(root=root, version=version, graph_name="BioGRID", label_name="DisGeNET")
 
 # Train and evaluate a GCN
 gcn_mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=n_tasks)
@@ -123,8 +123,8 @@ root = "datasets"  # save dataset and cache under the datasets/ directory
 # Alternatively, set version="latest" to get and process the newest data from scratch.
 g = data.BioGRID(root, version="nledata-v0.1.0-dev2")
 
-# Load DisGeNet gene set collections.
-lsc = data.DisGeNet(root, version="latest")
+# Load DisGeNET gene set collections.
+lsc = data.DisGeNET(root, version="latest")
 ```
 
 #### Setting up data and splits
