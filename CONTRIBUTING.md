@@ -1,6 +1,6 @@
 # Contributing to nleval
 
-First and formost, we thank you for your interest in contributing to the `nleval` pacakge! We welcome any kinds of contribution, e.g.,
+First and foremost, we thank you for your interest in contributing to the `nleval` pacakge! We welcome any kind of contribution, e.g.,
 
 - New features
 - Bug fixes and new tests
@@ -9,7 +9,7 @@ First and formost, we thank you for your interest in contributing to the `nleval
 To get started,
 
 1. Make a fork of the repository, and create a new branch where you will be making your changes
-1. After you are finshed with the new changes, make a Pull Request https://github.com/krishnanlab/NetworkLearningEval/pulls of you changes
+1. After you are done with the new changes, make a Pull Request https://github.com/krishnanlab/NetworkLearningEval/pulls of your changes
 
 ## Dev notes
 
@@ -22,13 +22,13 @@ git clone https://github.com/<your_github_handle>/NetworkLearningEval
 cd NetworkLearningEval
 ```
 
-If you have done it before, make sure your fork is in-sync with the latest changes and pull the changes to you local copy
+If you have done it before, make sure your fork is in-sync with the latest changes and pull the changes to your local copy
 
 ```bash
 git pull
 ```
 
-Then, create a conda environment for developing `nleval` (this is not required, but is recommended to have an isolated development
+Then, create a conda environment for developing `nleval` (this is not required, but it is recommended to have an isolated development
 environment as it keeps the dependency versions clean)
 
 ```bash
@@ -65,10 +65,10 @@ We provide some additional code quality control tools via `tox` to help catch ea
 tox -e mypy,flake8
 ```
 
-### Continuout integration
+### Continuous integration
 
 We have set up continuous integration via [GitHub Actions](https://github.com/krishnanlab/NetworkLearningEval/actions).
-Everytime a pull request is made from a branch (and any following push to that branch) will trigger automated [testing](#testing)
+Every time a pull request is made from a branch (and any following push to that branch) will trigger automated [testing](#testing)
 and [linting](#linting) to check the changes against out dev guidelines.
 
 ## Building documentation
