@@ -9,7 +9,7 @@ First and formost, we thank you for your interest in contributing to the `nleval
 To get started,
 
 1. Make a fork of the repository, and create a new branch where you will be making your changes
-2. After you are finshed with the new changes, make a Pull Request https://github.com/krishnanlab/NetworkLearningEval/pulls of you changes
+1. After you are finshed with the new changes, make a Pull Request https://github.com/krishnanlab/NetworkLearningEval/pulls of you changes
 
 ## Dev notes
 
@@ -79,14 +79,14 @@ and [linting](#linting) to check the changes against out dev guidelines.
    pip install -e .[full,doc]
    ```
 
-2. Install [PyTorch](https://pytorch.org/get-started/locally/) if you have not done so yet, or simply install a
+1. Install [PyTorch](https://pytorch.org/get-started/locally/) if you have not done so yet, or simply install a
    minimal cpu version of PyTorch if you only want to build the `nleval` documentation:
 
    ```bash
    conda install pytorch cpuonly -c pytorch
    ```
 
-3. Build the documentation
+1. Build the documentation
 
    ```bash
    cd docs
