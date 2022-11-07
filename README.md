@@ -160,30 +160,7 @@ from nleval import Dataset
 dataset = Dataset(graph=g, feature=g.to_dense_graph().to_feature(), label=lsc, splitter=splitter)
 ```
 
-## Dev notes
-
-### Dev installation
-
-```bash
-pip install -r requirements.txt  # install dependencies with pinned version
-pip install -e ".[dev]"  # install extra dependencies for dev
-```
-
-### Testing
-
-Run `pytest` to run all tests
-
-```bash
-pytest
-```
-
-Run type checks and coding style checks using mypy and flake8 via tox:
-
-```bash
-$ tox -e mypy,flake8
-```
-
-### Data preparation and releasing
+## Data preparation and releasing notes
 
 First, bump data version in `__init__.py` to the next data release version, e.g., `nledata-v0.1.0 -> nledata-v0.1.1-dev`.
 Then, download and process all latest data by running
