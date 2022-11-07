@@ -54,6 +54,7 @@ def test_disgenet(tmpdir, caplog, mocker, subtests):
         transform_called += 1  # called due to mismatched config
         assert spy.call_count == transform_called
 
-    with subtests.test("Cannot set pre-transform for archived data"):
-        with pytest.raises(ValueError):
-            DisGeNET(tmpdir, pre_transform=filter_, version="nledata-v1.0-test")
+    # XXX: to be decided whether or not to allow pre-transform archived data
+    # with subtests.test("Cannot set pre-transform for archived data"):
+    #     with pytest.raises(ValueError):
+    #         DisGeNET(tmpdir, pre_transform=filter_, version="nledata-v1.0-test")
