@@ -55,7 +55,7 @@ section below.
 from nleval.util.dataset_constructors import default_constructor
 
 root = "datasets"  # save dataset and cache under the datasets/ directory
-version = "nledata-v0.1.0-dev2"  # archive data version, use 'latest' to pull latest data from source instead
+version = "nledata-v0.1.0-dev3"  # archive data version, use 'latest' to pull latest data from source instead
 
 # Download and process network/label data. Use the adjacency matrix as the ML feature
 dataset = default_constructor(root=root, version=version, graph_name="BioGRID", label_name="DisGeNET",
@@ -121,7 +121,7 @@ root = "datasets"  # save dataset and cache under the datasets/ directory
 
 # Load processed BioGRID data from archive.
 # Alternatively, set version="latest" to get and process the newest data from scratch.
-g = data.BioGRID(root, version="nledata-v0.1.0-dev2")
+g = data.BioGRID(root, version="nledata-v0.1.0-dev3")
 
 # Load DisGeNET gene set collections.
 lsc = data.DisGeNET(root, version="latest")
