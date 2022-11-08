@@ -7,7 +7,7 @@ from pprint import pformat
 import yaml
 
 import nleval
-from nleval.typing import Any, Dict, List, LogLevel, Mapping, Optional, Union
+from nleval.typing import Any, Converter, Dict, List, LogLevel, Mapping, Optional
 from nleval.util.checkers import checkConfig
 from nleval.util.converter import MyGeneInfoConverter
 from nleval.util.download import download_unzip, get_data_url
@@ -43,7 +43,7 @@ class BaseData:
         transform: Optional[Any] = None,
         cache_transform: bool = True,
         download_cache: bool = True,
-        gene_id_converter: Optional[Union[Mapping[str, str], str]] = "HumanEntrez",
+        gene_id_converter: Converter = "HumanEntrez",
         **kwargs,
     ):
         """Initialize BaseData object.
