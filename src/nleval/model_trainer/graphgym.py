@@ -67,7 +67,7 @@ class GraphGymTrainer(GNNTrainer):
         device: str = "auto",
         metric_best: str = "auto",
         cfg_file: Optional[str] = None,
-        cfg_opts: Dict[str, Any] = None,
+        cfg_opts: Optional[Dict[str, Any]] = None,
     ):
         """Initialize GraphGymTrainer.
 

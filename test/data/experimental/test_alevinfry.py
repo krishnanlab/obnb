@@ -15,7 +15,7 @@ def test_alevinfry(tmpdir):
         assert af.metadata[metadata_key] is not None
 
     # Check feature matrix shape
-    assert af.mat.shape == (10620, 36601)
+    assert af.mat.shape == (10186, 36601)
 
     # Check that we can get item
     af[af.node_ids[:10]]

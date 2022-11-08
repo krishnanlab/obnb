@@ -148,7 +148,7 @@ class StandardTrainer(BaseTrainer):
 
         return results
 
-    def _setup(self, dataset, split_idx):
+    def _setup(self, dataset, split_idx: int):
         # Initialize y dictionary: mask_name -> y_pred/true (2d arrays)
         y_pred_dict: Dict[str, np.ndarray] = {}
         y_true_dict: Dict[str, np.ndarray] = {}

@@ -87,7 +87,7 @@ class TestData(unittest.TestCase):
     @pytest.mark.mediumruns
     def test_disgenet(self):
         with Timeout(600):
-            self.lsc = nleval.data.DisGeNet(self.tmp_dir, **opts)
+            self.lsc = nleval.data.DisGeNET(self.tmp_dir, **opts)
 
     @pytest.mark.longruns
     def test_funcoup(self):
@@ -163,7 +163,7 @@ def test_dataset_constructor(subtests, tmpdir):
             dataset = default_constructor(
                 root=datadir,
                 graph_name="BioPlex",
-                label_name="DisGeNet",
+                label_name="DisGeNET",
                 graph_as_feature=graph_as_feature,
                 use_dense_graph=use_dense_graph,
                 **opts,
