@@ -994,12 +994,10 @@ class TestOntologyGraph(unittest.TestCase):
         self.assertEqual(graph.get_node_attr("b"), ["a", "x", "y", "z"])
 
     def test_complete_node_attrs(self):
-        r"""
-                a
-        /       |        \
-        b       c [x, y]  d [x]
-        |       |
-        e [w]   f [z]
+        r"""a.
+
+        /       |        \ b       c [x, y]  d [x] |       | e [w]   f [z]
+
         """
         graph = OntologyGraph()
 
@@ -1048,12 +1046,10 @@ class TestOntologyGraph(unittest.TestCase):
         self.assertEqual(graph.get_node_attr("g"), ["z"])
 
     def test_ancestors(self):
-        r"""
-           a
-        /  |  \
-        b  c   d
-        |  |  /
-        e  f
+        r"""a.
+
+        /  |  \ b  c   d |  |  / e  f
+
         """
         graph = OntologyGraph()
 
@@ -1074,12 +1070,10 @@ class TestOntologyGraph(unittest.TestCase):
         self.assertEqual(graph.ancestors("f"), {"a", "c", "d"})
 
     def test_read_obo(self):
-        r"""
-               a
-        /      |       \
-        b      c (x, y)  d
-        |       \      /
-        e [z]       f
+        r"""a.
+
+        /      |       \ b      c (x, y)  d |       \      / e [z]       f
+
         """
         obo_path = osp.join(SAMPLE_DATA_DIR, "toy_ontology.obo")
         with self.subTest(xref_prefix=None):
