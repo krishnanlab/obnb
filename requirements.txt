@@ -3,7 +3,7 @@ mygene==3.2.2
 ndex2==3.5.0
 numpy==1.23.3
 pandas==1.5.2
-pyroe==0.6.4
+pyroe==0.7.0
 pyyaml==6.0
 requests==2.28.1
 scanpy==1.9.1
