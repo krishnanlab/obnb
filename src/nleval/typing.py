@@ -43,6 +43,8 @@ GraphGymMetric = Callable[[List[Tensor], List[Tensor], str], float]
 Term = Tuple[str, str, Optional[List[str]], Optional[List[str]]]
 Splitter = Callable[[np.ndarray, np.ndarray], Iterator[Tuple[np.ndarray, ...]]]
 
+Converter = Optional[Union[Mapping[str, str], str]]
+
 
 __all__ = [
     "Any",
