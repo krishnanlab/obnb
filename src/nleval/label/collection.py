@@ -46,9 +46,9 @@ class LabelsetCollection(idhandler.IDprop):
     def to_df(self) -> pd.DataFrame:
         """Construct label sets info dataframe.
 
-        The first three columns of the table correspond to the name, info, and the
-        number of positive examples for each labelset. The rest of the columns contain
-        the positive examples, padded with `None`.
+        The first three columns of the table correspond to the name, info, and
+        the number of positive examples for each labelset. The rest of the
+        columns contain the positive examples, padded with `None`.
 
         """
         label_info = list(map(self.get_info, self.label_ids))
@@ -209,8 +209,8 @@ class LabelsetCollection(idhandler.IDprop):
     def reset_labelset(self, label_id):
         """Reset an existing labelset to an empty set.
 
-        Setting the labelset back to empty and deecrement `Noccur` of all entities
-        belonging to the labelset by 1.
+        Setting the labelset back to empty and deecrement `Noccur` of all
+        entities belonging to the labelset by 1.
 
         """
         lbset = self.get_labelset(label_id)

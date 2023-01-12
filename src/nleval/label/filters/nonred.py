@@ -12,11 +12,12 @@ class LabelsetNonRedFilter(BaseFilter):
 
     The detailed procedure can be found in the supplementary data of
     https://doi.org/10.1093/bioinformatics/btaa150 In brief, given a labelset
-    collection, a graph of labelsets if first constructed based on the redundancy score
-    function of interest. Here, we use the combination of Jaccard index and overlap
-    coefficient. Then, for each connected component in this graph, retreieve
-    representative labelsets according to the sum of the proportions of genes in a
-    geneset that is contained in any other gene sets within that component.
+    collection, a graph of labelsets if first constructed based on the
+    redundancy score function of interest. Here, we use the combination of
+    Jaccard index and overlap coefficient. Then, for each connected component in
+    this graph, retreieve representative labelsets according to the sum of the
+    proportions of genes in a geneset that is contained in any other gene sets
+    within that component.
 
     """
 
@@ -97,9 +98,9 @@ class LabelsetNonRedFilter(BaseFilter):
     def _get_repr_score(labelsets: List[Set[str]], idx: int) -> float:
         """Compute the representative score of a gene set in the component.
 
-        For a given gene set in the component of gene sets, the representative score is
-        the sum of the ratios of genes in any other gene sets that are contained in this
-        gene set.
+        For a given gene set in the component of gene sets, the representative
+        score is the sum of the ratios of genes in any other gene sets that are
+        contained in this gene set.
 
         """
         current_labelset = labelsets[idx]

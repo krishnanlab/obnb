@@ -10,8 +10,8 @@ from nleval.util.logger import attach_file_handler, get_logger
 class BaseTrainer:
     """The BaseTrainer object.
 
-    Abstract class for trainer objects, which serve as interfaces or shortcuts for
-    training specific types of models.
+    Abstract class for trainer objects, which serve as interfaces or shortcuts
+    for training specific types of models.
 
     """
 
@@ -89,9 +89,9 @@ class StandardTrainer(BaseTrainer):
     ) -> Dict[str, float]:
         """Train a supervised learning model.
 
-        The ``model`` in this case is a  upervised learning model that has a ``fit``
-        method for training the model, and a ``decision_function`` that returns the
-        predict confidence scores given some features. See
+        The ``model`` in this case is a  upervised learning model that has a
+        ``fit`` method for training the model, and a ``decision_function`` that
+        returns the predict confidence scores given some features. See
         ``sklearn.linear_model.LogisticRegression`` for example.
 
         """

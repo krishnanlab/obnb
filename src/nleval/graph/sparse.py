@@ -118,8 +118,8 @@ class SparseGraph(BaseGraph):
     def connected_components(self) -> List[List[str]]:
         """Find connected components via Breadth First Search.
 
-        Returns a list of connected components sorted by the number of nodes, each of
-        which is a list of node ids within a connected component.
+        Returns a list of connected components sorted by the number of nodes,
+        each of which is a list of node ids within a connected component.
 
         """
         unvisited = set(range(self.num_nodes))
@@ -274,7 +274,8 @@ class SparseGraph(BaseGraph):
     def edglst_reader(edg_path, weighted, directed, cut_threshold):
         """Edge list file reader.
 
-        Read line by line from a edge list file and yield (node_id1, node_id2, weight)
+        Read line by line from a edge list file and yield (node_id1, node_id2,
+        weight)
 
         """
         with open(edg_path) as f:
@@ -723,8 +724,8 @@ class SparseGraph(BaseGraph):
 class DirectedSparseGraph(SparseGraph):
     """Directed sparse graph that also keeps track of reversed edge data.
 
-    The reversed edge data is captured for more efficient "propagation upwards" in
-    addition to the more natural "propagation downwards" operation.
+    The reversed edge data is captured for more efficient "propagation upwards"
+    in addition to the more natural "propagation downwards" operation.
 
     """
 

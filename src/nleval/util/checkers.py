@@ -1,7 +1,7 @@
 """Type checking functions.
 
-This module contains a collection of checkers to ensure that the input value to a
-function call is valid.
+This module contains a collection of checkers to ensure that the input value to
+a function call is valid.
 
 """
 from typing import get_args

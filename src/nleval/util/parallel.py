@@ -171,8 +171,8 @@ class ParDat:
     def spawn(self, func, func_args, func_kwargs):
         """Spawn new child process.
 
-        Set up communication with the child process and set up the result queue where
-        the parent process can grab the results.
+        Set up communication with the child process and set up the result queue
+        where the parent process can grab the results.
 
         """
         # Setup parent child connection and start a child process

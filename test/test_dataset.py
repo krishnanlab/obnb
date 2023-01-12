@@ -11,7 +11,14 @@ from nleval.label.collection import LabelsetCollection
 class Data:
     """Setup toy multi-feature vector object.
 
-    f1  f2  f3 a   1   2   3 b   2   3   4 c   3   4   5 d   4   5   6 e   5   6   7
+    .. code-block::
+
+           f1  f2  f3
+        a   1   2   3
+        b   2   3   4
+        c   3   4   5
+        d   4   5   6
+        e   5   6   7
 
     """
 
