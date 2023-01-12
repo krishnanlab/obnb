@@ -63,7 +63,7 @@ class GNNTrainer(BaseTrainer):
         Raises:
             ValueError: More than one metrics is available but did not specify
                 metric_best.
-            KeyError: metric_best did not match any of the spcified metrics.
+            KeyError: metric_best did not match any of the specified metrics.
 
         """
         if metric_best is None or metric_best == "auto":

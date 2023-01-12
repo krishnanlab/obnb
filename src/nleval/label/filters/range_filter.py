@@ -24,7 +24,7 @@ class BaseRangeFilter(BaseFilter):
 
         Args:
             min_val: minimum below which entities are removed
-            max_val: maximum beyound which entiteis are removed
+            max_val: maximum beyond which entiteis are removed
 
         """
         super().__init__(**kwargs)
@@ -47,7 +47,7 @@ class BaseRangeFilter(BaseFilter):
 
 
 class EntityRangeFilterNoccur(BaseRangeFilter):
-    """Filter entities based on number of occurance.
+    """Filter entities based on number of occurrence.
 
     Example:
         The following example removes any entity that occurs to be positive
@@ -156,8 +156,8 @@ class LabelsetRangeFilterSplit(BaseRangeFilter):
     def get_val_getter(self, lsc):
         """Return the value getter.
 
-        The value getter finds the minimum number of positives for a labelset across all
-        the dataset splits.
+        The value getter finds the minimum number of positives for a labelset
+        across all the dataset splits.
 
         """
 

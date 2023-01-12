@@ -32,9 +32,9 @@ class OntologyGraph(DirectedSparseGraph):
     edges (``_rev_edge_data``). This bidirectional awareness is useful in the
     context of propagating information "upwards" or "downloads".
 
-    The ``idmap`` attribute is swapped with a more functional ``IDProp``
-    object that allows the storing of node informations such as name and
-    node attributes.
+    The ``idmap`` attribute is swapped with a more functional ``IDProp`` object
+    that allows the storing of node information such as the name and the node
+    attributes.
 
     """
 
@@ -82,7 +82,7 @@ class OntologyGraph(DirectedSparseGraph):
         """Return the ancestor nodes of a given node.
 
         Note:
-            To enable cache utilization to optimize dynamic programing, execute
+            To enable cache utilization to optimize dynamic programming, execute
             this with the cach_on_static context. Note that this would only be
             done when not more structural changes (node and edge modifications)
             will be introduced throughout the span of this context.
@@ -144,7 +144,7 @@ class OntologyGraph(DirectedSparseGraph):
         node: Union[str, int],
         new_node_attr: Union[List[str], str],
     ):
-        """Update the ndoe attributes of a node without reduction and sort."""
+        """Update the node attributes of a node without reduction and sort."""
         if not isinstance(new_node_attr, list):
             new_node_attr = [new_node_attr]
         if self.get_node_attr(node) is None:
@@ -175,7 +175,7 @@ class OntologyGraph(DirectedSparseGraph):
     ):
         """Update node attributes of a given node.
 
-        Can update using a single instance or a lsit of instances.
+        Can update using a single instance or a list of instances.
 
         Args:
             node (Union[str, int]): Node index (int) or node ID (str).
@@ -227,7 +227,7 @@ class OntologyGraph(DirectedSparseGraph):
         recursion _aggregate_node_attrs.
 
         Note:
-            To enable effective dynamic programing of propagating attributes,
+            To enable effective dynamic programming of propagating attributes,
             lru_cache is used to decorate _aggregate_node_attrs. By the end of
             this function run, the cache is cleared to prevent overhead of
             calling __eq__ in the next execution.

@@ -11,7 +11,14 @@ from nleval.label.collection import LabelsetCollection
 class Data:
     """Setup toy multi-feature vector object.
 
-    f1  f2  f3 a   1   2   3 b   2   3   4 c   3   4   5 d   4   5   6 e   5   6   7
+    .. code-block::
+
+           f1  f2  f3
+        a   1   2   3
+        b   2   3   4
+        c   3   4   5
+        d   4   5   6
+        e   5   6   7
 
     """
 
@@ -134,7 +141,7 @@ def test_get_feat_from_ids(subtests, data):
         with subtests.test(id_=id_):
             assert dataset.get_feat(id_, mode="ids").tolist() == ans
 
-    # Unkown node id "f"
+    # Unknown node id "f"
     pytest.raises(IDNotExistError, dataset.get_feat, ["a", "f"], mode="ids")
 
 
@@ -215,7 +222,7 @@ def test_get_feat_from_ids_dual(subtests, data):
         with subtests.test(ids=ids):
             assert dataset.get_feat_from_ids(ids).tolist() == ans
 
-    # Unkown node id "f4"
+    # Unknown node id "f4"
     pytest.raises(IDNotExistError, dataset.get_feat_from_ids, ["f2", "f4"])
 
 

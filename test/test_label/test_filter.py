@@ -429,7 +429,7 @@ class TestFilter(unittest.TestCase):
         log_level = "INFO"
 
         # Train = [a, b], Test = [c, d, e, f, g, h], Group3 does not have any
-        # postives in the training split, hence should be removed
+        # positives in the training split, hence should be removed
         splitter = split.ThresholdPartition(2, **split_opts)
         with self.subTest(splitter=splitter):
             lsc = self.lsc.apply(
@@ -445,7 +445,7 @@ class TestFilter(unittest.TestCase):
                 ["Group1", "Group2", "Group4", "Group5"],
             )
 
-        # Same as above, but take into acount of negatives. Group1 is removed
+        # Same as above, but take into account of negatives. Group1 is removed
         # due to the lack of negatives (all negatives in training set)
         splitter = split.ThresholdPartition(2, **split_opts)
         with self.subTest(splitter=splitter):
@@ -463,7 +463,7 @@ class TestFilter(unittest.TestCase):
             )
 
         # Train = [a], Test = [b, c, d, e, f, g, h], Both Group2 and Group3 do
-        # not have any postives in the training split, hence should be removed
+        # not have any positives in the training split, hence should be removed
         splitter = split.ThresholdPartition(1, **split_opts)
         with self.subTest(splitter=splitter):
             lsc = self.lsc.apply(
@@ -562,7 +562,7 @@ class TestFilter(unittest.TestCase):
             filters.NegativeGeneratorHypergeom(p_thresh=0.5),
             inplace=True,
         )
-        # test wheter negative selected correctly for group1,
+        # test whether negative selected correctly for group1,
         # 'f' should be excluded due to sim with group2
         self.assertEqual(self.lsc.get_negative("Group1"), {"d", "e", "g", "h"})
 

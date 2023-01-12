@@ -152,8 +152,8 @@ class BaseFeature:
     ):
         """Align FeatureVec object with another FeatureVec.
 
-        Utilizes the ``align`` method of ``IDmap`` to align, then update the feature
-        vector matrix based on the returned left and right index.
+        Utilizes the ``align`` method of ``IDmap`` to align, then update the
+        feature vector matrix based on the returned left and right index.
 
         """
         checkers.checkType("Feature vectors", BaseFeature, new_fvec)

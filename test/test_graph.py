@@ -198,7 +198,7 @@ class TestSparseGraph(unittest.TestCase):
             self.assertEqual(sorted(graph.node_ids), ["a", "b"])
             self.assertEqual(graph._edge_data, [{1: 1.0}, {0: 1.0}])
 
-        with self.subTest("Overwritting edge value (no edge reduction)"):
+        with self.subTest("Overwriting edge value (no edge reduction)"):
             graph.add_edge("a", "b", 0.8)
             self.assertEqual(graph._edge_data, [{1: 0.8}, {0: 0.8}])
 
@@ -470,7 +470,7 @@ class TestDirectedSparseGraph(unittest.TestCase):
             self.assertEqual(graph._edge_data, [{1: 1.0}, {}])
             self.assertEqual(graph._rev_edge_data, [{}, {0: 1.0}])
 
-        with self.subTest("Overwritting edge value (no edge reduction)"):
+        with self.subTest("Overwriting edge value (no edge reduction)"):
             graph.add_edge("a", "b", 0.8)
             self.assertEqual(graph._edge_data, [{1: 0.8}, {}])
             self.assertEqual(graph._rev_edge_data, [{}, {0: 0.8}])

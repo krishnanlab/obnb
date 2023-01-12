@@ -110,7 +110,7 @@ class BaseConverter:
             if i in full_convert_map and j != full_convert_map[i]:
                 self.logger.error(
                     f"Conflicting mapping for {i!r}, previously mapped to"
-                    f"{full_convert_map[i]!r}, overwritting to {j!r})",
+                    f"{full_convert_map[i]!r}, overwriting to {j!r})",
                 )
             full_convert_map[i] = j
 
@@ -194,7 +194,7 @@ class MyGeneInfoConverter(BaseConverter):
         self,
         ids: List[str],
     ):
-        """Query gene IDs in bulk for performnace."""
+        """Query gene IDs in bulk for performance."""
         ids_set = set(ids)
         ids_to_query = ids_set.difference(self._convert_map)
         self.logger.info(
@@ -290,7 +290,7 @@ class GenePropertyConverter(BaseConverter):
                 called. The conversion mappings are merged with existing cache
                 if available.
             default_value: Default value to return if the property is
-                unavilable for a particular entity. If set to 'default', will
+                unavailable for a particular entity. If set to 'default', will
                 use the default value determined beforehand.
             log_level: Logging level.
 
@@ -318,7 +318,7 @@ class GenePropertyConverter(BaseConverter):
 
     @property
     def name(self) -> str:
-        """Name of the propery."""
+        """Name of the property."""
         return self._name
 
     @name.setter

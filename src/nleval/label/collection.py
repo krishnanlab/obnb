@@ -46,9 +46,9 @@ class LabelsetCollection(idhandler.IDprop):
     def to_df(self) -> pd.DataFrame:
         """Construct label sets info dataframe.
 
-        The first three columns of the table correspond to the name, info, and the numbe
-        of positive examples for each labelset. The rest of the columns contain the
-        positive examples, padded with `None`.
+        The first three columns of the table correspond to the name, info, and
+        the number of positive examples for each labelset. The rest of the
+        columns contain the positive examples, padded with `None`.
 
         """
         label_info = list(map(self.get_info, self.label_ids))
@@ -75,12 +75,12 @@ class LabelsetCollection(idhandler.IDprop):
     def __hash__(self):
         """Hash a LabelsecCollection object.
 
-        Hash using the followings
-        - Entity IDs and number of occurances
+        Hash using the following
+        - Entity IDs and number of occurrences
         - Labelsets along with negatives and their information
 
         Note:
-            This is used for lru cach that decorates the split method.
+            This is used for the LRU cache that decorates the split method.
 
         """
         eids = (*self.entity,)
@@ -101,7 +101,7 @@ class LabelsetCollection(idhandler.IDprop):
             print(lbset)
         print("Entities IDs:")
         print(self.entity._lst)
-        print("Entities occurances:")
+        print("Entities occurrences:")
         print(self.entity._prop)
 
     def stats(self) -> str:
@@ -178,7 +178,7 @@ class LabelsetCollection(idhandler.IDprop):
         Take list of entities IDs and update current labelset with a label
         name matching `label_id`. Any ID in the input list `lst` that does
         not exist in the entity list will be added to the entity list.
-        Increment the `Noccur` property of any newly added entites to the
+        Increment the `Noccur` property of any newly added entities to the
         labelset by 1.
 
         Note: label_id must already existed, use `.add_labelset()` for adding
@@ -209,8 +209,8 @@ class LabelsetCollection(idhandler.IDprop):
     def reset_labelset(self, label_id):
         """Reset an existing labelset to an empty set.
 
-        Setting the labelset back to empty and deecrement `Noccur` of all entites
-        belonging to the labelset by 1.
+        Setting the labelset back to empty and deecrement `Noccur` of all
+        entities belonging to the labelset by 1.
 
         """
         lbset = self.get_labelset(label_id)
@@ -316,7 +316,7 @@ class LabelsetCollection(idhandler.IDprop):
         return y_out
 
     @lru_cache  # noqa: B019
-    def split(  # TODO: Reduce cylic complexity..
+    def split(  # TODO: Reduce cyclic complexity..
         self,
         splitter: Splitter,
         target_ids: Optional[Tuple[str, ...]] = None,
@@ -558,17 +558,17 @@ class LabelsetCollection(idhandler.IDprop):
     ):
         """Load entity properties from file.
 
-        The file is tab seprated with two columns, first column
-        contains entities IDs, second column contains corresponding
-        properties of entities.
+        The file is tab separated with two columns, first column contains
+        entities IDs, second column contains corresponding properties of
+        entities.
 
         Args:
             path(str): path to the entity properties file.
             default_val: default value of property of an entity if not
                 specified.
             default_type(type): default type of the property.
-            interpreter: function to transfrom property value from string to
-                some other value
+            interpreter: function to transform property value from string to
+                some other value.
 
         """
         # TODO: option to skip non-existing entities
@@ -628,7 +628,7 @@ class LabelsetCollection(idhandler.IDprop):
 
         Args:
             path: path to the `.gmt` file.
-            sep: seperator used in the GMT file.
+            sep: separator used in the GMT file.
             reload: Remove existing labelsets before loading if set to True.
 
         """
@@ -645,7 +645,7 @@ class LabelsetCollection(idhandler.IDprop):
 
         Args:
             path: path to the `.gmt` file.
-            sep: seperator used in the GMT file.
+            sep: separator used in the GMT file.
 
         """
         lsc = cls()

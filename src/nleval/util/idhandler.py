@@ -87,8 +87,8 @@ class IDlst:
             return self._getitem_multiple(identifier)
         else:
             raise TypeError(
-                f"ID key(s) must be stirng or iterables of "
-                f"string, not {type(identifier)!r}",
+                f"ID key(s) must be string or iterables of string, "
+                f"not {type(identifier)!r}",
             )
 
     def _getitem_sinlge(self, identifier):
@@ -296,7 +296,7 @@ class IDmap(IDlst):
             left_idx = self[left_ids]
             right_idx = self[right_ids]
         else:
-            raise ValueError(f"Unknwon join type: {join!r}")
+            raise ValueError(f"Unknown join type: {join!r}")
 
         return left_idx, right_idx
 
@@ -479,7 +479,7 @@ class IDprop(IDmap):
             prop = prop.copy()
             for prop_name in prop:
                 self._check_prop_existence(prop_name, True)
-            # chekc type of prop val and fill in missing properties
+            # Check type of prop val and fill in missing properties
             for prop_name, default_type in self.prop_default_type.items():
                 if prop_name in prop:
                     if default_type is not None:

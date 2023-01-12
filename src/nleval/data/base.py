@@ -18,10 +18,10 @@ from nleval.util.path import cleandir, hexdigest
 class BaseData:
     """BaseData object.
 
-    This is an abstract (mixin) class for constructing data objects. The main methods
-    are _download and _process, which are wrappers that download the raw files and
-    process the files into the final processed file if they are not yet available.
-    Otherwise, directly load the previously processed file.
+    This is an abstract (mixin) class for constructing data objects. The main
+    methods are _download and _process, which are wrappers that download the raw
+    files and process the files into the final processed file if they are not
+    yet available. Otherwise, directly load the previously processed file.
 
     """
 
@@ -324,7 +324,7 @@ class BaseData:
                 if (cache_config := yaml.safe_load(f)) != config:
                     self.plogger.warning(
                         f"Found transformed cache in {cache_dir} but found in "
-                        "compatible configs, over writting now. Please report "
+                        "compatible configs, over writing now. Please report "
                         "to the GitHub issue if you saw this message, along "
                         "with the specific transformation you used.",
                     )
@@ -346,7 +346,7 @@ class BaseData:
 
         # Apply transformation to the data
         # TODO: add option to disable saving option
-        # FIX: imlement stats for graph/feature data types
+        # FIX: implement stats for graph/feature data types
         with log_file_context(self.plogger, osp.join(cache_dir, "run.log")):
             self.plogger.info(f"Before transformation:\n{self.stats()}")  # type: ignore
             self.plogger.info(f"Applying transformation:\n{transform}")
@@ -368,7 +368,7 @@ class BaseData:
             unzipped and saved to the :attr:`root` directory.
 
         Args:
-            version: Archival verion.
+            version: Archival version.
 
         """
         self.plogger.info(f"Loading {self.classname} ({version=})...")

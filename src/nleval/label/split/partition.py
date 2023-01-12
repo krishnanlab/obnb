@@ -31,9 +31,9 @@ class BasePartition(BaseSortedSplit):
 class RatioPartition(BasePartition):
     """Split the dataset into parts of size proportional to some ratio.
 
-    First sort the dataset entities (data points) based on a 1-dimensional entity
-    property parsed in as ``x``, either ascendingly or descendingly. Then split the
-    dataset based on the defined ratios.
+    First sort the dataset entities (data points) based on a 1-dimensional
+    entity property parsed in as ``x``, either ascendingly or descendingly. Then
+    split the dataset based on the defined ratios.
 
     """
 
@@ -142,7 +142,7 @@ class ThresholdPartition(BasePartition):
         for item, count in Counter(vals).items():
             if count > 1:
                 raise ValueError(
-                    f"Cannot have duplicated thresholds: {item} occured "
+                    f"Cannot have duplicated thresholds: {item} occurred "
                     f"{count} times from the input {vals}",
                 )
         self._thresholds = (*sorted(vals, reverse=not self.ascending),)

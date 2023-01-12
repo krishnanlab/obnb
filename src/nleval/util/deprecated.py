@@ -1,8 +1,6 @@
 import warnings
 from functools import wraps
 
-from nleval.typing import Optional
-
 
 class Deprecated:
     """Deprecation decorator."""

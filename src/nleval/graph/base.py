@@ -96,7 +96,7 @@ class BaseGraph:
             weight: Edge weight to use.
             reduction: Type of edge reduction to use if the target edge already
                 exist. If not set, warn if old edge exists with different edge
-                weight value then the input edge weight, and then overwite it
+                weight value then the input edge weight, and then overwrite it
                 with the new value.
 
         """
@@ -171,12 +171,13 @@ class BaseGraph:
 
     def __contains__(self, graph):
         """Return true if contains the input graph."""
-        # Check if containes all IDs in input graph
+        # Check if the current graph contains all IDs in input graph
         for node_id in graph.idmap:
             if node_id not in self.idmap:
                 return False
 
-        for node_id1 in graph.idmap:  # check if all connections match
+        # Check if the current graph contains all connections in the input graph
+        for node_id1 in graph.idmap:
             for node_id2 in graph.idmap:
                 if self.get_edge(node_id1, node_id2) != graph.get_edge(
                     node_id1,
@@ -223,7 +224,7 @@ class BaseGraph:
         raise NotImplementedError
 
     def is_connected(self) -> bool:
-        """Retrun True if the graph is connected."""
+        """Return True if the graph is connected."""
         return len(self.connected_components()) == 1
 
     def largest_connected_subgraph(self):
