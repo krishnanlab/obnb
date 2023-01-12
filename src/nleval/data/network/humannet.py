@@ -5,7 +5,7 @@ from nleval.typing import Converter
 class HumanNet(BaseNDExData):
     """The HumanNet-FN functional interaction network."""
 
-    cx_uuid = "fbc750ac-a17d-11ec-b3be-0ac135e8bacf"
+    cx_uuid = "40913318-3a9c-11ed-ac45-0ac135e8bacf"
 
     def __init__(
         self,
@@ -25,11 +25,11 @@ class HumanNet(BaseNDExData):
             largest_comp=largest_comp,
             gene_id_converter=gene_id_converter,
             cx_kwargs={
-                "interaction_types": ["associates-with"],
+                "interaction_types": ["has functional association with"],
                 "node_id_prefix": "ncbigene",
                 "default_edge_weight": 0.0,
                 "edge_weight_attr_name": "LLS",
-                "reduction": None,
+                "reduction": "max",
             },
             **kwargs,
         )
