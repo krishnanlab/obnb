@@ -107,6 +107,9 @@ required_plugins = [
     "pytest-subtests",
     "requests-mock",
 ]
+testpaths = [
+    "test",
+]
 
 addopts = [
     "--strict-markers",
