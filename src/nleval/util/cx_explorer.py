@@ -1,5 +1,8 @@
 """Utility for exploring NDEx CX data."""
+import itertools
 import json
+from collections import defaultdict
+from pprint import pformat
 
 import ndex2
 from requests import RequestException
@@ -100,5 +103,61 @@ class CXExplorer:
             >>> cxe.unique("node", "n")  # unique nodes
             >>> cxe.unique("edges", "i")  # unique interactions
 
+        Note:
+            Only counts `str`, `int`, and `float` types.
+
         """
-        return {i[name] for i in self[field]}
+        return {
+            i[name] for i in self[field] if isinstance(i.get(name), (str, int, float))
+        }
+
+    def node_types(self, sep: str = ":", channel: str = "r") -> Set[str]:
+        """Return all node types.
+
+        Node types are indicated by the node IDs, where the item before the
+        separator (default is `:`) is the node-type, and the one after is the
+        actual ID.
+
+        Args:
+            sep: Separator for the node ID.
+            channel: Which channel in the `nodes` field to use. Typically there
+                are three channels: (1) `@id` is the index of the node, (2)
+                `n` is the name of the node, and (3) `r` is the alternative
+                representation not the node.
+
+        """
+        return {i[channel].split(sep)[0] for i in self["nodes"]}
+
+    def edge_types(
+        self,
+        name_channel: str = "n",
+        value_channel: str = "v",
+    ) -> Dict[str, int]:
+        """Return all edge types with counts.
+
+        Args:
+            name_channel: Which channel in the `edgeAttributes` field to use for
+                inferring edge type.
+            value_channel: Which channel in the `edgeAttributes` field to use
+                as edge weights.
+
+        Note:
+            Only edges with positive edge weights are counted.
+
+        """
+        eattr = self["edgeAttributes"]
+        ets = {i[name_channel] for i in eattr}
+
+        ets_counts = defaultdict(int)
+        for edge_attr in self["edgeAttributes"]:
+            name = edge_attr[name_channel]
+            value = edge_attr[value_channel]
+            try:
+                ets_counts[name] += 1 if float(value) > 0 else 0
+            except (ValueError, TypeError):
+                continue
+
+        ets = sorted(ets_counts, key=ets_counts.get, reverse=True)  # sort by size
+        out = {i: ets_counts[i] for i in ets}
+
+        return out
