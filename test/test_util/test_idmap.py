@@ -96,7 +96,7 @@ class TestIDmap(unittest.TestCase):
         self.assertEqual(self.idmap.map, {"a": 0, "b": 1, "c": 2})
         self.assertRaises(IDNotExistError, self.idmap.pop_id, "d")
         self.assertEqual(self.idmap.pop_id("b"), 1)
-        # make sure both lst and data poped
+        # make sure both lst and data popped
         self.assertEqual(self.idmap.lst, ["a", "c"])
         # make sure data updated with new mapping
         self.assertEqual(self.idmap.map, {"a": 0, "c": 1})

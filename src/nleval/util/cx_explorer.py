@@ -1,7 +1,6 @@
 """Utility for exploring NDEx CX data."""
 import json
 
-import mygene
 import ndex2
 from requests import RequestException
 

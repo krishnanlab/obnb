@@ -46,7 +46,7 @@ class TestIDprop(unittest.TestCase):
         # test property name type check
         self.assertRaises(TypeError, self.IDprop1.new_property, 10)
         self.IDprop1.new_property("10")
-        # test property existance check
+        # test property existence check
         self.assertRaises(IDExistsError, self.IDprop1.new_property, "10")
         # test type consistency between default value and type
         self.assertRaises(
@@ -195,7 +195,7 @@ class TestIDprop(unittest.TestCase):
         self.assertRaises(TypeError, self.IDprop1.pop_id, 1)
         # test wrong ID val --> IDNotExistError
         self.assertRaises(IDNotExistError, self.IDprop1.pop_id, "d")
-        # test if poped correctly
+        # test if popped correctly
         self.assertEqual(self.IDprop1.pop_id("b"), 1)
         self.assertEqual(self.IDprop1.lst, ["a", "c"])
         self.assertEqual(self.IDprop1.properties, ["x", "y"])
@@ -217,7 +217,7 @@ class TestIDprop(unittest.TestCase):
         self.assertEqual(self.IDprop1.get_property("b", "y"), "2")
         # test wrong ID type --> TypeError
         self.assertRaises(TypeError, self.IDprop1.add_id, (1, 2, 3))
-        # test addd existed ID --> IDExistsError
+        # test add existed ID --> IDExistsError
         self.assertRaises(IDExistsError, self.IDprop1.add_id, "a")
         # test wrong prop type --> TypeError
         self.assertRaises(TypeError, self.IDprop1.add_id, "c", ("x", "y"))

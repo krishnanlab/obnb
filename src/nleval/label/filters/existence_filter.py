@@ -91,7 +91,7 @@ class LabelsetExistenceFilter(BaseExistenceFilter):
         >>> labelset_existence_filter = LabelsetExistenceFilter(label_name_list)
         >>> labelset_collection.apply(labelset_existence_filter, inplace=True)
 
-        Alternatively, can preserve (intead of remove) only labelsets not
+        Alternatively, can preserve (instead of remove) only labelsets not
         present in the label_name_list by setting ``remove_specified=True``.
 
     """

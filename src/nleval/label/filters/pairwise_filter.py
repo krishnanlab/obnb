@@ -28,7 +28,7 @@ class BaseLabelsetPairwiseFilter(BaseRangeFilter):
             max_val (float):
             size_constraint (str): If set to 'larger' (or 'smaller'), then only
                 make the pairwise comparison if the current labelset if larger
-                (or smaller) than the targer labelset. Finally, 'none' is the
+                (or smaller) than the target labelset. Finally, 'none' is the
                 same as setting to both 'larger' and 'smaller'
                 (default; 'larger').
             inclusive (bool): Whether or not to make the comparison if the two

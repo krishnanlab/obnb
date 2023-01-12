@@ -198,7 +198,7 @@ class GraphGymTrainer(GNNTrainer):
     def train(self, model, dataset, split_idx=0):
         """Train model using GraphGym.
 
-        Note that becuase nleval only concerns transductive node classification (for
+        Note that because nleval only concerns transductive node classification (for
         now), the training procedure is reduced to this specific setting for the sake of
         runtime performance.
 

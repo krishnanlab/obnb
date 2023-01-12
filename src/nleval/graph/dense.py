@@ -61,7 +61,7 @@ class DenseGraph(BaseGraph):
 
         Note:
             need to construct idmap (self.idmap) first before loading matrix
-            (self.mat), which should have same number of entires (rows) as size
+            (self.mat), which should have same number of entries (rows) as size
             of idmap, riases exption other wise>
 
         Args:

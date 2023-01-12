@@ -46,7 +46,7 @@ def test_mat():
     mat2 = np.random.random((5, 7))
     mat3 = np.random.random((5, 5))
 
-    # Test if dim set automaticall
+    # Test if dim set automatically
     assert feat.dim is None
     feat.mat = mat1
     assert feat.dim == 5
@@ -96,7 +96,7 @@ def test_add_featvec():
     # Test if automatically set dim correctly
     assert feat.dim == 3
 
-    # Test if captures inconsistency between number of IDs and number matrix entires
+    # Test if captures inconsistency between number of IDs and number matrix entries
     feat.idmap.add_id("d")
     with pytest.raises(ValueError):
         feat.add_featvec("e", vec1)

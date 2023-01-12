@@ -156,8 +156,8 @@ class Dataset:
                 sequence of instances indexes; `'mask'` means the indicator is a
                 numpy array whose entries corresponding to the instances of
                 interest are marked; finally, `'auto'` tires to determine the
-                type automatically. It is recommented to set the mode
-                explicitely rather than `'auto'` when possible.
+                type automatically. It is recommended to set the mode
+                explicitly rather than `'auto'` when possible.
 
         """
         if self.feature is None:

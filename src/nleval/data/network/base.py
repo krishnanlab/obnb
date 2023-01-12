@@ -69,7 +69,7 @@ class BaseNDExData(BaseData, SparseGraph):
             f.write(client_resp.content)
 
     def process(self):
-        """Process data and save for later useage."""
+        """Process data and save for later usage."""
         self.plogger.info(f"Process raw file {self.raw_file_path(0)}")
         cx_graph = SparseGraph(
             weighted=self.weighted,

@@ -121,7 +121,7 @@ class StandardTrainer(BaseTrainer):
 
         Note:
             The original model is not trained. For each task, a deep copy of
-            the model is craeted and it is evaluted via one-vs-rest.
+            the model is created and it is evaluated via one-vs-rest.
 
         """
         g = dataset.graph

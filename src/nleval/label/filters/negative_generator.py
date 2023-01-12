@@ -13,8 +13,8 @@ class NegativeGeneratorHypergeom(BaseFilter):
 
     Given a labelset, it compares all pairs of labelsets via hypergometric
     test. If the p-val is less than ``p_thresh``, then exclude the entities
-    from that labelset that are not possitive from training/testing sets,
-    i.e. set to neutral.
+    from that labelset that are not positive from training/testing sets, i.e.,
+    set to neutral.
 
     Example:
         The following example set up the negatives for each labelset using

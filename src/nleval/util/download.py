@@ -36,8 +36,8 @@ def get_data_url(
 
     Args:
         version: Archival version.
-        name: Name of the zip file withou the `.zip` extension.
-        logger: Logger to use. Use defaut logger if not specified.
+        name: Name of the zip file without the `.zip` extension.
+        logger: Logger to use. Use default logger if not specified.
 
     Returns:
         str: URL to download the archive data.
@@ -64,7 +64,7 @@ def download_unzip(url: str, root: str, *, logger: Optional[Logger] = None):
     Args:
         url: The url to download the data from.
         root: Directory to put the extracted contents.
-        logger: Logger to use. Use defaut logger if not specified.
+        logger: Logger to use. Use default logger if not specified.
 
     """
     logger = logger or native_logger

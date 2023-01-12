@@ -22,7 +22,7 @@ def wrap_metric(metric_func):
             y_pred: Predicted values.
             reduce: Reduction strategy to use when y_true and y_pred are
                 2-dimensional, with examples along the rows and label-class
-                along the colums. Accepted options: ['none', 'mean', 'median']
+                along the columns. Accepted options: ['none', 'mean', 'median']
 
         """
         if reduce not in ["none", "mean", "median"]:

@@ -1,8 +1,6 @@
 import gzip
 import os.path as osp
 
-import requests
-
 from nleval.data.base import BaseData
 from nleval.label import LabelsetCollection
 from nleval.typing import Any, List, Optional
@@ -58,7 +56,7 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
             )
 
     def download_ontology(self):
-        """Download ontology from obo foundary."""
+        """Download ontology from the OBO Foundry."""
         self.plogger.info(f"Download obo from: {self.ontology_url}")
         content = stream_download(self.ontology_url, log_level=self.log_level)[1]
         with open(self.ontology_file_path, "wb") as f:

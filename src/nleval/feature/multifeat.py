@@ -108,9 +108,9 @@ class MultiFeatureVec(BaseFeature):
                 raise ValueError("Cannot set both indptr and fset_ids to None.")
             if (num_fsets := len(fset_ids)) != mat.shape[1]:  # type: ignore
                 raise ValueError(
-                    "Cannot asign indptr automatically because the  dimension "
+                    "Cannot assign indptr automatically because the  dimension "
                     f"of fset_ids ({num_fsets}) does not match the number "
-                    f"of columsn in the input matrix ({mat.shape[1]}). Please "
+                    f"of columns in the input matrix ({mat.shape[1]}). Please "
                     "specify fset_ids",
                 )
             indptr = np.arange(mat.shape[1] + 1)
@@ -149,7 +149,7 @@ class MultiFeatureVec(BaseFeature):
         """Construct MultiFeatureVec object from list of matrices.
 
         Args:
-            mats (list of :obj:`numpy.ndarray`): list of feature vecotr
+            mats (list of :obj:`numpy.ndarray`): list of feature vector
                 matrices.
             ids (list of str or :obj:`IDmap`, optional): node IDs, if not
                 specified, use the default ordering as node IDs.

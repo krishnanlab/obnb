@@ -15,7 +15,7 @@ g, lsc, _ = load_data()
 # initialize model
 mdl = LogisticRegression(penalty="l2", solver="liblinear")
 
-# diplay choice of labelsets
+# display choice of labelsets
 for j, m in enumerate(lsc.label_ids):
     print(f"Index: {j:>4d}, Labelset size: {len(lsc.get_labelset(m)):>4d}, {m}")
 print("")

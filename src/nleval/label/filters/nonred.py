@@ -65,7 +65,7 @@ class LabelsetNonRedFilter(BaseFilter):
     def thresholds(self, thresholds):
         if len(thresholds) != 2:
             raise ValueError(
-                "Exepecting two thresholds, one for Jaccard index and the other "
+                "Expect two thresholds, one for Jaccard index and the other "
                 f"one for overlap coefficient, got {len(thresholds)} instead",
             )
         for threshold in thresholds:

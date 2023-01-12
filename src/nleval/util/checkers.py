@@ -179,8 +179,8 @@ def checkConfig(
     Args:
         name: Name of the input config dict.
         allowed_types: A tuple containing all allowed types.
-        max_depth: Maximum number of levels of dictonary allowed. When it is
-            set to one, then nested dictionary, i.e., dictonary as parameter,
+        max_depth: Maximum number of levels of dictionary allowed. When it is
+            set to one, then nested dictionary, i.e., dictionary as parameter,
             is disallowed.
         white_list: List of keys to bypass the checks.
 

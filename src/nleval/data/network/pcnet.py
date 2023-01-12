@@ -3,7 +3,7 @@ from nleval.typing import Converter
 
 
 class PCNet(BaseNDExData):
-    """The PCNet (v1.3) Parsimonious Composit human gene interaction network."""
+    """The PCNet (v1.3) Parsimonious Composite human gene interaction network."""
 
     cx_uuid = "7a686aa6-c494-11ec-b397-0ac135e8bacf"
 

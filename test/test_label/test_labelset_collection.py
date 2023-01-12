@@ -87,7 +87,7 @@ class TestLabelsetCollection(unittest.TestCase):
         self.assertEqual(self.lsc.get_negative("Labelset2"), {"a"})
         self.lsc.set_negative(["c"], "Labelset2")
         self.assertEqual(self.lsc.get_negative("Labelset2"), {"c"})
-        # test with knwon positive ID --> IDExistsError
+        # test with known positive ID --> IDExistsError
         self.assertRaises(
             IDExistsError,
             self.lsc.set_negative,
@@ -231,7 +231,7 @@ class TestLabelsetCollection(unittest.TestCase):
                 self.lsc.pop_labelset,
                 "Labelset3",
             )
-            # make sure nothing poped
+            # make sure nothing popped
             self.assertEqual(self.lsc.lst, ["Labelset1", "Labelset2"])
         # make sure enties that are no longer in any labelset are popped
         self.lsc.pop_labelset("Labelset1")

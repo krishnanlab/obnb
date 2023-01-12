@@ -13,10 +13,10 @@ class BaseFilter:
 
     Basic components (methods) needed for children filter classes:
 
-    - criterion: retrun true if the corresponding value of an instance passesc the
-      criterion.
-    - get_ids: return list of IDs to scan through get_val_getter, which returns a
-      function that map ID of an instance to some corresponding values.
+    - criterion: return true if the corresponding value of an instance passesc
+      the criterion.
+    - get_ids: return list of IDs to scan through get_val_getter, which returns
+      a function that map ID of an instance to some corresponding values.
     - get_mod_fun: return a function that modifies an instance.
 
     All three 'get' methods above take a `LabelsetCollection` object as input
@@ -100,7 +100,7 @@ class Compose(BaseFilter):
         self.filters = filters
 
     def __repr__(self):
-        """Return namaes of each filter."""
+        """Return names of each filter."""
         reprs = "\n".join(f"\t- {filter_!r}" for filter_ in self.filters) or "None"
         return f"Composition of filters:\n{reprs}"
 

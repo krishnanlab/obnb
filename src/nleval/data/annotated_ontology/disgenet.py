@@ -13,7 +13,7 @@ from nleval.util.logger import display_pbar
 class DisGeNET(BaseAnnotatedOntologyData):
     """DisGeNET disease gene annotations.
 
-    Disease gene associations are retreived from disgenet.org and then mapped
+    Disease gene associations are retrieved from disgenet.org and then mapped
     to the disease ontology from obofoundry.org. The annotations are propagated
     upwards the ontology. Then, several filters are applied to reduce the
     redundancies between labelsets (disease genes):

@@ -333,7 +333,7 @@ class TestLabelsetSplit(unittest.TestCase):
             split.ThresholdPartition(5, 4, 5, **self.split_opts)
         self.assertEqual(
             str(context.exception),
-            "Cannot have duplicated thresholds: 5 occured 2 times from "
+            "Cannot have duplicated thresholds: 5 occurred 2 times from "
             "the input (5, 4, 5)",
         )
 

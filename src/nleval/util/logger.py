@@ -55,7 +55,7 @@ def attach_file_handler(
 ) -> logging.FileHandler:
     """Attach a file handler to a logger.
 
-    Use the format of the first handler to formate the file handler.
+    Use the format of the first handler to format the file handler.
 
     Args:
         logger: The logger to which the file handler is attached.

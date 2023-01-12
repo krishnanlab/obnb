@@ -30,7 +30,7 @@ PECANPY_ARGS = [
     "PreComp",
 ]
 
-# Start embedding processes in the backgroud
+# Start embedding processes in the background
 print(f"Start generating embeddings and saving to: {TEMP_DIR}")
 qs = [0.01, 0.1, 1, 10, 100]
 processes = []

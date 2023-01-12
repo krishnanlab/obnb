@@ -142,7 +142,7 @@ class ThresholdPartition(BasePartition):
         for item, count in Counter(vals).items():
             if count > 1:
                 raise ValueError(
-                    f"Cannot have duplicated thresholds: {item} occured "
+                    f"Cannot have duplicated thresholds: {item} occurred "
                     f"{count} times from the input {vals}",
                 )
         self._thresholds = (*sorted(vals, reverse=not self.ascending),)

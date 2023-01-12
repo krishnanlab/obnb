@@ -3,9 +3,9 @@ from nleval.typing import Converter
 
 
 class FunCoup(BaseNDExData):
-    """The FunCoup funcional asssociation network.
+    """The FunCoup funcional association network.
 
-    The edge weights are PFC values, which is a probablistic estimation about
+    The edge weights are PFC values, which is a probabilistic estimation about
     whether a pair of genes are functionally coupled.
 
     https://funcoup5.scilifelab.se/help/#Citation

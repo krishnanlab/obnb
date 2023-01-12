@@ -12,7 +12,7 @@ from nleval.util.idhandler import IDmap
 
 
 class SparseGraph(BaseGraph):
-    """SparseGraph object sotring data as adjacency list."""
+    """SparseGraph object storing data as adjacency list."""
 
     def __init__(
         self,
@@ -170,7 +170,7 @@ class SparseGraph(BaseGraph):
         Note:
             ``edge_data`` is being passed in for more flexibility in choosing
             which edge_data to be modieifed. For example, in the directed
-            graph case, where reveresed edge data is present for the sake of
+            graph case, where reversed edge data is present for the sake of
             reversed propagation, one can specify to use _add_edge to update
             the reversed edge data.
 
@@ -438,7 +438,7 @@ class SparseGraph(BaseGraph):
                 node_id_prefix if set. Note that when use_node_alias is set,
                 the node_id_prefix becomes mandatory.If multiple node ID
                 aliases with matching prefix are available, use the first one.
-                (defaut: :obj:`False`)
+                (default: :obj:`False`)
             node_id_converter (Mapping[str, str], optional): A mapping object
                 that maps a given node ID to a new node ID of interest.
 
@@ -446,7 +446,7 @@ class SparseGraph(BaseGraph):
         import json  # noreorder
 
         if node_id_entry not in ["r", "n"]:
-            raise ValueError(f"Unkown node ID entry {node_id_entry!r}")
+            raise ValueError(f"Unknown node ID entry {node_id_entry!r}")
 
         self.logger.info("Loading raw cx file")
         with open(path) as f:
@@ -538,7 +538,7 @@ class SparseGraph(BaseGraph):
 
             except KeyError:
                 self.logger.debug(
-                    f"Skipping edge: {edge} due to unkown nodes",
+                    f"Skipping edge: {edge} due to unknown nodes",
                 )
 
     @classmethod

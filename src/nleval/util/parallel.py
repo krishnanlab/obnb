@@ -11,14 +11,14 @@ mp.set_start_method("fork")
 class ParDat:
     """Run function over a list of args in parallel.
 
-    This method is bulit upon ``multiprocessing`` using the parent-children
+    This method is built upon ``multiprocessing`` using the parent-children
     communications. Specifically, it first spawns ``n_workers`` number of
     children (if this number is smaller than the total number of jobs), each
     remains a point communication with the parent process. The parent process
     then distribut jobs among the children processes. When a child process
-    finshes a job, it puts the result in the queue, and when the parent process
+    finishes a job, it puts the result in the queue, and when the parent process
     grab the result and either assign the child process with the next job if
-    there's any, or kill the child process if there is no futher job.
+    there's any, or kill the child process if there is no further job.
 
     Examples:
         Let's say we have a function ``func`` and a list of things ``mylist``,
@@ -116,7 +116,7 @@ class ParDat:
             q: Queue on which the results are placed.
             func: Function to parallelize.
             func_args: Remaining positional arguments for the function.
-            func_kwargs: Keyword arguments for the fucntion.
+            func_kwargs: Keyword arguments for the function.
 
         """
         job_id = worker_id
