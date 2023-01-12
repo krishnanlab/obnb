@@ -3,6 +3,7 @@ import itertools
 import json
 from collections import defaultdict
 from pprint import pformat
+from typing import no_type_check
 
 import ndex2
 from requests import RequestException
@@ -63,6 +64,7 @@ class CXExplorer:
         """All available fields in the CX data."""
         return list(self._fields)
 
+    @no_type_check
     def show_fields(self, full: bool = False):
         """Print fields with index, size, example, and unique keys."""
         for i, j in enumerate(self.fields):
@@ -145,10 +147,7 @@ class CXExplorer:
             Only edges with positive edge weights are counted.
 
         """
-        eattr = self["edgeAttributes"]
-        ets = {i[name_channel] for i in eattr}
-
-        ets_counts = defaultdict(int)
+        ets_counts: Dict[str, int] = defaultdict(int)
         for edge_attr in self["edgeAttributes"]:
             name = edge_attr[name_channel]
             value = edge_attr[value_channel]
@@ -157,7 +156,8 @@ class CXExplorer:
             except (ValueError, TypeError):
                 continue
 
-        ets = sorted(ets_counts, key=ets_counts.get, reverse=True)  # sort by size
+        # Sort by size
+        ets = sorted(ets_counts, key=ets_counts.get, reverse=True)  # type: ignore
         out = {i: ets_counts[i] for i in ets}
 
         return out
