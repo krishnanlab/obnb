@@ -10,16 +10,29 @@ from nleval.typing import Dict, List, Optional, Set
 class CXExplorer:
     """Explore NDEx cx stream data."""
 
-    def __init__(self, uuid: Optional[str]):
+    def __init__(self, uuid: Optional[str] = None, path: Optional[str] = None):
         """Initialize CXExplorer.
 
         Args:
             uuid (str, optional): NDEx network UUID to download. If None, then
                 do not download.
+            path (str, optional): Path to cx file.
+
+        Notes:
+            Either specify the network ndex `uuid` to download the CX stream
+            directly, or specify the `path` to the CX file. If neither is
+            specified, then initialize an empty `CXExplorer`.
+
+        Raises:
+            ValueError: If both `uuid` and `path` are specified.
 
         """
-        if uuid:
-            self.load_data(uuid)
+        if (uuid is not None) and (path is not None):
+            raise ValueError("Can not specify uuid and path at the same time.")
+        elif uuid is not None:
+            self.load_from_uuid(uuid)
+        elif path is not None:
+            self.load_from_file(path)
 
     def __getitem__(self, field: str):
         """Get field in the CX stream data."""
@@ -47,13 +60,18 @@ class CXExplorer:
         """All available fields in the CX data."""
         return list(self._fields)
 
-    def load_data(self, uuid: str):
+    def load_from_uuid(self, uuid: str):
         """Load CX stream data using the UUID."""
         client = ndex2.client.Ndex2()
         r = client.get_network_as_cx_stream(uuid)
         if not r.ok:
             raise RequestException(r)
         self.data = json.loads(r.content)
+
+    def load_from_file(self, path: str):
+        """Load CX stream from a CX file."""
+        with open(path) as f:
+            self.data = json.load(f)
 
     def unique(self, field: str, name: str) -> Set[str]:
         """Return unique elements in a field.
