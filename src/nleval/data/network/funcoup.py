@@ -12,7 +12,7 @@ class FunCoup(BaseNDExData):
 
     """
 
-    cx_uuid = "e5122c98-a17d-11ec-b3be-0ac135e8bacf"
+    cx_uuid = "172990f7-102f-11ec-b666-0ac135e8bacf"
 
     def __init__(
         self,

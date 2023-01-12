@@ -10,7 +10,7 @@ class HIPPIE(BaseNDExData):
 
     """
 
-    cx_uuid = "f123ed2a-a17d-11ec-b3be-0ac135e8bacf"
+    cx_uuid = "89dd3925-3718-11e9-9f06-0ac135e8bacf"
 
     def __init__(
         self,
@@ -31,7 +31,7 @@ class HIPPIE(BaseNDExData):
             gene_id_converter=gene_id_converter,
             cx_kwargs={
                 "interaction_types": ["interacts-with"],
-                "node_id_prefix": "ncbigene",
+                "node_id_prefix": "entrez gene",
                 "default_edge_weight": 0.0,
                 "edge_weight_attr_name": "Confidence Value",
                 "reduction": "max",

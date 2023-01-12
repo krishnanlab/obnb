@@ -4,7 +4,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from nleval.typing import INT_TYPE, Iterable, LogLevel, Optional, Union
+from nleval.typing import INT_TYPE, Iterable, LogLevel, Optional, Tuple, Union
 from nleval.util import checkers
 from nleval.util.idhandler import IDmap
 from nleval.util.logger import get_logger
@@ -35,6 +35,24 @@ class BaseFeature:
 
     def copy(self):
         return deepcopy(self)
+
+    def __getitem__(self, key):
+        """Return slice of features.
+
+        Args:
+            key(str): key of ID
+            key(:obj:`list` of :obj:`str`): list of keys of IDs
+
+        """
+        if isinstance(key, slice):
+            raise NotImplementedError
+        idx = self.idmap[key]
+        return self.mat[idx]
+
+    @property
+    def ids(self) -> Tuple[str, ...]:
+        """Return entity IDs as a tuple."""
+        return tuple(self.idmap.lst)
 
     @property
     def idmap(self) -> IDmap:
@@ -107,7 +125,7 @@ class BaseFeature:
 
         self._mat = mat
 
-    def add_featvec(self, node_id, vec):
+    def add_featvec(self, id_, vec):
         """Add a new feature vector."""
         # TODO: allow list
         checkers.checkNumpyArrayNDim("vec", 1, vec)
@@ -128,7 +146,7 @@ class BaseFeature:
             new_mat = vec.copy().reshape((1, vec.size))
         else:
             new_mat = np.vstack([self.mat, vec])
-        self.idmap.add_id(node_id)
+        self.idmap.add_id(id_)
         self.mat = new_mat
 
     def get_featvec(self, ids: Optional[Union[Iterable[str], str]]) -> np.ndarray:
@@ -272,8 +290,7 @@ class BaseFeature:
             f.readline()  # skip header
             for line in f:
                 terms = line.split(" ")
-                node_id = terms[0].strip()
-                idmap.add_id(node_id)
+                idmap.add_id(terms[0].strip())
                 fvec_lst.append(np.array(terms[1:], dtype=float))
         mat = np.asarray(fvec_lst)
         return cls.from_mat(mat, idmap, **kwargs)
