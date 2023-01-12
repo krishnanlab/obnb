@@ -18,4 +18,4 @@ def test_alevinfry(tmpdir):
     assert af.mat.shape == (10186, 36601)
 
     # Check that we can get item
-    af[af.node_ids[:10]]
+    af[af.ids[:10]]
