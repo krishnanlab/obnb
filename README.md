@@ -3,6 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
+
 [![Tests](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/tests.yml/badge.svg)](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/tests.yml)
 [![Test Examples](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/examples.yml/badge.svg)](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/examples.yml)
 [![Test Data](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/test_data.yml/badge.svg)](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/test_data.yml)
@@ -95,7 +96,7 @@ lp_results = lp_trainer.eval_multi_ovr(lp_mdl, dataset)
 
 ### Evaluating GNN models
 
-Training and evalution of Graph Neural Network (GNN) models can be done in a very similar fashion.
+Training and evaluation of Graph Neural Network (GNN) models can be done in a very similar fashion.
 
 ```python
 from torch_geometric.nn import GCN
@@ -133,7 +134,7 @@ lsc = data.DisGeNET(root, version="latest")
 from nleval.util.converter import GenePropertyConverter
 from nleval.label.split import RatioHoldout
 
-# Load PubMed count gene propery converter and use it to set up study-bias holdout split
+# Load PubMed count gene property converter and use it to set up study-bias holdout split
 pubmedcnt_converter = GenePropertyConverter(root, name="PubMedCount")
 splitter = RatioHoldout(0.6, 0.4, ascending=False, property_converter=pubmedcnt_converter)
 ```
