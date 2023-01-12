@@ -60,6 +60,25 @@ class CXExplorer:
         """All available fields in the CX data."""
         return list(self._fields)
 
+    def show_fields(self, full: bool = False):
+        """Print fields with index, size, example, and unique keys."""
+        for i, j in enumerate(self.fields):
+            field = self[j]
+
+            # Pad left with spaces to align with indentations
+            toreplace = ("\n", "\n\t\t")
+            example_str = pformat(field[0]).replace(*toreplace)
+
+            print(f"[{i}] {j} (n={len(field):,})")
+            print(f"\tExample:\n\t\t{example_str}")
+
+            # Show unique keys and the associated unique value counts
+            if full:
+                keys = set(itertools.chain.from_iterable(map(list, field)))
+                unique_counts = {x: len(self.unique(j, x)) for x in sorted(keys)}
+                unique_counts_str = pformat(unique_counts).replace(*toreplace)
+                print(f"\tUnique key value counts:\n\t\t{unique_counts_str}")
+
     def load_from_uuid(self, uuid: str):
         """Load CX stream data using the UUID."""
         client = ndex2.client.Ndex2()
