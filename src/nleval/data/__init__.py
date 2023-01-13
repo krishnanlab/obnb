@@ -8,6 +8,7 @@ from nleval.data.network import (
     FunCoup,
     HumanNet,
     PCNet,
+    ProteomeHD,
 )
 
 __all__ = classes = [
@@ -21,5 +22,6 @@ __all__ = classes = [
     "HIPPIE",
     "HumanNet",
     "PCNet",
+    "ProteomeHD",
     "STRING",
 ]

@@ -5,6 +5,7 @@ from nleval.data.network.funcoup import FunCoup
 from nleval.data.network.hippie import HIPPIE
 from nleval.data.network.humannet import HumanNet
 from nleval.data.network.pcnet import PCNet
+from nleval.data.network.proteomehd import ProteomeHD
 from nleval.data.network.string import STRING
 
 __all__ = [
@@ -14,5 +15,6 @@ __all__ = [
     "HIPPIE",
     "HumanNet",
     "PCNet",
+    "ProteomeHD",
     "STRING",
 ]
