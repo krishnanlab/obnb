@@ -4,6 +4,7 @@ from nleval.data.network.bioplex import BioPlex
 from nleval.data.network.funcoup import FunCoup
 from nleval.data.network.hippie import HIPPIE
 from nleval.data.network.humannet import HumanNet
+from nleval.data.network.huri import HuRI
 from nleval.data.network.pcnet import PCNet
 from nleval.data.network.proteomehd import ProteomeHD
 from nleval.data.network.string import STRING
@@ -13,6 +14,7 @@ __all__ = [
     "BioPlex",
     "FunCoup",
     "HIPPIE",
+    "HuRI",
     "HumanNet",
     "PCNet",
     "ProteomeHD",

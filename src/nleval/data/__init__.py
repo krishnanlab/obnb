@@ -7,6 +7,7 @@ from nleval.data.network import (
     BioPlex,
     FunCoup,
     HumanNet,
+    HuRI,
     PCNet,
     ProteomeHD,
 )
@@ -20,6 +21,7 @@ __all__ = classes = [
     "GOCC",
     "GOMF",
     "HIPPIE",
+    "HuRI",
     "HumanNet",
     "PCNet",
     "ProteomeHD",
