@@ -60,14 +60,19 @@ class DisGeNET(BaseAnnotatedOntologyData):
     def data_sources(self) -> List[str]:
         if self._data_sources == "default":
             return [
+                # Curated
                 "CGI",  # Cancer Genome Interpreter
                 "CLINGEN",  # Clinical Genome Resource
                 "CTD_human",  # Comparative Toxicogenomics Database (Human)
                 "GENOMICS_ENGLAND",  # Genomics England PanelApp
-                "HPO",  # Human Phenotype Ontology
                 "ORPHANET",  # Orphan drugs and rare diseases
                 "PSYGENET",  # Psychiatric disorders gene association network
                 "UNIPROT",  # UniProt/SwissProt data base
+                # Inferred
+                "CLINVAR",  # ClinVar disease-gene info with supported evidences
+                "GWASCAT",  # GWAS Catalog curated SNPs (p-val < 1e-6)
+                "GWASDB",  # GWASdb (p-val < 1e-6)
+                "HPO",  # Human Phenotype Ontology
             ]
         else:
             return self._data_sources  # type: ignore
