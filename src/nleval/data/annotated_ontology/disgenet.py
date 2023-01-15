@@ -24,15 +24,45 @@ class DisGeNET(BaseAnnotatedOntologyData):
     - Jaccard index filter
     - Overlap coefficient filter
 
+    There are four different categories of annotation sources from DisGeNET (
+    see below). By default, we only use the *curated and the *Inferred* data
+    sources. User can change the sources by passing the list of sources to the
+    `data_sources` argument. (Note: ~70% of the disease-gene annotations in
+    DisGeNET are only available in the *literature* data source).
+
+    - Curated
+        - `CGI` Caner Genome Interpreter
+        - `CLINGEN` Clinical Genome Resource
+        - `CTD_human` Comparative Toxicogenomics Database (Human)
+        - `GENOMICS_ENGLAND` Genomics England PanelApp
+        - `ORPHANET` Orphan drugs and rare diseases
+        - `PSYGENET` Psychiatric disorders gene association network
+        - `CLINVAR` ClinVar disease-gene information with supported evidences
+    - Inferred
+        - `HPO` Human Phenotype Ontology
+        - `UNIPROT` UniProt/SwissProt database
+        - `GWASCAT` GWAS Catalog curated SNPs (p-val < 1e-6)
+        - `GWASDB` GWASdb (p-val < 1e-6)
+    - Animal models
+        - `CTD_mouse` Comparative Toxicogenomics Database (Mouse)
+        - `CTD_rat` Comparative Toxicogenomics Database (Rat)
+        - `MGD` Mouse Genome Database
+        - `RGD` Rat Genome Database
+    - Literature
+        - `BEFREE` Disease-gene association extracted from MEDLINE using BeFree
+        - `LHGDN` Literature derived human disease network
+
+    [Last updated: 2023-01-14]
+
     """
 
     CONFIG_KEYS: List[str] = BaseAnnotatedOntologyData.CONFIG_KEYS + [
         "dsi_threshold",
         "data_sources",
     ]
-    ontology_url = "http://purl.obolibrary.org/obo/doid.obo"
+    ontology_url = "http://purl.obolibrary.org/obo/mondo.obo"
     annotation_url = "https://www.disgenet.org/static/disgenet_ap1/files/downloads/all_gene_disease_associations.tsv.gz"
-    ontology_file_name = "doid.obo"
+    ontology_file_name = "mondo.obo"
     annotation_file_name = "all_gene_disease_associations.tsv"
 
     def __init__(
@@ -60,14 +90,19 @@ class DisGeNET(BaseAnnotatedOntologyData):
     def data_sources(self) -> List[str]:
         if self._data_sources == "default":
             return [
-                "CGI",  # Cancer Genome Interpreter
-                "CLINGEN",  # Clinical Genome Resource
-                "CTD_human",  # Comparative Toxicogenomics Database (Human)
-                "GENOMICS_ENGLAND",  # Genomics England PanelApp
-                "HPO",  # Human Phenotype Ontology
-                "ORPHANET",  # Orphan drugs and rare diseases
-                "PSYGENET",  # Psychiatric disorders gene association network
-                "UNIPROT",  # UniProt/SwissProt data base
+                # Curated
+                "CGI",
+                "CLINGEN",
+                "CTD_human",
+                "GENOMICS_ENGLAND",
+                "ORPHANET",
+                "PSYGENET",
+                "UNIPROT",
+                # Inferred
+                "CLINVAR",
+                "GWASCAT",
+                "GWASDB",
+                "HPO",
             ]
         else:
             return self._data_sources  # type: ignore
@@ -83,10 +118,7 @@ class DisGeNET(BaseAnnotatedOntologyData):
 
     def process(self):
         g = OntologyGraph()
-        umls_to_doid = g.read_obo(
-            self.ontology_file_path,
-            xref_prefix="UMLS_CUI",
-        )
+        umls_to_mondo = g.read_obo(self.ontology_file_path, xref_prefix="UMLS")
 
         annot_df = pd.read_csv(self.annotation_file_path, sep="\t")
         annot_df = annot_df[
@@ -100,15 +132,15 @@ class DisGeNET(BaseAnnotatedOntologyData):
 
         enable_pbar = display_pbar(self.log_level)
         pbar = tqdm(annot_df[["geneId", "diseaseId"]].values, disable=not enable_pbar)
-        pbar.set_description("Annotating DOIDs")
+        pbar.set_description("Annotating MONDOs")
         for gene_id, disease_id in pbar:
-            for doid in umls_to_doid[disease_id]:
+            for mondo in umls_to_mondo[disease_id]:
                 try:
-                    g._update_node_attr_partial(doid, str(gene_id))
+                    g._update_node_attr_partial(mondo, str(gene_id))
                 except IDNotExistError:
                     self.plogger.debug(
-                        f"Skipping {disease_id}({doid})-{gene_id} because "
-                        f"{doid} is not available in the DO graph.",
+                        f"Skipping {disease_id}({mondo})-{gene_id} because "
+                        f"{mondo} is not available in the DO graph.",
                     )
         g._update_node_attr_finalize()
 

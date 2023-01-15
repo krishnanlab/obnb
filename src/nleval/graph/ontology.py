@@ -288,20 +288,24 @@ class OntologyGraph(DirectedSparseGraph):
         term_id = term_name = None
         term_xrefs, term_parents = [], []
 
-        def strip_key(line: str, key: str) -> str:
-            return line.strip()[len(key) :]
+        def strip_key(line: str, key: str, strip_space: bool = True) -> str:
+            key_size = len(key)
+            stripped = line.strip()[key_size:]
+            if strip_space:
+                stripped = stripped.split(" ")[0]
+            return stripped
 
         for line in stanza_lines:
             if line.startswith(key := "id: "):
                 term_id = strip_key(line, key)
             elif line.startswith(key := "name: "):
-                term_name = strip_key(line, key)
+                term_name = strip_key(line, key, strip_space=False)
             elif line.startswith(key := "xref: "):
                 term_xrefs.append(strip_key(line, key))
             elif line.startswith(key := "is_a: "):
-                term_parents.append(strip_key(line, key).split(" ! ")[0])
+                term_parents.append(strip_key(line, key))
             elif line.startswith(key := "relationship: part_of "):
-                term_parents.append(strip_key(line, key).split(" ! ")[0])
+                term_parents.append(strip_key(line, key))
 
         if term_id is None or term_name is None:
             raise OboTermIncompleteError
