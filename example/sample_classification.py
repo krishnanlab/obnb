@@ -41,7 +41,7 @@ mdl = LogisticRegression(
 y = lsc.get_y(mfvec.feature_ids)
 y_multiclass = (y * np.arange(y.shape[1])).sum(axis=1)
 
-print("\nStart trianing")
+print("\nStart training")
 for train_idx, test_idx in StratifiedKFold(n_splits=2).split(y, y_multiclass):
     X_train, X_test = mfvec.mat.T[train_idx], mfvec.mat.T[test_idx]
     y_train, y_test = y_multiclass[train_idx], y_multiclass[test_idx]
