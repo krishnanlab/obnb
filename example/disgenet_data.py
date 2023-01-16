@@ -12,17 +12,17 @@ data_root_dir = "datasets_disgenet"
 DisGeNET(data_root_dir)  # download DisGeNET data
 
 data_dir = osp.join(data_root_dir, "DisGeNET", "raw")
-do_path = osp.join(data_dir, "doid.obo")
+do_path = osp.join(data_dir, "mondo.obo")
 ga_path = osp.join(data_dir, "all_gene_disease_associations.tsv")
 
 g = OntologyGraph()
-umls_to_doid = g.read_obo(do_path, xref_prefix="UMLS_CUI")
+umls_to_mondo = g.read_obo(do_path, xref_prefix="UMLS_CUI")
 df = pd.read_csv(ga_path, sep="\t")
 
 for geneId, diseaseId in tqdm(df[["geneId", "diseaseId"]].values):
-    for doid in umls_to_doid[diseaseId]:
+    for mondo in umls_to_mondo[diseaseId]:
         try:
-            g._update_node_attr_partial(doid, geneId)
+            g._update_node_attr_partial(mondo, geneId)
         except IDNotExistError:
             pass
 g._update_node_attr_finalize()
