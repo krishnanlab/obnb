@@ -16,6 +16,6 @@ else
 fi
 
 for script in $(ls *.py); do
-    echo Start runing example script: $script
+    echo Start running example script: $script
     python $script
 done
