@@ -529,17 +529,17 @@ class SparseGraph(BaseGraph):
                     continue
 
                 eid = edge["@id"]
-                weight = (
-                    edge_weight_dict[eid]
-                    if eid in edge_weight_dict
-                    else default_edge_weight
-                )
+                if (weight := edge_weight_dict.get(eid)) is None:
+                    weight = default_edge_weight
+                    self.logger.warning(
+                        f"Unable to obtain edge weights for edge id {eid!r} from the "
+                        f"edge weight channel {edge_weight_attr_name!r}, using the "
+                        f"default weight instead: {default_edge_weight=!r}",
+                    )
                 self.add_edge(node_id1, node_id2, weight, reduction=reduction)
 
             except KeyError:
-                self.logger.debug(
-                    f"Skipping edge: {edge} due to unknown nodes",
-                )
+                self.logger.debug(f"Skipping edge: {edge} due to unknown nodes")
 
     @classmethod
     def from_npz(cls, path, weighted, directed=False, **kwargs):
