@@ -1,4 +1,5 @@
 import itertools
+import json
 import logging
 
 import numpy as np
@@ -444,8 +445,6 @@ class SparseGraph(BaseGraph):
                 that maps a given node ID to a new node ID of interest.
 
         """
-        import json  # noreorder
-
         if node_id_entry not in ["r", "n"]:
             raise ValueError(f"Unknown node ID entry {node_id_entry!r}")
 
