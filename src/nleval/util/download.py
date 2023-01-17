@@ -68,18 +68,30 @@ def download_unzip(url: str, root: str, *, logger: Optional[Logger] = None):
 
     """
     logger = logger or native_logger
-
     logger.info(f"Downloading zip archive from {url}")
 
+    _, content = stream_download(url, logger=logger)
+    logger.info("Download completed, start unpacking...")
+
+    zf = ZipFile(BytesIO(content))
+    zf.extractall(root)
+    logger.info("Done extracting")
+
+
+def stream_download(
+    url: str,
+    log_level: Optional[LogLevel] = None,
+    logger: Optional[Logger] = None,
+) -> Tuple[requests.Response, bytes]:
+    """Download content from url with option to display progress bar."""
+    logger = logger or native_logger
+    log_level = log_level or logger.getEffectiveLevel()
+
     for _ in range(MAX_DOWNLOAD_RETRIES):
-        r, content = stream_download(url)
+        r, content = _stream_download(url, log_level)
 
         if r.ok:
-            logger.info("Download completed, start unpacking...")
-            zf = ZipFile(BytesIO(content))
-            zf.extractall(root)
-            logger.info("Done extracting")
-            break
+            return r, content
         elif r.status_code in [429, 503]:  # Retry later
             t = r.headers.get("Retry-after", DEFAULT_RETRY_DELAY)
             logger.warning(f"Server temporarily unavailable, waiting for {t} sec")
@@ -98,11 +110,7 @@ def download_unzip(url: str, root: str, *, logger: Optional[Logger] = None):
         raise ExceededMaxNumRetries(reason)
 
 
-def stream_download(
-    url: str,
-    log_level: LogLevel = "INFO",
-) -> Tuple[requests.Response, bytes]:
-    """Download content from url with option to display progress bar."""
+def _stream_download(url: str, log_level: LogLevel) -> Tuple[requests.Response, bytes]:
     r = requests.get(url, stream=True)
     tot_bytes = int(r.headers.get("content-length", 0))
     pbar = tqdm(
