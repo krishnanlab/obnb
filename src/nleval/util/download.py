@@ -1,3 +1,5 @@
+import gzip
+import os.path as osp
 import time
 import urllib.parse
 from io import BytesIO
@@ -16,7 +18,7 @@ from nleval.config import (
     STREAM_BLOCK_SIZE,
 )
 from nleval.exception import DataNotFoundError, ExceededMaxNumRetries
-from nleval.typing import LogLevel, Optional, Tuple
+from nleval.typing import Literal, LogLevel, Optional, Tuple
 from nleval.util.logger import display_pbar, get_logger
 
 native_logger = get_logger(None, log_level="INFO")
@@ -58,23 +60,51 @@ def get_data_url(
     return data_url
 
 
-def download_unzip(url: str, root: str, *, logger: Optional[Logger] = None):
+def get_filename_from_url(url: str) -> str:
+    """Extract filename from url."""
+    path = urllib.parse.urlparse(url).path
+    filename = path.split("/")[-1]
+    return filename
+
+
+def download_unzip(
+    url: str,
+    root: str,
+    *,
+    zip_type: Literal["zip", "gzip"] = "zip",
+    logger: Optional[Logger] = None,
+):
     """Download a zip archive and extract all contents.
 
     Args:
         url: The url to download the data from.
         root: Directory to put the extracted contents.
+        zip_type: Type of zip files to extract, available options are ["zip",
+            "gzip"].
         logger: Logger to use. Use default logger if not specified.
 
     """
+    if zip_type not in ["zip", "gzip"]:  # check zip type first before downloading
+        raise ValueError(
+            f"Unknown zip type {zip_type!r}, available options are [zip|gzip]",
+        )
+
     logger = logger or native_logger
     logger.info(f"Downloading zip archive from {url}")
 
     _, content = stream_download(url, logger=logger)
     logger.info("Download completed, start unpacking...")
 
-    zf = ZipFile(BytesIO(content))
-    zf.extractall(root)
+    if zip_type == "zip":
+        zf = ZipFile(BytesIO(content))
+        zf.extractall(root)
+    elif zip_type == "gzip":
+        filename = get_filename_from_url(url).replace(".{zip_type}", "")
+        with open(osp.join(root, filename), "w") as f:
+            f.write(gzip.decompress(content).decode())
+    else:
+        raise ValueError(f"Fatal error! {zip_type=!r} should have been caught.")
+
     logger.info("Done extracting")
 
 
@@ -85,10 +115,10 @@ def stream_download(
 ) -> Tuple[requests.Response, bytes]:
     """Download content from url with option to display progress bar."""
     logger = logger or native_logger
-    log_level = log_level or logger.getEffectiveLevel()
+    log_level = log_level or logger.getEffectiveLevel()  # type: ignore
 
     for _ in range(MAX_DOWNLOAD_RETRIES):
-        r, content = _stream_download(url, log_level)
+        r, content = _stream_download(url, log_level)  # type: ignore
 
         if r.ok:
             return r, content
