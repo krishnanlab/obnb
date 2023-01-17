@@ -3,6 +3,7 @@ from nleval.data.network.biogrid import BioGRID
 from nleval.data.network.bioplex import BioPlex
 from nleval.data.network.funcoup import FunCoup
 from nleval.data.network.hippie import HIPPIE
+from nleval.data.network.humanbase import HumanBaseTopGlobal
 from nleval.data.network.humannet import HumanNet
 from nleval.data.network.huri import HuRI
 from nleval.data.network.pcnet import PCNet
@@ -15,6 +16,7 @@ __all__ = [
     "FunCoup",
     "HIPPIE",
     "HuRI",
+    "HumanBaseTopGlobal",
     "HumanNet",
     "PCNet",
     "ProteomeHD",

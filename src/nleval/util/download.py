@@ -1,3 +1,5 @@
+import gzip
+import os.path as osp
 import time
 import urllib.parse
 from io import BytesIO
@@ -16,7 +18,7 @@ from nleval.config import (
     STREAM_BLOCK_SIZE,
 )
 from nleval.exception import DataNotFoundError, ExceededMaxNumRetries
-from nleval.typing import LogLevel, Optional, Tuple
+from nleval.typing import Literal, LogLevel, Optional, Tuple
 from nleval.util.logger import display_pbar, get_logger
 
 native_logger = get_logger(None, log_level="INFO")
@@ -58,28 +60,77 @@ def get_data_url(
     return data_url
 
 
-def download_unzip(url: str, root: str, *, logger: Optional[Logger] = None):
+def get_filename_from_url(url: str) -> str:
+    """Extract filename from url."""
+    path = urllib.parse.urlparse(url).path
+    filename = path.split("/")[-1]
+    return filename
+
+
+def download_unzip(
+    url: str,
+    root: str,
+    *,
+    zip_type: Literal["zip", "gzip"] = "zip",
+    rename: Optional[str] = None,
+    logger: Optional[Logger] = None,
+):
     """Download a zip archive and extract all contents.
 
     Args:
         url: The url to download the data from.
         root: Directory to put the extracted contents.
+        zip_type: Type of zip files to extract, available options are ["zip",
+            "gzip"].
         logger: Logger to use. Use default logger if not specified.
 
     """
-    logger = logger or native_logger
+    if zip_type not in ["zip", "gzip"]:  # check zip type first before downloading
+        raise ValueError(
+            f"Unknown zip type {zip_type!r}, available options are [zip|gzip]",
+        )
 
+    # Extract and modify filename
+    filename = get_filename_from_url(url)
+    if (rename is not None) and (zip_type != "gzip"):
+        raise ValueError("'rename' option is only valid when zip type is 'gzip'")
+    elif rename is not None:
+        filename = rename
+    elif zip_type == "gzip":
+        filename = filename.replace(".gz", "")
+
+    logger = logger or native_logger
     logger.info(f"Downloading zip archive from {url}")
+    _, content = stream_download(url, logger=logger)
+    logger.info("Download completed, start unpacking...")
+
+    if zip_type == "zip":
+        zf = ZipFile(BytesIO(content))
+        zf.extractall(root)
+    elif zip_type == "gzip":
+        with open(path := osp.join(root, filename), "w") as f:
+            f.write(gzip.decompress(content).decode())
+        logger.info(f"File saved to {path!r}")
+    else:
+        raise ValueError(f"Fatal error! {zip_type=!r} should have been caught.")
+
+    logger.info("Done extracting")
+
+
+def stream_download(
+    url: str,
+    log_level: Optional[LogLevel] = None,
+    logger: Optional[Logger] = None,
+) -> Tuple[requests.Response, bytes]:
+    """Download content from url with option to display progress bar."""
+    logger = logger or native_logger
+    log_level = log_level or logger.getEffectiveLevel()  # type: ignore
 
     for _ in range(MAX_DOWNLOAD_RETRIES):
-        r, content = stream_download(url)
+        r, content = _stream_download(url, log_level)  # type: ignore
 
         if r.ok:
-            logger.info("Download completed, start unpacking...")
-            zf = ZipFile(BytesIO(content))
-            zf.extractall(root)
-            logger.info("Done extracting")
-            break
+            return r, content
         elif r.status_code in [429, 503]:  # Retry later
             t = r.headers.get("Retry-after", DEFAULT_RETRY_DELAY)
             logger.warning(f"Server temporarily unavailable, waiting for {t} sec")
@@ -98,11 +149,7 @@ def download_unzip(url: str, root: str, *, logger: Optional[Logger] = None):
         raise ExceededMaxNumRetries(reason)
 
 
-def stream_download(
-    url: str,
-    log_level: LogLevel = "INFO",
-) -> Tuple[requests.Response, bytes]:
-    """Download content from url with option to display progress bar."""
+def _stream_download(url: str, log_level: LogLevel) -> Tuple[requests.Response, bytes]:
     r = requests.get(url, stream=True)
     tot_bytes = int(r.headers.get("content-length", 0))
     pbar = tqdm(

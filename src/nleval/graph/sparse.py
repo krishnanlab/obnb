@@ -3,6 +3,7 @@ import json
 import logging
 
 import numpy as np
+from tqdm import trange
 
 from nleval.exception import EdgeNotExistError, IDNotExistError
 from nleval.graph.base import BaseGraph
@@ -324,7 +325,7 @@ class SparseGraph(BaseGraph):
                     except TypeError:
                         yield str(node_id1), str(node_id2), weight
 
-    def read(self, file, reader="edglst", cut_threshold=0):
+    def read(self, file, reader="edglst", cut_threshold=0, pbar=None):
         """Read data and construct sparse graph.
 
         Args:
@@ -333,23 +334,41 @@ class SparseGraph(BaseGraph):
             directed(bool): if not directed, automatically add 2 edges
             reader: generator function that yield edges from file
             cut_threshold(float): threshold below which edges are not considered
+            pbar: Progress bar. If not set, then do not use.
 
         TODO: reader part looks sus, check unit test
 
         """
-        for node_id1, node_id2, weight in reader(
-            file,
-            self.weighted,
-            self.directed,
-            cut_threshold,
-        ):
+        loading_iter = reader(file, self.weighted, self.directed, cut_threshold)
+        pbar = pbar or itertools.repeat(None)
+        for _, (node_id1, node_id2, weight) in zip(pbar, loading_iter):
             self.add_edge(node_id1, node_id2, weight)
 
     @classmethod
-    def from_edglst(cls, path_to_edglst, weighted, directed, cut_threshold=0):
+    def from_edglst(
+        cls,
+        path_to_edglst: str,
+        weighted: bool,
+        directed: bool,
+        cut_threshold: float = 0,
+        show_pbar: bool = False,
+    ):
         graph = cls(weighted=weighted, directed=directed)
         reader = cls.edglst_reader
-        graph.read(path_to_edglst, reader=reader, cut_threshold=cut_threshold)
+
+        if show_pbar:
+            with open(path_to_edglst) as f:
+                num_lines = sum(1 for _ in f)
+            pbar = trange(num_lines, disable=not show_pbar, desc="Loading edges")
+        else:
+            pbar = None
+
+        graph.read(
+            path_to_edglst,
+            reader=reader,
+            cut_threshold=cut_threshold,
+            pbar=pbar,
+        )
         return graph
 
     @classmethod
