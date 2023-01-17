@@ -14,7 +14,7 @@ class HumanBaseTopGlobal(BaseURLSparseGraphData):
         weighted: bool = True,
         directed: bool = False,
         largest_comp: bool = True,
-        gene_id_converter: Converter = "HumanEntrez",
+        gene_id_converter: Converter = None,  # already in Entrez space
         **kwargs,
     ):
         """Initialize the HumanBase-global network with top edges."""
