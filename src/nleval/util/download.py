@@ -72,6 +72,7 @@ def download_unzip(
     root: str,
     *,
     zip_type: Literal["zip", "gzip"] = "zip",
+    rename: Optional[str] = None,
     logger: Optional[Logger] = None,
 ):
     """Download a zip archive and extract all contents.
@@ -89,9 +90,17 @@ def download_unzip(
             f"Unknown zip type {zip_type!r}, available options are [zip|gzip]",
         )
 
+    # Extract and modify filename
+    filename = get_filename_from_url(url)
+    if (rename is not None) and (zip_type != "gzip"):
+        raise ValueError("'rename' option is only valid when zip type is 'gzip'")
+    elif rename is not None:
+        filename = rename
+    elif zip_type == "gzip":
+        filename = filename.replace(".gz", "")
+
     logger = logger or native_logger
     logger.info(f"Downloading zip archive from {url}")
-
     _, content = stream_download(url, logger=logger)
     logger.info("Download completed, start unpacking...")
 
@@ -99,9 +108,9 @@ def download_unzip(
         zf = ZipFile(BytesIO(content))
         zf.extractall(root)
     elif zip_type == "gzip":
-        filename = get_filename_from_url(url).replace(".{zip_type}", "")
-        with open(osp.join(root, filename), "w") as f:
+        with open(path := osp.join(root, filename), "w") as f:
             f.write(gzip.decompress(content).decode())
+        logger.info(f"File saved to {path!r}")
     else:
         raise ValueError(f"Fatal error! {zip_type=!r} should have been caught.")
 
