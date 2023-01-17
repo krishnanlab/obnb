@@ -30,29 +30,32 @@ class DisGeNET(BaseAnnotatedOntologyData):
     `data_sources` argument. (Note: ~70% of the disease-gene annotations in
     DisGeNET are only available in the *literature* data source).
 
-    - Curated
-        - `CGI` Caner Genome Interpreter
-        - `CLINGEN` Clinical Genome Resource
-        - `CTD_human` Comparative Toxicogenomics Database (Human)
-        - `GENOMICS_ENGLAND` Genomics England PanelApp
-        - `ORPHANET` Orphan drugs and rare diseases
-        - `PSYGENET` Psychiatric disorders gene association network
-        - `CLINVAR` ClinVar disease-gene information with supported evidences
-    - Inferred
-        - `HPO` Human Phenotype Ontology
-        - `UNIPROT` UniProt/SwissProt database
-        - `GWASCAT` GWAS Catalog curated SNPs (p-val < 1e-6)
-        - `GWASDB` GWASdb (p-val < 1e-6)
-    - Animal models
-        - `CTD_mouse` Comparative Toxicogenomics Database (Mouse)
-        - `CTD_rat` Comparative Toxicogenomics Database (Rat)
-        - `MGD` Mouse Genome Database
-        - `RGD` Rat Genome Database
-    - Literature
-        - `BEFREE` Disease-gene association extracted from MEDLINE using BeFree
-        - `LHGDN` Literature derived human disease network
+    - Curated:
+        - ``CGI`` Caner Genome Interpreter
+        - ``CLINGEN`` Clinical Genome Resource
+        - ``CTD_human`` Comparative Toxicogenomics Database (Human)
+        - ``GENOMICS_ENGLAND`` Genomics England PanelApp
+        - ``ORPHANET`` Orphan drugs and rare diseases
+        - ``PSYGENET`` Psychiatric disorders gene association network
+        - ``CLINVAR`` ClinVar disease-gene information with supported evidences
 
-    [Last updated: 2023-01-14]
+    - Inferred:
+        - ``HPO`` Human Phenotype Ontology
+        - ``UNIPROT`` UniProt/SwissProt database
+        - ``GWASCAT`` GWAS Catalog curated SNPs (p-val < 1e-6)
+        - ``GWASDB`` GWASdb (p-val < 1e-6)
+
+    - Animal models:
+        - ``CTD_mouse`` Comparative Toxicogenomics Database (Mouse)
+        - ``CTD_rat`` Comparative Toxicogenomics Database (Rat)
+        - ``MGD`` Mouse Genome Database
+        - ``RGD`` Rat Genome Database
+
+    - Literature:
+        - ``BEFREE`` Disease-gene association extracted from MEDLINE using BeFree
+        - ``LHGDN`` Literature derived human disease network
+
+    **[Last updated: 2023-01-14]**
 
     """
 

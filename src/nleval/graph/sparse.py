@@ -273,15 +273,22 @@ class SparseGraph(BaseGraph):
             raise EdgeNotExistError(f"The edge {node_id1}-{node_id2} does not exist.")
 
     @staticmethod
-    def edglst_reader(edg_path, weighted, directed, cut_threshold):
+    def edglst_reader(edg_path, weighted, directed, cut_threshold, show_pbar=True):
         """Edge list file reader.
 
         Read line by line from a edge list file and yield (node_id1, node_id2,
         weight)
 
         """
+        if show_pbar:
+            with open(edg_path) as f:
+                num_lines = sum(1 for _ in f)
+            pbar = trange(num_lines, disable=not show_pbar, desc="Loading edges")
+        else:
+            pbar = itertools.repeat(None)
+
         with open(edg_path) as f:
-            for line in f:
+            for _, line in zip(pbar, f):
                 try:
                     node_id1, node_id2, weight = line.split("\t")
                     weight = float(weight)
@@ -297,7 +304,7 @@ class SparseGraph(BaseGraph):
                 yield node_id1, node_id2, weight
 
     @staticmethod
-    def npy_reader(mat, weighted, directed, cut_threshold):
+    def npy_reader(mat, weighted, directed, cut_threshold, show_pbar=False):
         """Numpy reader.
 
         Load an numpy matrix (either from file path or numpy matrix directly)
@@ -306,6 +313,9 @@ class SparseGraph(BaseGraph):
         Note:
             The matrix should be in shape (N, N+1), where N is number of nodes.
             The first column of the matrix encodes the node IDs
+
+            Progress bar is not supported for the numpy reader. So `show_pbar`
+            the `pbar` option does nothing even it is set to `True`.
 
         """
         if isinstance(mat, str):
@@ -325,7 +335,7 @@ class SparseGraph(BaseGraph):
                     except TypeError:
                         yield str(node_id1), str(node_id2), weight
 
-    def read(self, file, reader="edglst", cut_threshold=0, pbar=None):
+    def read(self, file, reader="edglst", cut_threshold=0, show_pbar=True):
         """Read data and construct sparse graph.
 
         Args:
@@ -334,14 +344,20 @@ class SparseGraph(BaseGraph):
             directed(bool): if not directed, automatically add 2 edges
             reader: generator function that yield edges from file
             cut_threshold(float): threshold below which edges are not considered
-            pbar: Progress bar. If not set, then do not use.
+            show_pbar: Show progress bar for loading the graph (if the reader
+                supports this option).
 
         TODO: reader part looks sus, check unit test
 
         """
-        loading_iter = reader(file, self.weighted, self.directed, cut_threshold)
-        pbar = pbar or itertools.repeat(None)
-        for _, (node_id1, node_id2, weight) in zip(pbar, loading_iter):
+        loading_iter = reader(
+            file,
+            self.weighted,
+            self.directed,
+            cut_threshold,
+            show_pbar=show_pbar,
+        )
+        for node_id1, node_id2, weight in loading_iter:
             self.add_edge(node_id1, node_id2, weight)
 
     @classmethod
@@ -356,18 +372,11 @@ class SparseGraph(BaseGraph):
         graph = cls(weighted=weighted, directed=directed)
         reader = cls.edglst_reader
 
-        if show_pbar:
-            with open(path_to_edglst) as f:
-                num_lines = sum(1 for _ in f)
-            pbar = trange(num_lines, disable=not show_pbar, desc="Loading edges")
-        else:
-            pbar = None
-
         graph.read(
             path_to_edglst,
             reader=reader,
             cut_threshold=cut_threshold,
-            pbar=pbar,
+            show_pbar=show_pbar,
         )
         return graph
 

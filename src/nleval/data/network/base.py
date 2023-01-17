@@ -168,12 +168,31 @@ class BaseURLSparseGraphData(BaseData, SparseGraph):
     # TODO: add more flexibility to the types of raw network file to handle
     def process(self):
         """Process data and save for later usage."""
-        graph = SparseGraph.from_edglst(
+        raw_graph = SparseGraph.from_edglst(
             self.raw_file_path(0),
             weighted=self.weighted,
             directed=self.directed,
             show_pbar=display_pbar(self.log_level),
         )
+
+        if self.gene_id_converter is not None:  # convert node identifiers
+            # TODO: refactor id conversion as graph transform
+            self.plogger.info("Start converting gene IDs.")
+            converter = self.get_gene_id_converter()
+            converter.query_bulk(raw_graph.node_ids)
+
+            graph = SparseGraph(
+                weighted=self.weighted,
+                directed=self.directed,
+                logger=self.plogger,
+            )
+            for node1, node2, weight in raw_graph.edge_gen():
+                cvrtd_node1, cvrtd_node2 = converter[node1], converter[node2]
+                if cvrtd_node1 is not None is not cvrtd_node2:
+                    graph.add_edge(cvrtd_node1, cvrtd_node2, weight, reduction="max")
+        else:  # use original graph if no id conversion is needed
+            graph = raw_graph
+
         if self.largest_comp:
             graph = graph.largest_connected_subgraph()
 

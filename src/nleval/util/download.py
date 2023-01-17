@@ -1,3 +1,4 @@
+import functools
 import gzip
 import os.path as osp
 import time
@@ -117,39 +118,54 @@ def download_unzip(
     logger.info("Done extracting")
 
 
+def retry_download(download_func):
+    """Wrap download function to retry after unsuccessful download."""
+
+    @functools.wraps(download_func)
+    def wrapped_download(
+        url: str,
+        *,
+        log_level: Optional[LogLevel] = None,
+        logger: Optional[Logger] = None,
+        **kwargs,
+    ) -> Tuple[requests.Response, bytes]:
+        logger = logger or native_logger
+        log_level = log_level or logger.getEffectiveLevel()  # type: ignore
+
+        for _ in range(MAX_DOWNLOAD_RETRIES):
+            r, content = download_func(
+                url, log_level=log_level, logger=logger, **kwargs
+            )
+
+            if r.ok:
+                return r, content
+            elif r.status_code in [429, 503]:  # Retry later
+                t = r.headers.get("Retry-after", DEFAULT_RETRY_DELAY)
+                logger.warning(f"Server temporarily unavailable, waiting for {t} sec")
+                time.sleep(int(t))
+            elif r.status_code == 404:
+                reason = f"{url} is unavailable, try using a more recent data version"
+                logger.error(reason)
+                raise DataNotFoundError(reason)
+            else:
+                logger.error(f"Failed to download {url}: {r} {r.reason}")
+                raise requests.exceptions.RequestException(r)
+
+        else:  # failed to download within the allowed number of retries
+            logger.error(f"Failed to download {url}")
+            reason = f"Max number of retries exceeded {MAX_DOWNLOAD_RETRIES=}"
+            raise ExceededMaxNumRetries(reason)
+
+    return wrapped_download
+
+
+@retry_download
 def stream_download(
     url: str,
-    log_level: Optional[LogLevel] = None,
-    logger: Optional[Logger] = None,
+    log_level: LogLevel,
+    **kwargs,
 ) -> Tuple[requests.Response, bytes]:
-    """Download content from url with option to display progress bar."""
-    logger = logger or native_logger
-    log_level = log_level or logger.getEffectiveLevel()  # type: ignore
-
-    for _ in range(MAX_DOWNLOAD_RETRIES):
-        r, content = _stream_download(url, log_level)  # type: ignore
-
-        if r.ok:
-            return r, content
-        elif r.status_code in [429, 503]:  # Retry later
-            t = r.headers.get("Retry-after", DEFAULT_RETRY_DELAY)
-            logger.warning(f"Server temporarily unavailable, waiting for {t} sec")
-            time.sleep(int(t))
-        elif r.status_code == 404:
-            reason = f"{url} is unavailable, try using a more recent data version"
-            logger.error(reason)
-            raise DataNotFoundError(reason)
-        else:
-            logger.error(f"Failed to download {url}: {r} {r.reason}")
-            raise requests.exceptions.RequestException(r)
-
-    else:  # failed to download within the allowed number of retries
-        logger.error(f"Failed to download {url}")
-        reason = f"Max number of retries exceeded {MAX_DOWNLOAD_RETRIES=}"
-        raise ExceededMaxNumRetries(reason)
-
-
-def _stream_download(url: str, log_level: LogLevel) -> Tuple[requests.Response, bytes]:
+    """Stream download content from url with option to display progress bar."""
     r = requests.get(url, stream=True)
     tot_bytes = int(r.headers.get("content-length", 0))
     pbar = tqdm(
