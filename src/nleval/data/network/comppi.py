@@ -14,26 +14,31 @@ class ComPPI(BaseURLSparseGraphData):
     including compartmentalization and species. To request download from the
     webserver, a `POST` request is send with the following options.
 
-    - `fDlSet`: What type of data to download, available options are
-        - `int`: Integrated protein-protein interactions across compartments.
-        - `comp`: Compartmentalized interactions.
-        - `protnloc`: Subcellular localization information of proteins (this
-           is not interaction data).
-    - `fDlSpec`: What species to use, available options are
-        - `0`: H. sapiens (human).
-        - `1`: D. melanogaster (fruit fly).
-        - `2`: C.elegans (worm).
-        - `3`: S. cerevisiae (yeast).
-        - `all`: use all the above, the default option.
-    - `fDlMLoc`: What subcellular localization to use (do not specify when
-      `fDlSet` is set to `int`), available options are
-        - `0`: Cytosol.
-        - `1`: Mitochondrion.
-        - `2`: Nucleus.
-        - `3`: Extracellular.
-        - `4`: Secretory pathway.
-        - `5`: Membrane.
-        - `all`: Use all the above, the default option.
+    - ``fDlSet``: What type of data to download, available options are
+
+        - ``int``: Integrated protein-protein interactions across compartments.
+        - ``comp``: Compartmentalized interactions.
+        - ``protnloc``: Subcellular localization information of proteins (this
+          is not interaction data).
+
+    - ``fDlSpec``: What species to use, available options are
+
+        - ``0``: H. sapiens (human).
+        - ``1``: D. melanogaster (fruit fly).
+        - ``2``: C.elegans (worm).
+        - ``3``: S. cerevisiae (yeast).
+        - ``all``: use all the above, the default option.
+
+    - ``fDlMLoc``: What subcellular localization to use (do not specify when
+      ``fDlSet`` is set to ``int``), available options are
+
+        - ``0``: Cytosol.
+        - ``1``: Mitochondrion.
+        - ``2``: Nucleus.
+        - ``3``: Extracellular.
+        - ``4``: Secretory pathway.
+        - ``5``: Membrane.
+        - ``all``: Use all the above, the default option.
 
     Example:
         Request the file for integrated human interactom file and load into
@@ -41,9 +46,10 @@ class ComPPI(BaseURLSparseGraphData):
 
         >>> r = requests.post("https://comppi.linkgroup.hu/downloads",
         ...                   data={"fDlSet": "int", "fDlSpec": "0"})
-        >>> a = pd.read_csv(io.BytesIO(r.content), sep="\t", compression="gzip")
+        >>> df = pd.read_csv(io.BytesIO(r.content), sep="\\t",
+        ...                  compression="gzip")
 
-    [Last update: 2023-11-17]
+    **[Last update: 2023-11-17]**
 
     """
 
