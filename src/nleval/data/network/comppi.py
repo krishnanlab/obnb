@@ -8,7 +8,7 @@ from nleval.typing import Any, Dict, List, Mapping, Optional, Union
 
 
 class ComPPI(BaseURLSparseGraphData):
-    """The Compartmentalized Protein-Protein Interaction Database.
+    r"""The Compartmentalized Protein-Protein Interaction Database.
 
     The ComPPI database comes with interactomes with different contexts,
     including compartmentalization and species. To request download from the
@@ -42,11 +42,11 @@ class ComPPI(BaseURLSparseGraphData):
 
     Example:
         Request the file for integrated human interactom file and load into
-        a pandas dataframe `a` via
+        a pandas dataframe ``df`` via
 
         >>> r = requests.post("https://comppi.linkgroup.hu/downloads",
         ...                   data={"fDlSet": "int", "fDlSpec": "0"})
-        >>> df = pd.read_csv(io.BytesIO(r.content), sep="\\t",
+        >>> df = pd.read_csv(io.BytesIO(r.content), sep="\t",
         ...                  compression="gzip")
 
     **[Last update: 2023-11-17]**
