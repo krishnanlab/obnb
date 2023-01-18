@@ -10,6 +10,7 @@ from nleval.data.network import (
     HumanBaseTopGlobal,
     HumanNet,
     HuRI,
+    OmniPath,
     PCNet,
     ProteomeHD,
 )
@@ -27,6 +28,7 @@ __all__ = classes = [
     "HuRI",
     "HumanBaseTopGlobal",
     "HumanNet",
+    "OmniPath",
     "PCNet",
     "ProteomeHD",
     "STRING",
