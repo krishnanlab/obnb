@@ -168,10 +168,14 @@ class BaseURLSparseGraphData(BaseData, SparseGraph):
     # TODO: add more flexibility to the types of raw network file to handle
     def process(self):
         """Process data and save for later usage."""
-        raw_graph = SparseGraph.from_edglst(
-            self.raw_file_path(0),
+        raw_graph = SparseGraph(
             weighted=self.weighted,
             directed=self.directed,
+            logger=self.plogger,
+        )
+        raw_graph.read(
+            self.raw_file_path(0),
+            reader="edglst",
             show_pbar=display_pbar(self.log_level),
         )
 
