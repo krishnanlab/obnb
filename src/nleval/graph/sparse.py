@@ -350,6 +350,16 @@ class SparseGraph(BaseGraph):
         TODO: reader part looks sus, check unit test
 
         """
+        if isinstance(reader, str):
+            if reader == "edglst":
+                reader = self.edglst_reader
+            elif reader == "numpy":
+                reader = self.numpy_reader
+            else:
+                raise ValueError(
+                    f"Unknown reader {reader!r}, available options are [edglst|numpy]",
+                )
+
         loading_iter = reader(
             file,
             self.weighted,
