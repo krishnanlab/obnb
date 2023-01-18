@@ -11,6 +11,7 @@ from nleval.data.network.huri import HuRI
 from nleval.data.network.omnipath import OmniPath
 from nleval.data.network.pcnet import PCNet
 from nleval.data.network.proteomehd import ProteomeHD
+from nleval.data.network.signor import SIGNOR
 from nleval.data.network.string import STRING
 
 __all__ = [
@@ -26,5 +27,6 @@ __all__ = [
     "OmniPath",
     "PCNet",
     "ProteomeHD",
+    "SIGNOR",
     "STRING",
 ]
