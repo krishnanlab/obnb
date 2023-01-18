@@ -2,6 +2,7 @@
 from nleval.data.annotated_ontology import GOBP, GOCC, GOMF, DisGeNET
 from nleval.data.network import (
     HIPPIE,
+    SIGNOR,
     STRING,
     BioGRID,
     BioPlex,
@@ -33,5 +34,6 @@ __all__ = classes = [
     "OmniPath",
     "PCNet",
     "ProteomeHD",
+    "SIGNOR",
     "STRING",
 ]
