@@ -11,7 +11,8 @@ class LabelsetNonRedFilter(BaseFilter):
     """Filter out redundant labelsets in a labelset collection.
 
     The detailed procedure can be found in the supplementary data of
-    https://doi.org/10.1093/bioinformatics/btaa150 In brief, given a labelset
+    https://doi.org/10.1093/bioinformatics/btaa150
+    In brief, given a labelset
     collection, a graph of labelsets if first constructed based on the
     redundancy score function of interest. Here, we use the combination of
     Jaccard index and overlap coefficient. Then, for each connected component in

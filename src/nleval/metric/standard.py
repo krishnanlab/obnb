@@ -12,7 +12,6 @@ def wrap_metric(metric_func):
     - Perturn reduction when calculating metrics in a multi-class setting
 
     """
-
     @wraps(metric_func)
     def wrapped(y_true, y_pred, reduce="mean"):
         """Metric function with common processing steps.
