@@ -4,6 +4,7 @@ import os.path as osp
 from nleval.data.base import BaseData
 from nleval.label import LabelsetCollection
 from nleval.typing import Any, List, Optional
+from nleval.util.deprecated import Deprecated
 from nleval.util.download import stream_download
 from nleval.util.logger import display_pbar
 
@@ -62,6 +63,7 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
         with open(self.ontology_file_path, "wb") as f:
             f.write(content)
 
+    @Deprecated("To be removed upon refactoring the BaseAnnotationData object")
     def download_annotations(self):
         """Download annotations."""
         self.plogger.info(f"Download annotation from: {self.annotation_url}")
