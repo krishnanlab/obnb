@@ -1,4 +1,4 @@
-class-resolver==0.3.10
+class-resolver==0.4.0
 mygene==3.2.2
 ndex2==3.5.0
 numpy==1.23.3
