@@ -160,6 +160,7 @@ class LabelsetRangeFilterSplit(BaseRangeFilter):
         across all the dataset splits.
 
         """
+
         def val_getter(label_id):
             y_all, masks = lsc.split(self.splitter, **self.kwargs)
             neg_idx = lsc.entity[lsc.get_negative(label_id)]

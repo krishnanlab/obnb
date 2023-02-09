@@ -18,6 +18,7 @@ class Timeit:
 
     def __call__(self, func):
         """Return function wrapped with timer."""
+
         def wrapper(*args):
             start = time.perf_counter()
             func(*args)

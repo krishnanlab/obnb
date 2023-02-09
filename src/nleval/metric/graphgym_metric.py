@@ -16,6 +16,7 @@ __all__ = [
 
 def graphgym_metric_wrapper(metric_func: Metric):
     """Wrap standard metric function into a GraphGym compatible one."""
+
     @wraps(metric_func)
     def graphgym_compatible_metric(
         y_true: List[Tensor],

@@ -22,6 +22,7 @@ class Deprecated:
 
     def __call__(self, func):
         """Wraps the function with deprecation warning."""
+
         @wraps(func)
         def wrapped(*args, **kwargs):
             warnings.simplefilter("always", self.category)

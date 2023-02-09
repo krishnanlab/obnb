@@ -120,6 +120,7 @@ def download_unzip(
 
 def retry_download(download_func):
     """Wrap download function to retry after unsuccessful download."""
+
     @functools.wraps(download_func)
     def wrapped_download(
         url: str,

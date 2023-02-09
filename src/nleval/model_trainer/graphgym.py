@@ -240,6 +240,7 @@ class GraphGymTrainer(GNNTrainer):
 
 def graphgym_model_wrapper(model):
     """Wrap a GraphGym model to take PyG data as input."""
+
     @wraps(model)
     def wrapped_model(data):
         batch = Batch.from_data_list([data])

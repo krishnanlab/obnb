@@ -80,6 +80,7 @@ class ParDat:
 
     def __call__(self, func):
         """Return the parallelized function over the input arguments."""
+
         def wrapper(*func_args, **func_kwargs):
             n_workers = self.n_workers
             n_jobs = self.n_jobs
@@ -234,6 +235,7 @@ class ParDatMap(ParDat):
 
     def __call__(self, func):
         """Return the parallelized function over the input arguments."""
+
         def wrapper(*func_args, **func_kwargs):
             n_workers = self.n_workers
             n_jobs = self.n_jobs
@@ -280,6 +282,7 @@ class ParDatExe(ParDat):
 
     def __call__(self, func):
         """Return the parallelized function over the input arguments."""
+
         def wrapper(*func_args, **func_kwargs):
             n_workers = self.n_workers
             n_jobs = self.n_jobs
