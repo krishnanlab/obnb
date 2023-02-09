@@ -1,5 +1,4 @@
 import gzip
-import os.path as osp
 
 import pandas as pd
 
@@ -36,7 +35,7 @@ class BaseAnnotationData(BaseData):
         """
         self.plogger.info(f"Download annotation from: {self.annotation_url}")
         content = stream_download(self.annotation_url, log_level=self.log_level)[1]
-        with open(osp.join(self.raw_dir, self.annotation_file_name), "wb") as f:
+        with open(self.raw_file_path(0), "wb") as f:
             f.write(gzip.decompress(content))
 
     def load_processed_data(self, path: Optional[str] = None):
