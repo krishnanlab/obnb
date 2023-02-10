@@ -4,6 +4,7 @@ import pandas as pd
 import pytest
 
 from nleval.data.annotation.disgenet import DisGeNETAnnotation
+from nleval.data.annotation.gene_ontology import GeneOntologyAnnotation
 
 
 @pytest.mark.mediumruns
@@ -51,3 +52,20 @@ def test_digenet(tmpdir, subtests):
         assert aligned_full_df["DSI"].max() >= 0.6
         assert aligned_full_df["DPI"].min() <= 0.9
         assert aligned_full_df["DPI"].max() <= 0.9
+
+
+@pytest.mark.mediumruns
+def test_gene_ontology(tmpdir, subtests):
+    datadir = osp.join(tmpdir, "GeneOntologyAnnotation")
+
+    data = GeneOntologyAnnotation(tmpdir)
+    assert osp.isdir(datadir)
+    assert osp.isdir(osp.join(datadir, "processed"))
+    assert osp.isdir(osp.join(datadir, "raw"))
+    assert osp.isdir(osp.join(datadir, "info"))
+
+    # Check if columns are set to the correct name
+    assert data.data.columns.tolist() == ["gene_id", "term_id"]
+    # Check if values are prefixed correctly
+    assert data.data.iloc[0, 0].startswith("ncbigene:")
+    assert data.data.iloc[0, 1].startswith("go:")
