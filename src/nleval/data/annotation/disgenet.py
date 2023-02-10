@@ -107,7 +107,7 @@ class DisGeNETAnnotation(BaseAnnotationData):
                 "HPO",
             ]
         else:
-            return self._data_sources  # type: ignore
+            return self._data_sources
 
     def process(self):
         in_path = self.raw_file_path(0)

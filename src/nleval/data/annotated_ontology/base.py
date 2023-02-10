@@ -56,6 +56,7 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
                 f"Annotation file name not available for {self.classname!r}",
             )
 
+    @Deprecated("To be removed upon refactoring the BaseOntologyData object")
     def download_ontology(self):
         """Download ontology from the OBO Foundry."""
         self.plogger.info(f"Download obo from: {self.ontology_url}")

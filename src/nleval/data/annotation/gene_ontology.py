@@ -90,7 +90,7 @@ class GeneOntologyAnnotation(BaseAnnotationData):
                 "IC",  # Inferred by Curator
             ]
         else:
-            return self._data_sources  # type: ignore
+            return self._data_sources
 
     def process(self):
         in_path = self.raw_file_path(0)
