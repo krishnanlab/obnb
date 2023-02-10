@@ -3,16 +3,16 @@ import os.path as osp
 import pandas as pd
 import pytest
 
-from nleval.data.annotation.disgenet import DisGeNET
+from nleval.data.annotation.disgenet import DisGeNETAnnotation
 
 
 @pytest.mark.mediumruns
 def test_digenet(tmpdir, subtests):
-    datadir = osp.join(tmpdir, "DisGeNET")
+    datadir = osp.join(tmpdir, "DisGeNETAnnotation")
 
     # Normal download and formatting
     with subtests.test("Normal load"):
-        data = DisGeNET(tmpdir)
+        data = DisGeNETAnnotation(tmpdir)
         assert osp.isdir(datadir)
         assert osp.isdir(osp.join(datadir, "processed"))
         assert osp.isdir(osp.join(datadir, "raw"))
@@ -32,19 +32,19 @@ def test_digenet(tmpdir, subtests):
     full_df = full_df.set_index(index_cols)
 
     with subtests.test("Single filter"):
-        data = DisGeNET(tmpdir, dsi_min=0.9, reprocess=True)
+        data = DisGeNETAnnotation(tmpdir, dsi_min=0.9, reprocess=True)
         df = data.data.set_index(index_cols)
         aligned_full_df = full_df.align(df, axis=0, join="right")[0]
         assert aligned_full_df["DSI"].min() >= 0.9
 
-        data = DisGeNET(tmpdir, dpi_max=0.1, reprocess=True)
+        data = DisGeNETAnnotation(tmpdir, dpi_max=0.1, reprocess=True)
         df = data.data.set_index(index_cols)
         aligned_full_df = full_df.align(df, axis=0, join="right")[0]
         assert aligned_full_df["DPI"].max() <= 0.1
 
     with subtests.test("Multiple filterx"):
         settings = {"dsi_min": 0.6, "dpi_min": 0.6, "dsi_max": 0.9, "dpi_max": 0.9}
-        data = DisGeNET(tmpdir, reprocess=True, **settings)
+        data = DisGeNETAnnotation(tmpdir, reprocess=True, **settings)
         df = data.data.set_index(index_cols)
         aligned_full_df = full_df.align(df, axis=0, join="right")[0]
         assert aligned_full_df["DSI"].min() >= 0.6

@@ -6,7 +6,7 @@ from nleval.data.annotation.base import BaseAnnotationData
 from nleval.typing import List, Optional
 
 
-class DisGeNET(BaseAnnotationData):
+class DisGeNETAnnotation(BaseAnnotationData):
     """DisGeNET disease gene annotations.
 
     Disease gene associations are retrieved from disgenet.org.

@@ -1,4 +1,4 @@
 """Annotation data."""
-from nleval.data.annotation.disgenet import DisGeNET
+from nleval.data.annotation.disgenet import DisGeNETAnnotation
 
-__all__ = ["DisGeNET"]
+__all__ = ["DisGeNETAnnotation"]
