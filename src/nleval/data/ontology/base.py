@@ -47,5 +47,5 @@ class BaseOntologyData(BaseData):
         """Load ontology graph."""
         path = self.raw_file_path(0)
         self.plogger.info(f"Load processed annodataion {path}")
-        self.data = OntologyGraph()
+        self.data = OntologyGraph(logger=self.plogger)
         self.xref_to_onto_ids = self.data.read_obo(path, xref_prefix=self.xref_prefix)
