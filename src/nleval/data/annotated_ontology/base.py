@@ -39,9 +39,6 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
         xref_to_onto_ids = self.ontology.xref_to_onto_ids
         annot = self.annotation.data
         enable_pbar = display_pbar(self.log_level)
-
-        # FIX: perform gene id conversion here? Need to strip prefix
-        annot["gene_id"] = annot["gene_id"].str.split(":", expand=True)[1]
         pbar = tqdm(annot.values, disable=not enable_pbar)
 
         # Attach annotations to the corresponding ontology terms

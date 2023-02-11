@@ -147,9 +147,6 @@ class GeneOntologyAnnotation(BaseAnnotationData):
         # Convert gene symbol to the desired gene id type
         # NOTE: assumes that the mappings are one-to-one
         annot_df["gene_id"] = annot_df["db_symbol"].apply(gene_id_converter.__getitem__)
-        # Specify id prefixes
-        # XXX: bake the prefix conversion/specification into converter
-        annot_df["gene_id"] = "ncbigene:" + annot_df["gene_id"].astype(str).values
         annot_df["term_id"] = annot_df["go_id"]
 
         # Save formatted annotation
