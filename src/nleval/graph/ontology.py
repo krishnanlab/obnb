@@ -43,6 +43,7 @@ class OntologyGraph(DirectedSparseGraph):
         log_level: LogLevel = "WARNING",
         verbose: bool = False,
         logger: Optional[logging.Logger] = None,
+        **kwargs,
     ):
         """Initialize the ontology graph."""
         super().__init__(log_level=log_level, verbose=verbose, logger=logger)
@@ -105,6 +106,52 @@ class OntologyGraph(DirectedSparseGraph):
                 *(self.ancestors(i) for i in parents_idx),
             )
         return ancestors_set
+
+    def restrict_to_branch(
+        self,
+        node: Union[str, int],
+        inclusive: bool = True,
+    ) -> "OntologyGraph":
+        r"""Restrict the ontology to a branch under the specified node.
+
+        For example, the ontology
+
+        A
+        | \
+        B   D
+        |   | \
+        C   E   F
+
+        restricted to the node ``D`` (inclusive) is
+
+        D
+        | \
+        E   F
+
+        Args:
+            node: The node under which the branch will be restricted.
+            inclusive: If set to  ``True``, then include the specified node in
+                the branch. Otherwise, do not include.
+
+        Return:
+            OntologyGraph: A new ontology graph restricted to the branch under
+                the specified node.
+
+        """
+        node_id = self.get_node_id(node)
+        self.logger.info(f"Restricting onlogy under {node_id}")
+
+        def is_under_branch(node):
+            return node_id in self.ancestors(node)
+
+        with self.cache_on_static():
+            restricted_node_ids = set(filter(is_under_branch, self.node_ids))
+
+        if inclusive:
+            restricted_node_ids.add(node_id)
+
+        self.logger.info(f"{len(restricted_node_ids):,} out of {self.size:,} selected")
+        return self.induced_subgraph(list(restricted_node_ids))
 
     def _new_node_data(self):
         super()._new_node_data()

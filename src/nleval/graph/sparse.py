@@ -91,7 +91,8 @@ class SparseGraph(BaseGraph):
             node_ids (List[str]): List of nodes of interest.
 
         """
-        graph = SparseGraph(
+        cls = type(self)
+        graph = cls(
             weighted=self.weighted,
             directed=self.directed,
             self_loops=self.self_loops,
