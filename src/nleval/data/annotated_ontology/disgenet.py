@@ -22,7 +22,6 @@ class DisGeNET(BaseAnnotatedOntologyData):
         data_sources: Optional[List[str]] = None,
         gene_id_converter: Optional[Union[Mapping[str, str], str]] = None,
         redownload: bool = False,
-        reprocess: bool = False,
         **kwargs,
     ):
         """Initialize the DisGeNET data object."""
@@ -40,20 +39,14 @@ class DisGeNET(BaseAnnotatedOntologyData):
             dpi_max=dpi_max,
             gene_id_converter=gene_id_converter,
             redownload=redownload,
-            reprocess=reprocess,
         )
-        ontology = MondoDiseaseOntology(
-            root,
-            redownload=redownload,
-            reprocess=reprocess,
-        )
+        ontology = MondoDiseaseOntology(root, redownload=redownload)
 
         super().__init__(
             root,
             annotation=annotation,
             ontology=ontology,
             redownload=redownload,
-            reprocess=reprocess,
             **kwargs,
         )
 

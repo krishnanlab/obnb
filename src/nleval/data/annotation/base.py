@@ -1,7 +1,5 @@
 import gzip
 
-import pandas as pd
-
 from nleval.data.base import BaseData
 from nleval.typing import List, Optional
 from nleval.util.download import stream_download
@@ -22,10 +20,6 @@ class BaseAnnotationData(BaseData):
             raise ValueError("Annotation file name not specified.")
         return [self.annotation_file_name]
 
-    @property
-    def processed_files(self) -> List[str]:
-        return ["annotation.csv"]
-
     def download(self):
         """Download raw annotation table.
 
@@ -38,13 +32,14 @@ class BaseAnnotationData(BaseData):
         with open(self.raw_file_path(0), "wb") as f:
             f.write(gzip.decompress(content))
 
+    def process(self):
+        # NOTE: we process the ontology graph from raw file directly, so we
+        # do not need to pre-process and save the processed file.
+        pass
+
+    def process_completed(self) -> bool:
+        return True
+
     def load_processed_data(self, path: Optional[str] = None):
-        """Load processed annotation table.
-
-        The annotation table is a csv file with two columns: ``gene_id`` and
-        ``term_id``.
-
-        """
-        path = path or self.processed_file_path(0)
-        self.plogger.info(f"Load processed annodataion {path}")
-        self.data = pd.read_csv(path)
+        # To be implemented in the child class.
+        raise NotImplementedError

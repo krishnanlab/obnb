@@ -92,14 +92,14 @@ class GeneOntologyAnnotation(BaseAnnotationData):
         else:
             return self._data_sources
 
-    def process(self):
-        in_path = self.raw_file_path(0)
-        self.plogger.info(f"Loading raw annotation from {in_path}")
+    def load_processed_data(self):
+        path = self.raw_file_path(0)
+        self.plogger.info(f"Loading raw annotation from {path}")
 
         # Load gene annotation data (gaf-version: 2.2)
         # http://geneontology.org/docs/go-annotation-file-gaf-format-2.2/
         annot_df = pd.read_csv(
-            in_path,
+            path,
             sep="\t",
             comment="!",
             header=0,
@@ -149,7 +149,5 @@ class GeneOntologyAnnotation(BaseAnnotationData):
         annot_df["gene_id"] = annot_df["db_symbol"].apply(gene_id_converter.__getitem__)
         annot_df["term_id"] = annot_df["go_id"]
 
-        # Save formatted annotation
-        out_path = self.processed_file_path(0)
-        self.plogger.info(f"Saving formatted annotation to {out_path}\n{annot_df}")
-        annot_df[["gene_id", "term_id"]].to_csv(out_path, index=False)
+        # Save attributes
+        self.data = annot_df[["gene_id", "term_id"]].copy()

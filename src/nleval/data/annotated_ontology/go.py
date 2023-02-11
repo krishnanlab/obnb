@@ -20,7 +20,6 @@ class GO(BaseAnnotatedOntologyData):
         data_sources: Optional[List[str]] = None,
         gene_id_converter: Optional[Union[Mapping[str, str], str]] = "HumanEntrez",
         redownload: bool = False,
-        reprocess: bool = False,
         **kwargs,
     ):
         """Initialize the GO data object."""
@@ -34,9 +33,8 @@ class GO(BaseAnnotatedOntologyData):
             data_sources=data_sources,
             gene_id_converter=gene_id_converter,
             redownload=redownload,
-            reprocess=reprocess,
         )
-        ontology = GeneOntology(root, redownload=redownload, reprocess=reprocess)
+        ontology = GeneOntology(root, redownload=redownload)
         if self.namespace is not None:
             ontology.data = ontology.data.restrict_to_branch(self.namespace)
 
@@ -45,7 +43,6 @@ class GO(BaseAnnotatedOntologyData):
             annotation=annotation,
             ontology=ontology,
             redownload=redownload,
-            reprocess=reprocess,
             **kwargs,
         )
 

@@ -109,10 +109,10 @@ class DisGeNETAnnotation(BaseAnnotationData):
         else:
             return self._data_sources
 
-    def process(self):
-        in_path = self.raw_file_path(0)
-        self.plogger.info(f"Loading raw annotation from {in_path}")
-        annot_df = pd.read_csv(in_path, sep="\t")
+    def load_processed_data(self):
+        path = self.raw_file_path(0)
+        self.plogger.info(f"Loading raw annotation from {path}")
+        annot_df = pd.read_csv(path, sep="\t")
 
         # Select specified channels
         evidence_str = pprint.pformat(self.data_sources)
@@ -145,7 +145,5 @@ class DisGeNETAnnotation(BaseAnnotationData):
         # Specify id prefixes
         annot_df["term_id"] = "UMLS:" + annot_df["term_id"].astype(str).values
 
-        # Save formatted annotation
-        out_path = self.processed_file_path(0)
-        self.plogger.info(f"Saving formatted annotation to {out_path}\n{annot_df}")
-        annot_df.to_csv(out_path, index=False)
+        # Save attributes
+        self.data = annot_df.copy()
