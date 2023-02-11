@@ -153,7 +153,7 @@ class BaseData:
             return self.gene_id_converter
 
     @property
-    def _default_pre_transform(self) -> Any:
+    def default_pre_transform(self) -> Any:
         return None
 
     @property
@@ -163,7 +163,7 @@ class BaseData:
     @pre_transform.setter
     def pre_transform(self, pre_transform):
         if pre_transform == "default":
-            self._pre_transform = self._default_pre_transform
+            self._pre_transform = self.default_pre_transform
         elif isinstance(pre_transform, str):
             raise ValueError(f"Unknown pre_transform option {pre_transform}")
         elif self.version != "latest":

@@ -40,7 +40,7 @@ class GO(BaseAnnotatedOntologyData):
         super().__init__(root, annotation=annotation, ontology=ontology, **kwargs)
 
     @property
-    def _default_pre_transform(self):
+    def default_pre_transform(self):
         return Compose(
             LabelsetRangeFilterSize(max_val=self.max_size),
             LabelsetNonRedFilter(self.jaccard, self.overlap),
