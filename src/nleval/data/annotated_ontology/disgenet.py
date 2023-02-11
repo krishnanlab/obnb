@@ -21,6 +21,8 @@ class DisGeNET(BaseAnnotatedOntologyData):
         jaccard: float = 0.5,
         data_sources: Optional[List[str]] = None,
         gene_id_converter: Optional[Union[Mapping[str, str], str]] = None,
+        redownload: bool = False,
+        reprocess: bool = False,
         **kwargs,
     ):
         """Initialize the DisGeNET data object."""
@@ -37,11 +39,23 @@ class DisGeNET(BaseAnnotatedOntologyData):
             dpi_min=dpi_min,
             dpi_max=dpi_max,
             gene_id_converter=gene_id_converter,
+            redownload=redownload,
+            reprocess=reprocess,
+        )
+        ontology = MondoDiseaseOntology(
+            root,
+            redownload=redownload,
+            reprocess=reprocess,
+        )
+
+        super().__init__(
+            root,
+            annotation=annotation,
+            ontology=ontology,
+            redownload=redownload,
+            reprocess=reprocess,
             **kwargs,
         )
-        ontology = MondoDiseaseOntology(root, **kwargs)
-
-        super().__init__(root, annotation=annotation, ontology=ontology, **kwargs)
 
     @property
     def default_pre_transform(self):

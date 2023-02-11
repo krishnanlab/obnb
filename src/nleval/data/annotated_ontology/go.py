@@ -19,6 +19,8 @@ class GO(BaseAnnotatedOntologyData):
         jaccard: float = 0.5,
         data_sources: Optional[List[str]] = None,
         gene_id_converter: Optional[Union[Mapping[str, str], str]] = "HumanEntrez",
+        redownload: bool = False,
+        reprocess: bool = False,
         **kwargs,
     ):
         """Initialize the GO data object."""
@@ -31,13 +33,21 @@ class GO(BaseAnnotatedOntologyData):
             root,
             data_sources=data_sources,
             gene_id_converter=gene_id_converter,
-            **kwargs,
+            redownload=redownload,
+            reprocess=reprocess,
         )
-        ontology = GeneOntology(root, **kwargs)
+        ontology = GeneOntology(root, redownload=redownload, reprocess=reprocess)
         if self.namespace is not None:
             ontology.data = ontology.data.restrict_to_branch(self.namespace)
 
-        super().__init__(root, annotation=annotation, ontology=ontology, **kwargs)
+        super().__init__(
+            root,
+            annotation=annotation,
+            ontology=ontology,
+            redownload=redownload,
+            reprocess=reprocess,
+            **kwargs,
+        )
 
     @property
     def default_pre_transform(self):
