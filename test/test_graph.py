@@ -1046,9 +1046,13 @@ class TestOntologyGraph(unittest.TestCase):
         self.assertEqual(graph.get_node_attr("g"), ["z"])
 
     def test_ancestors(self):
-        r"""a.
+        r"""
 
-        /  |  \ b  c   d |  |  / e  f
+           a
+        /  |  \
+        b  c   d
+        |  |  /
+        e  f
 
         """
         graph = OntologyGraph()
@@ -1070,9 +1074,13 @@ class TestOntologyGraph(unittest.TestCase):
         self.assertEqual(graph.ancestors("f"), {"a", "c", "d"})
 
     def test_read_obo(self):
-        r"""a.
+        r"""
 
-        /      |       \ b      c (x, y)  d |       \      / e [z]       f
+               a
+        /      |       \
+        b      c (x, y)  d
+        |       \      /
+        e [z]       f
 
         """
         obo_path = osp.join(SAMPLE_DATA_DIR, "toy_ontology.obo")
@@ -1090,7 +1098,17 @@ class TestOntologyGraph(unittest.TestCase):
                 ["a", "b", "c", "d", "e", "f"],
             )
 
-            self.assertEqual(out, None)
+            self.assertEqual(
+                out,
+                {
+                    "ID:0": {"ID:0"},
+                    "ID:1": {"ID:1"},
+                    "ID:2": {"ID:2"},
+                    "ID:3": {"ID:3"},
+                    "ID:4": {"ID:4"},
+                    "ID:5": {"ID:5"},
+                },
+            )
             self.assertEqual(
                 graph._rev_edge_data,
                 [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {5: 1}, {}, {}],
@@ -1101,8 +1119,18 @@ class TestOntologyGraph(unittest.TestCase):
             out = graph.read_obo(obo_path, xref_prefix="ALIAS")
 
             self.assertEqual(
-                dict(out),
-                {"x": {"ID:2"}, "y": {"ID:2"}, "z": {"ID:4"}},
+                out,
+                {
+                    "ALIAS:x": {"ID:2"},
+                    "ALIAS:y": {"ID:2"},
+                    "ALIAS:z": {"ID:4"},
+                    "ID:0": {"ID:0"},
+                    "ID:1": {"ID:1"},
+                    "ID:2": {"ID:2"},
+                    "ID:3": {"ID:3"},
+                    "ID:4": {"ID:4"},
+                    "ID:5": {"ID:5"},
+                },
             )
             self.assertEqual(
                 graph._rev_edge_data,
@@ -1114,7 +1142,17 @@ class TestOntologyGraph(unittest.TestCase):
             graph = OntologyGraph()
             out = graph.read_obo(obo_path, xref_prefix="ALIAS2")
 
-            self.assertEqual(dict(out), {})
+            self.assertEqual(
+                out,
+                {
+                    "ID:0": {"ID:0"},
+                    "ID:1": {"ID:1"},
+                    "ID:2": {"ID:2"},
+                    "ID:3": {"ID:3"},
+                    "ID:4": {"ID:4"},
+                    "ID:5": {"ID:5"},
+                },
+            )
             self.assertEqual(
                 graph._rev_edge_data,
                 [{1: 1, 2: 1, 3: 1}, {4: 1}, {5: 1}, {5: 1}, {}, {}],
