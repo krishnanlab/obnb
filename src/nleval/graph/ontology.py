@@ -9,7 +9,7 @@ from tqdm import trange
 from nleval.exception import OboTermIncompleteError
 from nleval.graph.sparse import DirectedSparseGraph
 from nleval.typing import (
-    DefaultDict,
+    Dict,
     Iterable,
     Iterator,
     List,
@@ -316,7 +316,7 @@ class OntologyGraph(DirectedSparseGraph):
         self,
         path: str,
         xref_prefix: Optional[str] = None,
-    ) -> Optional[DefaultDict[str, Set[str]]]:
+    ) -> Dict[str, Set[str]]:
         """Read OBO-formatted ontology.
 
         Args:
@@ -325,13 +325,19 @@ class OntologyGraph(DirectedSparseGraph):
                 return a dictionary of xref to term_id. If not set, then do
                 not capture any xref (default: :obj:`None`).
 
+        Return:
+            A dictionary where the key is a cross reference term (or the
+            ontology term) id, and the corresponding value is a set of term ids
+            that are related to the key.
+
         """
-        xref_to_term_id = None if xref_prefix is None else defaultdict(set)
+        xref_to_term_id = defaultdict(set)
         with open(path) as f:
             for term in self.iter_terms(f):
                 term_id, term_name, term_xrefs, term_parents = term
 
                 self.add_node(term_id, exist_ok=True)
+                xref_to_term_id[term_id].add(term_id)
 
                 if self.get_node_name(term_id) is None:
                     self.set_node_name(term_id, term_name)
@@ -340,15 +346,14 @@ class OntologyGraph(DirectedSparseGraph):
                     for parent_id in term_parents:
                         self.add_edge(term_id, parent_id)
 
+                # TODO: allow multiple prefixes or even all of them?
                 if xref_prefix is not None and term_xrefs is not None:
                     for xref in term_xrefs:
-                        xref_terms = xref.split(":")
-                        prefix = xref_terms[0]
-                        xref_id = ":".join(xref_terms[1:])
+                        prefix = xref.split(":")[0]
                         if prefix == xref_prefix:
-                            xref_to_term_id[xref_id].add(term_id)
+                            xref_to_term_id[xref].add(term_id)
 
-        return xref_to_term_id
+        return dict(xref_to_term_id)
 
     @classmethod
     def from_obo(cls, path: str):
