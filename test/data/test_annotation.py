@@ -59,7 +59,7 @@ def test_digenet(tmpdir, subtests):
 
 
 @pytest.mark.mediumruns
-def test_gene_ontology(tmpdir, subtests):
+def test_gene_ontology(tmpdir):
     datadir = osp.join(tmpdir, "GeneOntologyAnnotation")
 
     data = GeneOntologyAnnotation(tmpdir)
@@ -78,20 +78,30 @@ def test_gene_ontology(tmpdir, subtests):
 def test_diseases(tmpdir, subtests):
     datadir = osp.join(tmpdir, "DISEASESAnnotation")
 
-    data = DISEASESAnnotation(tmpdir)
-    assert osp.isdir(datadir)
-    assert osp.isdir(osp.join(datadir, "processed"))
-    assert osp.isdir(osp.join(datadir, "raw"))
-    assert osp.isdir(osp.join(datadir, "info"))
+    for channel in [
+        "integrated_full",
+        "textmining_filtered",
+        "knowledge_filtered",
+        "experiments_filtered",
+    ]:
+        with subtests.test("Normal download (integrated full)"):
+            data = DISEASESAnnotation(tmpdir, channel=channel, score_min=None)
+            assert osp.isdir(datadir)
+            assert osp.isdir(osp.join(datadir, "processed"))
+            assert osp.isdir(osp.join(datadir, "raw"))
+            assert osp.isdir(osp.join(datadir, "info"))
 
-    # Check if columns are set to the correct name
-    assert data.data.columns.tolist() == ["gene_id", "term_id"]
-    assert ptypes.is_string_dtype(data.data["gene_id"])
-    assert ptypes.is_string_dtype(data.data["term_id"])
+            file_name = f"human_disease_{channel}.tsv"
+            assert osp.isfile(osp.join(datadir, "raw", file_name))
+
+            # Check if columns are set to the correct name
+            assert data.data.columns.tolist() == ["gene_id", "term_id"]
+            assert ptypes.is_string_dtype(data.data["gene_id"])
+            assert ptypes.is_string_dtype(data.data["term_id"])
 
 
 @pytest.mark.mediumruns
-def test_human_phenotype_ontology(tmpdir, subtests):
+def test_human_phenotype_ontology(tmpdir):
     datadir = osp.join(tmpdir, "HumanPhenotypeOntologyAnnotation")
 
     data = HumanPhenotypeOntologyAnnotation(tmpdir)

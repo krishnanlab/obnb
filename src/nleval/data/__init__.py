@@ -1,5 +1,23 @@
 """Interface with various databases to retrieve data."""
-from nleval.data.annotated_ontology import GOBP, GOCC, GOMF, DisGeNET
+from nleval.data.annotated_ontology import (
+    DISEASES,
+    GOBP,
+    GOCC,
+    GOMF,
+    HPO,
+    DISEASES_ExperimentsFiltered,
+    DISEASES_ExperimentsFull,
+    DISEASES_IntegratedFull,
+    DISEASES_KnowledgeFiltered,
+    DISEASES_KnowledgeFull,
+    DISEASES_TextminingFiltered,
+    DISEASES_TextminingFull,
+    DisGeNET,
+    DisGeNET_Animal,
+    DisGeNET_BEFREE,
+    DisGeNET_Curated,
+    DisGeNET_GWAS,
+)
 from nleval.data.network import (
     HIPPIE,
     SIGNOR,
@@ -18,14 +36,11 @@ from nleval.data.network import (
 )
 
 __all__ = classes = [
+    # Networks
     "BioGRID",
     "BioPlex",
     "ComPPIHumanInt",
-    "DisGeNET",
     "FunCoup",
-    "GOBP",
-    "GOCC",
-    "GOMF",
     "HIPPIE",
     "HuRI",
     "HuMAP",
@@ -36,4 +51,22 @@ __all__ = classes = [
     "ProteomeHD",
     "SIGNOR",
     "STRING",
+    # Gene set collections
+    "DISEASES",
+    "DISEASES_ExperimentsFiltered",
+    "DISEASES_ExperimentsFull",
+    "DISEASES_IntegratedFull",
+    "DISEASES_KnowledgeFiltered",
+    "DISEASES_KnowledgeFull",
+    "DISEASES_TextminingFiltered",
+    "DISEASES_TextminingFull",
+    "DisGeNET",
+    "DisGeNET_Animal",
+    "DisGeNET_BEFREE",
+    "DisGeNET_Curated",
+    "DisGeNET_GWAS",
+    "GOBP",
+    "GOCC",
+    "GOMF",
+    "HPO",
 ]
