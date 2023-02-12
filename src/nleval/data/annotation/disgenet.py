@@ -127,16 +127,16 @@ class DisGeNETAnnotation(BaseAnnotationData):
 
         # Filter by DSI and DPI scores
         if self.dsi_max is not None:
-            self.plogger.info(f"Removing annotations above {self.dsi_max} DSI")
+            self.plogger.info(f"Removing annotations above DSI: {self.dsi_max}")
             annot_df = annot_df[annot_df["DSI"] <= self.dsi_max]
         if self.dsi_min is not None:
-            self.plogger.info(f"Removing annotations below {self.dsi_min} DSI")
+            self.plogger.info(f"Removing annotations below DSI: {self.dsi_min}")
             annot_df = annot_df[annot_df["DSI"] >= self.dsi_min]
         if self.dpi_max is not None:
-            self.plogger.info(f"Removing annotations above {self.dpi_max} DPI")
+            self.plogger.info(f"Removing annotations above DPI: {self.dpi_max}")
             annot_df = annot_df[annot_df["DPI"] <= self.dpi_max]
         if self.dpi_min is not None:
-            self.plogger.info(f"Removing annotations below {self.dpi_min} DPI")
+            self.plogger.info(f"Removing annotations below DPI: {self.dpi_min}")
             annot_df = annot_df[annot_df["DPI"] >= self.dpi_min]
 
         # Select relevant columns and rename to standardized column names
