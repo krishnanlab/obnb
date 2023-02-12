@@ -2,7 +2,7 @@ from nleval.data.annotated_ontology.base import BaseAnnotatedOntologyData
 from nleval.data.annotation import GeneOntologyAnnotation
 from nleval.data.ontology import GeneOntology
 from nleval.label.filters import Compose, LabelsetNonRedFilter, LabelsetRangeFilterSize
-from nleval.typing import List, Mapping, Optional, Union
+from nleval.typing import List, LogLevel, Mapping, Optional, Union
 
 
 class GO(BaseAnnotatedOntologyData):
@@ -20,6 +20,8 @@ class GO(BaseAnnotatedOntologyData):
         data_sources: Optional[List[str]] = None,
         gene_id_converter: Optional[Union[Mapping[str, str], str]] = "HumanEntrez",
         redownload: bool = False,
+        version: str = "latest",
+        log_level: LogLevel = "INFO",
         **kwargs,
     ):
         """Initialize the GO data object."""
@@ -33,8 +35,15 @@ class GO(BaseAnnotatedOntologyData):
             data_sources=data_sources,
             gene_id_converter=gene_id_converter,
             redownload=redownload,
+            version=version,
+            log_level=log_level,
         )
-        ontology = GeneOntology(root, redownload=redownload)
+        ontology = GeneOntology(
+            root,
+            redownload=redownload,
+            version=version,
+            log_level=log_level,
+        )
         if self.namespace is not None:
             ontology.data = ontology.data.restrict_to_branch(self.namespace)
 
