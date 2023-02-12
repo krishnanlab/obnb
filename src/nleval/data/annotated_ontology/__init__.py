@@ -16,7 +16,7 @@ from nleval.data.annotated_ontology.disgenet import (
     DisGeNET_Curated,
     DisGeNET_GWAS,
 )
-from nleval.data.annotated_ontology.go import GOBP, GOCC, GOMF
+from nleval.data.annotated_ontology.go import GO, GOBP, GOCC, GOMF
 from nleval.data.annotated_ontology.hpo import HPO
 
 __all__ = [
@@ -33,6 +33,7 @@ __all__ = [
     "DisGeNET_BEFREE",
     "DisGeNET_Curated",
     "DisGeNET_GWAS",
+    "GO",
     "GOBP",
     "GOCC",
     "GOMF",

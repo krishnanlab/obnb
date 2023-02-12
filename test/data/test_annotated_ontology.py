@@ -4,8 +4,14 @@ import pytest
 import yaml
 
 import nleval
-from nleval.data.annotated_ontology.disgenet import DisGeNET
-from nleval.data.annotated_ontology.go import GO, GOBP, GOCC, GOMF
+from nleval.data.annotated_ontology import (
+    GO,
+    GOBP,
+    GOCC,
+    GOMF,
+    DISEASES_KnowledgeFiltered,
+    DisGeNET,
+)
 from nleval.label.filters import LabelsetRangeFilterSize
 from nleval.util.path import hexdigest
 
@@ -92,3 +98,61 @@ def test_go(tmpdir, mocker, subtests):
         lsc = GOMF(tmpdir)
         assert len(lsc.label_ids) > 0
         assert osp.isdir(osp.join(tmpdir, "GOMF"))
+
+
+@pytest.mark.mediumruns
+def test_diseases(tmpdir, mocker, subtests):
+    datadir = osp.join(tmpdir, "DISEASES_KnowledgeFiltered")
+
+    spy_ann_download = mocker.spy(
+        nleval.data.annotation.diseases.DISEASESAnnotation,
+        "download",
+    )
+    spy_ont_download = mocker.spy(
+        nleval.data.ontology.mondo.MondoDiseaseOntology,
+        "download",
+    )
+    spy_annont_download = mocker.spy(
+        nleval.data.annotated_ontology.diseases.DISEASES_KnowledgeFiltered,
+        "download",
+    )
+
+    with subtests.test("First download"):
+        lsc = DISEASES_KnowledgeFiltered(tmpdir)
+        assert len(lsc.label_ids) > 0
+
+        assert osp.isdir(datadir)
+        assert osp.isdir(osp.join(datadir, "processed"))
+        assert osp.isdir(osp.join(datadir, "raw"))
+        assert osp.isdir(osp.join(datadir, "info"))
+
+        assert osp.isdir(osp.join(tmpdir, "DISEASESAnnotation"))
+        assert osp.isdir(osp.join(tmpdir, "MondoDiseaseOntology"))
+
+        # Downloaded annotation and ontology
+        assert spy_ann_download.call_count == 1
+        assert spy_ont_download.call_count == 1
+        # Use the downloaded annotation and ontology
+        assert spy_annont_download.call_count == 0
+
+    with subtests.test("Load downloaded"):
+        lsc = DISEASES_KnowledgeFiltered(tmpdir)
+        assert len(lsc.label_ids) > 0
+
+        # Directly use the previously downloaded data
+        assert spy_ann_download.call_count == 1
+        assert spy_ont_download.call_count == 1
+        # Use the downloaded annotation and ontology
+        assert spy_annont_download.call_count == 0
+
+    with subtests.test("Redownload"):
+        lsc = DISEASES_KnowledgeFiltered(tmpdir, redownload=True)
+        assert len(lsc.label_ids) > 0
+
+        # Forced redownload annotation and ontology
+        assert spy_ann_download.call_count == 2
+        assert spy_ont_download.call_count == 2
+        # Use the downloaded annotation and ontology
+        # NOTE: annotated ontology download should never be incremented as
+        # the redownload kwarg is never passed to the annotated ontology object
+        assert spy_annont_download.call_count == 0

@@ -33,6 +33,9 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
         # NOTE: data are doownloaded separately by the annotation and ontology objects
         return True
 
+    def download(self):
+        pass
+
     def process(self):
         """Process raw data and save as gmt for future usage."""
         g = self.ontology.data
