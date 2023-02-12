@@ -1,14 +1,13 @@
-import gzip
-
 from nleval.data.base import BaseData
-from nleval.typing import List, Optional
-from nleval.util.download import stream_download
+from nleval.typing import List, Optional, ZipType
+from nleval.util.download import download_unzip
 
 
 class BaseAnnotationData(BaseData):
     CONFIG_KEYS: List[str] = BaseData.CONFIG_KEYS + ["annotation_url"]
     annotation_url: Optional[str] = None
     annotation_file_name: Optional[str] = None
+    annotation_file_zip_type: ZipType = "gzip"
 
     def __init__(self, root: str, **kwargs):
         """Initialize BaseAnnotationData."""
@@ -28,9 +27,13 @@ class BaseAnnotationData(BaseData):
 
         """
         self.plogger.info(f"Download annotation from: {self.annotation_url}")
-        content = stream_download(self.annotation_url, log_level=self.log_level)[1]
-        with open(self.raw_file_path(0), "wb") as f:
-            f.write(gzip.decompress(content))
+        download_unzip(
+            self.annotation_url,
+            self.raw_dir,
+            zip_type=self.annotation_file_zip_type,
+            rename=self.raw_files[0],
+            logger=self.plogger,
+        )
 
     def process(self):
         # NOTE: we process the ontology graph from raw file directly, so we

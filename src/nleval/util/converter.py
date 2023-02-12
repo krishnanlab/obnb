@@ -118,6 +118,54 @@ class BaseConverter:
             json.dump(full_convert_map, f, indent=4, sort_keys=True)
         self.logger.info(f"Gene conversion cache saved {self.cache_path}")
 
+    def query_bulk(self, ids: List[str]):
+        raise NotImplementedError
+
+    def map_df(
+        self,
+        df: pd.DataFrame,
+        input_column: str,
+        output_column: Optional[str] = None,
+        copy: bool = False,
+    ) -> pd.DataFrame:
+        """Map the id conversion to a column of a dataframe.
+
+        Args:
+            df: Input dataframe.
+            input_column: Column to use as conversion keys.
+            output_column: Column to save the converted values.
+            copy: If set to ``True``, then create a copy of the dataframe.
+                Otherwise, modify the dataframe inplace.
+
+        """
+        if copy:
+            df = df.copy()
+
+        if output_column is None:
+            output_column = input_column
+
+        try:
+            to_query = df[input_column].unique().tolist()
+            self.query_bulk(to_query)
+        except NotImplementedError:
+            self.logger.warning(f"{type(self)} do not support bulk query yet")
+
+        converted = {i for i in to_query if self[i] is not None}
+        num_succ = len(converted)
+        num_failed = len(to_query) - len(converted)
+        self.logger.info(f"Successfully mapped {num_succ:,} ({num_failed:,} failed)")
+
+        ind = df[input_column].isin(converted)
+        num_removed = ind.shape[0] - ind.sum()
+        self.logger.info(f"{num_removed:,} entries removed by due to conversion.")
+        df.drop(ind[~ind].index, inplace=True)
+
+        # XXX: Assumes all mappings are one-to-one. Need to adapt to one-to-many.
+        df[output_column] = df[input_column].map(self.__getitem__)
+        df.reset_index(inplace=True)
+
+        return df
+
 
 class MyGeneInfoConverter(BaseConverter):
     """Gene ID conversion via MyGeneInfo."""

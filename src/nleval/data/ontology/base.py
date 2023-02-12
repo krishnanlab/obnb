@@ -16,10 +16,10 @@ class BaseOntologyData(BaseData):
     CONFIG_KEYS: List[str] = BaseData.CONFIG_KEYS + ["ontology_url", "xref_prefix"]
     ontology_url: Optional[str] = None
     ontology_file_name: Optional[str] = None
-    xref_prefix: Optional[str] = None
 
-    def __init__(self, root: str, **kwargs):
+    def __init__(self, root: str, xref_prefix: Optional[str] = None, **kwargs):
         """Initialize BaseOntologyData."""
+        self.xref_prefix = xref_prefix
         super().__init__(root, **kwargs)
 
     @property

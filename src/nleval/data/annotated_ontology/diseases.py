@@ -1,26 +1,23 @@
 from nleval.data.annotated_ontology.base import BaseAnnotatedOntologyData
-from nleval.data.annotation import DisGeNETAnnotation
+from nleval.data.annotation import DISEASESAnnotation
 from nleval.data.ontology import MondoDiseaseOntology
 from nleval.label.filters import Compose, LabelsetNonRedFilter, LabelsetRangeFilterSize
-from nleval.typing import List, Mapping, Optional, Union
+from nleval.typing import Mapping, Optional, Union
 
 
-class DisGeNET(BaseAnnotatedOntologyData):
-    """The DisGeNET disease gene set collection."""
+class DISEASES(BaseAnnotatedOntologyData):
+    """The DISEASES disease gene set collection."""
 
     def __init__(
         self,
         root: str,
-        dsi_min: Optional[float] = None,
-        dsi_max: Optional[float] = None,
-        dpi_min: Optional[float] = None,
-        dpi_max: Optional[float] = None,
+        score_min: Optional[float] = 3,
+        score_max: Optional[float] = None,
         min_size: int = 10,
         max_size: int = 600,
         overlap: float = 0.7,
         jaccard: float = 0.5,
-        data_sources: Optional[List[str]] = None,
-        gene_id_converter: Optional[Union[Mapping[str, str], str]] = None,
+        gene_id_converter: Optional[Union[Mapping[str, str], str]] = "HumanEntrez",
         redownload: bool = False,
         **kwargs,
     ):
@@ -30,17 +27,14 @@ class DisGeNET(BaseAnnotatedOntologyData):
         self.jaccard = jaccard
         self.overlap = overlap
 
-        annotation = DisGeNETAnnotation(
+        annotation = DISEASESAnnotation(
             root,
-            data_sources=data_sources,
-            dsi_min=dsi_min,
-            dsi_max=dsi_max,
-            dpi_min=dpi_min,
-            dpi_max=dpi_max,
+            score_min=score_min,
+            score_max=score_max,
             gene_id_converter=gene_id_converter,
             redownload=redownload,
         )
-        ontology = MondoDiseaseOntology(root, xref_prefix="UMLS", redownload=redownload)
+        ontology = MondoDiseaseOntology(root, xref_prefix="DOID", redownload=redownload)
 
         super().__init__(
             root,

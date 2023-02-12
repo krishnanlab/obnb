@@ -6,6 +6,7 @@ import urllib.parse
 from io import BytesIO
 from logging import Logger
 from pprint import pformat
+from typing import get_args
 from zipfile import ZipFile
 
 import requests
@@ -19,7 +20,7 @@ from nleval.config import (
     STREAM_BLOCK_SIZE,
 )
 from nleval.exception import DataNotFoundError, ExceededMaxNumRetries
-from nleval.typing import Literal, LogLevel, Optional, Tuple
+from nleval.typing import LogLevel, Optional, Tuple, ZipType
 from nleval.util.logger import display_pbar, get_logger
 
 native_logger = get_logger(None, log_level="INFO")
@@ -72,7 +73,7 @@ def download_unzip(
     url: str,
     root: str,
     *,
-    zip_type: Literal["zip", "gzip"] = "zip",
+    zip_type: ZipType = "zip",
     rename: Optional[str] = None,
     logger: Optional[Logger] = None,
 ):
@@ -82,19 +83,20 @@ def download_unzip(
         url: The url to download the data from.
         root: Directory to put the extracted contents.
         zip_type: Type of zip files to extract, available options are ["zip",
-            "gzip"].
+            "gzip", "none"]. "none" means the file is not zipped.
         logger: Logger to use. Use default logger if not specified.
 
     """
-    if zip_type not in ["zip", "gzip"]:  # check zip type first before downloading
+    valid_zip_types = get_args(ZipType)
+    if zip_type not in valid_zip_types:  # check zip type first before downloading
         raise ValueError(
-            f"Unknown zip type {zip_type!r}, available options are [zip|gzip]",
+            f"Unknown zip type {zip_type!r}, available options are {valid_zip_types}",
         )
 
     # Extract and modify filename
     filename = get_filename_from_url(url)
-    if (rename is not None) and (zip_type != "gzip"):
-        raise ValueError("'rename' option is only valid when zip type is 'gzip'")
+    if (rename is not None) and (zip_type == "zip"):
+        raise ValueError("'rename' option is not valid when zip type is 'zip'")
     elif rename is not None:
         filename = rename
     elif zip_type == "gzip":
@@ -109,8 +111,12 @@ def download_unzip(
         zf = ZipFile(BytesIO(content))
         zf.extractall(root)
     elif zip_type == "gzip":
-        with open(path := osp.join(root, filename), "w") as f:
-            f.write(gzip.decompress(content).decode())
+        with open(path := osp.join(root, filename), "wb") as f:
+            f.write(gzip.decompress(content))
+        logger.info(f"File saved to {path!r}")
+    elif zip_type == "none":
+        with open(path := osp.join(root, filename), "wb") as f:
+            f.write(content)
         logger.info(f"File saved to {path!r}")
     else:
         raise ValueError(f"Fatal error! {zip_type=!r} should have been caught.")
