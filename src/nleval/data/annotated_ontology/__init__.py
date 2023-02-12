@@ -1,5 +1,14 @@
 """Annotated ontology data."""
-from nleval.data.annotated_ontology.diseases import DISEASES
+from nleval.data.annotated_ontology.diseases import (
+    DISEASES,
+    DISEASES_ExperimentsFiltered,
+    DISEASES_ExperimentsFull,
+    DISEASES_IntegratedFull,
+    DISEASES_KnowledgeFiltered,
+    DISEASES_KnowledgeFull,
+    DISEASES_TextminingFiltered,
+    DISEASES_TextminingFull,
+)
 from nleval.data.annotated_ontology.disgenet import (
     DisGeNET,
     DisGeNET_Animal,
@@ -12,6 +21,13 @@ from nleval.data.annotated_ontology.hpo import HPO
 
 __all__ = [
     "DISEASES",
+    "DISEASES_ExperimentsFiltered",
+    "DISEASES_ExperimentsFull",
+    "DISEASES_IntegratedFull",
+    "DISEASES_KnowledgeFiltered",
+    "DISEASES_KnowledgeFull",
+    "DISEASES_TextminingFiltered",
+    "DISEASES_TextminingFull",
     "DisGeNET",
     "DisGeNET_Animal",
     "DisGeNET_BEFREE",

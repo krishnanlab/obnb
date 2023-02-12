@@ -3,6 +3,7 @@ from nleval.data.annotation import DISEASESAnnotation
 from nleval.data.ontology import MondoDiseaseOntology
 from nleval.label.filters import Compose, LabelsetNonRedFilter, LabelsetRangeFilterSize
 from nleval.typing import Mapping, Optional, Union
+from nleval.util.registers import overload_class
 
 
 class DISEASES(BaseAnnotatedOntologyData):
@@ -32,6 +33,7 @@ class DISEASES(BaseAnnotatedOntologyData):
             root,
             score_min=score_min,
             score_max=score_max,
+            channel=channel,
             gene_id_converter=gene_id_converter,
             redownload=redownload,
         )
@@ -53,3 +55,47 @@ class DISEASES(BaseAnnotatedOntologyData):
             LabelsetRangeFilterSize(min_val=self.min_size),
             log_level=self.log_level,
         )
+
+
+DISEASES_IntegratedFull = overload_class(
+    DISEASES,
+    "IntegratedFull",
+    channel="integrated_full",
+    score_min=None,
+)
+DISEASES_TextminingFull = overload_class(
+    DISEASES,
+    "TextminingFull",
+    channel="textmining_full",
+    score_min=None,
+)
+DISEASES_TextminingFiltered = overload_class(
+    DISEASES,
+    "TextminingFiltered",
+    channel="textmining_filtered",
+    score_min=None,
+)
+DISEASES_KnowledgeFull = overload_class(
+    DISEASES,
+    "KnowledgeFull",
+    channel="knowledge_full",
+    score_min=None,
+)
+DISEASES_KnowledgeFiltered = overload_class(
+    DISEASES,
+    "KnowledgeFiltered",
+    channel="knowledge_filtered",
+    score_min=None,
+)
+DISEASES_ExperimentsFull = overload_class(
+    DISEASES,
+    "ExperimentsFull",
+    channel="experiments_full",
+    score_min=None,
+)
+DISEASES_ExperimentsFiltered = overload_class(
+    DISEASES,
+    "ExperimentsFiltered",
+    channel="experiments_filtered",
+    score_min=None,
+)
