@@ -10,8 +10,7 @@ class MondoDiseaseOntology(BaseOntologyData):
 
     ontology_file_name = "mondo.obo"
     ontology_url = "http://purl.obolibrary.org/obo/mondo.obo"
-    xref_prefix = "UMLS"
 
-    def __init__(self, root, **kwargs):
+    def __init__(self, root, xref_prefix=None, **kwargs):
         """Initialize MondoDiseaseOntology data object."""
-        super().__init__(root, **kwargs)
+        super().__init__(root, xref_prefix=xref_prefix, **kwargs)

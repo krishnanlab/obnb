@@ -40,7 +40,7 @@ class DisGeNET(BaseAnnotatedOntologyData):
             gene_id_converter=gene_id_converter,
             redownload=redownload,
         )
-        ontology = MondoDiseaseOntology(root, redownload=redownload)
+        ontology = MondoDiseaseOntology(root, xref_prefix="UMLS", redownload=redownload)
 
         super().__init__(
             root,
