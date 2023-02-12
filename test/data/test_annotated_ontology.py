@@ -5,13 +5,13 @@ import yaml
 
 import nleval
 from nleval.data.annotated_ontology import (
-    GO,
     GOBP,
     GOCC,
     GOMF,
     DISEASES_KnowledgeFiltered,
     DisGeNET,
 )
+from nleval.data.annotated_ontology.go import GO
 from nleval.label.filters import LabelsetRangeFilterSize
 from nleval.util.path import hexdigest
 
