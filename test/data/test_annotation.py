@@ -1,6 +1,7 @@
 import os.path as osp
 
 import pandas as pd
+import pandas.api.types as ptypes
 import pytest
 
 from nleval.data.annotation.diseases import DISEASESAnnotation
@@ -22,6 +23,8 @@ def test_digenet(tmpdir, subtests):
 
         # Check if columns are set to the correct name
         assert data.data.columns.tolist() == ["gene_id", "term_id"]
+        assert ptypes.is_string_dtype(data.data["gene_id"])
+        assert ptypes.is_string_dtype(data.data["term_id"])
 
     # Load full annotation data to be used for checking filtering later
     full_df = pd.read_csv(data.raw_file_path(0), sep="\t")
@@ -64,6 +67,8 @@ def test_gene_ontology(tmpdir, subtests):
 
     # Check if columns are set to the correct name
     assert data.data.columns.tolist() == ["gene_id", "term_id"]
+    assert ptypes.is_string_dtype(data.data["gene_id"])
+    assert ptypes.is_string_dtype(data.data["term_id"])
 
 
 @pytest.mark.mediumruns
@@ -78,3 +83,5 @@ def test_diseases(tmpdir, subtests):
 
     # Check if columns are set to the correct name
     assert data.data.columns.tolist() == ["gene_id", "term_id"]
+    assert ptypes.is_string_dtype(data.data["gene_id"])
+    assert ptypes.is_string_dtype(data.data["term_id"])
