@@ -299,9 +299,18 @@ class MyGeneInfoConverter(BaseConverter):
 
         """
         checkType("Name of converter", str, name)
+        scopes = [
+            "ensembl.protein",
+            "ensembl.gene",
+            "ensembl.transcript",
+            "entrezgene",
+            "uniprot",
+            "symbol",
+            "alias",
+        ]
         if name == "HumanEntrez":
             converter = cls(
-                scopes="all",
+                scopes=",".join(scopes),
                 species="human",
                 **kwargs,
             )
