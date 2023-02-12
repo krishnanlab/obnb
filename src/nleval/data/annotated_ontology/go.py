@@ -42,7 +42,6 @@ class GO(BaseAnnotatedOntologyData):
             root,
             annotation=annotation,
             ontology=ontology,
-            redownload=redownload,
             **kwargs,
         )
 

@@ -47,7 +47,6 @@ class DisGeNET(BaseAnnotatedOntologyData):
             root,
             annotation=annotation,
             ontology=ontology,
-            redownload=redownload,
             **kwargs,
         )
 
