@@ -13,6 +13,7 @@ class DISEASES(BaseAnnotatedOntologyData):
         root: str,
         score_min: Optional[float] = 3,
         score_max: Optional[float] = None,
+        channel: str = "integrated_full",
         min_size: int = 10,
         max_size: int = 600,
         overlap: float = 0.7,
