@@ -132,21 +132,9 @@ class GeneOntologyAnnotation(BaseAnnotationData):
         self.plogger.info(f"{ind.sum():,} (out of {ind.shape[0]:,}) entries selected")
         annot_df = annot_df[ind]
 
-        # Bulk query gene symbol to entrez conversion and get converted genes
-        gene_symbols_to_query = annot_df["db_symbol"].unique().tolist()
+        # Convert gene ids
         gene_id_converter = self.get_gene_id_converter()
-        gene_id_converter.query_bulk(gene_symbols_to_query)
-        converted_symbols = {
-            i for i in gene_symbols_to_query if gene_id_converter[i] is not None
-        }
-        ind = annot_df["db_symbol"].isin(converted_symbols)
-        num_removed = ind.shape[0] - ind.sum()
-        self.plogger.info(f"{num_removed:,} entries removed by gene id conversion.")
-        annot_df = annot_df[ind]
-
-        # Convert gene symbol to the desired gene id type
-        # NOTE: assumes that the mappings are one-to-one
-        annot_df["gene_id"] = annot_df["db_symbol"].apply(gene_id_converter.__getitem__)
+        gene_id_converter.map_df(annot_df, "db_symbol", "gene_id")
         annot_df["term_id"] = annot_df["go_id"]
 
         # Save attributes
