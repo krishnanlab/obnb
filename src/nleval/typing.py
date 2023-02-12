@@ -14,6 +14,7 @@ from typing import (
     Set,
     TextIO,
     Tuple,
+    Type,
     Union,
 )
 
@@ -73,6 +74,7 @@ __all__ = [
     "Term",
     "TextIO",
     "Tuple",
+    "Type",
     "Union",
     "ZipType",
 ]
