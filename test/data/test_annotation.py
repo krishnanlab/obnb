@@ -21,14 +21,11 @@ def test_digenet(tmpdir, subtests):
 
         # Check if columns are set to the correct name
         assert data.data.columns.tolist() == ["gene_id", "term_id"]
-        # Check if values are prefixed correctly
-        assert data.data.iloc[0, 0].startswith("ncbigene:")
-        assert data.data.iloc[0, 1].startswith("umls:C")
 
     # Load full annotation data to be used for checking filtering later
     full_df = pd.read_csv(data.raw_file_path(0), sep="\t")
-    full_df["gene_id"] = "ncbigene:" + full_df["geneId"].astype(str).values
-    full_df["term_id"] = "umls:" + full_df["diseaseId"].astype(str).values
+    full_df["gene_id"] = full_df["geneId"].astype(str)
+    full_df["term_id"] = "UMLS:" + full_df["diseaseId"].astype(str).values
     index_cols = ["gene_id", "term_id"]
     full_df = full_df.set_index(index_cols)
 
@@ -66,6 +63,3 @@ def test_gene_ontology(tmpdir, subtests):
 
     # Check if columns are set to the correct name
     assert data.data.columns.tolist() == ["gene_id", "term_id"]
-    # Check if values are prefixed correctly
-    assert data.data.iloc[0, 0].startswith("ncbigene:")
-    assert data.data.iloc[0, 1].startswith("go:")

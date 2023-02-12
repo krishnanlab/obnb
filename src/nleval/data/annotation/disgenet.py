@@ -143,6 +143,7 @@ class DisGeNETAnnotation(BaseAnnotationData):
         annot_df = annot_df[["geneId", "diseaseId"]].reset_index(drop=True)
         annot_df.columns = ["gene_id", "term_id"]
         # Specify id prefixes
+        annot_df["gene_id"] = annot_df["gene_id"].astype(str)
         annot_df["term_id"] = "UMLS:" + annot_df["term_id"].astype(str).values
 
         # Save attributes
