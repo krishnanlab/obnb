@@ -6,6 +6,7 @@ import urllib.parse
 from io import BytesIO
 from logging import Logger
 from pprint import pformat
+from typing import get_args
 from zipfile import ZipFile
 
 import requests
@@ -19,7 +20,7 @@ from nleval.config import (
     STREAM_BLOCK_SIZE,
 )
 from nleval.exception import DataNotFoundError, ExceededMaxNumRetries
-from nleval.typing import ZIP_TYPE, LogLevel, Optional, Tuple, ZipType
+from nleval.typing import LogLevel, Optional, Tuple, ZipType
 from nleval.util.logger import display_pbar, get_logger
 
 native_logger = get_logger(None, log_level="INFO")
@@ -86,9 +87,10 @@ def download_unzip(
         logger: Logger to use. Use default logger if not specified.
 
     """
-    if zip_type not in ZIP_TYPE:  # check zip type first before downloading
+    valid_zip_types = get_args(ZipType)
+    if zip_type not in valid_zip_types:  # check zip type first before downloading
         raise ValueError(
-            f"Unknown zip type {zip_type!r}, available options are {ZIP_TYPE}",
+            f"Unknown zip type {zip_type!r}, available options are {valid_zip_types}",
         )
 
     # Extract and modify filename

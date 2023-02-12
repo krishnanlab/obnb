@@ -38,8 +38,7 @@ EdgeDir = Literal["out", "in", "both"]
 
 LogLevel = Literal["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG", "NOTSET"]
 
-ZIP_TYPE = ["none", "gzip", "zip"]
-ZipType = Literal[ZIP_TYPE]
+ZipType = Literal["none", "gzip", "zip"]
 
 Metric = Callable[[np.ndarray, np.ndarray], float]
 GraphGymMetric = Callable[[List[Tensor], List[Tensor], str], float]
@@ -75,6 +74,5 @@ __all__ = [
     "TextIO",
     "Tuple",
     "Union",
-    "ZIP_TYPE",
     "ZipType",
 ]
