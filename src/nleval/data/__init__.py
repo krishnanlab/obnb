@@ -1,6 +1,7 @@
 """Interface with various databases to retrieve data."""
 from nleval.data.annotated_ontology import (
     DISEASES,
+    GO,
     GOBP,
     GOCC,
     GOMF,
@@ -65,6 +66,7 @@ __all__ = classes = [
     "DisGeNET_BEFREE",
     "DisGeNET_Curated",
     "DisGeNET_GWAS",
+    "GO",
     "GOBP",
     "GOCC",
     "GOMF",
