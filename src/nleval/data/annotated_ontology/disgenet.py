@@ -3,6 +3,7 @@ from nleval.data.annotation import DisGeNETAnnotation
 from nleval.data.ontology import MondoDiseaseOntology
 from nleval.label.filters import Compose, LabelsetNonRedFilter, LabelsetRangeFilterSize
 from nleval.typing import List, Mapping, Optional, Union
+from nleval.util.registers import overload_class
 
 
 class DisGeNET(BaseAnnotatedOntologyData):
@@ -58,3 +59,30 @@ class DisGeNET(BaseAnnotatedOntologyData):
             LabelsetRangeFilterSize(min_val=self.min_size),
             log_level=self.log_level,
         )
+
+
+DisGeNET_Curated = overload_class(
+    DisGeNET,
+    "Curated",
+    data_sources=[
+        "CGI",
+        "CLINGEN",
+        "CTD_human",
+        "GENOMICS_ENGLAND",
+        "ORPHANET",
+        "PSYGENET",
+        "CLINVAR",
+    ],
+)
+DisGeNET_Animal = overload_class(
+    DisGeNET,
+    "Animal",
+    data_sources=[
+        "CTD_mouse",
+        "CTD_rat",
+        "MGD",
+        "RGD",
+    ],
+)
+DisGeNET_GWAS = overload_class(DisGeNET, "GWAS", data_sources=["GWASCAT", "GWASDB"])
+DisGeNET_BEFREE = overload_class(DisGeNET, "BEFREE", data_sources=["BEFREE"])
