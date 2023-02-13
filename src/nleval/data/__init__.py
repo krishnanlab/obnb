@@ -17,6 +17,12 @@ from nleval.data.annotated_ontology import (
     DisGeNET_Curated,
     DisGeNET_GWAS,
 )
+from nleval.data.annotation import (
+    DISEASESAnnotation,
+    DisGeNETAnnotation,
+    GeneOntologyAnnotation,
+    HumanPhenotypeOntologyAnnotation,
+)
 from nleval.data.network import (
     HIPPIE,
     SIGNOR,
@@ -33,6 +39,7 @@ from nleval.data.network import (
     PCNet,
     ProteomeHD,
 )
+from nleval.data.ontology import GeneOntology, MondoDiseaseOntology
 
 __all__ = classes = [
     # Networks
@@ -67,4 +74,12 @@ __all__ = classes = [
     "GOCC",
     "GOMF",
     "HPO",
+    # Annotations
+    "DISEASESAnnotation",
+    "DisGeNETAnnotation",
+    "GeneOntologyAnnotation",
+    "HumanPhenotypeOntologyAnnotation",
+    # Ontologies
+    "GeneOntology",
+    "MondoDiseaseOntology",
 ]
