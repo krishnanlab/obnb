@@ -2,6 +2,7 @@
 from nleval.data.network.biogrid import BioGRID
 from nleval.data.network.bioplex import BioPlex
 from nleval.data.network.comppi import ComPPIHumanInt
+from nleval.data.network.consensuspathdb import ConsensusPathDB
 from nleval.data.network.funcoup import FunCoup
 from nleval.data.network.hippie import HIPPIE
 from nleval.data.network.humanbase import HumanBaseTopGlobal
@@ -18,6 +19,7 @@ __all__ = [
     "BioGRID",
     "BioPlex",
     "ComPPIHumanInt",
+    "ConsensusPathDB",
     "FunCoup",
     "HIPPIE",
     "HuRI",

@@ -32,20 +32,20 @@ logger.info(
 # Clean up old data
 while osp.isdir(datadir):
     # TODO: make --allow-dirty option
-    ans = input(f"Release data dir already exists ({datadir}), remove now? [yes/no]")
-    if ans == "yes":
+    answer = input(f"Release data dir already exists ({datadir}), remove now? [yes/no]")
+    if answer == "yes":
         logger.info(f"Removing old archives in {datadir}")
         rmtree(datadir)
         break
-    elif ans == "no":
+    elif answer == "no":
         exit()
     else:
-        logger.error(f"Unknown option {ans!r}, please answer 'yes' or 'no'")
+        logger.error(f"Unknown option {answer!r}, please answer 'yes' or 'no'")
 
 # Download, process, and archive all data
 for name in all_data:
     getattr(nleval.data, name)(datadir)
-    # TODO: validate data and print stats (#ndoes&#edges for networks; stats() for lsc)
+    # TODO: validate data and print stats (#nodes&#edges for networks; stats() for lsc)
     make_archive(osp.join(archdir, name), "zip", datadir, name, logger=logger)
 
 # Download and process gene property data

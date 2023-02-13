@@ -49,7 +49,7 @@ class ComPPI(BaseURLSparseGraphData):
         >>> df = pd.read_csv(io.BytesIO(r.content), sep="\t",
         ...                  compression="gzip")
 
-    **[Last update: 2023-11-17]**
+    **[Last updated: 2023-11-17]**
 
     """
 
