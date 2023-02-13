@@ -84,17 +84,17 @@ def test_go(tmpdir, mocker, subtests):
         assert osp.isdir(osp.join(tmpdir, "GeneOntologyAnnotation"))
         assert osp.isdir(osp.join(tmpdir, "GeneOntology"))
 
-    with subtests.test("GO"):
+    with subtests.test("GOBP"):
         lsc = GOBP(tmpdir)
         assert len(lsc.label_ids) > 0
         assert osp.isdir(osp.join(tmpdir, "GOBP"))
 
-    with subtests.test("GO"):
+    with subtests.test("GOCC"):
         lsc = GOCC(tmpdir)
         assert len(lsc.label_ids) > 0
         assert osp.isdir(osp.join(tmpdir, "GOCC"))
 
-    with subtests.test("GO"):
+    with subtests.test("GOMF"):
         lsc = GOMF(tmpdir)
         assert len(lsc.label_ids) > 0
         assert osp.isdir(osp.join(tmpdir, "GOMF"))
