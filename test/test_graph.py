@@ -258,12 +258,12 @@ class TestSparseGraph(unittest.TestCase):
             self.assertEqual(graph._edge_data, [{}, {0: 1.0}, {}])
 
     @parameterized.expand([(True, 3), (False, 4)])
-    def test_num_nodes(self, directed, ans):
+    def test_num_nodes(self, directed, answer):
         graph = SparseGraph(weighted=False, directed=directed)
         graph.add_edge("a", "b")
         graph.add_edge("b", "a")
         graph.add_edge("c", "a")
-        self.assertEqual(ans, graph.num_edges)
+        self.assertEqual(answer, graph.num_edges)
 
     @parameterized.expand(itertools.product((True, False), (True, False)))
     def test_add_edge_self_loops(self, directed, self_loops):
@@ -826,9 +826,9 @@ class TestDenseGraph(unittest.TestCase):
             ([[0, 1, 1], [1, 0, 0], [1, 0, 0]], 4),
         ],
     )
-    def test_num_nodes(self, mat, ans):
+    def test_num_nodes(self, mat, answer):
         graph = DenseGraph.from_mat(np.array(mat), ["a", "b", "c"])
-        self.assertEqual(ans, graph.num_edges)
+        self.assertEqual(answer, graph.num_edges)
 
     def test_from_mat(self):
         with self.subTest("From matrix with first column ids"):
@@ -994,9 +994,14 @@ class TestOntologyGraph(unittest.TestCase):
         self.assertEqual(graph.get_node_attr("b"), ["a", "x", "y", "z"])
 
     def test_complete_node_attrs(self):
-        r"""a.
+        r"""
 
-        /       |        \ b       c [x, y]  d [x] |       | e [w]   f [z]
+                a
+
+        /       |        \
+        b       c [x, y]  d [x]
+        |       |
+        e [w]   f [z]
 
         """
         graph = OntologyGraph()
