@@ -31,7 +31,7 @@ except ModuleNotFoundError:
     PyG_Data = Any
 
 INT_TYPE = (int, np.int32, np.int64)
-FLOAT_TYPE = (float, np.float32, np.float64, np.float128)
+FLOAT_TYPE = (float, np.float32, np.float64)
 NUMERIC_TYPE = INT_TYPE + FLOAT_TYPE
 
 EdgeData = List[Dict[int, float]]
