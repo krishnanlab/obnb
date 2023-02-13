@@ -151,7 +151,14 @@ class OntologyGraph(DirectedSparseGraph):
             restricted_node_ids.add(node_id)
 
         self.logger.info(f"{len(restricted_node_ids):,} out of {self.size:,} selected")
-        return self.induced_subgraph(list(restricted_node_ids))
+        restricted_branch = self.induced_subgraph(list(restricted_node_ids))
+
+        # Update node properties (name, info, etc.)
+        for i in restricted_node_ids:
+            for prop_name, prop_val in self.idmap.get_all_properties(i).items():
+                restricted_branch.idmap.set_property(i, prop_name, prop_val)
+
+        return restricted_branch
 
     def _new_node_data(self):
         super()._new_node_data()
