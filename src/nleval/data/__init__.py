@@ -1,14 +1,12 @@
 """Interface with various databases to retrieve data."""
 from nleval.data.annotated_ontology import (
     DISEASES,
-    GO,
     GOBP,
     GOCC,
     GOMF,
     HPO,
     DISEASES_ExperimentsFiltered,
     DISEASES_ExperimentsFull,
-    DISEASES_IntegratedFull,
     DISEASES_KnowledgeFiltered,
     DISEASES_KnowledgeFull,
     DISEASES_TextminingFiltered,
@@ -18,6 +16,12 @@ from nleval.data.annotated_ontology import (
     DisGeNET_BEFREE,
     DisGeNET_Curated,
     DisGeNET_GWAS,
+)
+from nleval.data.annotation import (
+    DISEASESAnnotation,
+    DisGeNETAnnotation,
+    GeneOntologyAnnotation,
+    HumanPhenotypeOntologyAnnotation,
 )
 from nleval.data.network import (
     HIPPIE,
@@ -35,6 +39,7 @@ from nleval.data.network import (
     PCNet,
     ProteomeHD,
 )
+from nleval.data.ontology import GeneOntology, MondoDiseaseOntology
 
 __all__ = classes = [
     # Networks
@@ -56,7 +61,6 @@ __all__ = classes = [
     "DISEASES",
     "DISEASES_ExperimentsFiltered",
     "DISEASES_ExperimentsFull",
-    "DISEASES_IntegratedFull",
     "DISEASES_KnowledgeFiltered",
     "DISEASES_KnowledgeFull",
     "DISEASES_TextminingFiltered",
@@ -66,9 +70,16 @@ __all__ = classes = [
     "DisGeNET_BEFREE",
     "DisGeNET_Curated",
     "DisGeNET_GWAS",
-    "GO",
     "GOBP",
     "GOCC",
     "GOMF",
     "HPO",
+    # Annotations
+    "DISEASESAnnotation",
+    "DisGeNETAnnotation",
+    "GeneOntologyAnnotation",
+    "HumanPhenotypeOntologyAnnotation",
+    # Ontologies
+    "GeneOntology",
+    "MondoDiseaseOntology",
 ]
