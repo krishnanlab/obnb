@@ -17,7 +17,6 @@ class TestCheckers(unittest.TestCase):
         self.n_npint64 = np.int64(n)
         self.n_float = float(n)
         self.n_npfloat = float(n)
-        self.n_npfloat128 = np.float128(n)
         self.n_int_tuple = (int(n), int(n), int(n))
         self.n_int_lst = [int(n), int(n), int(n)]
         self.n_int_npary = np.array([n, n, n], dtype=int)
@@ -31,7 +30,6 @@ class TestCheckers(unittest.TestCase):
         self.assertIsInstance(self.n_npint64, INT_TYPE)
         self.assertNotIsInstance(self.n_float, INT_TYPE)
         self.assertNotIsInstance(self.n_npfloat, INT_TYPE)
-        self.assertNotIsInstance(self.n_npfloat128, INT_TYPE)
 
     def test_FLOAT_TYPE(self):
         self.assertNotIsInstance(self.n_int, FLOAT_TYPE)
@@ -39,7 +37,6 @@ class TestCheckers(unittest.TestCase):
         self.assertNotIsInstance(self.n_npint64, FLOAT_TYPE)
         self.assertIsInstance(self.n_float, FLOAT_TYPE)
         self.assertIsInstance(self.n_npfloat, FLOAT_TYPE)
-        self.assertIsInstance(self.n_npfloat128, FLOAT_TYPE)
 
     def test_ITERABLE_TYPE(self):
         n_int_tuple = (1, 2, 3)

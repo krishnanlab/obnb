@@ -1,5 +1,3 @@
-from pprint import pformat
-
 from nleval.typing import Type
 
 
@@ -25,8 +23,8 @@ def overload_class(BaseClass: Type, suffix: str, /, **overload_init_kwargs) -> T
 
     NewClass.__name__ = "_".join((BaseClass.__name__, suffix))
     NewClass.__doc__ = (
-        f"Overloaded class {NewClass.__name__} inherited from {BaseClass.__name__} "
-        f"with kwargs:\n{pformat(overload_init_kwargs)}"
+        f"Overloaded class ``{NewClass.__name__}`` inherited from "
+        f"``{BaseClass.__name__}`` with kwargs:\n\n{overload_init_kwargs}"
     )
 
     return NewClass
