@@ -116,6 +116,7 @@ class IterativePropagation:
             warnings.warn(
                 f"Failed to converge within {self.max_iter} steps.",
                 NotConvergedWarning,
+                stacklevel=2,
             )
 
         return y_pred
