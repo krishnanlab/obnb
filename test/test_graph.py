@@ -11,7 +11,7 @@ import numpy as np
 from commonvar import SAMPLE_DATA_DIR
 from parameterized import parameterized
 
-from nleval.exception import EdgeNotExistError, IDExistsError
+from nleval.exception import EdgeNotExistError, IDExistsError, IDNotExistError
 from nleval.graph import DenseGraph, DirectedSparseGraph, OntologyGraph, SparseGraph
 from nleval.graph.base import BaseGraph
 from nleval.util import idhandler
@@ -1077,6 +1077,47 @@ class TestOntologyGraph(unittest.TestCase):
         self.assertEqual(graph.ancestors("d"), {"a"})
         self.assertEqual(graph.ancestors("e"), {"a", "b"})
         self.assertEqual(graph.ancestors("f"), {"a", "c", "d"})
+
+    def test_restrict_to_branch(self):
+        r"""
+
+        a
+        | \
+        b   d
+        |   |     \
+        c   e [z]   f [x, y]
+
+        |
+        V
+
+        d
+        |    \
+        e [z]  f [x, y]
+
+
+        """
+        graph = OntologyGraph()
+
+        graph.add_nodes(["a", "b", "c", "d", "e", "f"])
+
+        graph.add_edge("b", "a")
+        graph.add_edge("c", "b")
+        graph.add_edge("d", "a")
+        graph.add_edge("e", "d")
+        graph.add_edge("f", "d")
+
+        graph.set_node_attr("e", ["z"])
+        graph.set_node_attr("f", ["x", "y"])
+
+        subgraph = graph.restrict_to_branch("d")
+        self.assertEqual(subgraph.get_node_attr("e"), ["z"])
+        self.assertEqual(subgraph.get_node_attr("f"), ["x", "y"])
+        self.assertEqual(sorted(subgraph.node_ids), ["d", "e", "f"])
+
+        subgraph_exclusive = graph.restrict_to_branch("d", inclusive=False)
+        self.assertEqual(sorted(subgraph_exclusive.node_ids), ["e", "f"])
+
+        self.assertRaises(IDNotExistError, graph.restrict_to_branch, "g")
 
     def test_read_obo(self):
         r"""
