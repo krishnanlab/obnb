@@ -32,6 +32,12 @@ full_data_test_param = [
 ]
 
 
+def check_network_stats(data_dir, network_name, num_nodes, num_edges):
+    graph = getattr(nleval.data, network_name)(data_dir, **opts)
+    assert graph.size == num_nodes
+    assert graph.num_edges == num_edges
+
+
 @pytest.mark.longruns
 @pytest.mark.parametrize(
     "network_name,num_nodes,num_edges",
@@ -42,9 +48,7 @@ full_data_test_param = [
         ("ConsensusPathDB", 17_735, 10_611_416),
         ("FunCoup", 17_891, 10_037_386),
         ("HIPPIE", 19_338, 1_542_044),
-        ("HuMAP", 15_433, 35_052_604),
         ("HuRI", 8_099, 103_186),
-        ("HumanBaseTopGlobal", 25_689, 77_807_094),
         ("HumanNet", 18_452, 1_954_946),
         ("OmniPath", 15_952, 286_590),
         ("PCNet", 18_539, 5_365_976),
@@ -53,10 +57,21 @@ full_data_test_param = [
         ("STRING", 18_480, 11_019_492),
     ],
 )
-def test_network_data(tmpdir, subtests, network_name, num_nodes, num_edges):
-    graph = getattr(nleval.data, network_name)(tmpdir, **opts)
-    assert graph.size == num_nodes
-    assert graph.num_edges == num_edges
+def test_network_data(tmpdir, network_name, num_nodes, num_edges):
+    check_network_stats(tmpdir, network_name, num_nodes, num_edges)
+
+
+@pytest.mark.longruns
+@pytest.mark.highmemory
+@pytest.mark.parametrize(
+    "network_name,num_nodes,num_edges",
+    [
+        ("HuMAP", 15_433, 35_052_604),
+        ("HumanBaseTopGlobal", 25_689, 77_807_094),
+    ],
+)
+def test_network_data_highmem(tmpdir, network_name, num_nodes, num_edges):
+    check_network_stats(tmpdir, network_name, num_nodes, num_edges)
 
 
 class TestData(unittest.TestCase):
