@@ -26,7 +26,7 @@ def overload_class(BaseClass: Type, suffix: str, /, **overload_init_kwargs) -> T
     NewClass.__name__ = "_".join((BaseClass.__name__, suffix))
     NewClass.__doc__ = (
         f"Overloaded class {NewClass.__name__} inherited from {BaseClass.__name__} "
-        f"with kwargs:\n{pformat(overload_init_kwargs)}"
+        f"with kwargs:\n\n{pformat(overload_init_kwargs)}"
     )
 
     return NewClass
