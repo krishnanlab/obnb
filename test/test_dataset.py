@@ -107,15 +107,15 @@ def test_get_feat_from_idxs(subtests, data):
     # Test get multiple featvecs
     test_list = [[0, 2], [3], [0, 1, 2, 3, 4]]
     for idxs in test_list:
-        ans = [data.raw_data_list[i] for i in idxs]
+        answer = [data.raw_data_list[i] for i in idxs]
         with subtests.test(idxs=idxs):
-            assert dataset.get_feat(idxs, mode="idxs").tolist() == ans
+            assert dataset.get_feat(idxs, mode="idxs").tolist() == answer
 
     # Test get single featvec
     for idx in range(data.feature.size):
-        ans = data.raw_data_list[idx]
+        answer = data.raw_data_list[idx]
         with subtests.test(idx=idx):
-            assert dataset.get_feat(idx, mode="idxs").tolist() == ans
+            assert dataset.get_feat(idx, mode="idxs").tolist() == answer
 
     # Index out of range
     pytest.raises(IndexError, dataset.get_feat, [3, 5])
@@ -131,15 +131,15 @@ def test_get_feat_from_ids(subtests, data):
 
     # Test get multiple featvecs
     for ids in test_list:
-        ans = [data.raw_data[i] for i in ids]
+        answer = [data.raw_data[i] for i in ids]
         with subtests.test(ids=ids):
-            assert dataset.get_feat(ids, mode="ids").tolist() == ans
+            assert dataset.get_feat(ids, mode="ids").tolist() == answer
 
     # Test get single featvec
     for id_ in data.ids:
-        ans = data.raw_data[id_]
+        answer = data.raw_data[id_]
         with subtests.test(id_=id_):
-            assert dataset.get_feat(id_, mode="ids").tolist() == ans
+            assert dataset.get_feat(id_, mode="ids").tolist() == answer
 
     # Unknown node id "f"
     pytest.raises(IDNotExistError, dataset.get_feat, ["a", "f"], mode="ids")
@@ -165,11 +165,11 @@ def test_get_feat_auto(data):
     id_ = data.ids[idx]
     mask = np.zeros(len(data.ids))
     mask[idx] = 1
-    ans = data.raw_data_list[idx]
+    answer = data.raw_data_list[idx]
 
-    assert dataset.get_feat(idx, mode="auto").tolist() == ans
-    assert dataset.get_feat(id_, mode="auto").tolist() == ans
-    assert dataset.get_feat(mask, mode="auto").tolist() == [ans]
+    assert dataset.get_feat(idx, mode="auto").tolist() == answer
+    assert dataset.get_feat(id_, mode="auto").tolist() == answer
+    assert dataset.get_feat(mask, mode="auto").tolist() == [answer]
 
     pytest.raises(ValueError, dataset.get_feat, idx, mode="something")
     pytest.raises(ValueError, dataset.get_feat, [0, "1"], mode="auto")
@@ -181,9 +181,9 @@ def test_get_feat_fraom_idxs_dual(subtests, data):
     dataset = Dataset(feature=data.feature, dual=True, label=data.lsc)
     test_list = [[0, 2], [1], [0, 1, 2]]
     for idx in test_list:
-        ans = [data.feature.mat[:, i].tolist() for i in idx]
+        answer = [data.feature.mat[:, i].tolist() for i in idx]
         with subtests.test(idx=idx):
-            assert dataset.get_feat(idx).tolist() == ans
+            assert dataset.get_feat(idx).tolist() == answer
 
     # Index out of range
     pytest.raises(IndexError, dataset.get_feat, [1, 3])
@@ -218,9 +218,9 @@ def test_get_feat_from_ids_dual(subtests, data):
     test_ids_list = [["f1", "f2"], ["f1"], ["f1", "f2", "f3"]]
     test_idx_list = [[0, 1], [0], [0, 1, 2]]
     for ids, idx in zip(test_ids_list, test_idx_list):
-        ans = [data.feature.mat[:, i].tolist() for i in idx]
+        answer = [data.feature.mat[:, i].tolist() for i in idx]
         with subtests.test(ids=ids):
-            assert dataset.get_feat_from_ids(ids).tolist() == ans
+            assert dataset.get_feat_from_ids(ids).tolist() == answer
 
     # Unknown node id "f4"
     pytest.raises(IDNotExistError, dataset.get_feat_from_ids, ["f2", "f4"])
@@ -232,9 +232,9 @@ def test_get_feat_from_mask_dual(subtests, data):
     test_list = [[1, 0, 0], [1, 0, 1], [1, 1, 1]]
     fmat = data.feature.mat
     for mask in test_list:
-        ans = [fmat[:, i].tolist() for i in np.where(mask)[0]]
+        answer = [fmat[:, i].tolist() for i in np.where(mask)[0]]
         with subtests.test(mask=mask):
-            assert dataset.get_feat(np.array(mask), mode="mask").tolist() == ans
+            assert dataset.get_feat(np.array(mask), mode="mask").tolist() == answer
 
     # Incorrect mask size
     pytest.raises(ValueError, dataset.get_feat, np.array([1, 0, 1, 0]), mode="mask")
