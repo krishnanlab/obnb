@@ -32,6 +32,48 @@ full_data_test_param = [
 ]
 
 
+def check_network_stats(data_dir, network_name, num_nodes, num_edges):
+    graph = getattr(nleval.data, network_name)(data_dir, **opts)
+    assert graph.size == num_nodes
+    assert graph.num_edges == num_edges
+
+
+@pytest.mark.longruns
+@pytest.mark.parametrize(
+    "network_name,num_nodes,num_edges",
+    [
+        ("BioGRID", 19_765, 1_554_790),
+        ("BioPlex", 8_108, 71_004),
+        ("ComPPIHumanInt", 16_796, 689_886),
+        ("ConsensusPathDB", 17_735, 10_611_416),
+        ("FunCoup", 17_891, 10_037_386),
+        ("HIPPIE", 19_338, 1_542_044),
+        ("HuRI", 8_099, 103_186),
+        ("HumanNet", 18_452, 1_954_946),
+        ("OmniPath", 15_952, 286_590),
+        ("PCNet", 18_539, 5_365_976),
+        ("ProteomeHD", 2_471, 125_172),
+        ("SIGNOR", 5_267, 28_562),
+        ("STRING", 18_480, 11_019_492),
+    ],
+)
+def test_network_data(tmpdir, network_name, num_nodes, num_edges):
+    check_network_stats(tmpdir, network_name, num_nodes, num_edges)
+
+
+@pytest.mark.longruns
+@pytest.mark.highmemory
+@pytest.mark.parametrize(
+    "network_name,num_nodes,num_edges",
+    [
+        ("HuMAP", 15_433, 35_052_604),
+        ("HumanBaseTopGlobal", 25_689, 77_807_094),
+    ],
+)
+def test_network_data_highmem(tmpdir, network_name, num_nodes, num_edges):
+    check_network_stats(tmpdir, network_name, num_nodes, num_edges)
+
+
 class TestData(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -65,12 +107,6 @@ class TestData(unittest.TestCase):
         del self.graph, self.lsc
         gc.collect()
 
-    @pytest.mark.longruns
-    def test_biogrid(self):
-        self.graph = nleval.data.BioGRID(self.tmp_dir, **opts)
-        self.assertEqual(self.graph.size, 18951)
-        self.assertEqual(self.graph.num_edges, 1103298)
-
     @parameterized.expand(full_data_test_param)
     @pytest.mark.mediumruns
     def test_bioplex(self, name, reprocess, redownload):
@@ -81,50 +117,19 @@ class TestData(unittest.TestCase):
                 redownload=redownload,
                 **opts,
             )
-            self.assertEqual(self.graph.size, 8044)
-            self.assertEqual(self.graph.num_edges, 71084)
+            self.assertEqual(self.graph.size, 8108)
+            self.assertEqual(self.graph.num_edges, 71004)
 
     @pytest.mark.mediumruns
     def test_disgenet(self):
         with Timeout(600):
             self.lsc = nleval.data.DisGeNET(self.tmp_dir, **opts)
 
-    @pytest.mark.longruns
-    def test_funcoup(self):
-        self.graph = nleval.data.FunCoup(self.tmp_dir, **opts)
-        self.assertEqual(self.graph.size, 17905)
-        self.assertEqual(self.graph.num_edges, 10042420)
-
     @parameterized.expand([("GOBP",), ("GOCC",), ("GOMF",)])
     @pytest.mark.longruns
     def test_go(self, name):
         with self.subTest(name):
             self.lsc = getattr(nleval.data, name)(self.tmp_dir, **opts)
-
-    @pytest.mark.longruns
-    def test_hippie(self):
-        self.graph = nleval.data.HIPPIE(self.tmp_dir, **opts)
-        self.assertEqual(self.graph.size, 17364)
-        self.assertEqual(self.graph.num_edges, 768654)
-
-    @pytest.mark.longruns
-    def test_humannet(self):
-        self.graph = nleval.data.HumanNet(self.tmp_dir, **opts)
-        self.assertEqual(self.graph.size, 17211)
-        self.assertEqual(self.graph.num_edges, 847104)
-
-    @pytest.mark.longruns
-    def test_pcnet(self):
-        self.graph = nleval.data.PCNet(self.tmp_dir, **opts)
-        self.assertEqual(self.graph.size, 16968)
-        self.assertEqual(self.graph.num_edges, 5047854)
-
-    @pytest.mark.longruns
-    @pytest.mark.highmemory
-    def test_string(self):
-        self.graph = nleval.data.STRING(self.tmp_dir, **opts)
-        self.assertEqual(self.graph.size, 17942)
-        self.assertEqual(self.graph.num_edges, 10951202)
 
 
 @pytest.mark.mediumruns

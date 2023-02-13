@@ -8,7 +8,7 @@ on:
 jobs:
   test_data:
     runs-on: ${{ matrix.os }}
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
     strategy:
       matrix:
         os: [ubuntu-latest]

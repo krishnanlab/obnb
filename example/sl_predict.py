@@ -6,7 +6,7 @@ from nleval.label.split import AllHoldout
 from nleval.metric import auroc
 from nleval.model_trainer import SupervisedLearningTrainer
 
-i = 24  # index of labelset
+i = 5  # index of labelset
 k = 50  # numbers of top genes to display
 
 # load graph and labelset collection
