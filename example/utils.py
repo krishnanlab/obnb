@@ -23,12 +23,12 @@ def load_data(
     """Load graph and node labels.
 
     Args:
-        network (str): Name of the network to use (default: "STRING-EXP").
-        label (str): Name of the geneset collection to use (default: "KEGGBP").
+        network (str): Name of the network to use.
+        label (str): Name of the geneset collection to use.
         sparse (bool): Whether or not to load the network as sparse graph
-            instead of dense graph (default: :obj:`False`).
+            instead of dense graph.
         filter_negative (bool): Whether or not to filter negative genes based
-            on hypergeometric test (default: :obj:`True`).
+            on hypergeometric test.
 
     """
     data_version = "nledata-v0.1.0-dev4"
