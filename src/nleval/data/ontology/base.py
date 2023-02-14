@@ -17,9 +17,17 @@ class BaseOntologyData(BaseData):
     ontology_url: Optional[str] = None
     ontology_file_name: Optional[str] = None
 
-    def __init__(self, root: str, xref_prefix: Optional[str] = None, **kwargs):
+    def __init__(
+        self,
+        root: str,
+        *,
+        xref_prefix: Optional[str] = None,
+        branch: Optional[str] = None,
+        **kwargs,
+    ):
         """Initialize BaseOntologyData."""
         self.xref_prefix = xref_prefix
+        self.branch = branch
         super().__init__(root, **kwargs)
 
     @property
@@ -47,5 +55,6 @@ class BaseOntologyData(BaseData):
         """Load ontology graph."""
         path = self.raw_file_path(0)
         self.plogger.info(f"Load processed annodataion {path}")
-        self.data = OntologyGraph(logger=self.plogger)
-        self.xref_to_onto_ids = self.data.read_obo(path, xref_prefix=self.xref_prefix)
+        ont = OntologyGraph(logger=self.plogger)
+        self.xref_to_onto_ids = ont.read_obo(path, xref_prefix=self.xref_prefix)
+        self.data = ont if self.branch is None else ont.restrict_to_branch(self.branch)

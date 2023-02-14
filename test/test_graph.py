@@ -11,7 +11,7 @@ import numpy as np
 from commonvar import SAMPLE_DATA_DIR
 from parameterized import parameterized
 
-from nleval.exception import EdgeNotExistError, IDExistsError
+from nleval.exception import EdgeNotExistError, IDExistsError, IDNotExistError
 from nleval.graph import DenseGraph, DirectedSparseGraph, OntologyGraph, SparseGraph
 from nleval.graph.base import BaseGraph
 from nleval.util import idhandler
@@ -258,12 +258,12 @@ class TestSparseGraph(unittest.TestCase):
             self.assertEqual(graph._edge_data, [{}, {0: 1.0}, {}])
 
     @parameterized.expand([(True, 3), (False, 4)])
-    def test_num_nodes(self, directed, ans):
+    def test_num_nodes(self, directed, answer):
         graph = SparseGraph(weighted=False, directed=directed)
         graph.add_edge("a", "b")
         graph.add_edge("b", "a")
         graph.add_edge("c", "a")
-        self.assertEqual(ans, graph.num_edges)
+        self.assertEqual(answer, graph.num_edges)
 
     @parameterized.expand(itertools.product((True, False), (True, False)))
     def test_add_edge_self_loops(self, directed, self_loops):
@@ -826,9 +826,9 @@ class TestDenseGraph(unittest.TestCase):
             ([[0, 1, 1], [1, 0, 0], [1, 0, 0]], 4),
         ],
     )
-    def test_num_nodes(self, mat, ans):
+    def test_num_nodes(self, mat, answer):
         graph = DenseGraph.from_mat(np.array(mat), ["a", "b", "c"])
-        self.assertEqual(ans, graph.num_edges)
+        self.assertEqual(answer, graph.num_edges)
 
     def test_from_mat(self):
         with self.subTest("From matrix with first column ids"):
@@ -994,9 +994,14 @@ class TestOntologyGraph(unittest.TestCase):
         self.assertEqual(graph.get_node_attr("b"), ["a", "x", "y", "z"])
 
     def test_complete_node_attrs(self):
-        r"""a.
+        r"""
 
-        /       |        \ b       c [x, y]  d [x] |       | e [w]   f [z]
+                a
+
+        /       |        \
+        b       c [x, y]  d [x]
+        |       |
+        e [w]   f [z]
 
         """
         graph = OntologyGraph()
@@ -1072,6 +1077,47 @@ class TestOntologyGraph(unittest.TestCase):
         self.assertEqual(graph.ancestors("d"), {"a"})
         self.assertEqual(graph.ancestors("e"), {"a", "b"})
         self.assertEqual(graph.ancestors("f"), {"a", "c", "d"})
+
+    def test_restrict_to_branch(self):
+        r"""
+
+        a
+        | \
+        b   d
+        |   |     \
+        c   e [z]   f [x, y]
+
+        |
+        V
+
+        d
+        |    \
+        e [z]  f [x, y]
+
+
+        """
+        graph = OntologyGraph()
+
+        graph.add_nodes(["a", "b", "c", "d", "e", "f"])
+
+        graph.add_edge("b", "a")
+        graph.add_edge("c", "b")
+        graph.add_edge("d", "a")
+        graph.add_edge("e", "d")
+        graph.add_edge("f", "d")
+
+        graph.set_node_attr("e", ["z"])
+        graph.set_node_attr("f", ["x", "y"])
+
+        subgraph = graph.restrict_to_branch("d")
+        self.assertEqual(subgraph.get_node_attr("e"), ["z"])
+        self.assertEqual(subgraph.get_node_attr("f"), ["x", "y"])
+        self.assertEqual(sorted(subgraph.node_ids), ["d", "e", "f"])
+
+        subgraph_exclusive = graph.restrict_to_branch("d", inclusive=False)
+        self.assertEqual(sorted(subgraph_exclusive.node_ids), ["e", "f"])
+
+        self.assertRaises(IDNotExistError, graph.restrict_to_branch, "g")
 
     def test_read_obo(self):
         r"""

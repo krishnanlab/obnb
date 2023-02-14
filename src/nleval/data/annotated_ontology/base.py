@@ -5,7 +5,7 @@ from nleval.data.base import BaseData
 from nleval.data.ontology.base import BaseOntologyData
 from nleval.exception import IDNotExistError
 from nleval.label import LabelsetCollection
-from nleval.typing import Any, List, Optional
+from nleval.typing import Any, Dict, List, Optional, Type
 from nleval.util.logger import display_pbar
 
 
@@ -16,13 +16,17 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
         self,
         root: str,
         *,
-        annotation: BaseAnnotationData,
-        ontology: BaseOntologyData,
+        annotation_factory: Type[BaseAnnotationData],
+        ontology_factory: Type[BaseOntologyData],
+        annotation_kwargs: Dict[str, Any] = {},
+        ontology_kwargs: Dict[str, Any] = {},
         **kwargs,
     ):
         """Initialize the BaseAnnotatedOntologyData object."""
-        self.annotation = annotation
-        self.ontology = ontology
+        self.annotation_factory = annotation_factory
+        self.ontology_factory = ontology_factory
+        self.annotation_kwargs = annotation_kwargs
+        self.ontology_kwargs = ontology_kwargs
         super().__init__(root, **kwargs)
 
     @property
@@ -38,14 +42,25 @@ class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):
 
     def process(self):
         """Process raw data and save as gmt for future usage."""
-        g = self.ontology.data
-        xref_to_onto_ids = self.ontology.xref_to_onto_ids
-        annot = self.annotation.data
+        # NOTE: Reprocess is not a valid option for annotation and ontology
+        # data objects as we do not save the processed data. Similarly,
+        # retransform is invalid as there is not transformation for them yet.
+        opts = {
+            "redownload": self.redownload,
+            "version": self.version,
+            "log_level": self.log_level,
+        }
+        ann = self.annotation_factory(self.root, **self.annotation_kwargs, **opts)
+        ont = self.ontology_factory(self.root, **self.ontology_kwargs, **opts)
+
+        annot = ann.data
+        g = ont.data
+        xref_to_onto_ids = ont.xref_to_onto_ids
         enable_pbar = display_pbar(self.log_level)
-        pbar = tqdm(annot.values, disable=not enable_pbar)
 
         # Attach annotations to the corresponding ontology terms
         # TODO: extract the following block as a method of OntologyGraph?
+        pbar = tqdm(annot.values, disable=not enable_pbar)
         hits, nohits = set(), set()
         for gene_id, disease_id in pbar:
             if disease_id not in xref_to_onto_ids:

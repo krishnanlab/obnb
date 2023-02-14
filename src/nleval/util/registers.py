@@ -1,7 +1,14 @@
-from nleval.typing import Type
+from nleval.typing import Optional, Type
 
 
-def overload_class(BaseClass: Type, suffix: str, /, **overload_init_kwargs) -> Type:
+def overload_class(
+    BaseClass: Type,
+    suffix: str,
+    /,
+    sep: str = "_",
+    docstring: Optional[str] = None,
+    **overload_init_kwargs,
+) -> Type:
     """Overload a class with specific keyword argument selections.
 
     This function is analogous to :func:`functools.partial`, but for classes
@@ -12,6 +19,7 @@ def overload_class(BaseClass: Type, suffix: str, /, **overload_init_kwargs) -> T
         suffix: Suffix to append to the base class name as the new overloaded
             class name. For example, given ``SomeClass`` and the suffix ``New``,
             the newly generated class will be named ``SomeClass_New``.
+        sep: Separator between the BaseClass object name and the suffix.
         **overload_init_kwargs: Key word arguments to be used for initializing
             the overloaded class.
 
@@ -21,10 +29,11 @@ def overload_class(BaseClass: Type, suffix: str, /, **overload_init_kwargs) -> T
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **overload_init_kwargs, **kwargs)
 
-    NewClass.__name__ = "_".join((BaseClass.__name__, suffix))
-    NewClass.__doc__ = (
+    NewClass.__name__ = sep.join((BaseClass.__name__, suffix))
+    default_docstring = (
         f"Overloaded class ``{NewClass.__name__}`` inherited from "
-        f"``{BaseClass.__name__}`` with kwargs:\n\n{overload_init_kwargs}"
+        f"``{BaseClass.__name__}``.\n\nkwargs: {overload_init_kwargs}"
     )
+    NewClass.__doc__ = docstring or default_docstring
 
     return NewClass

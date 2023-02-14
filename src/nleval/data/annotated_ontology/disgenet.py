@@ -2,7 +2,7 @@ from nleval.data.annotated_ontology.base import BaseAnnotatedOntologyData
 from nleval.data.annotation import DisGeNETAnnotation
 from nleval.data.ontology import MondoDiseaseOntology
 from nleval.label.filters import Compose, LabelsetNonRedFilter, LabelsetRangeFilterSize
-from nleval.typing import List, LogLevel, Mapping, Optional, Union
+from nleval.typing import List, Mapping, Optional, Union
 from nleval.util.registers import overload_class
 
 
@@ -22,9 +22,6 @@ class DisGeNET(BaseAnnotatedOntologyData):
         jaccard: float = 0.5,
         data_sources: Optional[List[str]] = None,
         gene_id_converter: Optional[Union[Mapping[str, str], str]] = None,
-        redownload: bool = False,
-        version: str = "latest",
-        log_level: LogLevel = "INFO",
         **kwargs,
     ):
         """Initialize the DisGeNET data object."""
@@ -33,30 +30,19 @@ class DisGeNET(BaseAnnotatedOntologyData):
         self.jaccard = jaccard
         self.overlap = overlap
 
-        annotation = DisGeNETAnnotation(
-            root,
-            data_sources=data_sources,
-            dsi_min=dsi_min,
-            dsi_max=dsi_max,
-            dpi_min=dpi_min,
-            dpi_max=dpi_max,
-            gene_id_converter=gene_id_converter,
-            redownload=redownload,
-            version=version,
-            log_level=log_level,
-        )
-        ontology = MondoDiseaseOntology(
-            root,
-            xref_prefix="UMLS",
-            redownload=redownload,
-            version=version,
-            log_level=log_level,
-        )
-
         super().__init__(
             root,
-            annotation=annotation,
-            ontology=ontology,
+            annotation_factory=DisGeNETAnnotation,
+            ontology_factory=MondoDiseaseOntology,
+            annotation_kwargs={
+                "data_sources": data_sources,
+                "dsi_min": dsi_min,
+                "dsi_max": dsi_max,
+                "dpi_min": dpi_min,
+                "dpi_max": dpi_max,
+                "gene_id_converter": gene_id_converter,
+            },
+            ontology_kwargs={"xref_prefix": "UMLS"},
             **kwargs,
         )
 

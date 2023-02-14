@@ -2,7 +2,7 @@ from nleval.data.annotated_ontology.base import BaseAnnotatedOntologyData
 from nleval.data.annotation import DISEASESAnnotation
 from nleval.data.ontology import MondoDiseaseOntology
 from nleval.label.filters import Compose, LabelsetNonRedFilter, LabelsetRangeFilterSize
-from nleval.typing import LogLevel, Mapping, Optional, Union
+from nleval.typing import Mapping, Optional, Union
 from nleval.util.registers import overload_class
 
 
@@ -20,9 +20,6 @@ class DISEASES(BaseAnnotatedOntologyData):
         overlap: float = 0.7,
         jaccard: float = 0.5,
         gene_id_converter: Optional[Union[Mapping[str, str], str]] = "HumanEntrez",
-        redownload: bool = False,
-        version: str = "latest",
-        log_level: LogLevel = "INFO",
         **kwargs,
     ):
         """Initialize the DisGeNET data object."""
@@ -31,28 +28,17 @@ class DISEASES(BaseAnnotatedOntologyData):
         self.jaccard = jaccard
         self.overlap = overlap
 
-        annotation = DISEASESAnnotation(
-            root,
-            score_min=score_min,
-            score_max=score_max,
-            channel=channel,
-            gene_id_converter=gene_id_converter,
-            redownload=redownload,
-            version=version,
-            log_level=log_level,
-        )
-        ontology = MondoDiseaseOntology(
-            root,
-            xref_prefix="DOID",
-            redownload=redownload,
-            version=version,
-            log_level=log_level,
-        )
-
         super().__init__(
             root,
-            annotation=annotation,
-            ontology=ontology,
+            annotation_factory=DISEASESAnnotation,
+            ontology_factory=MondoDiseaseOntology,
+            annotation_kwargs={
+                "score_min": score_min,
+                "score_max": score_max,
+                "channel": channel,
+                "gene_id_converter": gene_id_converter,
+            },
+            ontology_kwargs={"xref_prefix": "DOID"},
             **kwargs,
         )
 

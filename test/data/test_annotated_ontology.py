@@ -84,17 +84,17 @@ def test_go(tmpdir, mocker, subtests):
         assert osp.isdir(osp.join(tmpdir, "GeneOntologyAnnotation"))
         assert osp.isdir(osp.join(tmpdir, "GeneOntology"))
 
-    with subtests.test("GO"):
+    with subtests.test("GOBP"):
         lsc = GOBP(tmpdir)
         assert len(lsc.label_ids) > 0
         assert osp.isdir(osp.join(tmpdir, "GOBP"))
 
-    with subtests.test("GO"):
+    with subtests.test("GOCC"):
         lsc = GOCC(tmpdir)
         assert len(lsc.label_ids) > 0
         assert osp.isdir(osp.join(tmpdir, "GOCC"))
 
-    with subtests.test("GO"):
+    with subtests.test("GOMF"):
         lsc = GOMF(tmpdir)
         assert len(lsc.label_ids) > 0
         assert osp.isdir(osp.join(tmpdir, "GOMF"))
@@ -153,6 +153,7 @@ def test_diseases(tmpdir, mocker, subtests):
         assert spy_ann_download.call_count == 2
         assert spy_ont_download.call_count == 2
         # Use the downloaded annotation and ontology
-        # NOTE: annotated ontology download should never be incremented as
-        # the redownload kwarg is never passed to the annotated ontology object
-        assert spy_annont_download.call_count == 0
+        # NOTE: The download method of the annotated ontology object is called
+        # due to the ``redownload`` option. However, the ``download`` method is
+        # just a null function that simply passes through without any action.
+        assert spy_annont_download.call_count == 1
