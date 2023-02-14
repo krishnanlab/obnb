@@ -2,12 +2,11 @@ import logging
 
 import pytest
 
+from nleval.data.experimental import AlevinFry
+
 
 @pytest.mark.mediumruns
-@pytest.mark.xfail
 def test_alevinfry(tmpdir):
-    from nleval.data.experimental import AlevinFry
-
     logging.info(f"{tmpdir=}")
 
     af = AlevinFry(tmpdir, dataset_id=1)
