@@ -305,6 +305,7 @@ class MyGeneInfoConverter(BaseConverter):
             "ensembl.transcript",
             "entrezgene",
             "uniprot",
+            "accession",
             "symbol",
             "alias",
         ]
