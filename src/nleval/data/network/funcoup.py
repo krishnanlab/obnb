@@ -9,6 +9,7 @@ class FunCoup(BaseNDExData):
     whether a pair of genes are functionally coupled.
 
 
+
     https://funcoup5.scilifelab.se/help/#Citation
 
     """
