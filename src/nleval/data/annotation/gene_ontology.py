@@ -134,7 +134,7 @@ class GeneOntologyAnnotation(BaseAnnotationData):
 
         # Convert gene ids
         gene_id_converter = self.get_gene_id_converter()
-        gene_id_converter.map_df(annot_df, "db_symbol", "gene_id")
+        gene_id_converter.map_df(annot_df, "db_id", "gene_id")
         annot_df["term_id"] = annot_df["go_id"]
 
         # Save attributes
