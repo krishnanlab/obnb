@@ -340,7 +340,7 @@ class BaseData:
 
             shutil.rmtree(cache_dir)
 
-        os.makedirs(cache_dir)
+        os.makedirs(cache_dir, exist_ok=True)
         with open(cache_config_path, "w") as f:
             f.write(config_dump)
 
