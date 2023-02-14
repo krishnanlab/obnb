@@ -31,7 +31,7 @@ def load_data(
             on hypergeometric test.
 
     """
-    data_version = "nledata-v0.1.0-dev4"
+    data_version = "nledata-v0.1.0-dev5"
     save_dir = "datasets"
     print(f"{network=}\n{label=}")
 
