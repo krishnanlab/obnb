@@ -5,6 +5,7 @@ from shutil import make_archive, rmtree
 
 import nleval
 import nleval.data
+import nleval.data.annotation
 from nleval.config import NLEDATA_URL_DICT
 from nleval.data.base import BaseData
 from nleval.util.converter import GenePropertyConverter
@@ -14,6 +15,7 @@ datadir = osp.join(homedir, "data_release")
 archdir = osp.join(datadir, "archived")
 
 all_data = sorted(nleval.data.__all__)
+annotation_data = sorted(nleval.data.annotation.__all__)
 new_data_release = nleval.__data_version__
 
 if (url := NLEDATA_URL_DICT.get(new_data_release)) is not None:
@@ -45,7 +47,16 @@ while osp.isdir(datadir):
 # Download, process, and archive all data
 for name in all_data:
     getattr(nleval.data, name)(datadir)
+    if name in annotation_data:
+        # NOTE: annotation data objects could contain multiple raw files
+        # preprared by different annotated ontology objects, so we need to wait
+        # until all annotations are prepared before archiving them.
+        continue
     # TODO: validate data and print stats (#nodes&#edges for networks; stats() for lsc)
+    make_archive(osp.join(archdir, name), "zip", datadir, name, logger=logger)
+
+# Archive annotation data once all raw files are prepared
+for name in annotation_data:
     make_archive(osp.join(archdir, name), "zip", datadir, name, logger=logger)
 
 # Download and process gene property data
