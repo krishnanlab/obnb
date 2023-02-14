@@ -22,5 +22,6 @@ NLEDATA_URL_DICT_DEV: Dict[str, str] = {
     "nledata-v0.1.0-dev2": "https://sandbox.zenodo.org/record/1103542/files/",
     "nledata-v0.1.0-dev3": "https://sandbox.zenodo.org/record/1127466/files/",
     "nledata-v0.1.0-dev4": "https://sandbox.zenodo.org/record/1163507/files/",
+    "nledata-v0.1.0-dev5": "https://sandbox.zenodo.org/record/1164492/files/",
 }
 NLEDATA_URL_DICT: Dict[str, str] = {**NLEDATA_URL_DICT_STABLE, **NLEDATA_URL_DICT_DEV}
