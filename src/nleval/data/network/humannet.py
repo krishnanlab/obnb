@@ -30,6 +30,7 @@ class HumanNet(BaseURLSparseGraphData):
 
     """
 
+    CONFIG_KEYS: List[str] = BaseURLSparseGraphData.CONFIG_KEYS + ["channel"]
     base_url: str = "https://staging2.inetbio.org/humannetv3/networks"
     download_zip_type: str = "none"
     individual_channels: List[str] = [
