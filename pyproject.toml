@@ -71,7 +71,10 @@ pyroe = [
     "pyroe",
     "scanpy",
 ]
-full = ["nleval[pyroe]"]
+ext = [
+    "grape",
+]
+full = ["nleval[pyroe,ext]"]
 
 [tool.setuptools]
 license-files = ["LICENSE"]
