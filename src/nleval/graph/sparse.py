@@ -7,7 +7,17 @@ from tqdm import trange
 
 from nleval.exception import EdgeNotExistError, IDNotExistError
 from nleval.graph.base import BaseGraph
-from nleval.typing import EdgeData, EdgeDir, List, LogLevel, Mapping, Optional, Union
+from nleval.typing import (
+    EdgeData,
+    EdgeDir,
+    Iterator,
+    List,
+    LogLevel,
+    Mapping,
+    Optional,
+    Tuple,
+    Union,
+)
 from nleval.util import checkers
 from nleval.util.cx_explorer import CXExplorer
 from nleval.util.idhandler import IDmap
@@ -679,15 +689,30 @@ class SparseGraph(BaseGraph):
         else:
             np.savez(out_path, edge_index=edge_index, node_ids=node_ids)
 
-    def edge_gen(self):
-        edge_data_copy = self._edge_data[:]
+    def edge_gen(
+        self,
+        compact: bool = True,
+    ) -> Iterator[Tuple[str, str, float]]:
+        """Iterate over all edges in the graph.
+
+        Args:
+            compact: If set to True, then only show one of the edges for the
+                undirected graph. Otherwise, print the edges from both
+                directions.
+
+        Yields:
+            A three-tuple containing (1) the source node id, (2) the target
+            node id, and (3) the edge weight.
+
+        """
+        edge_data_copy = self._edge_data
         for src_idx in range(len(edge_data_copy)):
             src_nbrs = edge_data_copy[src_idx]
             src_node_id = self.idmap.get_id(src_idx)
             for dst_idx in src_nbrs:
                 dst_node_id = self.idmap.get_id(dst_idx)
-                if not self.directed:
-                    edge_data_copy[dst_idx].pop(src_idx)
+                if (not self.directed) and (not compact) and (src_idx > dst_idx):
+                    continue
                 weight = edge_data_copy[src_idx][dst_idx]
                 yield src_node_id, dst_node_id, weight
 
