@@ -73,6 +73,7 @@ pyroe = [
 ]
 ext = [
     "grape",
+    "pecanpy",
 ]
 full = ["nleval[pyroe,ext]"]
 
