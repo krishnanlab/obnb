@@ -1,8 +1,13 @@
-import grape
 import pytest
 
-from nleval.ext.grape import grape_embed, grape_graph_from_nleval_sparse
 from nleval.graph import SparseGraph
+
+try:
+    import grape
+
+    from nleval.ext.grape import grape_embed, grape_graph_from_nleval_sparse
+except ModuleNotFoundError:
+    pass
 
 toy_edge_list = [
     ["a", "b", 0.3],
