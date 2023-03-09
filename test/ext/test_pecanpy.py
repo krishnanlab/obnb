@@ -29,6 +29,7 @@ def test_pecanpy_embed(toy_graph_1, mode, subtests):
     )
 
 
+@pytest.mark.ext
 def test_pecanpy_embed_err(toy_graph_1, subtests):
     pytest.raises(ValueError, pecanpy_embed, toy_graph_1, mode="NonSense")
     pytest.raises(TypeError, pecanpy_embed, toy_graph_1, mode=123)
