@@ -118,10 +118,11 @@ testpaths = [
 addopts = [
     "--strict-markers",
     "-m",
-    "not longruns and not mediumruns",
+    "not longruns and not mediumruns and not ext",
 ]
 markers = [
     "longruns",
     "mediumruns",
     "highmemory",
+    "ext",
 ]
