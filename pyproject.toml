@@ -71,7 +71,11 @@ pyroe = [
     "pyroe",
     "scanpy",
 ]
-full = ["nleval[pyroe]"]
+ext = [
+    "grape",
+    "pecanpy",
+]
+full = ["nleval[pyroe,ext]"]
 
 [tool.setuptools]
 license-files = ["LICENSE"]
@@ -115,10 +119,11 @@ testpaths = [
 addopts = [
     "--strict-markers",
     "-m",
-    "not longruns and not mediumruns",
+    "not longruns and not mediumruns and not ext",
 ]
 markers = [
     "longruns",
     "mediumruns",
     "highmemory",
+    "ext",
 ]
