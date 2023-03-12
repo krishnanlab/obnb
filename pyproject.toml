@@ -50,6 +50,7 @@ bug-tracker = "https://github.com/krishnanlab/NetworkLearningEval/issues"
 [project.optional-dependencies]
 dev = [
     "bump2version",
+    "jinja2",
     "parameterized",
     "pre-commit",
     "pytest",
@@ -58,6 +59,7 @@ dev = [
     "pytest-subtests",
     "pytest-xdist",
     "requests-mock",
+    "tabulate",  # print dataframe as markdown table
     "tox",
 ]
 doc = [

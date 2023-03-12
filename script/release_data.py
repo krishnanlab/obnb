@@ -1,69 +1,200 @@
 import os.path as osp
+from datetime import datetime
 from pathlib import Path
 from pprint import pformat
 from shutil import make_archive, rmtree
 
-import nleval
+import numpy as np
+import pandas as pd
+from jinja2 import Environment
+from tqdm import tqdm
+
 import nleval.data
-import nleval.data.annotation
+from nleval import logger
 from nleval.config import NLEDATA_URL_DICT
 from nleval.data.base import BaseData
+from nleval.typing import Dict, List, Tuple
 from nleval.util.converter import GenePropertyConverter
 
-homedir = Path(".").resolve()
-datadir = osp.join(homedir, "data_release")
-archdir = osp.join(datadir, "archived")
+HOMEDIR = Path(__file__).resolve().parent
+DATADIR = HOMEDIR / "data_release"
+ARCHDIR = DATADIR / "archived"
 
-all_data = sorted(nleval.data.__all__)
-annotation_data = sorted(nleval.data.annotation.__all__)
-new_data_release = nleval.__data_version__
+ALL_DATA = sorted(nleval.data.__all__)
+ANNOTATION_DATA = sorted(nleval.data.annotation.__all__)
+NETWORK_DATA = sorted(nleval.data.network.__all__)
+LABEL_DATA = sorted(nleval.data.annotated_ontology.__all__)
+DATA_RELEASE_VERSION = nleval.__data_version__
 
-if (url := NLEDATA_URL_DICT.get(new_data_release)) is not None:
-    raise ValueError(f"Data release version {new_data_release} exists ({url})")
+REPORT_TEMPLATE = r"""
+## Overview
 
-# Set this to enable setting the correct version number instead of 'latest'
-BaseData._new_data_release = new_data_release
+- Release version: {{ version }}
+- Release date: {{ time }}
+- Number of networks: {{ num_networks }}
+- Number of gene set collections (labels): {{ num_labels }}
 
-logger = nleval.logger
-logger.info(f"{homedir=!r}")
-logger.info(
-    f"Processing {len(all_data)} data objects for release "
-    f"{new_data_release!r}:\n{pformat(all_data)}",
-)
+## Network stats
 
-# Clean up old data
-while osp.isdir(datadir):
-    # TODO: make --allow-dirty option
-    answer = input(f"Release data dir already exists ({datadir}), remove now? [yes/no]")
-    if answer == "yes":
-        logger.info(f"Removing old archives in {datadir}")
-        rmtree(datadir)
-        break
-    elif answer == "no":
-        exit()
-    else:
-        logger.error(f"Unknown option {answer!r}, please answer 'yes' or 'no'")
+{{ network_stats_table }}
 
-# Download, process, and archive all data
-for name in all_data:
-    getattr(nleval.data, name)(datadir)
-    if name in annotation_data:
-        # NOTE: annotation data objects could contain multiple raw files
-        # preprared by different annotated ontology objects, so we need to wait
-        # until all annotations are prepared before archiving them.
-        continue
-    # TODO: validate data and print stats (#nodes&#edges for networks; stats() for lsc)
-    make_archive(osp.join(archdir, name), "zip", datadir, name, logger=logger)
+## Label stats
 
-# Archive annotation data once all raw files are prepared
-for name in annotation_data:
-    make_archive(osp.join(archdir, name), "zip", datadir, name, logger=logger)
+{{ label_stats_table }}
+"""
 
-# Download and process gene property data
-GenePropertyConverter(datadir, name="PubMedCount")
 
-# Archive cache
-make_archive(osp.join(archdir, ".cache"), "zip", datadir, ".cache", logger=logger)
+def setup_version():
+    if (url := NLEDATA_URL_DICT.get(DATA_RELEASE_VERSION)) is not None:
+        raise ValueError(f"Data release version {DATA_RELEASE_VERSION} exists ({url})")
 
-# TODO: validation summaries -> # of datasets, with one of them failed/succeeded
-# TODO: optionally, upload to zenodo and validate once done (check failed uploads)
+    # Set this to enable setting the correct version number instead of 'latest'
+    BaseData._new_data_release = DATA_RELEASE_VERSION
+
+    logger.info(f"{HOMEDIR=!r}")
+    logger.info(
+        f"Processing {len(ALL_DATA)} data objects for release "
+        f"{DATA_RELEASE_VERSION!r}:\n{pformat(ALL_DATA)}",
+    )
+
+
+def setup_dir():
+    # Clean up old data
+    while osp.isdir(DATADIR):
+        # TODO: make --allow-dirty option
+        answer = input(f"Release data dir exists ({DATADIR}), remove now? [yes/no]")
+        if answer == "yes":
+            logger.info(f"Removing old archives in {DATADIR}")
+            rmtree(DATADIR)
+            break
+        elif answer == "no":
+            exit()
+        else:
+            logger.error(f"Unknown option {answer!r}, please answer 'yes' or 'no'")
+
+
+def download_process():
+    # Download, process, and archive all data
+    for name in ALL_DATA:
+        getattr(nleval.data, name)(DATADIR)
+        if name in ANNOTATION_DATA:
+            # NOTE: annotation data objects could contain multiple raw files
+            # prepared by different annotated ontology objects, so we need to
+            # wait until all annotations are prepared before archiving them.
+            continue
+        # TODO: validate data and print stats (#nodes&#edges for nets; stats() for lsc)
+        make_archive(osp.join(ARCHDIR, name), "zip", DATADIR, name, logger=logger)
+
+    # Archive annotation data once all raw files are prepared
+    for name in ANNOTATION_DATA:
+        make_archive(osp.join(ARCHDIR, name), "zip", DATADIR, name, logger=logger)
+
+    # Download and process gene property data
+    GenePropertyConverter(DATADIR, name="PubMedCount")
+
+    # Archive cache
+    make_archive(osp.join(ARCHDIR, ".cache"), "zip", DATADIR, ".cache", logger=logger)
+
+
+def wrap_section(func):
+    width = 100
+    name = func.__name__
+
+    def wrapped_func():
+        logger.info(f"{f'[BEGIN] {name}':=^{width}}")
+        res = func()
+        logger.info(f"{f'[DONE] {name}':-^{width}}")
+        return res
+
+    return wrapped_func
+
+
+@wrap_section
+def report_network_stats() -> Tuple[int, str]:
+    stats_list: List[Tuple[str, str, str]] = []  # (name, num_nodes, num_edges)
+    stats_str_list: List[str] = []
+    pbar = tqdm(sorted(set(ALL_DATA) & set(NETWORK_DATA)))
+    for name in pbar:
+        pbar.set_description(f"Loading stats for {name!r}")
+        g = getattr(nleval.data, name)(DATADIR, log_level="WARNING")
+        stats_list.append((name, f"{g.num_nodes:,}", f"{g.num_edges:,}"))
+        stats_str_list.append(f'("{name}", {g.num_nodes:_}, {g.num_edges:_}),')
+
+    stats_df = pd.DataFrame(stats_list, columns=["Network", "# Nodes", "# Edges"])
+    md_table_str = stats_df.to_markdown(index=False)
+    logger.info(f"Number of networks: {stats_df.shape[0]}")
+    logger.info(f"Network stats:\n{md_table_str}")
+
+    paramatrize_str = "\n".join(stats_str_list)
+    logger.info(f"Parametrize format:\n{paramatrize_str}")
+
+    return stats_df.shape[0], md_table_str
+
+
+@wrap_section
+def report_label_stats() -> Tuple[int, str]:
+    stats_dict_list: List[Dict[str, float]] = []
+    pbar = tqdm(sorted(set(ALL_DATA) & set(LABEL_DATA)))
+    for name in pbar:
+        pbar.set_description(f"Loading stats for {name!r}")
+        lsc = getattr(nleval.data, name)(DATADIR, log_level="WARNING")
+        stats_dict_list.append(
+            {
+                "Name": name,
+                "# Terms": len(lsc.sizes),
+                "Num pos avg": np.mean(lsc.sizes),
+                "Num pos std": np.std(lsc.sizes),
+                "Num pos min": min(lsc.sizes),
+                "Num pos max": max(lsc.sizes),
+                "Num pos median": np.median(lsc.sizes),
+                "Num pos upper quartile": np.quantile(lsc.sizes, 0.75),
+                "Num pos lower quartile": np.quantile(lsc.sizes, 0.25),
+            },
+        )
+
+    stats_df = pd.DataFrame(stats_dict_list)
+    md_table_str = stats_df.to_markdown(index=False)
+    logger.info(f"Number of gene set collections: {stats_df.shape[0]}")
+    logger.info(f"Label stats:\n{md_table_str}")
+
+    return stats_df.shape[0], md_table_str
+
+
+def dump_report(network_stats: Tuple[int, str], label_stats: Tuple[int, str]):
+    env = Environment()
+    template = env.from_string(REPORT_TEMPLATE)
+    rendered_str = template.render(
+        {
+            "version": DATA_RELEASE_VERSION,
+            "time": datetime.now().strftime("%Y-%m-%d"),
+            "num_networks": network_stats[0],
+            "network_stats_table": network_stats[1],
+            "num_labels": label_stats[0],
+            "label_stats_table": label_stats[1],
+        },
+    )
+    logger.info(f"Full report:\n{rendered_str}")
+
+    outpath = ARCHDIR / "README.md"
+    with open(outpath, "w") as f:
+        f.write(rendered_str)
+    logger.info(f"Report saved to {outpath}")
+
+
+def report_stats():
+    network_stats = report_network_stats()
+    label_stats = report_label_stats()
+    dump_report(network_stats, label_stats)
+
+
+def main():
+    setup_version()
+    setup_dir()
+    download_process()
+    report_stats()
+    # TODO: validation summaries -> # of datasets, with one of them failed/succeeded
+    # TODO: optionally, upload to zenodo and validate once done (check failed uploads)
+
+
+if __name__ == "__main__":
+    main()
