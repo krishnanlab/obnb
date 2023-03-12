@@ -60,6 +60,7 @@ def grape_embed(
     g: Union[SparseGraph, Graph],
     embedding_model: Union[str, Type[AbstractEmbeddingModel]],
     *,
+    dim: int = 128,
     as_array: bool = False,
     grape_enable: bool = False,
     _test_mode: bool = False,
@@ -72,6 +73,7 @@ def grape_embed(
         embedding_model: Embedding model to use, see
             https://anacletolab.github.io/grape/grape/embiggen.html for more
             info.
+        dim: Embedding dimensions.
         as_array: If set to True, then return the embeddings as a 2-d numpy
             array (node x dim). Otherwise, return as a :class:`FeatureVec`
             object.
@@ -79,7 +81,7 @@ def grape_embed(
             time with the cost of extra memory usage.
         _test_mode: Bypass the constriaint of only allowing instantiating
             validated GRAPE embedders.
-        **kwargs: Other kwaargs for the ``embedding_model``. Only used when the
+        **kwargs: Other kwargs for the ``embedding_model``. Only used when the
             ``embedding_model`` is passed as a string.
 
     """
@@ -110,7 +112,7 @@ def grape_embed(
                 "to use this method, pass `_test_mode=True`. Currently "
                 f"supported options are:\n{pformat(VALIDATED_EMBEDDERS)}",
             )
-        embedder = getattr(embedders, embedding_model)(**kwargs)
+        embedder = getattr(embedders, embedding_model)(embedding_size=dim, **kwargs)
     else:
         embedder = embedding_model
 
