@@ -1,6 +1,6 @@
 from pprint import pformat
 
-# NOTE:do not import GRAPE directly, which occupies modules like 'utils'
+# NOTE: do not import GRAPE directly, which occupies modules like 'utils'
 import numpy as np
 from embiggen import embedders
 from embiggen.utils.abstract_models.abstract_embedding_model import (
@@ -118,4 +118,8 @@ def grape_embed(
     gpe = embedders.embed_graph(gpg, embedder, return_dataframe=False)
     emd = np.hstack(gpe.get_all_node_embedding())
 
-    return emd if as_array else FeatureVec.from_mat(emd, gpg.get_node_names())
+    featvec = FeatureVec.from_mat(emd, gpg.get_node_names())
+    if featvec.ids != g.node_ids:
+        featvec.align_to_ids(list(g.node_ids))
+
+    return featvec.mat if as_array else featvec
