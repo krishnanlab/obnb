@@ -1,5 +1,6 @@
 from nleval.data.network.base import BaseURLSparseGraphData
 from nleval.typing import Converter, List
+from nleval.util.registers import overload_class
 
 
 class HumanNet(BaseURLSparseGraphData):
@@ -91,3 +92,7 @@ class HumanNet(BaseURLSparseGraphData):
     @property
     def processed_files(self) -> List[str]:
         return [f"data_{self.channel.lower()}.npz"]
+
+
+HumanNet_CC = overload_class(HumanNet, "CC", channel="CC")
+HumanNet_FN = overload_class(HumanNet, "FN", channel="FN")

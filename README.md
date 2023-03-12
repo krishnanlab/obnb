@@ -176,4 +176,12 @@ After some necessary inspection and checking, if everything looks good, upload a
 
 **Note:** `dev` data should be uploaded to the [sandbox](https://sandbox.zenodo.org/record/1097545#.YxYrqezMJzV) instead.
 
+Check items:
+
+- [ ] Update `__data_version__`
+- [ ] Run [`release_data.py`](script/release_data.py)
+- [ ] Upload archived data to Zenodo (be sure to edit the data version there also)
+- [ ] Update url dict in config (will improve in the future to get info from Zenodo directly)
+- [ ] Update network stats in data [test](test/test_data.py)
+
 Finally, commit and push the bumped version.

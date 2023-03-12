@@ -3,7 +3,9 @@ from datetime import datetime
 from pathlib import Path
 from pprint import pformat
 from shutil import make_archive, rmtree
+from types import ModuleType
 
+import click
 import numpy as np
 import pandas as pd
 from jinja2 import Environment
@@ -26,8 +28,7 @@ NETWORK_DATA = sorted(nleval.data.network.__all__)
 LABEL_DATA = sorted(nleval.data.annotated_ontology.__all__)
 DATA_RELEASE_VERSION = nleval.__data_version__
 
-REPORT_TEMPLATE = r"""
-## Overview
+REPORT_TEMPLATE = r"""## Overview
 
 - Release version: {{ version }}
 - Release date: {{ time }}
@@ -58,10 +59,15 @@ def setup_version():
     )
 
 
-def setup_dir():
+def setup_dir(allow_dirty: bool):
+    if allow_dirty:
+        logger.warning(
+            "Skip cleaning old archives, be sure you know what you are doing!",
+        )
+        return
+
     # Clean up old data
     while osp.isdir(DATADIR):
-        # TODO: make --allow-dirty option
         answer = input(f"Release data dir exists ({DATADIR}), remove now? [yes/no]")
         if answer == "yes":
             logger.info(f"Removing old archives in {DATADIR}")
@@ -76,13 +82,18 @@ def setup_dir():
 def download_process():
     # Download, process, and archive all data
     for name in ALL_DATA:
-        getattr(nleval.data, name)(DATADIR)
         if name in ANNOTATION_DATA:
             # NOTE: annotation data objects could contain multiple raw files
             # prepared by different annotated ontology objects, so we need to
             # wait until all annotations are prepared before archiving them.
             continue
-        # TODO: validate data and print stats (#nodes&#edges for nets; stats() for lsc)
+
+        if isinstance(obj := getattr(nleval.data, name), ModuleType):
+            # Skip modules
+            continue
+
+        logger.info(f"Start downloading and processing {name!r}")
+        obj(DATADIR)
         make_archive(osp.join(ARCHDIR, name), "zip", DATADIR, name, logger=logger)
 
     # Archive annotation data once all raw files are prepared
@@ -187,9 +198,11 @@ def report_stats():
     dump_report(network_stats, label_stats)
 
 
-def main():
+@click.command()
+@click.option("--allow-dirty", is_flag=True, help="Do not clean data_release/")
+def main(allow_dirty: bool):
     setup_version()
-    setup_dir()
+    setup_dir(allow_dirty)
     download_process()
     report_stats()
     # TODO: validation summaries -> # of datasets, with one of them failed/succeeded

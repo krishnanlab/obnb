@@ -6,7 +6,7 @@ from nleval.data.network.consensuspathdb import ConsensusPathDB
 from nleval.data.network.funcoup import FunCoup
 from nleval.data.network.hippie import HIPPIE
 from nleval.data.network.humanbase import HumanBaseTopGlobal
-from nleval.data.network.humannet import HumanNet
+from nleval.data.network.humannet import HumanNet, HumanNet_CC, HumanNet_FN
 from nleval.data.network.humap import HuMAP
 from nleval.data.network.huri import HuRI
 from nleval.data.network.omnipath import OmniPath
@@ -26,6 +26,8 @@ __all__ = [
     "HuMAP",
     "HumanBaseTopGlobal",
     "HumanNet",
+    "HumanNet_CC",
+    "HumanNet_FN",
     "OmniPath",
     "PCNet",
     "ProteomeHD",
