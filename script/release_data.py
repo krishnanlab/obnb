@@ -28,8 +28,7 @@ NETWORK_DATA = sorted(nleval.data.network.__all__)
 LABEL_DATA = sorted(nleval.data.annotated_ontology.__all__)
 DATA_RELEASE_VERSION = nleval.__data_version__
 
-REPORT_TEMPLATE = r"""
-## Overview
+REPORT_TEMPLATE = r"""## Overview
 
 - Release version: {{ version }}
 - Release date: {{ time }}
