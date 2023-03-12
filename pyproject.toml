@@ -50,6 +50,7 @@ bug-tracker = "https://github.com/krishnanlab/NetworkLearningEval/issues"
 [project.optional-dependencies]
 dev = [
     "bump2version",
+    "click",
     "jinja2",
     "parameterized",
     "pre-commit",
