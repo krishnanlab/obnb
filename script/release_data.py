@@ -3,12 +3,15 @@ from pathlib import Path
 from pprint import pformat
 from shutil import make_archive, rmtree
 
-import nleval
+import numpy as np
+import pandas as pd
+from tqdm import tqdm
+
 import nleval.data
-import nleval.data.annotation
 from nleval import logger
 from nleval.config import NLEDATA_URL_DICT
 from nleval.data.base import BaseData
+from nleval.typing import Dict, List, Tuple
 from nleval.util.converter import GenePropertyConverter
 
 HOMEDIR = Path(__file__).resolve().parent
@@ -17,6 +20,8 @@ ARCHDIR = DATADIR / "archived"
 
 ALL_DATA = sorted(nleval.data.__all__)
 ANNOTATION_DATA = sorted(nleval.data.annotation.__all__)
+NETWORK_DATA = sorted(nleval.data.network.__all__)
+LABEL_DATA = sorted(nleval.data.annotated_ontology.__all__)
 DATA_RELEASE_VERSION = nleval.__data_version__
 
 
@@ -72,10 +77,73 @@ def download_process():
     make_archive(osp.join(ARCHDIR, ".cache"), "zip", DATADIR, ".cache", logger=logger)
 
 
+def wrap_section(func):
+    width = 100
+    name = func.__name__
+
+    def wrapped_func():
+        logger.info(f"{f'[BEGIN] {name}':=^{width}}")
+        func()
+        logger.info(f"{f'[DONE] {name}':-^{width}}")
+
+    return wrapped_func
+
+
+@wrap_section
+def report_network_stats():
+    stats_list: List[Tuple[str, str, str]] = []  # (name, num_nodes, num_edges)
+    stats_str_list: List[str] = []
+    pbar = tqdm(sorted(set(ALL_DATA) & set(NETWORK_DATA)))
+    for name in pbar:
+        pbar.set_description(f"Loading stats for {name!r}")
+        g = getattr(nleval.data, name)(DATADIR, log_level="WARNING")
+        stats_list.append((name, f"{g.num_nodes:,}", f"{g.num_edges:,}"))
+        stats_str_list.append(f'("{name}", {g.num_nodes:_}, {g.num_edges:_}),')
+
+    stats_df = pd.DataFrame(stats_list, columns=["Network", "# Nodes", "# Edges"])
+    logger.info(f"Number of networks: {stats_df.shape[0]}")
+    logger.info(f"Network stats:\n{stats_df.to_markdown(index=False)}")
+
+    paramatrize_str = "\n".join(stats_str_list)
+    logger.info(f"Parametrize format:\n{paramatrize_str}")
+
+
+@wrap_section
+def report_annotation_stats():
+    stats_dict_list: List[Dict[str, float]] = []
+    pbar = tqdm(sorted(set(ALL_DATA) & set(LABEL_DATA)))
+    for name in pbar:
+        pbar.set_description(f"Loading stats for {name!r}")
+        lsc = getattr(nleval.data, name)(DATADIR, log_level="WARNING")
+        stats_dict_list.append(
+            {
+                "Name": name,
+                "# Terms": len(lsc.sizes),
+                "Num pos avg": np.mean(lsc.sizes),
+                "Num pos std": np.std(lsc.sizes),
+                "Num pos min": min(lsc.sizes),
+                "Num pos max": max(lsc.sizes),
+                "Num pos median": np.median(lsc.sizes),
+                "Num pos upper quartile": np.quantile(lsc.sizes, 0.75),
+                "Num pos lower quartile": np.quantile(lsc.sizes, 0.25),
+            },
+        )
+
+    stats_df = pd.DataFrame(stats_dict_list)
+    logger.info(f"Number of gene set collections: {stats_df.shape[0]}")
+    logger.info(f"Label stats:\n{stats_df.to_markdown(index=False)}")
+
+
+def report_stats():
+    report_network_stats()
+    report_annotation_stats()
+
+
 def main():
     setup_version()
     setup_dir()
     download_process()
+    report_stats()
     # TODO: validation summaries -> # of datasets, with one of them failed/succeeded
     # TODO: optionally, upload to zenodo and validate once done (check failed uploads)
 

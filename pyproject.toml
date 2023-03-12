@@ -58,6 +58,7 @@ dev = [
     "pytest-subtests",
     "pytest-xdist",
     "requests-mock",
+    "tabulate",  # print dataframe as markdown table
     "tox",
 ]
 doc = [
