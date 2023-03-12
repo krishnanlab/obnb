@@ -47,4 +47,4 @@ def test_grape_embed(toy_graph_1, model_name, subtests):
     embedder = getattr(embedders, model_name)(embedding_size=5)
     grape_embed(toy_graph_1, embedder)
     grape_embed(toy_graph_1, embedder, as_array=True)
-    grape_embed(toy_graph_1, model_name, embedding_size=5)
+    grape_embed(toy_graph_1, model_name, dim=5)
