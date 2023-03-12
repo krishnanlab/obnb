@@ -1,10 +1,12 @@
 from pprint import pformat
 
-import grape
+# NOTE:do not import GRAPE directly, which occupies modules like 'utils'
 import numpy as np
+from embiggen import embedders
 from embiggen.utils.abstract_models.abstract_embedding_model import (
     AbstractEmbeddingModel,
 )
+from ensmallen import Graph, GraphBuilder
 
 from nleval.feature import FeatureVec
 from nleval.graph.sparse import SparseGraph
@@ -36,9 +38,9 @@ VALIDATED_EMBEDDERS = [
 
 
 # TODO: from dense graph object (edge_gen -> only nonzeros)
-def grape_graph_from_nleval_sparse(g: SparseGraph) -> grape.Graph:
+def grape_graph_from_nleval_sparse(g: SparseGraph) -> Graph:
     """Convert nleval SparseGraph to a GRAPE graph object."""
-    ggb = grape.GraphBuilder()
+    ggb = GraphBuilder()
 
     # Add nodes
     for node in g.node_ids:
@@ -55,7 +57,7 @@ def grape_graph_from_nleval_sparse(g: SparseGraph) -> grape.Graph:
 
 
 def grape_embed(
-    g: Union[SparseGraph, grape.Graph],
+    g: Union[SparseGraph, Graph],
     embedding_model: Union[str, Type[AbstractEmbeddingModel]],
     *,
     as_array: bool = False,
@@ -82,7 +84,7 @@ def grape_embed(
 
     """
     # Convert graph to GRAPE grape if necessary
-    if isinstance(g, grape.Graph):
+    if isinstance(g, Graph):
         gpg = g
     elif not isinstance(g, SparseGraph):
         raise TypeError(
@@ -108,12 +110,12 @@ def grape_embed(
                 "to use this method, pass `_test_mode=True`. Currently "
                 f"supported options are:\n{pformat(VALIDATED_EMBEDDERS)}",
             )
-        embedder = getattr(grape.embedders, embedding_model)(**kwargs)
+        embedder = getattr(embedders, embedding_model)(**kwargs)
     else:
         embedder = embedding_model
 
     # Generate embeddings
-    gpe = grape.embedders.embed_graph(gpg, embedder, return_dataframe=False)
+    gpe = embedders.embed_graph(gpg, embedder, return_dataframe=False)
     emd = np.hstack(gpe.get_all_node_embedding())
 
     return emd if as_array else FeatureVec.from_mat(emd, gpg.get_node_names())

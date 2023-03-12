@@ -1,7 +1,7 @@
 import pytest
 
 try:
-    from nleval.ext.grape import grape, grape_embed, grape_graph_from_nleval_sparse
+    from nleval.ext.grape import embedders, grape_embed, grape_graph_from_nleval_sparse
 except ModuleNotFoundError:
     pass
 
@@ -44,7 +44,7 @@ def test_grape_graph_from_nleval_sparse(toy_graph_1, subtests):
     ],
 )
 def test_grape_embed(toy_graph_1, model_name, subtests):
-    embedder = getattr(grape.embedders, model_name)(embedding_size=5)
+    embedder = getattr(embedders, model_name)(embedding_size=5)
     grape_embed(toy_graph_1, embedder)
     grape_embed(toy_graph_1, embedder, as_array=True)
     grape_embed(toy_graph_1, model_name, embedding_size=5)
