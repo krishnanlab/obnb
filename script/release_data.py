@@ -3,6 +3,7 @@ from datetime import datetime
 from pathlib import Path
 from pprint import pformat
 from shutil import make_archive, rmtree
+from types import ModuleType
 
 import click
 import numpy as np
@@ -87,9 +88,13 @@ def download_process():
             # prepared by different annotated ontology objects, so we need to
             # wait until all annotations are prepared before archiving them.
             continue
+
+        if isinstance(obj := getattr(nleval.data, name), ModuleType):
+            # Skip modules
+            continue
+
         logger.info(f"Start downloading and processing {name!r}")
-        getattr(nleval.data, name)(DATADIR)
-        # TODO: validate data and print stats (#nodes&#edges for nets; stats() for lsc)
+        obj(DATADIR)
         make_archive(osp.join(ARCHDIR, name), "zip", DATADIR, name, logger=logger)
 
     # Archive annotation data once all raw files are prepared
