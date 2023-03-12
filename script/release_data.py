@@ -1,10 +1,12 @@
 import os.path as osp
+from datetime import datetime
 from pathlib import Path
 from pprint import pformat
 from shutil import make_archive, rmtree
 
 import numpy as np
 import pandas as pd
+from jinja2 import Environment
 from tqdm import tqdm
 
 import nleval.data
@@ -23,6 +25,23 @@ ANNOTATION_DATA = sorted(nleval.data.annotation.__all__)
 NETWORK_DATA = sorted(nleval.data.network.__all__)
 LABEL_DATA = sorted(nleval.data.annotated_ontology.__all__)
 DATA_RELEASE_VERSION = nleval.__data_version__
+
+REPORT_TEMPLATE = r"""
+## Overview
+
+- Release version: {{ version }}
+- Release date: {{ time }}
+- Number of networks: {{ num_networks }}
+- Number of gene set collections (labels): {{ num_labels }}
+
+## Network stats
+
+{{ network_stats_table }}
+
+## Label stats
+
+{{ label_stats_table }}
+"""
 
 
 def setup_version():
@@ -83,14 +102,15 @@ def wrap_section(func):
 
     def wrapped_func():
         logger.info(f"{f'[BEGIN] {name}':=^{width}}")
-        func()
+        res = func()
         logger.info(f"{f'[DONE] {name}':-^{width}}")
+        return res
 
     return wrapped_func
 
 
 @wrap_section
-def report_network_stats():
+def report_network_stats() -> Tuple[int, str]:
     stats_list: List[Tuple[str, str, str]] = []  # (name, num_nodes, num_edges)
     stats_str_list: List[str] = []
     pbar = tqdm(sorted(set(ALL_DATA) & set(NETWORK_DATA)))
@@ -101,15 +121,18 @@ def report_network_stats():
         stats_str_list.append(f'("{name}", {g.num_nodes:_}, {g.num_edges:_}),')
 
     stats_df = pd.DataFrame(stats_list, columns=["Network", "# Nodes", "# Edges"])
+    md_table_str = stats_df.to_markdown(index=False)
     logger.info(f"Number of networks: {stats_df.shape[0]}")
-    logger.info(f"Network stats:\n{stats_df.to_markdown(index=False)}")
+    logger.info(f"Network stats:\n{md_table_str}")
 
     paramatrize_str = "\n".join(stats_str_list)
     logger.info(f"Parametrize format:\n{paramatrize_str}")
 
+    return stats_df.shape[0], md_table_str
+
 
 @wrap_section
-def report_annotation_stats():
+def report_label_stats() -> Tuple[int, str]:
     stats_dict_list: List[Dict[str, float]] = []
     pbar = tqdm(sorted(set(ALL_DATA) & set(LABEL_DATA)))
     for name in pbar:
@@ -130,13 +153,38 @@ def report_annotation_stats():
         )
 
     stats_df = pd.DataFrame(stats_dict_list)
+    md_table_str = stats_df.to_markdown(index=False)
     logger.info(f"Number of gene set collections: {stats_df.shape[0]}")
-    logger.info(f"Label stats:\n{stats_df.to_markdown(index=False)}")
+    logger.info(f"Label stats:\n{md_table_str}")
+
+    return stats_df.shape[0], md_table_str
+
+
+def dump_report(network_stats: Tuple[int, str], label_stats: Tuple[int, str]):
+    env = Environment()
+    template = env.from_string(REPORT_TEMPLATE)
+    rendered_str = template.render(
+        {
+            "version": DATA_RELEASE_VERSION,
+            "time": datetime.now().strftime("%Y-%m-%d"),
+            "num_networks": network_stats[0],
+            "network_stats_table": network_stats[1],
+            "num_labels": label_stats[0],
+            "label_stats_table": label_stats[1],
+        },
+    )
+    logger.info(f"Full report:\n{rendered_str}")
+
+    outpath = ARCHDIR / "README.md"
+    with open(outpath, "w") as f:
+        f.write(rendered_str)
+    logger.info(f"Report saved to {outpath}")
 
 
 def report_stats():
-    report_network_stats()
-    report_annotation_stats()
+    network_stats = report_network_stats()
+    label_stats = report_label_stats()
+    dump_report(network_stats, label_stats)
 
 
 def main():
