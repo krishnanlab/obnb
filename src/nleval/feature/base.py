@@ -4,7 +4,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from nleval.typing import INT_TYPE, Iterable, LogLevel, Optional, Tuple, Union
+from nleval.typing import INT_TYPE, Iterable, List, LogLevel, Optional, Tuple, Union
 from nleval.util import checkers
 from nleval.util.idhandler import IDmap
 from nleval.util.logger import get_logger
@@ -216,6 +216,11 @@ class BaseFeature:
         new_mat = np.zeros((len(new_idmap), self.mat.shape[1]))
         new_mat[r_idx] = self.mat[l_idx]
         self._mat = new_mat
+
+    def align_to_ids(self, ids: List[str]):
+        """Align FeatureVec to a List of node ids."""
+        idmap = IDmap.from_list(ids)
+        self.align_to_idmap(idmap)
 
     def read_anndata(self, adata, obs_id_name: str = "_index_"):
         """Read feature data from AnnData object.
