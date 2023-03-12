@@ -1,4 +1,5 @@
 """Interface with various databases to retrieve data."""
+from nleval.data import annotated_ontology, annotation, network, ontology
 from nleval.data.annotated_ontology import (
     DISEASES,
     GOBP,
@@ -43,6 +44,11 @@ from nleval.data.network import (
 from nleval.data.ontology import GeneOntology, MondoDiseaseOntology
 
 __all__ = classes = [
+    # Modules
+    "annotated_ontology",
+    "annotation",
+    "network",
+    "ontology",
     # Networks
     "BioGRID",
     "BioPlex",
