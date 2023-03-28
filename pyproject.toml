@@ -33,7 +33,7 @@ keywords = [
 ]
 
 dependencies = [
-    "matplotlib<3.8",  # https://github.com/scverse/scanpy/issues/2411
+    "matplotlib",
     "mygene",
     "ndex2",
     "numpy>=1.20.0",
