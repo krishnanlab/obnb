@@ -871,3 +871,39 @@ class DirectedSparseGraph(SparseGraph):
     def connected_components(self):
         """Find connected components."""
         raise NotImplementedError
+
+    def to_undirected_sparse_graph(self, reduction="none", **kwargs):
+        """Turn the directed sparse graph into an undirected sparse graph.
+
+        Args:
+            reduction: Type of edge weight reduction to use when directed edges
+                from both directions (source->target and target->source) are
+                present. By default, no reduction will be used, which raises
+                a ValueError exception in the presence of bidirectionarl edges.
+                Other avialble reduction strategies are: "mean" and "max".
+
+        """
+        g = SparseGraph(weighted=self.weighted, directed=False, **kwargs)
+
+        # Iterate over each node and combine edges from both directions
+        for out_nbrs, in_nbrs in zip(self._edge_data, self._rev_edge_data):
+            new_edge_data = {**out_nbrs, **in_nbrs}
+
+            # Handle bidirectional edges
+            if common_nbrs_set := set(out_nbrs) & set(in_nbrs):
+                if reduction == "mean":
+                    common_nbrs = {
+                        i: (out_nbrs[i] + in_nbrs[i]) / 2 for i in common_nbrs_set
+                    }
+                elif reduction == "max":
+                    common_nbrs = {
+                        i: max(out_nbrs[i], in_nbrs[i]) for i in common_nbrs_set
+                    }
+                else:
+                    raise ValueError(f"Conflicting nbrs:\n{out_nbrs=}\n{in_nbrs=}")
+                new_edge_data.update(common_nbrs)
+            g._edge_data.append(new_edge_data)
+
+        g.idmap = self.idmap
+
+        return g
