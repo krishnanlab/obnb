@@ -343,9 +343,21 @@ class TestLabelsetCollection(unittest.TestCase):
     def test_get_y(self):
         input_dict = {"a": "L1", "b": "L2", "c": "L1", "f": "L2", "h": "L1"}
         lsc = LabelsetCollection.from_dict(input_dict)
+        lsc.set_negative(["b"], "L1")
 
         y = lsc.get_y(("a", "b", "c", "f", "h"))
         self.assertEqual(y.T.tolist(), [[1, 0, 1, 0, 1], [0, 1, 0, 1, 0]])
+
+        y = lsc.get_y(("a", "b", "c", "f", "h"), "L1")
+        self.assertEqual(y.T.tolist(), [[1, 0, 1, 0, 1]])
+
+        y, m = lsc.get_y(("a", "b", "c", "f", "h"), "L1", return_data_mask=True)
+        self.assertEqual(y.T.tolist(), [[1, 0, 1, 0, 1]])
+        self.assertEqual(m.T.tolist(), [[1, 1, 1, 0, 1]])
+
+        y, m = lsc.get_y(("a", "b", "c", "f", "h"), "L2", return_data_mask=True)
+        self.assertEqual(y.T.tolist(), [[0, 1, 0, 1, 0]])
+        self.assertEqual(m.T.tolist(), [[1, 1, 1, 1, 1]])
 
         y = lsc.get_y(("a", "c", "b", "x", "f", "h"))
         self.assertEqual(y.T.tolist(), [[1, 1, 0, 0, 0, 1], [0, 0, 1, 0, 1, 0]])
