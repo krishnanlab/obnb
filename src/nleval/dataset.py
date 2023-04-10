@@ -44,9 +44,9 @@ class Dataset:
             )
 
         # TODO: replace consider_negative option in label.split with this
-        _, self.data_mask = label.get_y(
+        _, self.y_mask = label.get_y(
             target_ids=tuple(self.idmap.lst),
-            return_data_mask=True,
+            return_y_mask=True,
         )
 
     @property
@@ -102,14 +102,14 @@ class Dataset:
         self._y = y
 
     @property
-    def data_mask(self) -> Optional[np.ndarray]:
-        return getattr(self, "_data_mask", None)
+    def y_mask(self) -> Optional[np.ndarray]:
+        return getattr(self, "_y_mask", None)
 
-    @data_mask.setter
-    def data_mask(self, data_mask: Optional[np.ndarray]):
-        if data_mask is not None and data_mask.shape[0] != self.size:
-            raise ValueError(f"Incorrect shape {data_mask.shape=}")
-        self._data_mask = data_mask
+    @y_mask.setter
+    def y_mask(self, y_mask: Optional[np.ndarray]):
+        if y_mask is not None and y_mask.shape[0] != self.size:
+            raise ValueError(f"Incorrect shape {y_mask.shape=}")
+        self._y_mask = y_mask
 
     @property
     def dual(self):
@@ -279,8 +279,8 @@ class Dataset:
         if self.y is not None:
             data.y = torch.FloatTensor(self.y)
 
-        if self.data_mask is not None:
-            data.data_mask = torch.BoolTensor(self.data_mask)
+        if self.y_mask is not None:
+            data.y_mask = torch.BoolTensor(self.y_mask)
 
         if self.masks is not None:
             data.masks = []

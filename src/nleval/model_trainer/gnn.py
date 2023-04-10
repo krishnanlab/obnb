@@ -38,7 +38,7 @@ class GNNTrainer(BaseTrainer):
             use_negative: If set to True, then try to restrict calculation of
                 the loss function to only the positive and negative examples,
                 and exclude those that are neutral. This will be indicated in
-                the :obj:`data_mask` attribute of the data object, where the
+                the :obj:`y_mask` attribute of the data object, where the
                 entries corresponding to positives or negatives are set to
                 :obj:`True`.
 
@@ -156,10 +156,10 @@ class SimpleGNNTrainer(GNNTrainer):
         out = model(data.x, data.edge_index)
         loss = criterion(out[train_mask], data.y[train_mask])
 
-        data_mask = data.data_mask[train_mask]
+        y_mask = data.y_mask[train_mask]
         if self.use_negative:
             # Average of column(task)-wise mean
-            loss = (loss / data_mask.float().sum(0))[data_mask].sum()
+            loss = (loss / y_mask.float().sum(0))[y_mask].sum()
         else:
             loss = loss.mean()
 
@@ -180,9 +180,9 @@ class SimpleGNNTrainer(GNNTrainer):
         for metric_name, metric_func in self.metrics.items():
             for mask_name in data.masks:
                 mask = data[mask_name][:, split_idx].detach().cpu().numpy()
-                data_mask = data.data_mask[mask].detach().cpu().numpy()
+                y_mask = data.y_mask[mask].detach().cpu().numpy()
                 score_name = f"{mask_name.split(self.mask_suffix)[0]}_{metric_name}"
-                score = metric_func(y_true[mask], y_pred[mask], data_mask=data_mask)
+                score = metric_func(y_true[mask], y_pred[mask], y_mask=y_mask)
                 results[score_name] = score
 
         results["time_per_epoch"] = self._elapse() / self.eval_steps

@@ -20,7 +20,7 @@ def wrap_metric(metric_func):
         y_true: np.ndarray,
         y_pred: np.ndarray,
         reduce: str = "mean",
-        data_mask: Optional[np.ndarray] = None,
+        y_mask: Optional[np.ndarray] = None,
     ):
         """Metric function with common processing steps.
 
@@ -30,7 +30,7 @@ def wrap_metric(metric_func):
             reduce: Reduction strategy to use when y_true and y_pred are
                 2-dimensional, with examples along the rows and label-class
                 along the columns. Accepted options: ['none', 'mean', 'median']
-            data_mask: Mask inidicating which entries should be considered as
+            y_mask: Mask inidicating which entries should be considered as
                 either positives or negatives when calculating the metric. In
                 other words, we ignore the neutrals in the calculation.
 
@@ -41,15 +41,14 @@ def wrap_metric(metric_func):
         if _skip(y_true, y_pred):
             return np.nan
 
-        if data_mask is None:
-            data_mask = np.ones_like(y_true, dtype=bool)
+        if y_mask is None:
+            y_mask = np.ones_like(y_true, dtype=bool)
 
         if len(y_true.shape) == 1 or y_true.shape[1] == 1:
-            return metric_func(y_true[data_mask], y_pred[data_mask])
+            return metric_func(y_true[y_mask], y_pred[y_mask])
         else:
             scores = [
-                metric_func(i[m], j[m])
-                for i, j, m in zip(y_true.T, y_pred.T, data_mask.T)
+                metric_func(i[m], j[m]) for i, j, m in zip(y_true.T, y_pred.T, y_mask.T)
             ]
 
             if reduce == "none":

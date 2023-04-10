@@ -351,11 +351,11 @@ class TestLabelsetCollection(unittest.TestCase):
         y = lsc.get_y(("a", "b", "c", "f", "h"), "L1")
         self.assertEqual(y.T.tolist(), [[1, 0, 1, 0, 1]])
 
-        y, m = lsc.get_y(("a", "b", "c", "f", "h"), "L1", return_data_mask=True)
+        y, m = lsc.get_y(("a", "b", "c", "f", "h"), "L1", return_y_mask=True)
         self.assertEqual(y.T.tolist(), [[1, 0, 1, 0, 1]])
         self.assertEqual(m.T.tolist(), [[1, 1, 1, 0, 1]])
 
-        y, m = lsc.get_y(("a", "b", "c", "f", "h"), "L2", return_data_mask=True)
+        y, m = lsc.get_y(("a", "b", "c", "f", "h"), "L2", return_y_mask=True)
         self.assertEqual(y.T.tolist(), [[0, 1, 0, 1, 0]])
         self.assertEqual(m.T.tolist(), [[1, 1, 1, 1, 1]])
 

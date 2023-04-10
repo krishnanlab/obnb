@@ -283,7 +283,7 @@ class LabelsetCollection(idhandler.IDprop):
         self,
         target_ids: Tuple[str, ...],
         labelset_name: Optional[str] = None,
-        return_data_mask: bool = False,
+        return_y_mask: bool = False,
     ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
         """Return the y matrix.
 
@@ -291,7 +291,7 @@ class LabelsetCollection(idhandler.IDprop):
             target_ids: Tuple of entity ids used to order the rows.
             labelset_name: A specific labelset to use, if not set, use all the
                 labelests (default: :obj:`None`).
-            return_data_mask: If set to :obj:`True`, then additionally return
+            return_y_mask: If set to :obj:`True`, then additionally return
                 a mask indicating the positive and negative entries. In other
                 words, the neutrals, or exmaples whose labels are not
                 confidently known as positives or negatives, are deselected in
@@ -306,24 +306,24 @@ class LabelsetCollection(idhandler.IDprop):
 
         names = self.label_ids if labelset_name is None else [labelset_name]
         y = np.zeros((len(self.entity_ids), len(names)), dtype=bool)
-        data_mask = np.zeros_like(y)
+        y_mask = np.zeros_like(y)
         for i, name in enumerate(names):
             positives = self.get_labelset(name)
             pos_idxs = list(map(entity_idmap.get, positives))
-            y[pos_idxs, i] = data_mask[pos_idxs, i] = True
+            y[pos_idxs, i] = y_mask[pos_idxs, i] = True
 
             negatives = self.get_negative(name)
             neg_idxs = list(map(entity_idmap.get, negatives))
-            data_mask[neg_idxs, i] = True
+            y_mask[neg_idxs, i] = True
 
         # Align ids with target ids
         y_out = np.zeros((len(target_ids), y.shape[1]), dtype=bool)
-        data_mask_out = np.zeros_like(y_out)
+        y_mask_out = np.zeros_like(y_out)
 
         y_out[to_target_idx] = y
-        data_mask_out[to_target_idx] = data_mask
+        y_mask_out[to_target_idx] = y_mask
 
-        return y_out if not return_data_mask else (y_out, data_mask_out)
+        return y_out if not return_y_mask else (y_out, y_mask_out)
 
     @lru_cache  # noqa: B019
     def split(  # TODO: Reduce cyclic complexity..
