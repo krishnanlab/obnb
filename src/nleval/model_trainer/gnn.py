@@ -20,6 +20,7 @@ class GNNTrainer(BaseTrainer):
         lr: float = 0.01,
         epochs: int = 100,
         eval_steps: int = 10,
+        use_negative: bool = False,
         log_level: LogLevel = "INFO",
         log_path: Optional[str] = None,
     ):
@@ -34,6 +35,12 @@ class GNNTrainer(BaseTrainer):
             lr (float): Learning rate (default: :obj:`0.01`)
             epochs (int): Total epochs (default: :obj:`100`)
             eval_steps (int): Interval for evaluation (default: :obj:`10`)
+            use_negative: If set to True, then try to restrict calculation of
+                the loss function to only the positive and negative examples,
+                and exclude those that are neutral. This will be indicated in
+                the :obj:`data_mask` attribute of the data object, where the
+                entries corresponding to positives or negatives are set to
+                :obj:`True`.
 
         """
         super().__init__(
@@ -49,6 +56,7 @@ class GNNTrainer(BaseTrainer):
         self.lr = lr
         self.epochs = epochs
         self.eval_steps = eval_steps
+        self.use_negative = use_negative
         self.device = device
 
     @property
@@ -142,12 +150,20 @@ class SimpleGNNTrainer(GNNTrainer):
     def train_epoch(self, model, data, split_idx, optimizer):
         """Train a single epoch."""
         model.train()
-        criterion = torch.nn.BCEWithLogitsLoss()
-        optimizer.zero_grad()
+        criterion = torch.nn.BCEWithLogitsLoss(reduction="none")
 
         train_mask = data[self.train_on + self.mask_suffix][:, split_idx]
         out = model(data.x, data.edge_index)
         loss = criterion(out[train_mask], data.y[train_mask])
+
+        data_mask = data.data_mask[train_mask]
+        if self.use_negative:
+            # Average of column(task)-wise mean
+            loss = (loss / data_mask.float().sum(0))[data_mask].sum()
+        else:
+            loss = loss.mean()
+
+        optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
@@ -164,8 +180,9 @@ class SimpleGNNTrainer(GNNTrainer):
         for metric_name, metric_func in self.metrics.items():
             for mask_name in data.masks:
                 mask = data[mask_name][:, split_idx].detach().cpu().numpy()
+                data_mask = data.data_mask[mask].detach().cpu().numpy()
                 score_name = f"{mask_name.split(self.mask_suffix)[0]}_{metric_name}"
-                score = metric_func(y_true[mask], y_pred[mask])
+                score = metric_func(y_true[mask], y_pred[mask], data_mask=data_mask)
                 results[score_name] = score
 
         results["time_per_epoch"] = self._elapse() / self.eval_steps
