@@ -6,7 +6,7 @@ import pandas as pd
 from nleval.exception import IDExistsError
 from nleval.graph import OntologyGraph
 from nleval.label.filters.base import BaseFilter
-from nleval.typing import Dict, Iterator, List, Optional, Set, Splitter, Tuple
+from nleval.typing import Dict, Iterator, List, Optional, Set, Splitter, Tuple, Union
 from nleval.util import checkers, idhandler
 
 
@@ -283,37 +283,47 @@ class LabelsetCollection(idhandler.IDprop):
         self,
         target_ids: Tuple[str, ...],
         labelset_name: Optional[str] = None,
-    ) -> np.ndarray:
+        return_y_mask: bool = False,
+    ) -> Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]:
         """Return the y matrix.
 
         Args:
             target_ids: Tuple of entity ids used to order the rows.
             labelset_name: A specific labelset to use, if not set, use all the
                 labelests (default: :obj:`None`).
+            return_y_mask: If set to :obj:`True`, then additionally return
+                a mask indicating the positive and negative entries. In other
+                words, the neutrals, or exmaples whose labels are not
+                confidently known as positives or negatives, are deselected in
+                the mask.
 
         """
         # TODO: Clean up this, reduce redundancy with split
         target_idmap = {j: i for i, j in enumerate(target_ids)}
         entity_idmap = {j: i for i, j in enumerate(self.entity_ids)}
+        # NOTE: Assume target_ids contains all of self.entity_ids
         to_target_idx = np.array([target_idmap[i] for i in self.entity_ids])
 
-        if labelset_name is None:
-            labelsets = list(map(self.get_labelset, self.label_ids))
-            y = np.zeros((len(self.entity_ids), len(labelsets)), dtype=bool)
-            for i, labelset in enumerate(labelsets):
-                y[list(map(entity_idmap.get, labelset)), i] = True
-        else:
-            labelset = self.get_labelset(labelset_name)
-            y = np.zeros(len(self.entity_ids), dtype=bool)
-            y[list(map(entity_idmap.get, labelset))] = True
+        names = self.label_ids if labelset_name is None else [labelset_name]
+        y = np.zeros((len(self.entity_ids), len(names)), dtype=bool)
+        y_mask = np.zeros_like(y)
+        for i, name in enumerate(names):
+            positives = self.get_labelset(name)
+            pos_idxs = list(map(entity_idmap.get, positives))
+            y[pos_idxs, i] = y_mask[pos_idxs, i] = True
 
-        if labelset_name is not None or len(y.shape) == 1:
-            y_out = np.zeros(len(target_ids), dtype=bool)
-        else:
-            y_out = np.zeros((len(target_ids), y.shape[1]), dtype=bool)
+            negatives = self.get_negative(name)
+            neg_idxs = list(map(entity_idmap.get, negatives))
+            y_mask[neg_idxs, i] = True
+
+        # Align ids with target ids
+        y_out = np.zeros((len(target_ids), y.shape[1]), dtype=bool)
+        y_mask_out = np.zeros_like(y_out)
+
         y_out[to_target_idx] = y
+        y_mask_out[to_target_idx] = y_mask
 
-        return y_out
+        return y_out if not return_y_mask else (y_out, y_mask_out)
 
     @lru_cache  # noqa: B019
     def split(  # TODO: Reduce cyclic complexity..

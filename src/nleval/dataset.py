@@ -43,6 +43,12 @@ class Dataset:
                 **split_kwargs,
             )
 
+        # TODO: replace consider_negative option in label.split with this
+        _, self.y_mask = label.get_y(
+            target_ids=tuple(self.idmap.lst),
+            return_y_mask=True,
+        )
+
     @property
     def idmap(self) -> IDmap:
         """Map instance IDs to indexes."""
@@ -87,13 +93,23 @@ class Dataset:
 
     @property
     def y(self) -> Optional[np.ndarray]:
-        return self._y
+        return getattr(self, "_y", None)
 
     @y.setter
     def y(self, y: Optional[np.ndarray]):
         if y is not None and y.shape[0] != self.size:
             raise ValueError(f"Incorrect shape {y.shape=}")
         self._y = y
+
+    @property
+    def y_mask(self) -> Optional[np.ndarray]:
+        return getattr(self, "_y_mask", None)
+
+    @y_mask.setter
+    def y_mask(self, y_mask: Optional[np.ndarray]):
+        if y_mask is not None and y_mask.shape[0] != self.size:
+            raise ValueError(f"Incorrect shape {y_mask.shape=}")
+        self._y_mask = y_mask
 
     @property
     def dual(self):
@@ -262,6 +278,9 @@ class Dataset:
 
         if self.y is not None:
             data.y = torch.FloatTensor(self.y)
+
+        if self.y_mask is not None:
+            data.y_mask = torch.BoolTensor(self.y_mask)
 
         if self.masks is not None:
             data.masks = []

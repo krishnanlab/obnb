@@ -4,6 +4,8 @@ from functools import wraps
 import numpy as np
 import sklearn.metrics
 
+from nleval.typing import Optional
+
 
 def wrap_metric(metric_func):
     """Wrap metric function with common processing steps.
@@ -14,7 +16,12 @@ def wrap_metric(metric_func):
     """
 
     @wraps(metric_func)
-    def wrapped(y_true, y_pred, reduce="mean"):
+    def wrapped(
+        y_true: np.ndarray,
+        y_pred: np.ndarray,
+        reduce: str = "mean",
+        y_mask: Optional[np.ndarray] = None,
+    ):
         """Metric function with common processing steps.
 
         Args:
@@ -23,6 +30,9 @@ def wrap_metric(metric_func):
             reduce: Reduction strategy to use when y_true and y_pred are
                 2-dimensional, with examples along the rows and label-class
                 along the columns. Accepted options: ['none', 'mean', 'median']
+            y_mask: Mask inidicating which entries should be considered as
+                either positives or negatives when calculating the metric. In
+                other words, we ignore the neutrals in the calculation.
 
         """
         if reduce not in ["none", "mean", "median"]:
@@ -31,10 +41,15 @@ def wrap_metric(metric_func):
         if _skip(y_true, y_pred):
             return np.nan
 
+        if y_mask is None:
+            y_mask = np.ones_like(y_true, dtype=bool)
+
         if len(y_true.shape) == 1 or y_true.shape[1] == 1:
-            return metric_func(y_true, y_pred)
+            return metric_func(y_true[y_mask], y_pred[y_mask])
         else:
-            scores = [metric_func(i, j) for i, j in zip(y_true.T, y_pred.T)]
+            scores = [
+                metric_func(i[m], j[m]) for i, j, m in zip(y_true.T, y_pred.T, y_mask.T)
+            ]
 
             if reduce == "none":
                 score = np.array(scores)
@@ -43,7 +58,10 @@ def wrap_metric(metric_func):
             elif reduce == "median":
                 score = np.median(scores)
             else:
-                raise ValueError("This should never happen")
+                raise ValueError(
+                    f"Unknown reduce option {reduce!r}, this should have been "
+                    "caught earlier. Please fix.",
+                )
 
             return score
 
