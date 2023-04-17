@@ -1,4 +1,4 @@
-class-resolver==0.4.1
+class-resolver==0.4.2
 matplotlib<3.8  # https://github.com/scverse/scanpy/issues/2411
 mygene==3.2.2
 ndex2==3.5.0
