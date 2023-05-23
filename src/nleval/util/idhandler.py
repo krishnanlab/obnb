@@ -122,7 +122,7 @@ class IDlst:
 
     @property
     def size(self):
-        """int: number of IDs in list."""
+        """Int: number of IDs in list."""
         return len(self._lst)
 
     def copy(self):

@@ -203,16 +203,16 @@ class BaseGraph:
 
     @property
     def size(self):
-        """int: number of nodes in graph."""
+        """Int: number of nodes in graph."""
         return self.num_nodes
 
     @property
     def num_edges(self) -> int:
-        """int: Number of edges."""
+        """Int: Number of edges."""
         raise NotImplementedError
 
     def isempty(self):
-        """bool: true if graph is empty, indicated by empty idmap."""
+        """Bool: true if graph is empty, indicated by empty idmap."""
         return not self.size
 
     def induced_subgraph(self, node_ids: List[str]):

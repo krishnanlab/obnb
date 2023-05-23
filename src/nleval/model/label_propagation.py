@@ -151,7 +151,7 @@ class RandomWalkRestart(IterativePropagation):
 
     @property
     def beta(self) -> float:
-        """float: restart parameter."""
+        """Float: restart parameter."""
         return self._beta
 
     @beta.setter

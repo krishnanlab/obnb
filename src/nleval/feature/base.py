@@ -75,7 +75,7 @@ class BaseFeature:
 
     @property
     def dim(self):
-        """int: dimension of feature vectors."""
+        """Int: dimension of feature vectors."""
         return self._dim
 
     @dim.setter
