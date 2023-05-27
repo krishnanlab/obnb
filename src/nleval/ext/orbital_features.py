@@ -70,7 +70,7 @@ class OrbitCountingMachine:
         n_jobs: int = 1,
         progress: bool = False,
     ):
-        """Creating an orbital role counter machine.
+        """Initialize orbital feature counting machine.
 
         Args:
             graph: A NetowrkX graph object.
@@ -86,14 +86,15 @@ class OrbitCountingMachine:
         self.progress = progress
 
     def create_edge_subsets(self):
-        """Enumerating connected subgraphs with size 2 up to the graphlet size."""
+        """Enumerate connected subgraphs with size 2 up to the graphlet size."""
         logger.info("Enumerating subgraphs.")
-        self.edge_subsets = dict()
+        self.edge_subsets = {}
         subsets = [[edge[0], edge[1]] for edge in self.graph.edges()]
         self.edge_subsets[2] = subsets
-        unique_subsets = dict()
+
         for i in range(3, self.graphlet_size + 1):
             logger.info(f"Enumerating graphlets with size: {i}")
+            unique_subsets = {}
             for subset in tqdm(subsets, disable=not self.progress):
                 for node in subset:
                     for neb in self.graph.neighbors(node):
@@ -103,10 +104,9 @@ class OrbitCountingMachine:
                             unique_subsets[tuple(new_subset)] = 1
             subsets = [list(k) for k, v in unique_subsets.items()]
             self.edge_subsets[i] = subsets
-            unique_subsets = dict()
 
     def enumerate_graphs(self):
-        """Creating a hash table of the benchmark motifs."""
+        """Create a hash table of the benchmark motifs."""
         graphs = graph_atlas_g()
         self.interesting_graphs = {i: [] for i in range(2, self.graphlet_size + 1)}
         for graph in graphs:
@@ -118,13 +118,13 @@ class OrbitCountingMachine:
                 self.interesting_graphs[graph.number_of_nodes()].append(graph)
 
     def enumerate_categories(self):
-        """Creating a hash table of benchmark orbital roles."""
+        """Create a hash table of benchmark orbital roles."""
         main_index = 0
-        self.categories = dict()
+        self.categories = {}
         for size, graphs in self.interesting_graphs.items():
-            self.categories[size] = dict()
+            self.categories[size] = {}
             for index, graph in enumerate(graphs):
-                self.categories[size][index] = dict()
+                self.categories[size][index] = {}
                 degrees = list({graph.degree(node) for node in graph.nodes()})
                 for degree in degrees:
                     self.categories[size][index][degree] = main_index
@@ -132,7 +132,7 @@ class OrbitCountingMachine:
         self.unique_motif_count = main_index + 1
 
     def setup_features(self):
-        """Counting all the orbital roles."""
+        """Count orbital degrees."""
         logger.info("Counting orbital roles.")
         self.features = {
             node: {i: 0 for i in range(self.unique_motif_count)}
@@ -173,7 +173,7 @@ class OrbitCountingMachine:
             self.features[node][self.categories[size][index][degree]] += 1
 
     def create_tabular_motifs(self):
-        """Creating a table with the orbital role features."""
+        """Create orbital degree features table."""
         motifs_counts_lists = [
             [self.features[n][i] for i in range(self.unique_motif_count)]
             for n in self.graph.nodes()
@@ -185,7 +185,7 @@ class OrbitCountingMachine:
         )
 
     def extract_features(self) -> pd.DataFrame:
-        """Executing steps for feature extraction."""
+        """Execute orbital feature extraction pipeline."""
         logger.info("Begin extracting orbital features.")
         self.create_edge_subsets()
         self.enumerate_graphs()
