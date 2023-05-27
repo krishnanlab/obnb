@@ -4,7 +4,7 @@ import pytest
 try:
     import networkx as nx
 
-    from nleval.ext.orbital_features import OrbitCountingMachine
+    from nleval.ext.orbital_features import OrbitCountingMachine, orbital_feat_extract
 except ModuleNotFoundError:
     pass
 
@@ -53,7 +53,12 @@ KARATE_CLUB_ORBITAL_FEAT_4 = pd.DataFrame(
 @pytest.mark.ext
 def test_orbital_features_karate():
     g = nx.karate_club_graph()
-    orb = OrbitCountingMachine(g, graphlet_size=3, progress=True)
+    orb = OrbitCountingMachine(g, graphlet_size=3)
 
     feat = orb.extract_features().sort_index()
     assert KARATE_CLUB_ORBITAL_FEAT_4.values.tolist() == feat.values.tolist()
+
+
+@pytest.mark.ext
+def test_orbital_features_toy(toy_graph_1):
+    orbital_feat_extract(toy_graph_1, graphlet_size=3, as_array=True)

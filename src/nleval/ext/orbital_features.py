@@ -9,6 +9,43 @@ from networkx.generators.atlas import graph_atlas_g
 from tqdm import tqdm
 
 from nleval import logger
+from nleval.feature import FeatureVec
+from nleval.graph import SparseGraph
+
+
+def orbital_feat_extract(
+    g: SparseGraph,
+    *,
+    graphlet_size: int = 4,
+    n_jobs: int = 1,
+    verbose: bool = False,
+    as_array: bool = False,
+):
+    """Generate orbital features.
+
+    Args:
+        g: A NetworkX graph object.
+        graphlet_size: The size of the graphlets to extract.
+        n_jobs: Number of parallel jobs to run. If -1, use all available
+        verbose: Whether to show progress bar.
+        as_array: If set to True, then return the embeddings as a 2-d numpy
+            array (node x dim). Otherwise, return as a :class:`FeatureVec`
+            object.
+
+    """
+    # TODO: make utils for networkx conversion
+    nx_g = nx.Graph()
+    for u, v, _ in g.edge_gen():
+        nx_g.add_edge(u, v)
+
+    orb = OrbitCountingMachine(nx_g, graphlet_size=graphlet_size, progress=verbose)
+    feat_df = orb.extract_features()
+
+    featvec = FeatureVec.from_mat(feat_df.values, feat_df.index.tolist())
+    if featvec.ids != g.node_ids:
+        featvec.align_to_ids(list(g.node_ids))
+
+    return featvec.mat if as_array else featvec
 
 
 class OrbitCountingMachine:
