@@ -79,6 +79,7 @@ ext = [
     "grape",
     "pecanpy",
     "scikit-network",
+    "networkx",
 ]
 full = ["nleval[pyroe,ext]"]
 
