@@ -61,7 +61,7 @@ class GNNTrainer(BaseTrainer):
 
     @property
     def metric_best(self):
-        """str: Metric used for determining the best model."""
+        """Str: Metric used for determining the best model."""
         return self._metric_best
 
     @metric_best.setter

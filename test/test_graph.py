@@ -758,7 +758,7 @@ class TestDenseGraph(unittest.TestCase):
         cls.case = test_case1()
 
     def check_graph(self, graph):
-        """compare graph with data, true if identical."""
+        """Compare graph with data, true if identical."""
         mat = self.case.data_mat[:, 1:]
         IDlst = [str(int(i)) for i in self.case.data_mat[:, 0]]
         for idx1, node_id1 in enumerate(IDlst):
@@ -1120,15 +1120,7 @@ class TestOntologyGraph(unittest.TestCase):
         self.assertRaises(IDNotExistError, graph.restrict_to_branch, "g")
 
     def test_read_obo(self):
-        r"""
-
-               a
-        /      |       \
-        b      c (x, y)  d
-        |       \      /
-        e [z]       f
-
-        """
+        r"""A /      |       \ b      c (x, y)  d |       \      / e [z]       f."""
         obo_path = osp.join(SAMPLE_DATA_DIR, "toy_ontology.obo")
         with self.subTest(xref_prefix=None):
             # Do not capture xref when xref_prefix is unset

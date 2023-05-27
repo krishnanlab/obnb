@@ -40,7 +40,7 @@ class DenseGraph(BaseGraph):
 
     @property
     def num_edges(self) -> int:
-        """int: Number of edges."""
+        """Int: Number of edges."""
         return (self.mat != 0).sum()
 
     @property

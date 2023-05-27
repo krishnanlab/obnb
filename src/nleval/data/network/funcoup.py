@@ -8,7 +8,6 @@ class FunCoup(BaseNDExData):
     The edge weights are PFC values, which is a probabilistic estimation about
     whether a pair of genes are functionally coupled.
 
-
     https://funcoup5.scilifelab.se/help/#Citation
 
     """

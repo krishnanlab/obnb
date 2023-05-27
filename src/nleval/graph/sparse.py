@@ -49,12 +49,12 @@ class SparseGraph(BaseGraph):
 
     @property
     def weighted(self):
-        """bool: Whether weights (3rd column in edgelist) are available."""
+        """Bool: Whether weights (3rd column in edgelist) are available."""
         return self._weighted
 
     @property
     def directed(self):
-        """bool: Indicate whether edges are directed or not."""
+        """Bool: Indicate whether edges are directed or not."""
         return self._directed
 
     @weighted.setter
@@ -69,7 +69,7 @@ class SparseGraph(BaseGraph):
 
     @property
     def num_edges(self) -> int:
-        """int: Number of edges."""
+        """Int: Number of edges."""
         return sum(len(nbrs) for nbrs in self.edge_data)
 
     def __getitem__(self, key: Union[str, List[str]]):
