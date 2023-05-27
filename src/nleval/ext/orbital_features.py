@@ -26,7 +26,13 @@ class OrbitCountingMachine:
 
     """
 
-    def __init__(self, graph, graphlet_size: int = 4, n_jobs: int = 1):
+    def __init__(
+        self,
+        graph,
+        graphlet_size: int = 4,
+        n_jobs: int = 1,
+        progress: bool = False,
+    ):
         """Creating an orbital role counter machine.
 
         Args:
@@ -34,22 +40,24 @@ class OrbitCountingMachine:
             graphlet_size: The size of the graphlets to extract.
             n_jobs: Number of parallel jobs to run. If -1, use all available
                 CPU counts.
+            progress: Whether to show progress bar.
 
         """
         self.graph = graph
         self.graphlet_size = graphlet_size
         self.n_jobs = n_jobs if n_jobs != -1 else multiprocessing.cpu_count()
+        self.progress = progress
 
     def create_edge_subsets(self):
         """Enumerating connected subgraphs with size 2 up to the graphlet size."""
-        logger.info("    Enumerating subgraphs.")
+        logger.info("Enumerating subgraphs.")
         self.edge_subsets = dict()
         subsets = [[edge[0], edge[1]] for edge in self.graph.edges()]
         self.edge_subsets[2] = subsets
         unique_subsets = dict()
         for i in range(3, self.graphlet_size + 1):
-            logger.info("    Enumerating graphlets with size: {i}")
-            for subset in tqdm(subsets):
+            logger.info(f"Enumerating graphlets with size: {i}")
+            for subset in tqdm(subsets, disable=not self.progress):
                 for node in subset:
                     for neb in self.graph.neighbors(node):
                         new_subset = subset + [neb]
@@ -88,7 +96,7 @@ class OrbitCountingMachine:
 
     def setup_features(self):
         """Counting all the orbital roles."""
-        logger.info("    Counting orbital roles.")
+        logger.info("Counting orbital roles.")
         self.features = {
             node: {i: 0 for i in range(self.unique_motif_count)}
             for node in self.graph.nodes()
@@ -102,7 +110,13 @@ class OrbitCountingMachine:
                 graphs=graphs,
             )
             with multiprocessing.Pool(self.n_jobs) as p:
-                feat_lists = p.map(_wrapped_setup_feature, tqdm(node_lists))
+                feat_lists = list(
+                    tqdm(
+                        p.imap(_wrapped_setup_feature, node_lists),
+                        total=len(node_lists),
+                        disable=not self.progress,
+                    ),
+                )
             self._feat_lists_to_features(feat_lists)
 
     @staticmethod
@@ -135,7 +149,7 @@ class OrbitCountingMachine:
 
     def extract_features(self) -> pd.DataFrame:
         """Executing steps for feature extraction."""
-        logger.info("[*] Begin extracting orbital features.")
+        logger.info("Begin extracting orbital features.")
         self.create_edge_subsets()
         self.enumerate_graphs()
         self.enumerate_categories()
