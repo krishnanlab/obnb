@@ -1,6 +1,9 @@
+import typing
+
 from nleval.typing import Optional, Type
 
 
+@typing.no_type_check  # issue with Type
 def overload_class(
     BaseClass: Type,
     suffix: str,
