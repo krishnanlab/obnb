@@ -49,6 +49,7 @@ class OpenBiomedNetBench(InMemoryDataset):
         self.data, self.slices = torch.load(self.processed_paths[0])
 
     def __repr__(self) -> str:
+        """Return the representation containing data size and names."""
         paramstr = f"{len(self):,}, network={self.network}, label={self.label}"
         return f"{self.__class__.__name__}({paramstr})"
 
@@ -58,7 +59,7 @@ class OpenBiomedNetBench(InMemoryDataset):
 
     @property
     def processed_file_names(self) -> str:
-        "data.pt"
+        return "data.pt"
 
     def process(self):
         dataset = default_constructor(
