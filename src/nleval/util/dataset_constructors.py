@@ -3,7 +3,7 @@ import nleval.data
 import nleval.label.split
 from nleval import Dataset
 from nleval.label import filters
-from nleval.typing import LogLevel
+from nleval.typing import List, LogLevel, Optional
 from nleval.util.converter import GenePropertyConverter
 
 
@@ -12,8 +12,15 @@ def default_constructor(
     version: str,
     graph_name: str,
     label_name: str,
+    *,
     graph_as_feature: bool = False,
     use_dense_graph: bool = False,
+    min_size: int = 50,
+    min_size_split: int = 5,
+    negatives_p_thresh: float = 0.05,
+    val_ratio: float = 0.2,
+    test_ratio: float = 0.2,
+    selected_genes: Optional[List[str]] = None,
     log_level: LogLevel = "INFO",
 ):
     """Default dataset constructor using study-bias holdout splitting scheme.
@@ -28,28 +35,59 @@ def default_constructor(
             adjacency matrix of the network.
         use_dense_graph: If set to True, then use dense graph data type for
             the graph in the dataset.
+        min_size: Minimum number of positive genes below which the gene set is
+            discarded.
+        min_size_split: Minimum number of positive genes in any of the
+            train/val/test split below which the gene set is discarded.
+        negatives_p_thresh: P-value threshold for excluding neutral genes
+            determining from negatives.
+        selected_genes: List of gene ids to be used in addition to the network
+            gene ids for filtering. More specifically, only genes that are
+            present in the network and in the provided selected gene list will
+            be used. Only use network genes if this is list is not provided.
         log_level: Logging level.
 
     """
     # Download network data
     graph = getattr(nleval.data, graph_name)(root, version=version)
 
-    # Set up data splitter
+    # Set up study-bias holdout data splitter
+    train_ratio = 1 - val_ratio - test_ratio
+    if train_ratio < 0:
+        raise ValueError("val_ratio and test_ratio must sum below 1")
+    elif val_ratio < 0 or test_ratio < 0:
+        raise ValueError("val_ratio and test_ratio must be non-negative")
     pubmedcnt_converter = GenePropertyConverter(root, name="PubMedCount")
     splitter = nleval.label.split.RatioPartition(
-        *(0.6, 0.2, 0.2),
+        train_ratio,
+        val_ratio,
+        test_ratio,
         ascending=False,
         property_converter=pubmedcnt_converter,
     )
+
+    # List of genes of interest
+    genes_to_use = list(graph.node_ids)
+    if selected_genes is not None:
+        orig_num_genes = len(genes_to_use)
+        genes_to_use = list(set(genes_to_use) & set(selected_genes))
+        new_num_genes = len(genes_to_use)
+        nleval.logger.info(
+            f"{new_num_genes:,} genes intersecting network genes "
+            f"(n={orig_num_genes}:,) and the provided gene list "
+            f"(n={len(selected_genes):,})",
+        )
 
     # Download and process the label data
     label = getattr(nleval.data, label_name)(
         root,
         version=version,
         transform=filters.Compose(
-            filters.EntityExistenceFilter(list(graph.node_ids)),
-            filters.LabelsetRangeFilterSize(min_val=50),
-            filters.LabelsetRangeFilterSplit(min_val=10, splitter=splitter),
+            filters.EntityExistenceFilter(genes_to_use),
+            filters.LabelsetRangeFilterSize(min_val=min_size),
+            filters.LabelsetRangeFilterSplit(min_val=min_size_split, splitter=splitter),
+            # XXX: make sure to filter out tasks with insufficient negatives
+            filters.NegativeGeneratorHypergeom(p_thresh=negatives_p_thresh),
             log_level=log_level,
         ),
     )
