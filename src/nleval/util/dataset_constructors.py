@@ -49,15 +49,20 @@ def default_constructor(
 
     """
     # Download network data
-    graph = getattr(nleval.data, graph_name)(root, version=version)
+    graph_cls = getattr(nleval.data, graph_name)
+    graph = graph_cls(root, version=version, log_level=log_level)
 
     # Set up study-bias holdout data splitter
-    train_ratio = 1 - val_ratio - test_ratio
+    train_ratio = round(1 - val_ratio - test_ratio, 4)
     if train_ratio < 0:
         raise ValueError("val_ratio and test_ratio must sum below 1")
     elif val_ratio < 0 or test_ratio < 0:
         raise ValueError("val_ratio and test_ratio must be non-negative")
-    pubmedcnt_converter = GenePropertyConverter(root, name="PubMedCount")
+    pubmedcnt_converter = GenePropertyConverter(
+        root,
+        name="PubMedCount",
+        log_level=log_level,
+    )
     splitter = nleval.label.split.RatioPartition(
         train_ratio,
         val_ratio,
@@ -90,6 +95,7 @@ def default_constructor(
             filters.NegativeGeneratorHypergeom(p_thresh=negatives_p_thresh),
             log_level=log_level,
         ),
+        log_level=log_level,
     )
 
     # Perform necessary data conversion

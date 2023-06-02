@@ -5,7 +5,7 @@ import torch
 from torch_geometric.data import InMemoryDataset
 
 from nleval import __data_version__
-from nleval.typing import Callable, List, Optional
+from nleval.typing import Callable, List, LogLevel, Optional
 from nleval.util.dataset_constructors import default_constructor
 
 
@@ -23,6 +23,7 @@ class OpenBiomedNetBench(InMemoryDataset):
             specified, will use the current (archived) release. If specified as
             "latest", then download data from source and process them from
             scratch.
+        log_level: Data downloading and processing verbosity.
         transform: PyG transformation to be applied.
         pre_transform: PyG transformation to be applied before saving.
 
@@ -36,6 +37,7 @@ class OpenBiomedNetBench(InMemoryDataset):
         *,
         selected_genes: Optional[List[str]] = None,
         data_version: Optional[str] = None,
+        log_level: LogLevel = "INFO",
         transform: Optional[Callable] = None,
         pre_transform: Optional[Callable] = None,
     ):
@@ -44,6 +46,7 @@ class OpenBiomedNetBench(InMemoryDataset):
         self.name = f"{network}-{label}"
         self.selected_genes = selected_genes
         self.data_version = data_version or __data_version__
+        self.log_level = log_level
 
         super().__init__(root, transform, pre_transform)
         self.data, self.slices = torch.load(self.processed_paths[0])
@@ -61,13 +64,17 @@ class OpenBiomedNetBench(InMemoryDataset):
     def processed_file_names(self) -> str:
         return "data.pt"
 
-    def process(self):
-        dataset = default_constructor(
+    def get_raw_dataset(self, log_level: Optional[LogLevel] = None):
+        return default_constructor(
             self.root,
             version=self.data_version,
             graph_name=self.network,
             label_name=self.label,
+            log_level=log_level or self.log_level,
         )
+
+    def process(self):
+        dataset = self.get_raw_dataset()
         data = dataset.to_pyg_data()
 
         if self.pre_transform is not None:
