@@ -274,14 +274,19 @@ class Dataset:
             edge_index=edge_index,
             edge_weight=edge_weight,
             x=x,
+            node_ids=list(self.graph.node_ids),
+            task_ids=list(self.label.label_ids),
         )
 
+        # Label (true) matrix
         if self.y is not None:
             data.y = torch.FloatTensor(self.y)
 
+        # Label mask (negative selection) matrix
         if self.y_mask is not None:
             data.y_mask = torch.BoolTensor(self.y_mask)
 
+        # Split mask matrix
         if self.masks is not None:
             data.masks = []
             for mask_name, mask in self.masks.items():
