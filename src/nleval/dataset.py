@@ -274,9 +274,13 @@ class Dataset:
             edge_index=edge_index,
             edge_weight=edge_weight,
             x=x,
-            node_ids=list(self.graph.node_ids),
-            task_ids=list(self.label.label_ids),
         )
+
+        if self.graph is not None:
+            data.node_ids = list(self.graph.node_ids)
+
+        if self.label is not None:
+            data.task_ids = list(self.label.label_ids)
 
         # Label (true) matrix
         if self.y is not None:
