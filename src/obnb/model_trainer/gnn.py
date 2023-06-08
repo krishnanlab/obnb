@@ -74,8 +74,8 @@ class GNNTrainer(BaseTrainer):
 
         """
         if metric_best is None or metric_best == "auto":
-            if "APOP" in self.metrics:  # default best metric
-                self._metric_best = "APOP"
+            if "apop" in self.metrics:  # default best metric
+                self._metric_best = "apop"
             elif len(self.metrics) != 1:
                 raise ValueError(
                     "Multiple metrics found but did not specify metric_best",
