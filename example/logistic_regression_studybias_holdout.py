@@ -1,10 +1,9 @@
+from obnb import Dataset
+from obnb.label.split import RatioPartition
+from obnb.metric import auroc
+from obnb.model_trainer import SupervisedLearningTrainer
 from sklearn.linear_model import LogisticRegression
 from utils import load_data, print_expected
-
-from nleval import Dataset
-from nleval.label.split import RatioPartition
-from nleval.metric import auroc
-from nleval.model_trainer import SupervisedLearningTrainer
 
 # Load dataset
 g, lsc, converter = load_data()

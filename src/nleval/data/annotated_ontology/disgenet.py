@@ -1,9 +1,9 @@
-from nleval.data.annotated_ontology.base import BaseAnnotatedOntologyData
-from nleval.data.annotation import DisGeNETAnnotation
-from nleval.data.ontology import MondoDiseaseOntology
-from nleval.label.filters import Compose, LabelsetNonRedFilter, LabelsetRangeFilterSize
-from nleval.typing import List, Mapping, Optional, Union
-from nleval.util.registers import overload_class
+from obnb.data.annotated_ontology.base import BaseAnnotatedOntologyData
+from obnb.data.annotation import DisGeNETAnnotation
+from obnb.data.ontology import MondoDiseaseOntology
+from obnb.label.filters import Compose, LabelsetNonRedFilter, LabelsetRangeFilterSize
+from obnb.typing import List, Mapping, Optional, Union
+from obnb.util.registers import overload_class
 
 
 class DisGeNET(BaseAnnotatedOntologyData):

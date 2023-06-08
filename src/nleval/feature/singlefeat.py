@@ -1,8 +1,7 @@
 """Single modality feature objects."""
 import numpy as np
-
-from nleval.feature.base import BaseFeature
-from nleval.typing import Iterable, LogLevel, Optional, Union
+from obnb.feature.base import BaseFeature
+from obnb.typing import Iterable, LogLevel, Optional, Union
 
 
 class FeatureVec(BaseFeature):

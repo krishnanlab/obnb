@@ -1,10 +1,9 @@
+from obnb import Dataset
+from obnb.label.split import RatioPartition
+from obnb.metric import auroc
+from obnb.model.label_propagation import OneHopPropagation
+from obnb.model_trainer import LabelPropagationTrainer
 from utils import load_data, print_expected
-
-from nleval import Dataset
-from nleval.label.split import RatioPartition
-from nleval.metric import auroc
-from nleval.model.label_propagation import OneHopPropagation
-from nleval.model_trainer import LabelPropagationTrainer
 
 # Load dataset
 g, lsc, converter = load_data()

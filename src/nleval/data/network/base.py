@@ -1,10 +1,9 @@
 import ndex2
-
-from nleval.data.base import BaseData
-from nleval.graph import SparseGraph
-from nleval.typing import Any, Dict, List, Mapping, Optional, Union
-from nleval.util.download import download_unzip
-from nleval.util.logger import display_pbar
+from obnb.data.base import BaseData
+from obnb.graph import SparseGraph
+from obnb.typing import Any, Dict, List, Mapping, Optional, Union
+from obnb.util.download import download_unzip
+from obnb.util.logger import display_pbar
 
 
 class BaseNDExData(BaseData, SparseGraph):

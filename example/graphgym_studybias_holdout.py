@@ -1,9 +1,8 @@
+from obnb import Dataset
+from obnb.label.split import RatioPartition
+from obnb.metric import auroc
+from obnb.model_trainer.graphgym import GraphGymTrainer, graphgym_model_wrapper
 from utils import load_data
-
-from nleval import Dataset
-from nleval.label.split import RatioPartition
-from nleval.metric import auroc
-from nleval.model_trainer.graphgym import GraphGymTrainer, graphgym_model_wrapper
 
 # Load dataset (with sparse graph)
 g, lsc, converter = load_data(

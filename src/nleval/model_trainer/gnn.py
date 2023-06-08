@@ -1,9 +1,8 @@
 from copy import deepcopy
 
 import torch
-
-from nleval.model_trainer.base import BaseTrainer
-from nleval.typing import Any, Dict, List, LogLevel, Optional, Tuple
+from obnb.model_trainer.base import BaseTrainer
+from obnb.typing import Any, Dict, List, LogLevel, Optional, Tuple
 
 
 class GNNTrainer(BaseTrainer):

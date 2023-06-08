@@ -8,7 +8,7 @@ Warning:
     versions of the package.
 
 """
-from nleval.data.experimental.alevinfry import AlevinFry
+from obnb.data.experimental.alevinfry import AlevinFry
 
 __all__ = [
     "AlevinFry",

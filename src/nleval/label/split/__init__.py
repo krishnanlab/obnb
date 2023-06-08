@@ -1,11 +1,11 @@
 """Genearting data splits from the labelset collection."""
-from nleval.label.split.holdout import (
+from obnb.label.split.holdout import (
     AllHoldout,
     RandomRatioHoldout,
     RatioHoldout,
     ThresholdHoldout,
 )
-from nleval.label.split.partition import (
+from obnb.label.split.partition import (
     RandomRatioPartition,
     RatioPartition,
     ThresholdPartition,

@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from nleval.graph.dense import DenseGraph
-from nleval.graph.sparse import DirectedSparseGraph, SparseGraph
+from obnb.graph.dense import DenseGraph
+from obnb.graph.sparse import DirectedSparseGraph, SparseGraph
 
 
 def test_sprase_get_neighbors(subtests):

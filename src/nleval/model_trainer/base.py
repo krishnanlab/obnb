@@ -2,9 +2,8 @@ import time
 from copy import deepcopy
 
 import numpy as np
-
-from nleval.typing import Any, Callable, Dict, LogLevel, Optional
-from nleval.util.logger import attach_file_handler, get_logger
+from obnb.typing import Any, Callable, Dict, LogLevel, Optional
+from obnb.util.logger import attach_file_handler, get_logger
 
 
 class BaseTrainer:
@@ -39,7 +38,7 @@ class BaseTrainer:
         self.logger = get_logger(
             self.__class__.__name__,
             log_level=log_level,
-            base_logger="nleval_brief",
+            base_logger="obnb_brief",
         )
 
         if log_path:

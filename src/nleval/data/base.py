@@ -4,15 +4,14 @@ import shutil
 from datetime import datetime
 from pprint import pformat
 
+import obnb
 import yaml
-
-import nleval
-from nleval.typing import Any, Converter, Dict, List, LogLevel, Mapping, Optional
-from nleval.util.checkers import checkConfig
-from nleval.util.converter import MyGeneInfoConverter
-from nleval.util.download import download_unzip, get_data_url
-from nleval.util.logger import get_logger, log_file_context
-from nleval.util.path import cleandir, hexdigest
+from obnb.typing import Any, Converter, Dict, List, LogLevel, Mapping, Optional
+from obnb.util.checkers import checkConfig
+from obnb.util.converter import MyGeneInfoConverter
+from obnb.util.download import download_unzip, get_data_url
+from obnb.util.logger import get_logger, log_file_context
+from obnb.util.path import cleandir, hexdigest
 
 
 class BaseData:
@@ -117,7 +116,7 @@ class BaseData:
             params["pre_transform"] = self.pre_transform.to_config()
 
         config = {
-            "package_version": nleval.__version__,
+            "package_version": obnb.__version__,
             "processed_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "data_module": self.classname,
             "data_module_params": params,
@@ -136,7 +135,7 @@ class BaseData:
         os.makedirs(self.info_dir, exist_ok=True)
         self.plogger = get_logger(
             None,
-            base_logger="nleval_precise",
+            base_logger="obnb_precise",
             log_level=self.log_level,
         )
 

@@ -1,36 +1,36 @@
-nleval.data
+obnb.data
 ===========
 
-.. currentmodule:: nleval.data
+.. currentmodule:: obnb.data
 
 .. autosummary::
    :nosignatures:
 
-   {% for cls in nleval.data.classes %}
+   {% for cls in obnb.data.classes %}
      {{ cls }}
    {% endfor %}
 
 Base data objects
 -----------------
 
-.. autoclass:: nleval.data.base.BaseData
+.. autoclass:: obnb.data.base.BaseData
    :members:
 
-.. autoclass:: nleval.data.network.base.BaseNDExData
+.. autoclass:: obnb.data.network.base.BaseNDExData
    :members:
 
-.. autoclass:: nleval.data.annotated_ontology.base.BaseAnnotatedOntologyData
+.. autoclass:: obnb.data.annotated_ontology.base.BaseAnnotatedOntologyData
    :members:
 
 Data objects
 ------------
 
-.. automodule:: nleval.data
+.. automodule:: obnb.data
    :members:
    :exclude-members: download, process
 
 Experimental features
 ---------------------
 
-.. automodule:: nleval.data.experimental
+.. automodule:: obnb.data.experimental
    :members:

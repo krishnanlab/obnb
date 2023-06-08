@@ -1,19 +1,19 @@
-nleval.graph
+obnb.graph
 ============
 
-.. currentmodule:: nleval.graph
+.. currentmodule:: obnb.graph
 
 .. autosummary::
    :nosignatures:
 
-   nleval.graph.base.BaseGraph
+   obnb.graph.base.BaseGraph
    DenseGraph
    SparseGraph
    DirectedSparseGraph
    OntologyGraph
 
-.. automodule:: nleval.graph.base
+.. automodule:: obnb.graph.base
    :members:
 
-.. automodule:: nleval.graph
+.. automodule:: obnb.graph
    :members:

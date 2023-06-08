@@ -1,7 +1,7 @@
 import signal
 import time
 
-from nleval.util.checkers import checkType
+from obnb.util.checkers import checkType
 
 
 class Timeit:

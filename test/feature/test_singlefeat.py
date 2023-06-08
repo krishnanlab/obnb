@@ -3,7 +3,7 @@ import os.path as osp
 import numpy as np
 import pytest
 
-from nleval.feature import FeatureVec
+from obnb.feature import FeatureVec
 
 
 def test_dim():

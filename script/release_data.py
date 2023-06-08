@@ -7,26 +7,25 @@ from types import ModuleType
 
 import click
 import numpy as np
+import obnb.data
 import pandas as pd
 from jinja2 import Environment
+from obnb import logger
+from obnb.config import NLEDATA_URL_DICT
+from obnb.data.base import BaseData
+from obnb.typing import Dict, List, Tuple
+from obnb.util.converter import GenePropertyConverter
 from tqdm import tqdm
-
-import nleval.data
-from nleval import logger
-from nleval.config import NLEDATA_URL_DICT
-from nleval.data.base import BaseData
-from nleval.typing import Dict, List, Tuple
-from nleval.util.converter import GenePropertyConverter
 
 HOMEDIR = Path(__file__).resolve().parent
 DATADIR = HOMEDIR / "data_release"
 ARCHDIR = DATADIR / "archived"
 
-ALL_DATA = sorted(nleval.data.__all__)
-ANNOTATION_DATA = sorted(nleval.data.annotation.__all__)
-NETWORK_DATA = sorted(nleval.data.network.__all__)
-LABEL_DATA = sorted(nleval.data.annotated_ontology.__all__)
-DATA_RELEASE_VERSION = nleval.__data_version__
+ALL_DATA = sorted(obnb.data.__all__)
+ANNOTATION_DATA = sorted(obnb.data.annotation.__all__)
+NETWORK_DATA = sorted(obnb.data.network.__all__)
+LABEL_DATA = sorted(obnb.data.annotated_ontology.__all__)
+DATA_RELEASE_VERSION = obnb.__data_version__
 
 REPORT_TEMPLATE = r"""## Overview
 
@@ -88,7 +87,7 @@ def download_process():
             # wait until all annotations are prepared before archiving them.
             continue
 
-        if isinstance(obj := getattr(nleval.data, name), ModuleType):
+        if isinstance(obj := getattr(obnb.data, name), ModuleType):
             # Skip modules
             continue
 
@@ -127,7 +126,7 @@ def report_network_stats() -> Tuple[int, str]:
     pbar = tqdm(sorted(set(ALL_DATA) & set(NETWORK_DATA)))
     for name in pbar:
         pbar.set_description(f"Loading stats for {name!r}")
-        g = getattr(nleval.data, name)(DATADIR, log_level="WARNING")
+        g = getattr(obnb.data, name)(DATADIR, log_level="WARNING")
         stats_list.append((name, f"{g.num_nodes:,}", f"{g.num_edges:,}"))
         stats_str_list.append(f'("{name}", {g.num_nodes:_}, {g.num_edges:_}),')
 
@@ -148,7 +147,7 @@ def report_label_stats() -> Tuple[int, str]:
     pbar = tqdm(sorted(set(ALL_DATA) & set(LABEL_DATA)))
     for name in pbar:
         pbar.set_description(f"Loading stats for {name!r}")
-        lsc = getattr(nleval.data, name)(DATADIR, log_level="WARNING")
+        lsc = getattr(obnb.data, name)(DATADIR, log_level="WARNING")
         stats_dict_list.append(
             {
                 "Name": name,

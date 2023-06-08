@@ -1,11 +1,11 @@
 import logging
 from copy import deepcopy
 
-from nleval.exception import IDExistsError
-from nleval.typing import EdgeDir, Iterable, List, LogLevel, Optional, Tuple, Union
-from nleval.util import checkers, idhandler
-from nleval.util.checkers import checkLiteral
-from nleval.util.logger import get_logger
+from obnb.exception import IDExistsError
+from obnb.typing import EdgeDir, Iterable, List, LogLevel, Optional, Tuple, Union
+from obnb.util import checkers, idhandler
+from obnb.util.checkers import checkLiteral
+from obnb.util.logger import get_logger
 
 
 class BaseGraph:

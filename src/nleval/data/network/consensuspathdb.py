@@ -3,10 +3,9 @@ import re
 
 import numpy as np
 import pandas as pd
-
-from nleval.data.network.base import BaseURLSparseGraphData
-from nleval.typing import List, Literal, Mapping, Optional, Union
-from nleval.util.download import download_unzip
+from obnb.data.network.base import BaseURLSparseGraphData
+from obnb.typing import List, Literal, Mapping, Optional, Union
+from obnb.util.download import download_unzip
 
 
 class ConsensusPathDB(BaseURLSparseGraphData):

@@ -3,17 +3,17 @@ import os.path as osp
 import pytest
 import yaml
 
-import nleval
-from nleval.data.annotated_ontology import (
+import obnb
+from obnb.data.annotated_ontology import (
     GOBP,
     GOCC,
     GOMF,
     DISEASES_KnowledgeFiltered,
     DisGeNET,
 )
-from nleval.data.annotated_ontology.go import GO
-from nleval.label.filters import LabelsetRangeFilterSize
-from nleval.util.path import hexdigest
+from obnb.data.annotated_ontology.go import GO
+from obnb.label.filters import LabelsetRangeFilterSize
+from obnb.util.path import hexdigest
 
 
 @pytest.mark.mediumruns
@@ -23,7 +23,7 @@ def test_disgenet(tmpdir, mocker, subtests):
     hexhash = hexdigest(yaml.dump(filter_.to_config()))
     config_path = osp.join(datadir, "processed", ".cache", hexhash, "config.yaml")
     spy = mocker.spy(
-        nleval.data.annotated_ontology.disgenet.DisGeNET,
+        obnb.data.annotated_ontology.disgenet.DisGeNET,
         "apply_transform",
     )
     transform_called = 0
@@ -105,15 +105,15 @@ def test_diseases(tmpdir, mocker, subtests):
     datadir = osp.join(tmpdir, "DISEASES_KnowledgeFiltered")
 
     spy_ann_download = mocker.spy(
-        nleval.data.annotation.diseases.DISEASESAnnotation,
+        obnb.data.annotation.diseases.DISEASESAnnotation,
         "download",
     )
     spy_ont_download = mocker.spy(
-        nleval.data.ontology.mondo.MondoDiseaseOntology,
+        obnb.data.ontology.mondo.MondoDiseaseOntology,
         "download",
     )
     spy_annont_download = mocker.spy(
-        nleval.data.annotated_ontology.diseases.DISEASES_KnowledgeFiltered,
+        obnb.data.annotated_ontology.diseases.DISEASES_KnowledgeFiltered,
         "download",
     )
 

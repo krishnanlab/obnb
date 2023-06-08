@@ -2,10 +2,9 @@
 from itertools import chain
 
 import numpy as np
-
-from nleval.feature.base import BaseFeature
-from nleval.typing import Iterable, List, LogLevel, Optional, Tuple, Union
-from nleval.util.idhandler import IDmap
+from obnb.feature.base import BaseFeature
+from obnb.typing import Iterable, List, LogLevel, Optional, Tuple, Union
+from obnb.util.idhandler import IDmap
 
 
 class MultiFeatureVec(BaseFeature):

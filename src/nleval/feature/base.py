@@ -3,11 +3,10 @@ from __future__ import annotations
 from copy import deepcopy
 
 import numpy as np
-
-from nleval.typing import INT_TYPE, Iterable, List, LogLevel, Optional, Tuple, Union
-from nleval.util import checkers
-from nleval.util.idhandler import IDmap
-from nleval.util.logger import get_logger
+from obnb.typing import INT_TYPE, Iterable, List, LogLevel, Optional, Tuple, Union
+from obnb.util import checkers
+from obnb.util.idhandler import IDmap
+from obnb.util.logger import get_logger
 
 
 class BaseFeature:

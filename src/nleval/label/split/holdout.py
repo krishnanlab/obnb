@@ -1,8 +1,7 @@
 import numpy as np
-
-from nleval.label.split.base import BaseRandomSplit, BaseSortedSplit
-from nleval.typing import Tuple
-from nleval.util.checkers import checkType
+from obnb.label.split.base import BaseRandomSplit, BaseSortedSplit
+from obnb.typing import Tuple
+from obnb.util.checkers import checkType
 
 
 class BaseHoldout(BaseSortedSplit):

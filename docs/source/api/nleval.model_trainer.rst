@@ -1,20 +1,20 @@
-nleval.model\_trainer
+obnb.model\_trainer
 =====================
 
-.. autoclass:: nleval.model_trainer.base.BaseTrainer
+.. autoclass:: obnb.model_trainer.base.BaseTrainer
    :members:
 
 ML trainers
 -----------
 
-.. automodule:: nleval.model_trainer.label_propagation
+.. automodule:: obnb.model_trainer.label_propagation
    :members:
 
-.. automodule:: nleval.model_trainer.supervised_learning
+.. automodule:: obnb.model_trainer.supervised_learning
    :members:
 
 GNN trainers
 ------------
 
-.. autoclass:: nleval.model_trainer.gnn.SimpleGNNTrainer
+.. autoclass:: obnb.model_trainer.gnn.SimpleGNNTrainer
    :members:

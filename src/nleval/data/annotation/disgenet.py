@@ -1,9 +1,8 @@
 import pprint
 
 import pandas as pd
-
-from nleval.data.annotation.base import BaseAnnotationData
-from nleval.typing import List, Optional
+from obnb.data.annotation.base import BaseAnnotationData
+from obnb.typing import List, Optional
 
 
 class DisGeNETAnnotation(BaseAnnotationData):

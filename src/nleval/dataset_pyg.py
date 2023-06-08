@@ -2,11 +2,10 @@
 import os.path as osp
 
 import torch
+from obnb import __data_version__
+from obnb.typing import Callable, List, LogLevel, Optional
+from obnb.util.dataset_constructors import default_constructor
 from torch_geometric.data import InMemoryDataset
-
-from nleval import __data_version__
-from nleval.typing import Callable, List, LogLevel, Optional
-from nleval.util.dataset_constructors import default_constructor
 
 
 class OpenBiomedNetBench(InMemoryDataset):

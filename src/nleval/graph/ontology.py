@@ -4,11 +4,9 @@ import logging
 from collections import defaultdict
 from contextlib import contextmanager
 
-from tqdm import trange
-
-from nleval.exception import OboTermIncompleteError
-from nleval.graph.sparse import DirectedSparseGraph
-from nleval.typing import (
+from obnb.exception import OboTermIncompleteError
+from obnb.graph.sparse import DirectedSparseGraph
+from obnb.typing import (
     Dict,
     Iterable,
     Iterator,
@@ -20,7 +18,8 @@ from nleval.typing import (
     TextIO,
     Union,
 )
-from nleval.util import idhandler
+from obnb.util import idhandler
+from tqdm import trange
 
 
 class OntologyGraph(DirectedSparseGraph):

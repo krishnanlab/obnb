@@ -4,17 +4,13 @@ import subprocess
 import tempfile
 
 import numpy as np
+from obnb.feature import FeatureVec, MultiFeatureVec
+from obnb.label.filters import LabelsetRangeFilterSplit
+from obnb.label.split import RatioPartition
+from obnb.metric import auroc
+from obnb.model_trainer import MultiSupervisedLearningTrainer, SupervisedLearningTrainer
 from sklearn.linear_model import LogisticRegression
 from utils import load_data
-
-from nleval.feature import FeatureVec, MultiFeatureVec
-from nleval.label.filters import LabelsetRangeFilterSplit
-from nleval.label.split import RatioPartition
-from nleval.metric import auroc
-from nleval.model_trainer import (
-    MultiSupervisedLearningTrainer,
-    SupervisedLearningTrainer,
-)
 
 raise NotImplementedError("NEED TO FIX")
 TEMP_DIR = tempfile.mkdtemp()

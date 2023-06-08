@@ -1,10 +1,9 @@
 from collections import Counter
 
 import numpy as np
-
-from nleval.label.split.base import BaseRandomSplit, BaseSortedSplit
-from nleval.typing import List, Tuple
-from nleval.util.checkers import checkTypesInIterableErrEmpty
+from obnb.label.split.base import BaseRandomSplit, BaseSortedSplit
+from obnb.typing import List, Tuple
+from obnb.util.checkers import checkTypesInIterableErrEmpty
 
 
 class BasePartition(BaseSortedSplit):

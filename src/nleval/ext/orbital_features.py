@@ -6,11 +6,10 @@ from functools import partial
 import networkx as nx
 import pandas as pd
 from networkx.generators.atlas import graph_atlas_g
+from obnb import logger
+from obnb.feature import FeatureVec
+from obnb.graph import SparseGraph
 from tqdm import tqdm
-
-from nleval import logger
-from nleval.feature import FeatureVec
-from nleval.graph import SparseGraph
 
 
 def orbital_feat_extract(

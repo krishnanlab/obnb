@@ -1,4 +1,4 @@
-"""Collection of types used in nleval."""
+"""Collection of types used in obnb."""
 from typing import (
     Any,
     Callable,

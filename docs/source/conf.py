@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.abspath("../../src"))
 
 # -- Project information -----------------------------------------------------
 
-project = "nleval"
+project = "obnb"
 copyright = "2022, Remy Liu"
 author = "Remy Liu"
 release = "0.1.0"
@@ -66,12 +66,12 @@ html_theme = "sphinx_rtd_theme"
 html_static_path = []
 
 # Jinja template renderer
-import nleval
+import obnb
 
 
 def setup(app):
     def rst_jinja_render(app, _, source):
-        rst_context = {"nleval": nleval}
+        rst_context = {"obnb": obnb}
         source[0] = app.builder.templates.render_string(source[0], rst_context)
 
     app.connect("source-read", rst_jinja_render)

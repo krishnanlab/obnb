@@ -1,5 +1,5 @@
-from nleval.model_trainer.base import StandardTrainer
-from nleval.typing import LogLevel, Optional
+from obnb.model_trainer.base import StandardTrainer
+from obnb.typing import LogLevel, Optional
 
 
 class LabelPropagationTrainer(StandardTrainer):

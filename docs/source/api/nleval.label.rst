@@ -1,40 +1,40 @@
-nleval.label
+obnb.label
 ============
 
 Labelset collection object
 --------------------------
 
-.. currentmodule:: nleval.label
+.. currentmodule:: obnb.label
 
-.. autoclass:: nleval.label.LabelsetCollection
+.. autoclass:: obnb.label.LabelsetCollection
    :members:
 
 Labelset collection filters
 ---------------------------
 
-.. currentmodule:: nleval.label.filters
+.. currentmodule:: obnb.label.filters
 
 .. autosummary::
    :nosignatures:
 
-   {% for cls in nleval.label.filters.classes %}
+   {% for cls in obnb.label.filters.classes %}
      {{ cls }}
    {% endfor %}
 
-.. automodule:: nleval.label.filters
+.. automodule:: obnb.label.filters
    :members:
 
 Labelset collection splits
 --------------------------
 
-.. currentmodule:: nleval.label.split
+.. currentmodule:: obnb.label.split
 
 .. autosummary::
    :nosignatures:
 
-   {% for cls in nleval.label.split.classes %}
+   {% for cls in obnb.label.split.classes %}
      {{ cls }}
    {% endfor %}
 
-.. automodule:: nleval.label.split
+.. automodule:: obnb.label.split
    :members:

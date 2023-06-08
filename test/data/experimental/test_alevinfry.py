@@ -2,7 +2,7 @@ import logging
 
 import pytest
 
-from nleval.data.experimental import AlevinFry
+from obnb.data.experimental import AlevinFry
 
 
 @pytest.mark.mediumruns

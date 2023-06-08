@@ -1,7 +1,7 @@
 import pytest
 
 try:
-    from nleval.ext.sknetwork import sknetwork_embed
+    from obnb.ext.sknetwork import sknetwork_embed
 except ModuleNotFoundError:
     pass
 

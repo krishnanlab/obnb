@@ -1,9 +1,9 @@
-from nleval.data.annotated_ontology.base import BaseAnnotatedOntologyData
-from nleval.data.annotation import GeneOntologyAnnotation
-from nleval.data.ontology import GeneOntology
-from nleval.label.filters import Compose, LabelsetNonRedFilter, LabelsetRangeFilterSize
-from nleval.typing import List, Mapping, Optional, Union
-from nleval.util.registers import overload_class
+from obnb.data.annotated_ontology.base import BaseAnnotatedOntologyData
+from obnb.data.annotation import GeneOntologyAnnotation
+from obnb.data.ontology import GeneOntology
+from obnb.label.filters import Compose, LabelsetNonRedFilter, LabelsetRangeFilterSize
+from obnb.typing import List, Mapping, Optional, Union
+from obnb.util.registers import overload_class
 
 
 class GO(BaseAnnotatedOntologyData):

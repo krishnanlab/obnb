@@ -1,8 +1,7 @@
 import pyroe
-
-from nleval.data.base import BaseData
-from nleval.feature import FeatureVec
-from nleval.typing import Dict, List, Optional
+from obnb.data.base import BaseData
+from obnb.feature import FeatureVec
+from obnb.typing import Dict, List, Optional
 
 
 class AlevinFry(BaseData, FeatureVec):

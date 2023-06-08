@@ -1,10 +1,10 @@
 """Helper functions to construct processed datasets."""
-import nleval.data
-import nleval.label.split
-from nleval import Dataset
-from nleval.label import filters
-from nleval.typing import List, LogLevel, Optional
-from nleval.util.converter import GenePropertyConverter
+import obnb.data
+import obnb.label.split
+from obnb import Dataset
+from obnb.label import filters
+from obnb.typing import List, LogLevel, Optional
+from obnb.util.converter import GenePropertyConverter
 
 
 def default_constructor(
@@ -49,7 +49,7 @@ def default_constructor(
 
     """
     # Download network data
-    graph_cls = getattr(nleval.data, graph_name)
+    graph_cls = getattr(obnb.data, graph_name)
     graph = graph_cls(root, version=version, log_level=log_level)
 
     # Set up study-bias holdout data splitter
@@ -63,7 +63,7 @@ def default_constructor(
         name="PubMedCount",
         log_level=log_level,
     )
-    splitter = nleval.label.split.RatioPartition(
+    splitter = obnb.label.split.RatioPartition(
         train_ratio,
         val_ratio,
         test_ratio,
@@ -77,14 +77,14 @@ def default_constructor(
         orig_num_genes = len(genes_to_use)
         genes_to_use = list(set(genes_to_use) & set(selected_genes))
         new_num_genes = len(genes_to_use)
-        nleval.logger.info(
+        obnb.logger.info(
             f"{new_num_genes:,} genes intersecting network genes "
             f"(n={orig_num_genes}:,) and the provided gene list "
             f"(n={len(selected_genes):,})",
         )
 
     # Download and process the label data
-    label = getattr(nleval.data, label_name)(
+    label = getattr(obnb.data, label_name)(
         root,
         version=version,
         transform=filters.Compose(

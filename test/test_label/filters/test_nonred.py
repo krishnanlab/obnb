@@ -1,7 +1,7 @@
 import pytest
 
-from nleval.label import LabelsetCollection
-from nleval.label.filters.nonred import LabelsetNonRedFilter
+from obnb.label import LabelsetCollection
+from obnb.label.filters.nonred import LabelsetNonRedFilter
 
 # TODO: add test for construct_labelset_graph
 # TODO: add test for get_nonred_label_ids

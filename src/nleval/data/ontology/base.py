@@ -1,7 +1,7 @@
-from nleval.data.base import BaseData
-from nleval.graph import OntologyGraph
-from nleval.typing import List, Optional
-from nleval.util.download import stream_download
+from obnb.data.base import BaseData
+from obnb.graph import OntologyGraph
+from obnb.typing import List, Optional
+from obnb.util.download import stream_download
 
 
 class BaseOntologyData(BaseData):
@@ -9,7 +9,7 @@ class BaseOntologyData(BaseData):
 
     Attributes:
         xref_prefix: Cross reference prefix to filter (see
-            :meth:`nleval.graph.ontology.OntologyGraph.read_obo`)
+            :meth:`obnb.graph.ontology.OntologyGraph.read_obo`)
 
     """
 

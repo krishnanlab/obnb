@@ -1,17 +1,17 @@
-nleval.feature
+obnb.feature
 ==============
 
-.. currentmodule:: nleval.feature
+.. currentmodule:: obnb.feature
 
 .. autosummary::
    :nosignatures:
 
-   nleval.feature.base.BaseFeature
+   obnb.feature.base.BaseFeature
    FeatureVec
    MultiFeatureVec
 
-.. autoclass:: nleval.feature.base.BaseFeature
+.. autoclass:: obnb.feature.base.BaseFeature
    :members:
 
-.. automodule:: nleval.feature
+.. automodule:: obnb.feature
    :members:

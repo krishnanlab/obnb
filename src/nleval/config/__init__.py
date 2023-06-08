@@ -1,5 +1,5 @@
-"""Configurations used by nleval."""
-from nleval.typing import Dict
+"""Configurations used by obnb."""
+from obnb.typing import Dict
 
 __all__ = [
     "DEFAULT_RETRY_DELAY",

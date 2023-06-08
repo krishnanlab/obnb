@@ -2,12 +2,11 @@ from functools import lru_cache
 
 import numpy as np
 import pandas as pd
-
-from nleval.exception import IDExistsError
-from nleval.graph import OntologyGraph
-from nleval.label.filters.base import BaseFilter
-from nleval.typing import Dict, Iterator, List, Optional, Set, Splitter, Tuple, Union
-from nleval.util import checkers, idhandler
+from obnb.exception import IDExistsError
+from obnb.graph import OntologyGraph
+from obnb.label.filters.base import BaseFilter
+from obnb.typing import Dict, Iterator, List, Optional, Set, Splitter, Tuple, Union
+from obnb.util import checkers, idhandler
 
 
 class LabelsetCollection(idhandler.IDprop):
@@ -458,7 +457,7 @@ class LabelsetCollection(idhandler.IDprop):
     ):
         """Apply filter to labelsets.
 
-        See `nleval.label.filters` for more info.
+        See `obnb.label.filters` for more info.
 
         Args:
             filter_func

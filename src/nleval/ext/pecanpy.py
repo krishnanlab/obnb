@@ -1,11 +1,10 @@
 from typing import get_args
 
 import numpy as np
+from obnb.feature import FeatureVec
+from obnb.graph import DenseGraph, SparseGraph
+from obnb.typing import Literal, Optional, Union
 from pecanpy import pecanpy
-
-from nleval.feature import FeatureVec
-from nleval.graph import DenseGraph, SparseGraph
-from nleval.typing import Literal, Optional, Union
 
 PECANPY_MODES = Literal[
     "PreComp",

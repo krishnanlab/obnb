@@ -1,4 +1,4 @@
-from nleval.data.ontology.base import BaseOntologyData
+from obnb.data.ontology.base import BaseOntologyData
 
 
 class GeneOntology(BaseOntologyData):

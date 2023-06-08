@@ -1,6 +1,6 @@
 """Interface with various databases to retrieve data."""
-from nleval.data import annotated_ontology, annotation, network, ontology
-from nleval.data.annotated_ontology import (
+from obnb.data import annotated_ontology, annotation, network, ontology
+from obnb.data.annotated_ontology import (
     DISEASES,
     GOBP,
     GOCC,
@@ -18,13 +18,13 @@ from nleval.data.annotated_ontology import (
     DisGeNET_Curated,
     DisGeNET_GWAS,
 )
-from nleval.data.annotation import (
+from obnb.data.annotation import (
     DISEASESAnnotation,
     DisGeNETAnnotation,
     GeneOntologyAnnotation,
     HumanPhenotypeOntologyAnnotation,
 )
-from nleval.data.network import (
+from obnb.data.network import (
     HIPPIE,
     SIGNOR,
     STRING,
@@ -43,7 +43,7 @@ from nleval.data.network import (
     PCNet,
     ProteomeHD,
 )
-from nleval.data.ontology import GeneOntology, MondoDiseaseOntology
+from obnb.data.ontology import GeneOntology, MondoDiseaseOntology
 
 __all__ = classes = [
     # Modules

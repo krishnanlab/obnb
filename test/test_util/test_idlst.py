@@ -2,8 +2,8 @@ import unittest
 
 import numpy as np
 
-from nleval.exception import IDExistsError, IDNotExistError
-from nleval.util import idhandler
+from obnb.exception import IDExistsError, IDNotExistError
+from obnb.util import idhandler
 
 
 class TestIDlst(unittest.TestCase):

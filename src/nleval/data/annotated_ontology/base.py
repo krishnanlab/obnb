@@ -1,12 +1,11 @@
+from obnb.data.annotation.base import BaseAnnotationData
+from obnb.data.base import BaseData
+from obnb.data.ontology.base import BaseOntologyData
+from obnb.exception import IDNotExistError
+from obnb.label import LabelsetCollection
+from obnb.typing import Any, Dict, List, Optional, Type
+from obnb.util.logger import display_pbar
 from tqdm import tqdm
-
-from nleval.data.annotation.base import BaseAnnotationData
-from nleval.data.base import BaseData
-from nleval.data.ontology.base import BaseOntologyData
-from nleval.exception import IDNotExistError
-from nleval.label import LabelsetCollection
-from nleval.typing import Any, Dict, List, Optional, Type
-from nleval.util.logger import display_pbar
 
 
 class BaseAnnotatedOntologyData(BaseData, LabelsetCollection):

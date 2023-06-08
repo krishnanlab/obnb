@@ -3,8 +3,7 @@ from functools import wraps
 
 import numpy as np
 import sklearn.metrics
-
-from nleval.typing import Optional
+from obnb.typing import Optional
 
 
 def wrap_metric(metric_func):

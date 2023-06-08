@@ -3,11 +3,9 @@ import json
 import logging
 
 import numpy as np
-from tqdm import trange
-
-from nleval.exception import EdgeNotExistError, IDNotExistError
-from nleval.graph.base import BaseGraph
-from nleval.typing import (
+from obnb.exception import EdgeNotExistError, IDNotExistError
+from obnb.graph.base import BaseGraph
+from obnb.typing import (
     EdgeData,
     EdgeDir,
     Iterator,
@@ -18,9 +16,10 @@ from nleval.typing import (
     Tuple,
     Union,
 )
-from nleval.util import checkers
-from nleval.util.cx_explorer import CXExplorer
-from nleval.util.idhandler import IDmap
+from obnb.util import checkers
+from obnb.util.cx_explorer import CXExplorer
+from obnb.util.idhandler import IDmap
+from tqdm import trange
 
 
 class SparseGraph(BaseGraph):
@@ -780,7 +779,7 @@ class SparseGraph(BaseGraph):
 
     def to_dense_graph(self):
         """Convert SparseGraph to a DenseGraph."""
-        from nleval.graph.dense import DenseGraph  # noreorder
+        from obnb.graph.dense import DenseGraph  # noreorder
 
         return DenseGraph.from_mat(self.to_adjmat(), self.idmap)
 

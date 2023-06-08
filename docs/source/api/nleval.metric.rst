@@ -1,14 +1,14 @@
-nleval.metric
+obnb.metric
 =============
 
 Standard metrics
 ----------------
 
-.. automodule:: nleval.metric.standard
+.. automodule:: obnb.metric.standard
    :members:
 
 GrpahGym patches
 ----------------
 
-.. automodule:: nleval.metric.graphgym_metric
+.. automodule:: obnb.metric.graphgym_metric
    :members:

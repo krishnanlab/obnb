@@ -8,7 +8,7 @@ from typing import get_args
 
 import numpy as np
 
-from nleval.typing import INT_TYPE, NUMERIC_TYPE, Iterable, List, Optional, Tuple
+from obnb.typing import INT_TYPE, NUMERIC_TYPE, Iterable, List, Optional, Tuple
 
 __all__ = [
     "checkConfig",

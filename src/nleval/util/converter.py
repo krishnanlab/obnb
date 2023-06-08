@@ -8,9 +8,9 @@ from io import BytesIO
 import mygene
 import pandas as pd
 
-from nleval.typing import Any, Dict, Iterator, List, LogLevel, Optional
-from nleval.util.checkers import checkType
-from nleval.util.logger import get_logger
+from obnb.typing import Any, Dict, Iterator, List, LogLevel, Optional
+from obnb.util.checkers import checkType
+from obnb.util.logger import get_logger
 
 
 class BaseConverter:

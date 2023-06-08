@@ -1,14 +1,13 @@
 """Dataset object."""
 import numpy as np
-
-from nleval.feature import MultiFeatureVec
-from nleval.feature.base import BaseFeature
-from nleval.graph.base import BaseGraph
-from nleval.label.collection import LabelsetCollection
-from nleval.label.split.base import BaseSplit
-from nleval.typing import Iterable, Iterator, Literal, Optional, PyG_Data, Tuple, Union
-from nleval.util.checkers import checkLiteral, checkNumpyArrayShape, checkType
-from nleval.util.idhandler import IDmap
+from obnb.feature import MultiFeatureVec
+from obnb.feature.base import BaseFeature
+from obnb.graph.base import BaseGraph
+from obnb.label.collection import LabelsetCollection
+from obnb.label.split.base import BaseSplit
+from obnb.typing import Iterable, Iterator, Literal, Optional, PyG_Data, Tuple, Union
+from obnb.util.checkers import checkLiteral, checkNumpyArrayShape, checkType
+from obnb.util.idhandler import IDmap
 
 
 class Dataset:

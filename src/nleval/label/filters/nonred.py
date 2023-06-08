@@ -1,10 +1,10 @@
 from functools import partial
 from itertools import combinations
 
-from nleval.graph import SparseGraph
-from nleval.label.collection import LabelsetCollection
-from nleval.label.filters.base import BaseFilter
-from nleval.typing import List, Set, Tuple
+from obnb.graph import SparseGraph
+from obnb.label.collection import LabelsetCollection
+from obnb.label.filters.base import BaseFilter
+from obnb.typing import List, Set, Tuple
 
 
 class LabelsetNonRedFilter(BaseFilter):

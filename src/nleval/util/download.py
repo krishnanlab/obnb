@@ -12,16 +12,16 @@ from zipfile import ZipFile
 import requests
 from tqdm import tqdm
 
-from nleval.config import (
+from obnb.config import (
     DEFAULT_RETRY_DELAY,
     MAX_DOWNLOAD_RETRIES,
     NLEDATA_URL_DICT,
     NLEDATA_URL_DICT_STABLE,
     STREAM_BLOCK_SIZE,
 )
-from nleval.exception import DataNotFoundError, ExceededMaxNumRetries
-from nleval.typing import LogLevel, Optional, Tuple, ZipType
-from nleval.util.logger import display_pbar, get_logger
+from obnb.exception import DataNotFoundError, ExceededMaxNumRetries
+from obnb.typing import LogLevel, Optional, Tuple, ZipType
+from obnb.util.logger import display_pbar, get_logger
 
 native_logger = get_logger(None, log_level="INFO")
 

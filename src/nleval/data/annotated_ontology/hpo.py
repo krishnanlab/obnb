@@ -1,8 +1,8 @@
-from nleval.data.annotated_ontology.base import BaseAnnotatedOntologyData
-from nleval.data.annotation import HumanPhenotypeOntologyAnnotation
-from nleval.data.ontology import MondoDiseaseOntology
-from nleval.label.filters import Compose, LabelsetNonRedFilter, LabelsetRangeFilterSize
-from nleval.typing import List, Mapping, Optional, Union
+from obnb.data.annotated_ontology.base import BaseAnnotatedOntologyData
+from obnb.data.annotation import HumanPhenotypeOntologyAnnotation
+from obnb.data.ontology import MondoDiseaseOntology
+from obnb.label.filters import Compose, LabelsetNonRedFilter, LabelsetRangeFilterSize
+from obnb.typing import List, Mapping, Optional, Union
 
 
 class HPO(BaseAnnotatedOntologyData):

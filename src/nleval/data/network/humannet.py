@@ -1,6 +1,6 @@
-from nleval.data.network.base import BaseURLSparseGraphData
-from nleval.typing import Converter, List
-from nleval.util.registers import overload_class
+from obnb.data.network.base import BaseURLSparseGraphData
+from obnb.typing import Converter, List
+from obnb.util.registers import overload_class
 
 
 class HumanNet(BaseURLSparseGraphData):

@@ -1,6 +1,6 @@
-from nleval.data.base import BaseData
-from nleval.typing import List, Optional, ZipType
-from nleval.util.download import download_unzip
+from obnb.data.base import BaseData
+from obnb.typing import List, Optional, ZipType
+from obnb.util.download import download_unzip
 
 
 class BaseAnnotationData(BaseData):

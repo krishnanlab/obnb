@@ -1,6 +1,6 @@
-# Contributing to nleval
+# Contributing to obnb
 
-First and foremost, we thank you for your interest in contributing to the `nleval` pacakge! We welcome any kind of contribution, e.g.,
+First and foremost, we thank you for your interest in contributing to the `obnb` pacakge! We welcome any kind of contribution, e.g.,
 
 - New features
 - Bug fixes and new tests
@@ -15,7 +15,7 @@ To get started,
 
 ### Installation
 
-To develop `nleval`, first clone your forked repository to your machine (replace `<your_github_handle>` with your GitHub handle)
+To develop `obnb`, first clone your forked repository to your machine (replace `<your_github_handle>` with your GitHub handle)
 
 ```bash
 git clone https://github.com/<your_github_handle>/NetworkLearningEval
@@ -28,15 +28,15 @@ If you have done it before, make sure your fork is in-sync with the latest chang
 git pull
 ```
 
-Then, create a conda environment for developing `nleval` (this is not required, but it is recommended to have an isolated development
+Then, create a conda environment for developing `obnb` (this is not required, but it is recommended to have an isolated development
 environment as it keeps the dependency versions clean)
 
 ```bash
-conda create -n nleval-dev python=3.9
-conda activate nleval-dev
+conda create -n obnb-dev python=3.9
+conda activate obnb-dev
 ```
 
-Install `nleval` with development dependencies
+Install `obnb` with development dependencies
 
 ```bash
 pip install -r requirements.txt  # install dependencies with pinned version
@@ -73,14 +73,14 @@ and [linting](#linting) to check the changes against out dev guidelines.
 
 ## Building documentation
 
-1. Install `nleval` with doc dependencies (e.g., [Sphinx](https://www.sphinx-doc.org/en/master/))
+1. Install `obnb` with doc dependencies (e.g., [Sphinx](https://www.sphinx-doc.org/en/master/))
 
    ```bash
    pip install -e .[full,doc]
    ```
 
 1. Install [PyTorch](https://pytorch.org/get-started/locally/) if you have not done so yet, or simply install a
-   minimal cpu version of PyTorch if you only want to build the `nleval` documentation:
+   minimal cpu version of PyTorch if you only want to build the `obnb` documentation:
 
    ```bash
    conda install pytorch cpuonly -c pytorch

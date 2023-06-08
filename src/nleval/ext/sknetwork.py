@@ -2,10 +2,9 @@ from typing import get_args
 
 import numpy as np
 import sknetwork.embedding
-
-from nleval.feature import FeatureVec
-from nleval.graph import DenseGraph, SparseGraph
-from nleval.typing import Literal, Union
+from obnb.feature import FeatureVec
+from obnb.graph import DenseGraph, SparseGraph
+from obnb.typing import Literal, Union
 
 SKNETWORK_EMBEDDINGS = Literal[
     "Spectral",

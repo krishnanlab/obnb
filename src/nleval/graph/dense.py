@@ -1,14 +1,13 @@
 import logging
 
 import numpy as np
-
-from nleval.exception import IDNotExistError
-from nleval.feature import FeatureVec
-from nleval.graph.base import BaseGraph
-from nleval.graph.sparse import SparseGraph
-from nleval.typing import EdgeDir, List, LogLevel, Optional, Union
-from nleval.util import checkers
-from nleval.util.idhandler import IDmap
+from obnb.exception import IDNotExistError
+from obnb.feature import FeatureVec
+from obnb.graph.base import BaseGraph
+from obnb.graph.sparse import SparseGraph
+from obnb.typing import EdgeDir, List, LogLevel, Optional, Union
+from obnb.util import checkers
+from obnb.util.idhandler import IDmap
 
 
 class DenseGraph(BaseGraph):

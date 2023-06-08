@@ -1,5 +1,5 @@
-from nleval.data.network.base import BaseNDExData
-from nleval.typing import Converter
+from obnb.data.network.base import BaseNDExData
+from obnb.typing import Converter
 
 
 class PCNet(BaseNDExData):

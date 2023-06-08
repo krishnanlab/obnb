@@ -1,4 +1,4 @@
-"""Configuration of loggers used by nleval."""
+"""Configuration of loggers used by obnb."""
 
 LOGGER_CONFIG = {
     "version": 1,
@@ -32,17 +32,17 @@ LOGGER_CONFIG = {
         },
     },
     "loggers": {
-        "nleval": {
+        "obnb": {
             "level": "INFO",
             "handlers": ["defaultConsoleHandler"],
             "propagate": False,
         },
-        "nleval_brief": {
+        "obnb_brief": {
             "level": "INFO",
             "handlers": ["briefConsoleHandler"],
             "propagate": False,
         },
-        "nleval_precise": {
+        "obnb_precise": {
             "level": "INFO",
             "handlers": ["preciseConsoleHandler"],
             "propagate": False,

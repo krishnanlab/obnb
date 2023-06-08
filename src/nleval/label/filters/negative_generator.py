@@ -1,11 +1,10 @@
 from itertools import combinations
 
 import numpy as np
+from obnb.label.filters.base import BaseFilter
+from obnb.typing import List
 from scipy.stats import hypergeom
 from tqdm import tqdm
-
-from nleval.label.filters.base import BaseFilter
-from nleval.typing import List
 
 
 class NegativeGeneratorHypergeom(BaseFilter):

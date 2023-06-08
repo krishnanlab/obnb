@@ -7,10 +7,9 @@ from embiggen.utils.abstract_models.abstract_embedding_model import (
     AbstractEmbeddingModel,
 )
 from ensmallen import Graph, GraphBuilder
-
-from nleval.feature import FeatureVec
-from nleval.graph.sparse import SparseGraph
-from nleval.typing import Type, Union
+from obnb.feature import FeatureVec
+from obnb.graph.sparse import SparseGraph
+from obnb.typing import Type, Union
 
 # Tested methods, see test/ext/test_grape.py
 VALIDATED_EMBEDDERS = [
@@ -38,8 +37,8 @@ VALIDATED_EMBEDDERS = [
 
 
 # TODO: from dense graph object (edge_gen -> only nonzeros)
-def grape_graph_from_nleval_sparse(g: SparseGraph) -> Graph:
-    """Convert nleval SparseGraph to a GRAPE graph object."""
+def grape_graph_from_obnb_sparse(g: SparseGraph) -> Graph:
+    """Convert obnb SparseGraph to a GRAPE graph object."""
     ggb = GraphBuilder()
 
     # Add nodes
@@ -91,10 +90,10 @@ def grape_embed(
     elif not isinstance(g, SparseGraph):
         raise TypeError(
             "Input graph must be either a GRAPE Graph object or "
-            f"a nleval SparseGraph object, got {type(g)} instead.",
+            f"a obnb SparseGraph object, got {type(g)} instead.",
         )
     else:
-        gpg = grape_graph_from_nleval_sparse(g)
+        gpg = grape_graph_from_obnb_sparse(g)
 
     if grape_enable:
         gpg.enable()

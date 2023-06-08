@@ -4,8 +4,8 @@ import logging.config
 import os
 from contextlib import contextmanager
 
-from nleval.config.logger_config import LOGGER_CONFIG
-from nleval.typing import List, LogLevel, Optional, Union
+from obnb.config.logger_config import LOGGER_CONFIG
+from obnb.typing import List, LogLevel, Optional, Union
 
 
 def display_pbar(level: Union[int, str], threshold="INFO") -> bool:
@@ -16,13 +16,13 @@ def display_pbar(level: Union[int, str], threshold="INFO") -> bool:
 
 
 def config_logger():
-    """Configure logger used by nleval."""
+    """Configure logger used by obnb."""
     logging.config.dictConfig(LOGGER_CONFIG)
 
 
 def get_logger(
     name: Optional[str],
-    base_logger: str = "nleval",
+    base_logger: str = "obnb",
     log_level: LogLevel = "WARNING",
     verbose: bool = False,
 ) -> logging.Logger:

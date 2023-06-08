@@ -53,7 +53,7 @@ and processing options, see the [customized dataset construction](#customized-da
 section below.
 
 ```python
-from nleval.util.dataset_constructors import default_constructor
+from obnb.util.dataset_constructors import default_constructor
 
 root = "datasets"  # save dataset and cache under the datasets/ directory
 version = "nledata-v0.1.0-dev3"  # archive data version, use 'latest' to pull latest data from source instead
@@ -70,8 +70,8 @@ can be done easily using the trainer objects. The trainer objects take a diction
 as input for evaluating the models' performances, and can be set up as follows.
 
 ```python
-from nleval.metric import auroc
-from nleval.model_trainer import SupervisedLearningTrainer, LabelPropagationTrainer
+from obnb.metric import auroc
+from obnb.model_trainer import SupervisedLearningTrainer, LabelPropagationTrainer
 
 metrics = {"auroc": auroc}  # use AUROC as our default evaluation metric
 sl_trainer = SupervisedLearningTrainer(metrics)
@@ -83,7 +83,7 @@ in a one-vs-rest setting.
 
 ```python
 from sklearn.linear_model import LogisticRegression
-from nleval.model.label_propagation import OneHopPropagation
+from obnb.model.label_propagation import OneHopPropagation
 
 # Initialize models
 sl_mdl = LogisticRegression(penalty="l2", solver="lbfgs")
@@ -100,7 +100,7 @@ Training and evaluation of Graph Neural Network (GNN) models can be done in a ve
 
 ```python
 from torch_geometric.nn import GCN
-from nleval.model_trainer.gnn import SimpleGNNTrainer
+from obnb.model_trainer.gnn import SimpleGNNTrainer
 
 # Use 1-dimensional trivial node feature
 dataset = default_constructor(root=root, version=version, graph_name="BioGRID", label_name="DisGeNET")
@@ -116,7 +116,7 @@ gcn_results = gcn_trainer.train(gcn_mdl, dataset)
 #### Load network and labels
 
 ```python
-from nleval import data
+from obnb import data
 
 root = "datasets"  # save dataset and cache under the datasets/ directory
 
@@ -131,8 +131,8 @@ lsc = data.DisGeNET(root, version="latest")
 #### Setting up data and splits
 
 ```python
-from nleval.util.converter import GenePropertyConverter
-from nleval.label.split import RatioHoldout
+from obnb.util.converter import GenePropertyConverter
+from obnb.label.split import RatioHoldout
 
 # Load PubMed count gene property converter and use it to set up study-bias holdout split
 pubmedcnt_converter = GenePropertyConverter(root, name="PubMedCount")
@@ -158,7 +158,7 @@ lsc.iapply(
 #### Combine into dataset
 
 ```python
-from nleval import Dataset
+from obnb import Dataset
 dataset = Dataset(graph=g, feature=g.to_dense_graph().to_feature(), label=lsc, splitter=splitter)
 ```
 

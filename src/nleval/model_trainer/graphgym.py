@@ -5,6 +5,8 @@ from functools import wraps
 from itertools import chain
 
 import torch
+from obnb.model_trainer.gnn import GNNTrainer
+from obnb.typing import Any, Dict, List, Optional
 from torch_geometric import graphgym as pyg_gg
 from torch_geometric import seed_everything
 from torch_geometric.data import Batch, DataLoader
@@ -18,8 +20,8 @@ from torch_geometric.graphgym.train import train_epoch
 from torch_geometric.graphgym.utils.comp_budget import params_count
 from torch_geometric.graphgym.utils.device import auto_select_device
 
-from nleval.model_trainer.gnn import GNNTrainer
-from nleval.typing import Any, Dict, List, Optional
+from obnb.model_trainer.gnn import GNNTrainer
+from obnb.typing import Any, Dict, List, Optional
 
 
 def _patch_gg_makedirs_rm_exist(dir_):  # patch for PyG<2.1.0
@@ -198,7 +200,7 @@ class GraphGymTrainer(GNNTrainer):
     def train(self, model, dataset, split_idx=0):
         """Train model using GraphGym.
 
-        Note that because nleval only concerns transductive node classification
+        Note that because obnb only concerns transductive node classification
         (for now), the training procedure is reduced to this specific setting
         for the sake of runtime performance.
 
