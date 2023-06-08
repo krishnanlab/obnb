@@ -86,8 +86,8 @@ class OpenBiomedNetBenchDGL(DGLDataset):
         has_info = osp.exists(self.processed_info_path)
         return has_graph and has_info
 
-    def __getitem__(self, idx: int = 0):
+    def __getitem__(self, idx: int = 0):  # noqa: D105
         return self._graph
 
-    def __len__(self):
+    def __len__(self):  # noqa: D105
         return 1
