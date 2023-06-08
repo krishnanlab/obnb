@@ -1,12 +1,12 @@
 [![PyPI version](https://badge.fury.io/py/obnb.svg)](https://badge.fury.io/py/obnb)
-[![Documentation Status](https://readthedocs.org/projects/networklearningeval/badge/?version=latest)](https://networklearningeval.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/obnb/badge/?version=latest)](https://obnb.readthedocs.io/en/latest/?badge=latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 
-[![Tests](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/tests.yml/badge.svg)](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/tests.yml)
-[![Test Examples](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/examples.yml/badge.svg)](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/examples.yml)
-[![Test Data](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/test_data.yml/badge.svg)](https://github.com/krishnanlab/NetworkLearningEval/actions/workflows/test_data.yml)
+[![Tests](https://github.com/krishnanlab/obnb/actions/workflows/tests.yml/badge.svg)](https://github.com/krishnanlab/obnb/actions/workflows/tests.yml)
+[![Test Examples](https://github.com/krishnanlab/obnb/actions/workflows/examples.yml/badge.svg)](https://github.com/krishnanlab/obnb/actions/workflows/examples.yml)
+[![Test Data](https://github.com/krishnanlab/obnb/actions/workflows/test_data.yml/badge.svg)](https://github.com/krishnanlab/obnb/actions/workflows/test_data.yml)
 
 # Open Biomedical Network Benchmark
 
@@ -15,7 +15,7 @@
 Clone the repository first and then install via `pip`
 
 ```bash
-git clone https://github.com/krishnanlab/NetworkLearningEval && cd NetworkLearningEval
+git clone https://github.com/krishnanlab/obnb && cd obnb
 pip install -e .
 ```
 
@@ -56,7 +56,9 @@ section below.
 from obnb.util.dataset_constructors import default_constructor
 
 root = "datasets"  # save dataset and cache under the datasets/ directory
-version = "obnbdata-v0.1.0-dev1"  # archive data version, use 'latest' to pull latest data from source instead
+version = "current"  # use the last archived version
+# Optionally, set version to the specific data version number
+# Or, set version to "latest" to download the latest data from source and process it from scratch
 
 # Download and process network/label data. Use the adjacency matrix as the ML feature
 dataset = default_constructor(root=root, version=version, graph_name="BioGRID", label_name="DisGeNET",
@@ -121,11 +123,10 @@ from obnb import data
 root = "datasets"  # save dataset and cache under the datasets/ directory
 
 # Load processed BioGRID data from archive.
-# Alternatively, set version="latest" to get and process the newest data from scratch.
-g = data.BioGRID(root, version="obnbdata-v0.1.0-dev1")
+g = data.BioGRID(root, version="current")
 
 # Load DisGeNET gene set collections.
-lsc = data.DisGeNET(root, version="latest")
+lsc = data.DisGeNET(root, version="current")
 ```
 
 #### Setting up data and splits

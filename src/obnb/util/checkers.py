@@ -4,9 +4,12 @@ This module contains a collection of checkers to ensure that the input value to
 a function call is valid.
 
 """
+import os
+import warnings
 from typing import get_args
 
 import numpy as np
+import requests
 
 from obnb.typing import INT_TYPE, NUMERIC_TYPE, Iterable, List, Optional, Tuple
 
@@ -25,6 +28,36 @@ __all__ = [
     "checkValueNonnegative",
     "checkValuePositive",
 ]
+
+
+def checkVersion(version: str):
+    """Check if the current version is up to date."""
+    if os.environ.get("OBNB_IGNORE_OUTDATE") == "1":
+        return
+
+    try:
+        r = requests.get("https://pypi.org/pypi/obnb/json")
+
+        versions = list(r.json()["releases"])
+        stable_versions = [v for v in versions if "dev" not in v]
+        if not stable_versions:
+            # XXX: remove once the first stable version is released
+            return
+
+        latest_version = stable_versions[-1]
+        if latest_version != version:
+            warnings.warn(
+                f"A new OBNB version {latest_version!r} is available "
+                f"(current version: {version!r}).",
+                UserWarning,
+                stacklevel=2,
+            )
+    except requests.exceptions.ConnectionError:
+        warnings.warn(
+            "Failed to check the latest obnb version due to connection errorx",
+            RuntimeWarning,
+            stacklevel=2,
+        )
 
 
 def checkValuePositive(name, val):

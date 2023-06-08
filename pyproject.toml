@@ -39,14 +39,15 @@ dependencies = [
     "numpy>=1.20.0",
     "pyOpenSSL>=23.1.1",
     "pyyaml",
+    "requests",
     "scikit-learn>=1.0.0",
     "scipy",
     "tqdm",
 ]
 
 [project.urls]
-home = "https://github.com/krishnanlab/NetworkLearningEval"
-bug-tracker = "https://github.com/krishnanlab/NetworkLearningEval/issues"
+home = "https://github.com/krishnanlab/obnb"
+bug-tracker = "https://github.com/krishnanlab/obnb/issues"
 
 [project.optional-dependencies]
 dev = [
