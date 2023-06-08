@@ -300,3 +300,53 @@ class Dataset:
         data.to(device)
 
         return data
+
+    def to_dgl_data(
+        self,
+        *,
+        device: str = "cpu",
+        mask_suffix: str = "_mask",
+    ):
+        """Convert dataset into a DGL graph."""
+        # TODO: dense option
+        import dgl
+        import torch
+
+        device = torch.device(device)
+        num_nodes = self.size
+
+        # Use trivial feature if feature not available
+        x = np.ones((num_nodes, 1)) if self.feature is None else self.feature.mat
+        (edges_src, edges_dst), edge_weight = self.graph.to_coo()  # TODO: empty graph?
+
+        dglgraph = dgl.graph(
+            (torch.LongTensor(edges_src), torch.LongTensor(edges_dst)),
+            num_nodes=num_nodes,
+        )
+        dglgraph.ndata["feat"] = torch.FloatTensor(x)
+
+        if edge_weight is not None:
+            dglgraph.edata["weight"] = torch.FloatTensor(edge_weight)
+
+        if self.graph is not None:
+            dglgraph.node_ids = list(self.graph.node_ids)
+
+        if self.label is not None:
+            dglgraph.task_ids = list(self.label.label_ids)
+
+        # Label (true) matrix
+        if self.y is not None:
+            dglgraph.ndata["label"] = torch.FloatTensor(self.y)
+
+        # Label mask (negative selection) matrix
+        if self.y_mask is not None:
+            dglgraph.ndata["label_mask"] = torch.BoolTensor(self.y_mask)
+
+        # Split mask matrix
+        if self.masks is not None:
+            for mask_name, mask in self.masks.items():
+                dglgraph.ndata[mask_name + mask_suffix] = torch.BoolTensor(mask)
+
+        dglgraph = dglgraph.to(device)
+
+        return dglgraph
