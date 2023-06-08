@@ -41,7 +41,7 @@ class HumanPhenotypeOntologyAnnotation(BaseAnnotationData):
         super().__init__(root, **kwargs)
 
     @property
-    def data_sources(self) -> List[str]:
+    def data_sources(self) -> Optional[List[str]]:
         return self._data_sources
 
     def load_processed_data(self):
@@ -67,7 +67,7 @@ class HumanPhenotypeOntologyAnnotation(BaseAnnotationData):
         annot_df["gene_id"] = annot_df["gene_id"].astype(str)
 
         # Select specified channels
-        if self.data_sources is not None:
+        if self.data_sources:
             evidence_str = pprint.pformat(self.data_sources)
             self.plogger.info(f"Subsetting annotations to evidences:\n{evidence_str}")
 
