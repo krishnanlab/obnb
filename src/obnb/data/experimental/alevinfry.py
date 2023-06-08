@@ -1,4 +1,7 @@
-import pyroe
+try:
+    import pyroe
+except ImportError:
+    pyroe = None
 
 from obnb.data.base import BaseData
 from obnb.feature import FeatureVec
@@ -73,6 +76,8 @@ class AlevinFry(BaseData, FeatureVec):
         return True
 
     def download(self):
+        if pyroe is None:
+            raise ModuleNotFoundError("Please install pyroe first: pip install pyroe")
         # TODO: capture prints and redirect to logger?
         pyroe.fetch_processed_quant(
             dataset_ids=[self.dataset_id],
@@ -87,6 +92,8 @@ class AlevinFry(BaseData, FeatureVec):
             self._metadata[key] = getattr(data, key)
 
     def load_processed_data(self, path: Optional[str] = None):
+        if pyroe is None:
+            raise ModuleNotFoundError("Please install pyroe first: pip install pyroe")
         # TODO: capture prints and redirect to logger?
         dts_id = self.dataset_id
         data = pyroe.load_processed_quant(
