@@ -33,7 +33,7 @@ jobs:
           pip install git+https://github.com/pyg-team/pytorch_geometric.git#egg=torch-geometric[full]
           pip install -r requirements.txt
 
-      - name: Install NLEval
+      - name: Install OBNB
         run: |
           pip install -e .
 

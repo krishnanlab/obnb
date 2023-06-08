@@ -33,7 +33,7 @@ jobs:
           pip install torch-geometric[full]==${{ matrix.pyg-version }} torch-scatter torch-sparse torch-cluster -f https://data.pyg.org/whl/torch-${{ matrix.torch-version }}+cpu.html
           pip install -r requirements.txt
 
-      - name: Install NLEval
+      - name: Install OBNB
         run: |
           pip install -e .
 
