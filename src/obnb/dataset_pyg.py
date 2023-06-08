@@ -16,9 +16,6 @@ class OpenBiomedNetBench(InMemoryDataset):
         root: Root directory of the dataset to be saved.
         network: Name of the network to use.
         label: Name of the gene annotation label to use.
-        selected_genes: An optional list of genes. When supplied, will be used
-            to filter out genes in the label in addition to the filtering based
-            on network genes.
         version: Version of the OpenBiomedNetBench data to use. By default,
             "current" means using current (archived) release. If specified as
             "latest", then download data from source and process them from
@@ -35,7 +32,6 @@ class OpenBiomedNetBench(InMemoryDataset):
         network: str,
         label: str,
         *,
-        selected_genes: Optional[List[str]] = None,
         version: str = "current",
         log_level: LogLevel = "INFO",
         transform: Optional[Callable] = None,
@@ -64,18 +60,14 @@ class OpenBiomedNetBench(InMemoryDataset):
     def processed_file_names(self) -> str:
         return "data.pt"
 
-    def get_raw_dataset(self, log_level: Optional[LogLevel] = None):
-        return default_constructor(
+    def process(self):
+        dataset = default_constructor(
             self.root,
             version=self.version,
             graph_name=self.network,
             label_name=self.label,
-            selected_genes=self.selected_genes,
-            log_level=log_level or self.log_level,
+            log_level=self.log_level,
         )
-
-    def process(self):
-        dataset = self.get_raw_dataset()
         data = dataset.to_pyg_data()
 
         if self.pre_transform is not None:
