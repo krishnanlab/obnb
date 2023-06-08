@@ -1,6 +1,6 @@
 import pytest
 
-from nleval.util.checkers import checkConfig
+from obnb.util.checkers import checkConfig
 
 config1 = {"a": 1, "b": "s", "c": None}
 config2 = {"a": 1, "b": {"x": 1, "y": "2"}}

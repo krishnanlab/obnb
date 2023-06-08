@@ -11,10 +11,10 @@ import numpy as np
 from commonvar import SAMPLE_DATA_DIR
 from parameterized import parameterized
 
-from nleval.exception import EdgeNotExistError, IDExistsError, IDNotExistError
-from nleval.graph import DenseGraph, DirectedSparseGraph, OntologyGraph, SparseGraph
-from nleval.graph.base import BaseGraph
-from nleval.util import idhandler
+from obnb.exception import EdgeNotExistError, IDExistsError, IDNotExistError
+from obnb.graph import DenseGraph, DirectedSparseGraph, OntologyGraph, SparseGraph
+from obnb.graph.base import BaseGraph
+from obnb.util import idhandler
 
 
 def shuffle_sparse(graph):

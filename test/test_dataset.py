@@ -1,11 +1,11 @@
 import numpy as np
 import pytest
 
-from nleval.dataset import Dataset
-from nleval.exception import IDNotExistError
-from nleval.feature import MultiFeatureVec
-from nleval.graph.dense import DenseGraph
-from nleval.label.collection import LabelsetCollection
+from obnb.dataset import Dataset
+from obnb.exception import IDNotExistError
+from obnb.feature import MultiFeatureVec
+from obnb.graph.dense import DenseGraph
+from obnb.label.collection import LabelsetCollection
 
 
 class Data:
@@ -192,7 +192,7 @@ def test_get_feat_fraom_idxs_dual(subtests, data):
     with pytest.raises(
         TypeError,
         match="'dual' mode only works when the feature is of type MultiFeatureVec, "
-        "but received type <class 'nleval.graph.dense.DenseGraph'>",
+        "but received type <class 'obnb.graph.dense.DenseGraph'>",
     ):
         dataset = Dataset(feature=data.graph.to_feature(), dual=True, label=data.lsc)
 

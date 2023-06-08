@@ -3,9 +3,9 @@ import unittest
 
 from commonvar import SAMPLE_DATA_DIR
 
-from nleval.exception import IDExistsError, IDNotExistError
-from nleval.graph import OntologyGraph
-from nleval.label import LabelsetCollection
+from obnb.exception import IDExistsError, IDNotExistError
+from obnb.graph import OntologyGraph
+from obnb.label import LabelsetCollection
 
 
 class TestLabelsetCollection(unittest.TestCase):

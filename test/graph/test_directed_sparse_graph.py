@@ -1,6 +1,6 @@
 import pytest
 
-from nleval.graph.sparse import DirectedSparseGraph, SparseGraph
+from obnb.graph.sparse import DirectedSparseGraph, SparseGraph
 
 
 @pytest.fixture

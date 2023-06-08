@@ -1,13 +1,13 @@
 #!/bin/sh --login
-# This is an optional installation script for setting up the nle package
+# This is an optional installation script for setting up the obnb package
 # without much headache of dealing with setting up CUDA enabled packages, such
 # as PyTorch and Pytorch Geometric (PYG).
 #
 # Example:
-# $ source install.sh cu117  # install nle with CUDA 11.7
+# $ source install.sh cu117  # install obnb with CUDA 11.7
 #
-# To uninstall and remove the nle environment:
-# $ conda remove -n nle --all
+# To uninstall and remove the obnb environment:
+# $ conda remove -n obnb --all
 
 # Check input
 if [ -z $1 ]; then
@@ -39,17 +39,17 @@ case $CUDA_VERSION in
 esac
 
 # Create environment
-conda create -n nle python=3.8 -y
-conda activate nle
+conda create -n obnb python=3.8 -y
+conda activate obnb
 
 # Install CUDA enabled dependencies
 conda install pytorch=${PYTORCH_VERSION} torchvision torchaudio ${TORCH_OPT} -y
 conda install pyg=${PYG_VERSION} -c pyg -y
 
-# Finally, install nle
+# Finally, install obnb
 pip install -e .
 
-printf "Successfully installed nle, be sure to activate the nle conda environment via:\n"
-printf "\n    \$ conda activate nle\n"
-printf "\nTo uninstall and remove the nle environment:\n"
-printf "\n    \$ conda remove -n nle --all\n\n"
+printf "Successfully installed obnb, be sure to activate the obnb conda environment via:\n"
+printf "\n    \$ conda activate obnb\n"
+printf "\nTo uninstall and remove the obnb environment:\n"
+printf "\n    \$ conda remove -n obnb --all\n\n"

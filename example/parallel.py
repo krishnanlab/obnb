@@ -1,6 +1,6 @@
 import time
 
-from nleval.util.parallel import ParDat, ParDatExe, ParDatMap
+from obnb.util.parallel import ParDat, ParDatExe, ParDatMap
 
 lst = list(range(10))
 

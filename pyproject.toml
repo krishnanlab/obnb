@@ -3,8 +3,8 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "nleval"
-version = "0.1.0-dev8"
+name = "obnb"
+version = "0.1.0-dev1"
 description = "A Python toolkit for biological network learning evaluation"
 readme = "README.md"
 
@@ -81,7 +81,7 @@ ext = [
     "scikit-network",
     "networkx",
 ]
-full = ["nleval[pyroe,ext]"]
+full = ["obnb[pyroe,ext]"]
 
 [tool.setuptools]
 license-files = ["LICENSE"]
@@ -103,7 +103,7 @@ line_length = 88
 ignore_missing_imports = true
 follow_imports = "skip"
 exclude = [
-    "src/nleval/graph/",
+    "src/obnb/graph/",
 ]
 
 [[tool.mypy.overrides]]

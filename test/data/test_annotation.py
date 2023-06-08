@@ -4,7 +4,7 @@ import pandas as pd
 import pandas.api.types as ptypes
 import pytest
 
-from nleval.data.annotation import (
+from obnb.data.annotation import (
     DISEASESAnnotation,
     DisGeNETAnnotation,
     GeneOntologyAnnotation,

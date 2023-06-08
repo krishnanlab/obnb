@@ -2,10 +2,10 @@ import torch
 from torch_geometric.nn import GCN
 from utils import load_data
 
-from nleval import Dataset
-from nleval.label.split import RatioPartition
-from nleval.metric import auroc
-from nleval.model_trainer.gnn import SimpleGNNTrainer
+from obnb import Dataset
+from obnb.label.split import RatioPartition
+from obnb.metric import auroc
+from obnb.model_trainer.gnn import SimpleGNNTrainer
 
 # Load dataset (with sparse graph)
 g, lsc, converter = load_data(

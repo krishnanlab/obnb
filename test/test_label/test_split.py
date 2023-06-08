@@ -3,10 +3,10 @@ import unittest
 import numpy as np
 from sklearn.model_selection import KFold
 
-from nleval.exception import IDNotExistError
-from nleval.label import LabelsetCollection, split
-from nleval.label.split.base import BaseSplit
-from nleval.util.converter import GenePropertyConverter
+from obnb.exception import IDNotExistError
+from obnb.label import LabelsetCollection, split
+from obnb.label.split.base import BaseSplit
+from obnb.util.converter import GenePropertyConverter
 
 
 def test_base_split_repr(mocker):
@@ -16,7 +16,7 @@ def test_base_split_repr(mocker):
     a.property_converter = {}
     assert repr(a) == "BaseSplit(property_converter=CustomConverter)"
 
-    mocker.patch("nleval.util.converter.GenePropertyConverter._load_cache")
+    mocker.patch("obnb.util.converter.GenePropertyConverter._load_cache")
     a.property_converter = GenePropertyConverter(name="PubMedCount")
     assert repr(a) == (
         "BaseSplit(property_converter=GenePropertyConverter(name='PubMedCount'))"

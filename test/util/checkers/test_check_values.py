@@ -1,7 +1,7 @@
 import pytest
 
-from nleval.typing import Literal
-from nleval.util.checkers import checkLiteral
+from obnb.typing import Literal
+from obnb.util.checkers import checkLiteral
 
 
 def test_check_literal():

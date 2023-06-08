@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import sklearn.metrics
 
-from nleval.metric.standard import auroc, prior
+from obnb.metric.standard import auroc, prior
 
 
 @pytest.fixture

@@ -1,7 +1,7 @@
 import pytest
 
 try:
-    from nleval.ext.pecanpy import pecanpy_embed
+    from obnb.ext.pecanpy import pecanpy_embed
 except ModuleNotFoundError:
     pass
 

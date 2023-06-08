@@ -1,8 +1,8 @@
 import pytest
 
-from nleval.config import MAX_DOWNLOAD_RETRIES
-from nleval.exception import DataNotFoundError, ExceededMaxNumRetries
-from nleval.util.download import download_unzip, get_data_url
+from obnb.config import MAX_DOWNLOAD_RETRIES
+from obnb.exception import DataNotFoundError, ExceededMaxNumRetries
+from obnb.util.download import download_unzip, get_data_url
 
 
 def test_download(caplog, tmpdir, requests_mock, subtests):

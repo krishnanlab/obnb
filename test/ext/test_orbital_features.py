@@ -4,7 +4,7 @@ import pytest
 try:
     import networkx as nx
 
-    from nleval.ext.orbital_features import OrbitCountingMachine, orbital_feat_extract
+    from obnb.ext.orbital_features import OrbitCountingMachine, orbital_feat_extract
 except ModuleNotFoundError:
     pass
 

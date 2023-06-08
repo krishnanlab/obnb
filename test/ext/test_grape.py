@@ -1,15 +1,15 @@
 import pytest
 
 try:
-    from nleval.ext.grape import embedders, grape_embed, grape_graph_from_nleval_sparse
+    from obnb.ext.grape import embedders, grape_embed, grape_graph_from_obnb_sparse
 except ModuleNotFoundError:
     pass
 
 
 @pytest.mark.ext
-def test_grape_graph_from_nleval_sparse(toy_graph_1, subtests):
+def test_grape_graph_from_obnb_sparse(toy_graph_1, subtests):
     with subtests.test(weighted=True, directed=False):
-        gpg = grape_graph_from_nleval_sparse(toy_graph_1)
+        gpg = grape_graph_from_obnb_sparse(toy_graph_1)
         assert gpg.get_node_names() == list(toy_graph_1.node_ids)
 
         for src, dst, weight in toy_graph_1.edge_gen(compact=False):

@@ -1,10 +1,10 @@
 from sklearn.linear_model import LogisticRegression
 from utils import load_data
 
-from nleval import Dataset
-from nleval.label.split import AllHoldout
-from nleval.metric import auroc
-from nleval.model_trainer import SupervisedLearningTrainer
+from obnb import Dataset
+from obnb.label.split import AllHoldout
+from obnb.metric import auroc
+from obnb.model_trainer import SupervisedLearningTrainer
 
 i = 5  # index of labelset
 k = 50  # numbers of top genes to display

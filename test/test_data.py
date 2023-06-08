@@ -9,19 +9,19 @@ from urllib.parse import urljoin
 import pytest
 from parameterized import parameterized
 
-import nleval
-import nleval.data
-import nleval.graph
-from nleval.config import NLEDATA_URL_DICT
-from nleval.exception import DataNotFoundError
-from nleval.feature.base import BaseFeature
-from nleval.util.dataset_constructors import default_constructor
-from nleval.util.download import download_unzip
-from nleval.util.timer import Timeout
+import obnb
+import obnb.data
+import obnb.graph
+from obnb.config import OBNB_DATA_URL_DICT
+from obnb.exception import DataNotFoundError
+from obnb.feature.base import BaseFeature
+from obnb.util.dataset_constructors import default_constructor
+from obnb.util.download import download_unzip
+from obnb.util.timer import Timeout
 
 opts = {
     "log_level": "DEBUG",
-    "version": nleval.__data_version__,
+    "version": obnb.__data_version__,
 }
 # Name, reprocess, redownload
 full_data_test_param = [
@@ -33,7 +33,7 @@ full_data_test_param = [
 
 
 def check_network_stats(data_dir, network_name, num_nodes, num_edges):
-    graph = getattr(nleval.data, network_name)(data_dir, **opts)
+    graph = getattr(obnb.data, network_name)(data_dir, **opts)
     assert graph.size == num_nodes
     assert graph.num_edges == num_edges
 
@@ -89,7 +89,7 @@ class TestData(unittest.TestCase):
             f"{cls.tmp_dir_preserve}",
         )
 
-        data_url = urljoin(NLEDATA_URL_DICT[nleval.__data_version__], ".cache.zip")
+        data_url = urljoin(OBNB_DATA_URL_DICT[obnb.__data_version__], ".cache.zip")
         download_unzip(data_url, cls.tmp_dir_preserve)
 
     @classmethod
@@ -113,7 +113,7 @@ class TestData(unittest.TestCase):
     @pytest.mark.mediumruns
     def test_bioplex(self, name, reprocess, redownload):
         with self.subTest(name):
-            self.graph = nleval.data.BioPlex(
+            self.graph = obnb.data.BioPlex(
                 self.tmp_dir_preserve,
                 reprocess=reprocess,
                 redownload=redownload,
@@ -125,41 +125,41 @@ class TestData(unittest.TestCase):
     @pytest.mark.mediumruns
     def test_disgenet(self):
         with Timeout(600):
-            self.lsc = nleval.data.DisGeNET(self.tmp_dir, **opts)
+            self.lsc = obnb.data.DisGeNET(self.tmp_dir, **opts)
 
     @parameterized.expand([("GOBP",), ("GOCC",), ("GOMF",)])
     @pytest.mark.longruns
     def test_go(self, name):
         with self.subTest(name):
-            self.lsc = getattr(nleval.data, name)(self.tmp_dir, **opts)
+            self.lsc = getattr(obnb.data, name)(self.tmp_dir, **opts)
 
 
 @pytest.mark.mediumruns
 def test_archive_data_v1(tmpdir):
-    nleval.logger.info(f"{tmpdir=}")
+    obnb.logger.info(f"{tmpdir=}")
     with pytest.raises(ValueError):
-        g = nleval.data.BioGRID(
+        g = obnb.data.BioGRID(
             tmpdir,
             version="nledata-vDNE-test",
             download_cache=False,
         )
 
     with pytest.raises(DataNotFoundError):
-        g = nleval.data.HIPPIE(
+        g = obnb.data.HIPPIE(
             tmpdir,
             version="nledata-v1.0-test",
             download_cache=False,
         )
 
     # TODO: check changed version redownload
-    g = nleval.data.BioGRID(tmpdir, version="nledata-v1.0-test", download_cache=False)
+    g = obnb.data.BioGRID(tmpdir, version="nledata-v1.0-test", download_cache=False)
     assert g.size == 19276
     assert g.num_edges == 1100282
 
 
 @pytest.mark.mediumruns
 def test_dataset_constructor(subtests, tmpdir):
-    nleval.logger.info(f"{tmpdir=}")
+    obnb.logger.info(f"{tmpdir=}")
     datadir = tmpdir / "datasets"
 
     for graph_as_feature, use_dense_graph in product([True, False], [True, False]):
@@ -182,6 +182,6 @@ def test_dataset_constructor(subtests, tmpdir):
                 assert dataset.feature is None
 
             if use_dense_graph:
-                assert isinstance(dataset.graph, nleval.graph.DenseGraph)
+                assert isinstance(dataset.graph, obnb.graph.DenseGraph)
             else:
-                assert isinstance(dataset.graph, nleval.graph.SparseGraph)
+                assert isinstance(dataset.graph, obnb.graph.SparseGraph)

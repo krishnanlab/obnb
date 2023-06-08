@@ -1,7 +1,7 @@
 import unittest
 
-from nleval.exception import IDExistsError, IDNotExistError
-from nleval.util import idhandler
+from obnb.exception import IDExistsError, IDNotExistError
+from obnb.util import idhandler
 
 
 class TestIDprop(unittest.TestCase):

@@ -1,14 +1,14 @@
-import nleval.data
-from nleval.label.filters import (
+import obnb.data
+from obnb.label.filters import (
     Compose,
     EntityExistenceFilter,
     LabelsetRangeFilterSize,
     LabelsetRangeFilterSplit,
     NegativeGeneratorHypergeom,
 )
-from nleval.label.split import RatioPartition
-from nleval.typing import LogLevel
-from nleval.util.converter import GenePropertyConverter
+from obnb.label.split import RatioPartition
+from obnb.typing import LogLevel
+from obnb.util.converter import GenePropertyConverter
 
 
 def load_data(
@@ -36,7 +36,7 @@ def load_data(
     print(f"{network=}\n{label=}")
 
     # Load graph data
-    g = getattr(nleval.data, network)(save_dir, version=data_version)
+    g = getattr(obnb.data, network)(save_dir, version=data_version)
     if not sparse:
         g = g.to_dense_graph()
 
@@ -65,7 +65,7 @@ def load_data(
         )
         filter_list.append(LabelsetRangeFilterSplit(min_val=20, splitter=splitter))
 
-    lsc = getattr(nleval.data, label)(
+    lsc = getattr(obnb.data, label)(
         save_dir,
         version=data_version,
         transform=Compose(*filter_list, log_level=log_level),

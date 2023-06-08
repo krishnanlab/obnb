@@ -1,6 +1,6 @@
 import pytest
 
-from nleval.graph import SparseGraph
+from obnb.graph import SparseGraph
 
 
 @pytest.fixture(scope="module")
