@@ -1,9 +1,10 @@
 from copy import deepcopy
 
+import numpy as np
 import torch
 
 from obnb.model_trainer.base import BaseTrainer
-from obnb.typing import Any, Dict, List, LogLevel, Optional, Tuple
+from obnb.typing import Any, Callable, Dict, List, LogLevel, Optional, Tuple
 
 
 class GNNTrainer(BaseTrainer):
@@ -11,7 +12,7 @@ class GNNTrainer(BaseTrainer):
 
     def __init__(
         self,
-        metrics,
+        metrics: Optional[Dict[str, Callable[[np.ndarray, np.ndarray], float]]] = None,
         train_on="train",
         val_on: str = "val",
         mask_suffix: str = "_mask",
@@ -29,9 +30,7 @@ class GNNTrainer(BaseTrainer):
         Args:
             val_on (str): Validation mask name (default: :obj:`"train"`).
             device (str): Training device (default: :obj:`"cpu"`).
-            metric_best (str): Metric used for determining the best model
-                (default: :obj:`None`).
-                if set to True (default: :obj:`False`)
+            metric_best (str): Metric used for determining the best epoch.
             lr (float): Learning rate (default: :obj:`0.01`)
             epochs (int): Total epochs (default: :obj:`100`)
             eval_steps (int): Interval for evaluation (default: :obj:`10`)
@@ -75,7 +74,9 @@ class GNNTrainer(BaseTrainer):
 
         """
         if metric_best is None or metric_best == "auto":
-            if len(self.metrics) != 1:
+            if "APOP" in self.metrics:  # default best metric
+                self._metric_best = "APOP"
+            elif len(self.metrics) != 1:
                 raise ValueError(
                     "Multiple metrics found but did not specify metric_best",
                 )

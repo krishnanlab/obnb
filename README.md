@@ -68,16 +68,13 @@ dataset = default_constructor(root=root, version=version, graph_name="BioGRID", 
 ### Evaluating standard models
 
 Evaluation of simple machine learning methods such as logistic regression and label propagation
-can be done easily using the trainer objects. The trainer objects take a dictionary of metrics
-as input for evaluating the models' performances, and can be set up as follows.
+can be done easily using the trainer objects.
 
 ```python
-from obnb.metric import auroc
 from obnb.model_trainer import SupervisedLearningTrainer, LabelPropagationTrainer
 
-metrics = {"auroc": auroc}  # use AUROC as our default evaluation metric
-sl_trainer = SupervisedLearningTrainer(metrics)
-lp_trainer = LabelPropagationTrainer(metrics)
+sl_trainer = SupervisedLearningTrainer()
+lp_trainer = LabelPropagationTrainer()
 ```
 
 Then, use the `fit_and_eval` method of the trainer to evaluate a given ML model over all tasks
@@ -109,7 +106,7 @@ dataset = default_constructor(root=root, version=version, graph_name="BioGRID", 
 
 # Train and evaluate a GCN
 gcn_mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=n_tasks)
-gcn_trainer = SimpleGNNTrainer(metrics, device="cuda", metric_best="auroc")
+gcn_trainer = SimpleGNNTrainer(device="cuda", metric_best="apop")
 gcn_results = gcn_trainer.train(gcn_mdl, dataset)
 ```
 

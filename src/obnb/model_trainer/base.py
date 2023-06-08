@@ -3,6 +3,7 @@ from copy import deepcopy
 
 import numpy as np
 
+import obnb.metric
 from obnb.typing import Any, Callable, Dict, LogLevel, Optional
 from obnb.util.logger import attach_file_handler, get_logger
 
@@ -17,7 +18,7 @@ class BaseTrainer:
 
     def __init__(
         self,
-        metrics: Dict[str, Callable[[np.ndarray, np.ndarray], float]],
+        metrics: Optional[Dict[str, Callable[[np.ndarray, np.ndarray], float]]] = None,
         train_on: str = "train",
         log_level: LogLevel = "INFO",
         log_path: Optional[str] = None,
@@ -27,14 +28,22 @@ class BaseTrainer:
         Note: "dual" mode only works if the input features is MultiFeatureVec.
 
         Args:
-            metrics: Dictionary of metrics used to train/evaluate the model.
+            metrics: Dictionary of metrics used to train/evaluate the model. If
+                not specified, will use the default selection of APOP and AUROC.
             train_on: Which mask to use for training.
             log_level: Log level.
             log_path: Log file path. If not set, then do not log to file.
 
         """
         self._tic: Optional[float] = None
+
+        if not metrics:
+            metrics = {
+                "apop": obnb.metric.log2_auprc_prior,
+                "auroc": obnb.metric.auroc,
+            }
         self.metrics = metrics
+
         self.train_on = train_on
         self.logger = get_logger(
             self.__class__.__name__,
