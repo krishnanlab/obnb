@@ -1,4 +1,4 @@
-[![PyPI version](https://badge.fury.io/py/nleval.svg)](https://badge.fury.io/py/nleval)
+[![PyPI version](https://badge.fury.io/py/obnb.svg)](https://badge.fury.io/py/obnb)
 [![Documentation Status](https://readthedocs.org/projects/networklearningeval/badge/?version=latest)](https://networklearningeval.readthedocs.io/en/latest/?badge=latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -56,7 +56,7 @@ section below.
 from obnb.util.dataset_constructors import default_constructor
 
 root = "datasets"  # save dataset and cache under the datasets/ directory
-version = "nledata-v0.1.0-dev3"  # archive data version, use 'latest' to pull latest data from source instead
+version = "obnbdata-v0.1.0-dev1"  # archive data version, use 'latest' to pull latest data from source instead
 
 # Download and process network/label data. Use the adjacency matrix as the ML feature
 dataset = default_constructor(root=root, version=version, graph_name="BioGRID", label_name="DisGeNET",
@@ -122,7 +122,7 @@ root = "datasets"  # save dataset and cache under the datasets/ directory
 
 # Load processed BioGRID data from archive.
 # Alternatively, set version="latest" to get and process the newest data from scratch.
-g = data.BioGRID(root, version="nledata-v0.1.0-dev3")
+g = data.BioGRID(root, version="obnbdata-v0.1.0-dev1")
 
 # Load DisGeNET gene set collections.
 lsc = data.DisGeNET(root, version="latest")
@@ -164,7 +164,7 @@ dataset = Dataset(graph=g, feature=g.to_dense_graph().to_feature(), label=lsc, s
 
 ## Data preparation and releasing notes
 
-First, bump data version in `__init__.py` to the next data release version, e.g., `nledata-v0.1.0 -> nledata-v0.1.1-dev`.
+First, bump data version in `__init__.py` to the next data release version, e.g., `obnbdata-v0.1.0 -> obnbdata-v0.1.1-dev`.
 Then, download and process all latest data by running
 
 ```bash

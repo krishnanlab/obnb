@@ -7,15 +7,16 @@ from types import ModuleType
 
 import click
 import numpy as np
-import obnb.data
 import pandas as pd
 from jinja2 import Environment
+from tqdm import tqdm
+
+import obnb.data
 from obnb import logger
-from obnb.config import NLEDATA_URL_DICT
+from obnb.config import OBNB_DATA_URL_DICT
 from obnb.data.base import BaseData
 from obnb.typing import Dict, List, Tuple
 from obnb.util.converter import GenePropertyConverter
-from tqdm import tqdm
 
 HOMEDIR = Path(__file__).resolve().parent
 DATADIR = HOMEDIR / "data_release"
@@ -45,7 +46,7 @@ REPORT_TEMPLATE = r"""## Overview
 
 
 def setup_version():
-    if (url := NLEDATA_URL_DICT.get(DATA_RELEASE_VERSION)) is not None:
+    if (url := OBNB_DATA_URL_DICT.get(DATA_RELEASE_VERSION)) is not None:
         raise ValueError(f"Data release version {DATA_RELEASE_VERSION} exists ({url})")
 
     # Set this to enable setting the correct version number instead of 'latest'

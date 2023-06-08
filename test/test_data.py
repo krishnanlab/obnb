@@ -12,7 +12,7 @@ from parameterized import parameterized
 import obnb
 import obnb.data
 import obnb.graph
-from obnb.config import NLEDATA_URL_DICT
+from obnb.config import OBNB_DATA_URL_DICT
 from obnb.exception import DataNotFoundError
 from obnb.feature.base import BaseFeature
 from obnb.util.dataset_constructors import default_constructor
@@ -89,7 +89,7 @@ class TestData(unittest.TestCase):
             f"{cls.tmp_dir_preserve}",
         )
 
-        data_url = urljoin(NLEDATA_URL_DICT[obnb.__data_version__], ".cache.zip")
+        data_url = urljoin(OBNB_DATA_URL_DICT[obnb.__data_version__], ".cache.zip")
         download_unzip(data_url, cls.tmp_dir_preserve)
 
     @classmethod

@@ -15,8 +15,8 @@ from tqdm import tqdm
 from obnb.config import (
     DEFAULT_RETRY_DELAY,
     MAX_DOWNLOAD_RETRIES,
-    NLEDATA_URL_DICT,
-    NLEDATA_URL_DICT_STABLE,
+    OBNB_DATA_URL_DICT,
+    OBNB_DATA_URL_DICT_STABLE,
     STREAM_BLOCK_SIZE,
 )
 from obnb.exception import DataNotFoundError, ExceededMaxNumRetries
@@ -49,8 +49,8 @@ def get_data_url(
     """
     logger = logger or native_logger
 
-    if (base_url := NLEDATA_URL_DICT.get(version)) is None:
-        versions = list(NLEDATA_URL_DICT_STABLE) + ["latest"]
+    if (base_url := OBNB_DATA_URL_DICT.get(version)) is None:
+        versions = list(OBNB_DATA_URL_DICT_STABLE) + ["latest"]
         raise ValueError(
             f"Unrecognized version {version!r}, please choose from the "
             f"following versions:\n{pformat(versions)}",
