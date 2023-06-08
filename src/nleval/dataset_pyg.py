@@ -70,6 +70,7 @@ class OpenBiomedNetBench(InMemoryDataset):
             version=self.data_version,
             graph_name=self.network,
             label_name=self.label,
+            selected_genes=self.selected_genes,
             log_level=log_level or self.log_level,
         )
 
