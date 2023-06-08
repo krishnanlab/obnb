@@ -1,8 +1,9 @@
 import numpy as np
-from obnb import label
-from obnb.feature import MultiFeatureVec
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedKFold
+
+from obnb import label
+from obnb.feature import MultiFeatureVec
 
 LABEL_FP = "/mnt/research/compbio/krishnanlab/projects/data_onto_mapping/data/tissue/RealTextManualAnnotations.txt"
 # EXP_DATA_FP = "/mnt/research/compbio/krishnanlab/data/GEO/2019-07-29_downloaded-files/2019-07-31.npz"

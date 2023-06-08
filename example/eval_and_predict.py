@@ -1,11 +1,12 @@
 import numpy as np
+from sklearn.linear_model import LogisticRegression
+from utils import load_data, print_expected
+
 from obnb import Dataset
 from obnb.label.split import RatioPartition
 from obnb.metric import auroc
 from obnb.model_trainer import SupervisedLearningTrainer
 from obnb.util.parallel import ParDatMap
-from sklearn.linear_model import LogisticRegression
-from utils import load_data, print_expected
 
 progressbar = False
 

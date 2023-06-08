@@ -1,6 +1,7 @@
+from utils import print_expected
+
 from obnb.data import GOBP
 from obnb.label import filters
-from utils import print_expected
 
 # specify p-val threshold
 p_thresh = 0.05
