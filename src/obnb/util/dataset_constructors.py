@@ -9,10 +9,10 @@ from obnb.util.converter import GenePropertyConverter
 
 def default_constructor(
     root: str,
-    version: str,
     graph_name: str,
     label_name: str,
     *,
+    version: str = "current",
     graph_as_feature: bool = False,
     use_dense_graph: bool = False,
     min_size: int = 50,
@@ -27,8 +27,9 @@ def default_constructor(
 
     Args:
         root: Directory where the data will be saved.
-        version: Archive data version to use. If set to "latest", then download
-            and process the latest data directly from the source.
+        version: Archive data version to use. "current" uses the most recent
+            processed archive data. "latest" download the latest data from
+            source direction and process it from scratch.
         graph_name: Name of the biological network to use.
         label_name: Name of the label sets to use.
         graph_as_feature: If set to True, then set the dataset feature as the
@@ -79,7 +80,7 @@ def default_constructor(
         new_num_genes = len(genes_to_use)
         obnb.logger.info(
             f"{new_num_genes:,} genes intersecting network genes "
-            f"(n={orig_num_genes}:,) and the provided gene list "
+            f"(n={orig_num_genes:,}) and the provided gene list "
             f"(n={len(selected_genes):,})",
         )
 

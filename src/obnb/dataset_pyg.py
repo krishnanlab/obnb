@@ -5,11 +5,12 @@ import torch
 from torch_geometric.data import InMemoryDataset
 
 from obnb import __data_version__
-from obnb.typing import Callable, List, LogLevel, Optional
+from obnb.typing import Callable, LogLevel, Optional
 from obnb.util.dataset_constructors import default_constructor
+from obnb.util.logger import verbose
 
 
-class OpenBiomedNetBench(InMemoryDataset):
+class OpenBiomedNetBenchPyG(InMemoryDataset):
     """PyTorch Geometric default dataset construct.
 
     Args:
@@ -21,8 +22,8 @@ class OpenBiomedNetBench(InMemoryDataset):
             "latest", then download data from source and process them from
             scratch.
         log_level: Data downloading and processing verbosity.
-        transform: PyG transformation to be applied.
-        pre_transform: PyG transformation to be applied before saving.
+        transform: PyG transforms to be applied.
+        pre_transform: PyG transforms to be applied before saving.
 
     """
 
@@ -40,11 +41,10 @@ class OpenBiomedNetBench(InMemoryDataset):
         self.network = network
         self.label = label
         self.name = f"{network}-{label}"
-        self.selected_genes = selected_genes
         self.version = __data_version__ if version == "current" else version
         self.log_level = log_level
 
-        super().__init__(root, transform, pre_transform)
+        super().__init__(root, transform, pre_transform, log=verbose(log_level))
         self.data, self.slices = torch.load(self.processed_paths[0])
 
     def __repr__(self) -> str:
