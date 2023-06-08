@@ -109,7 +109,7 @@ class StandardTrainer(BaseTrainer):
 
         return results
 
-    def eval_multi_ovr(
+    def fit_and_eval(
         self,
         model: Any,
         dataset,
@@ -117,7 +117,7 @@ class StandardTrainer(BaseTrainer):
         consider_negative: bool = False,
         reduce: str = "none",
     ) -> Dict[str, float]:
-        """Evaluate the model in a multiclass setting.
+        """Fit model and evaluate.
 
         Note:
             The original model is not trained. For each task, a deep copy of

@@ -80,7 +80,7 @@ sl_trainer = SupervisedLearningTrainer(metrics)
 lp_trainer = LabelPropagationTrainer(metrics)
 ```
 
-Then, use the `eval_multi_ovr` method of the trainer to evaluate a given ML model over all tasks
+Then, use the `fit_and_eval` method of the trainer to evaluate a given ML model over all tasks
 in a one-vs-rest setting.
 
 ```python
@@ -92,8 +92,8 @@ sl_mdl = LogisticRegression(penalty="l2", solver="lbfgs")
 lp_mdl = OneHopPropagation()
 
 # Evaluate the models over all tasks
-sl_results = sl_trainer.eval_multi_ovr(sl_mdl, dataset)
-lp_results = lp_trainer.eval_multi_ovr(lp_mdl, dataset)
+sl_results = sl_trainer.fit_and_eval(sl_mdl, dataset)
+lp_results = lp_trainer.fit_and_eval(lp_mdl, dataset)
 ```
 
 ### Evaluating GNN models
