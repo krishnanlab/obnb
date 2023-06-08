@@ -19,8 +19,8 @@ class OpenBiomedNetBench(InMemoryDataset):
         selected_genes: An optional list of genes. When supplied, will be used
             to filter out genes in the label in addition to the filtering based
             on network genes.
-        data_version: Version of the OpenBiomedNetBench data to use. If not
-            specified, will use the current (archived) release. If specified as
+        version: Version of the OpenBiomedNetBench data to use. By default,
+            "current" means using current (archived) release. If specified as
             "latest", then download data from source and process them from
             scratch.
         log_level: Data downloading and processing verbosity.
@@ -36,7 +36,7 @@ class OpenBiomedNetBench(InMemoryDataset):
         label: str,
         *,
         selected_genes: Optional[List[str]] = None,
-        data_version: Optional[str] = None,
+        version: str = "current",
         log_level: LogLevel = "INFO",
         transform: Optional[Callable] = None,
         pre_transform: Optional[Callable] = None,
@@ -45,7 +45,7 @@ class OpenBiomedNetBench(InMemoryDataset):
         self.label = label
         self.name = f"{network}-{label}"
         self.selected_genes = selected_genes
-        self.data_version = data_version or __data_version__
+        self.version = __data_version__ if version == "current" else version
         self.log_level = log_level
 
         super().__init__(root, transform, pre_transform)
@@ -67,7 +67,7 @@ class OpenBiomedNetBench(InMemoryDataset):
     def get_raw_dataset(self, log_level: Optional[LogLevel] = None):
         return default_constructor(
             self.root,
-            version=self.data_version,
+            version=self.version,
             graph_name=self.network,
             label_name=self.label,
             selected_genes=self.selected_genes,

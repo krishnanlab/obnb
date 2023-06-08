@@ -80,7 +80,7 @@ class BaseData:
         super().__init__(**kwargs)
 
         self.root = root
-        self.version = version
+        self.version = obnb.__data_version__ if version == "current" else version
         self.log_level = log_level
         self.cache_transform = cache_transform
         self.download_cache = download_cache

@@ -56,7 +56,9 @@ section below.
 from obnb.util.dataset_constructors import default_constructor
 
 root = "datasets"  # save dataset and cache under the datasets/ directory
-version = "obnbdata-v0.1.0-dev1"  # archive data version, use 'latest' to pull latest data from source instead
+version = "current"  # use the last archived version
+# Optionally, set version to the specific data version number
+# Or, set version to "latest" to download the latest data from source and process it from scratch
 
 # Download and process network/label data. Use the adjacency matrix as the ML feature
 dataset = default_constructor(root=root, version=version, graph_name="BioGRID", label_name="DisGeNET",
@@ -121,11 +123,10 @@ from obnb import data
 root = "datasets"  # save dataset and cache under the datasets/ directory
 
 # Load processed BioGRID data from archive.
-# Alternatively, set version="latest" to get and process the newest data from scratch.
-g = data.BioGRID(root, version="obnbdata-v0.1.0-dev1")
+g = data.BioGRID(root, version="current")
 
 # Load DisGeNET gene set collections.
-lsc = data.DisGeNET(root, version="latest")
+lsc = data.DisGeNET(root, version="current")
 ```
 
 #### Setting up data and splits
