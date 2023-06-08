@@ -9,7 +9,7 @@ First and foremost, we thank you for your interest in contributing to the `obnb`
 To get started,
 
 1. Make a fork of the repository, and create a new branch where you will be making your changes
-1. After you are done with the new changes, make a Pull Request https://github.com/krishnanlab/NetworkLearningEval/pulls of your changes
+1. After you are done with the new changes, make a Pull Request https://github.com/krishnanlab/obnb/pulls of your changes
 
 ## Dev notes
 
@@ -18,8 +18,8 @@ To get started,
 To develop `obnb`, first clone your forked repository to your machine (replace `<your_github_handle>` with your GitHub handle)
 
 ```bash
-git clone https://github.com/<your_github_handle>/NetworkLearningEval
-cd NetworkLearningEval
+git clone https://github.com/<your_github_handle>/obnb
+cd obnb
 ```
 
 If you have done it before, make sure your fork is in-sync with the latest changes and pull the changes to your local copy
@@ -67,7 +67,7 @@ tox -e mypy,flake8
 
 ### Continuous integration
 
-We have set up continuous integration via [GitHub Actions](https://github.com/krishnanlab/NetworkLearningEval/actions).
+We have set up continuous integration via [GitHub Actions](https://github.com/krishnanlab/obnb/actions).
 Every time a pull request is made from a branch (and any following push to that branch) will trigger automated [testing](#testing)
 and [linting](#linting) to check the changes against out dev guidelines.
 
