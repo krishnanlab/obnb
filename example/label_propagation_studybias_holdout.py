@@ -31,7 +31,7 @@ print(trainer.train(mdl, dataset))
 
 # Evaluate the model for all tasks
 dataset = Dataset(graph=g, label=lsc, splitter=splitter)
-results = trainer.eval_multi_ovr(mdl, dataset, consider_negative=True, reduce="mean")
+results = trainer.fit_and_eval(mdl, dataset, consider_negative=True, reduce="mean")
 print(f"Average train score = {results['train_auroc']:.4f}")
 print(f"Average test score = {results['test_auroc']:.4f}")
 
