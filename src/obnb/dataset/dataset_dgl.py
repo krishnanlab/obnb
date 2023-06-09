@@ -94,7 +94,7 @@ class OpenBiomedNetBenchDGL(DGLDataset):
 
         for key, val in self._graph.ndata.items():
             if key.endswith("_mask"):
-                self._graph.ndata[key] = self._graph.ndata[key].to(dtype=torch.bool)
+                self._graph.ndata[key] = val.to(dtype=torch.bool)
 
     def has_cache(self) -> bool:
         has_graph = osp.exists(self.processed_graph_path)

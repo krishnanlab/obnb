@@ -12,6 +12,7 @@ from obnb.typing import Optional, Tensor, Union
 
 
 def cast_ndarray_type(x: Union[np.ndarray, Tensor]) -> np.ndarray:
+    """Cast numpy ndarray type."""
     if isinstance(x, np.ndarray):
         x = x
     elif torch is None or not isinstance(x, torch.Tensor):
