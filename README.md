@@ -56,7 +56,7 @@ section below.
 from obnb.dataset import OpenBiomedNetBench
 
 root = "datasets"  # save dataset and cache under the datasets/ directory
-version = "current"  # use the last archived version
+version = __data_version__  # use the last archived version (same as setting to "current")
 # Optionally, set version to the specific data version number
 # Or, set version to "latest" to download the latest data from source and process it from scratch
 
@@ -120,10 +120,10 @@ from obnb import data
 root = "datasets"  # save dataset and cache under the datasets/ directory
 
 # Load processed BioGRID data from archive.
-g = data.BioGRID(root, version="current")
+g = data.BioGRID(root, version=version)
 
 # Load DisGeNET gene set collections.
-lsc = data.DisGeNET(root, version="current")
+lsc = data.DisGeNET(root, version=version)
 ```
 
 #### Setting up data and splits
