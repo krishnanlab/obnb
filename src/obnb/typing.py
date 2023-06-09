@@ -22,7 +22,7 @@ import numpy as np
 
 try:
     from torch import Tensor
-except ModuleNotFoundError:
+except (ModuleNotFoundError, OSError):
     Tensor = Any
 
 try:

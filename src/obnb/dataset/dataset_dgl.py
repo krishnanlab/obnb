@@ -2,6 +2,7 @@
 import os.path as osp
 
 try:
+    import torch
     from dgl import load_graphs, save_graphs
     from dgl.data import DGLDataset
     from dgl.data.utils import load_info, save_info
@@ -90,6 +91,10 @@ class OpenBiomedNetBenchDGL(DGLDataset):
         info = load_info(self.processed_info_path)
         self._graph.node_ids = info["node_ids"]
         self._graph.task_ids = info["task_ids"]
+
+        for key, val in self._graph.ndata.items():
+            if key.endswith("_mask"):
+                self._graph.ndata[key] = val.to(dtype=torch.bool)
 
     def has_cache(self) -> bool:
         has_graph = osp.exists(self.processed_graph_path)

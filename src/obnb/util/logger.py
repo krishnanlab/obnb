@@ -20,6 +20,22 @@ def display_pbar(level: Union[int, str], threshold="INFO") -> bool:
     return verbose(level, threshold)
 
 
+def log(_round: int = 3, _fill: str = ": ", **kwargs):
+    """Simple keyword-value logger."""
+
+    def _format(key: str) -> str:
+        value = kwargs[key]
+        if isinstance(value, int):
+            out = f"{key}{_fill}{value:,}"
+        elif isinstance(value, float):
+            out = f"{key}{_fill}{value:.{_round}f}"
+        else:
+            out = f"{key}{_fill}{value}"
+        return out
+
+    print(", ".join(map(_format, kwargs)))
+
+
 def config_logger():
     """Configure logger used by obnb."""
     logging.config.dictConfig(LOGGER_CONFIG)
