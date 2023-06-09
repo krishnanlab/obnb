@@ -37,7 +37,7 @@ pip install torch-geometric==2.0.4 torch-scatter torch-sparse torch-cluster -f h
 ### Quick install using the installation script
 
 ```bash
-source install.sh cu102  # other options are [cpu,cu113]
+source install.sh cu117  # other options are [cpu,cu118]
 ```
 
 ## Quick Demonstration
