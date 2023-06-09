@@ -796,14 +796,16 @@ class DirectedSparseGraph(SparseGraph):
     def __init__(
         self,
         weighted: bool = True,
+        directed: bool = True,
         log_level: LogLevel = "WARNING",
         verbose: bool = False,
         logger: Optional[logging.Logger] = None,
     ):
         """Initialize the directed sparse graoh."""
+        assert directed, "DirectedSparseGraph must have directed=True"
         super().__init__(
             weighted=weighted,
-            directed=True,
+            directed=directed,
             log_level=log_level,
             verbose=verbose,
             logger=logger,
