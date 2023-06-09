@@ -61,8 +61,8 @@ version = "current"  # use the last archived version
 # Or, set version to "latest" to download the latest data from source and process it from scratch
 
 # Download and process network/label data. Use the adjacency matrix as the ML feature
-dataset = default_constructor(root=root, version=version, graph_name="BioGRID", label_name="DisGeNET",
-                              graph_as_feature=True, use_dense_graph=True)
+dataset = default_constructor(root=root, graph_name="BioGRID", label_name="DisGeNET",
+                              version=version, graph_as_feature=True, use_dense_graph=True)
 ```
 
 ### Evaluating standard models
@@ -101,8 +101,8 @@ Training and evaluation of Graph Neural Network (GNN) models can be done in a ve
 from torch_geometric.nn import GCN
 from obnb.model_trainer.gnn import SimpleGNNTrainer
 
-# Use 1-dimensional trivial node feature
-dataset = default_constructor(root=root, version=version, graph_name="BioGRID", label_name="DisGeNET")
+# Use 1-dimensional trivial node feature by default
+dataset = default_constructor(root=root, graph_name="BioGRID", label_name="DisGeNET", version=version)
 
 # Train and evaluate a GCN
 gcn_mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=n_tasks)

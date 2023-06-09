@@ -8,11 +8,16 @@ from obnb.config.logger_config import LOGGER_CONFIG
 from obnb.typing import List, LogLevel, Optional, Union
 
 
-def display_pbar(level: Union[int, str], threshold="INFO") -> bool:
-    """Determines whether to display progress bar."""
+def verbose(level: Union[int, str], threshold="INFO") -> bool:
+    """Determines verbosity based on the given level and the threshold."""
     level_int = level if isinstance(level, int) else logging.getLevelName(level)
     threshold_int = logging.getLevelName(threshold)
     return level_int <= threshold_int
+
+
+def display_pbar(level: Union[int, str], threshold="INFO") -> bool:
+    """Determines whether to display progress bar."""
+    return verbose(level, threshold)
 
 
 def config_logger():
