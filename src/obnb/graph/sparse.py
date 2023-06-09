@@ -109,7 +109,7 @@ class SparseGraph(BaseGraph):
             deg = np.array([sum(i.values()) for i in self._edge_data])
         elif direction == "in":
             deg = np.zeros(self.size)
-            for src, dst_data in enumerate(self._edge_data):
+            for _, dst_data in enumerate(self._edge_data):
                 for dst, weight in dst_data.items():
                     deg[dst] += weight if weighted else 1
         return deg
