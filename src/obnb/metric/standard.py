@@ -1,10 +1,24 @@
 """Standard metric extending those available in sklearn."""
 from functools import wraps
 
+try:
+    import torch
+except (ModuleNotFoundError, OSError):
+    torch = None
 import numpy as np
 import sklearn.metrics
 
-from obnb.typing import Optional
+from obnb.typing import Optional, Tensor, Union
+
+
+def cast_ndarray_type(x: Union[np.ndarray, Tensor]) -> np.ndarray:
+    if isinstance(x, np.ndarray):
+        x = x
+    elif torch is None or not isinstance(x, torch.Tensor):
+        raise TypeError(f"Cannot to typecast {type(x)} to numpy array")
+    else:
+        x = x.detach().clone().to("cpu", non_blocking=True).numpy()
+    return x
 
 
 def wrap_metric(metric_func):
@@ -17,8 +31,8 @@ def wrap_metric(metric_func):
 
     @wraps(metric_func)
     def wrapped(
-        y_true: np.ndarray,
-        y_pred: np.ndarray,
+        y_true: Union[np.ndarray, Tensor],
+        y_pred: Union[np.ndarray, Tensor],
         reduce: str = "mean",
         y_mask: Optional[np.ndarray] = None,
     ):
@@ -37,6 +51,9 @@ def wrap_metric(metric_func):
         """
         if reduce not in ["none", "mean", "median"]:
             raise ValueError(f"Unknown reduce option {reduce!r}")
+
+        y_true = cast_ndarray_type(y_true)
+        y_pred = cast_ndarray_type(y_pred)
 
         if _skip(y_true, y_pred):
             return np.nan
