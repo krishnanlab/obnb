@@ -1,6 +1,6 @@
 from utils import load_data, print_expected
 
-from obnb import Dataset
+from obnb import BaseDataset
 from obnb.label.split import RatioPartition
 from obnb.metric import auroc
 from obnb.model.label_propagation import OneHopPropagation

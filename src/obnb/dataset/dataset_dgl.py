@@ -1,13 +1,16 @@
 """DGL dataset object."""
 import os.path as osp
 
-from dgl import load_graphs, save_graphs
-from dgl.data import DGLDataset
-from dgl.data.utils import load_info, save_info
+try:
+    from dgl import load_graphs, save_graphs
+    from dgl.data import DGLDataset
+    from dgl.data.utils import load_info, save_info
+except (ModuleNotFoundError, OSError):
+    DGLDataset = object
 
-from obnb import __data_version__
+import obnb
+from obnb.dataset import OpenBiomedNetBench
 from obnb.typing import Callable, LogLevel, Optional
-from obnb.util.dataset_constructors import default_constructor
 from obnb.util.logger import verbose
 
 
@@ -37,10 +40,17 @@ class OpenBiomedNetBenchDGL(DGLDataset):
         log_level: LogLevel = "INFO",
         transform: Optional[Callable] = None,
     ):
+        if DGLDataset is object:
+            raise ImportError(
+                "OpenBiomedNetBenchDGL requires the DGL libary, which is currently "
+                "missing.\nPlease follow the installation instructions on "
+                "https://www.dgl.ai/pages/start.html to install the DGL library first",
+            )
+
         self.root = root
         self.network = network
         self.label = label
-        self.version = __data_version__ if version == "current" else version
+        self.version = obnb.__data_version__ if version == "current" else version
         self.log_level = log_level
         super().__init__(
             name=f"{network}-{label}",
@@ -50,11 +60,11 @@ class OpenBiomedNetBenchDGL(DGLDataset):
         )
 
     def process(self):
-        dataset = default_constructor(
-            self.root,
-            version=self.version,
+        dataset = OpenBiomedNetBench(
+            root=self.root,
             graph_name=self.network,
             label_name=self.label,
+            version=self.version,
             log_level=self.log_level,
         )
         self._graph = dataset.to_dgl_data()
