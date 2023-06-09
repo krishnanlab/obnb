@@ -53,6 +53,7 @@ and processing options, see the [customized dataset construction](#customized-da
 section below.
 
 ```python
+from obnb import __data_version__
 from obnb.dataset import OpenBiomedNetBench
 
 root = "datasets"  # save dataset and cache under the datasets/ directory
