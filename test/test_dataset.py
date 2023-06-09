@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from obnb.dataset import Dataset
+from obnb.dataset.base import Dataset
 from obnb.exception import IDNotExistError
 from obnb.feature import MultiFeatureVec
 from obnb.graph.dense import DenseGraph

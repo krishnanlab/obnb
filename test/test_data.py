@@ -13,9 +13,9 @@ import obnb
 import obnb.data
 import obnb.graph
 from obnb.config import OBNB_DATA_URL_DICT
+from obnb.dataset.dataset import OpenBiomedNetBench
 from obnb.exception import DataNotFoundError
 from obnb.feature.base import BaseFeature
-from obnb.util.dataset_constructors import default_constructor
 from obnb.util.download import download_unzip
 from obnb.util.timer import Timeout
 
@@ -167,7 +167,7 @@ def test_dataset_constructor(subtests, tmpdir):
             graph_as_feature=graph_as_feature,
             use_dense_graph=use_dense_graph,
         ):
-            dataset = default_constructor(
+            dataset = OpenBiomedNetBench(
                 root=datadir,
                 graph_name="BioPlex",
                 label_name="DisGeNET",

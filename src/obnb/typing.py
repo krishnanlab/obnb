@@ -27,7 +27,7 @@ except ModuleNotFoundError:
 
 try:
     from torch_geometric.data import Data as PyG_Data
-except ModuleNotFoundError:
+except (ModuleNotFoundError, OSError):
     PyG_Data = Any
 
 INT_TYPE = (int, np.int32, np.int64)

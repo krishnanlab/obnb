@@ -1,12 +1,15 @@
 """PyTorch Geometric dataset object."""
 import os.path as osp
 
-import torch
-from torch_geometric.data import InMemoryDataset
+try:
+    import torch
+    from torch_geometric.data import InMemoryDataset
+except (ModuleNotFoundError, OSError):
+    InMemoryDataset = object
 
-from obnb import __data_version__
+import obnb
+from obnb.dataset import OpenBiomedNetBench
 from obnb.typing import Callable, LogLevel, Optional
-from obnb.util.dataset_constructors import default_constructor
 from obnb.util.logger import verbose
 
 
@@ -38,10 +41,17 @@ class OpenBiomedNetBenchPyG(InMemoryDataset):
         transform: Optional[Callable] = None,
         pre_transform: Optional[Callable] = None,
     ):
+        if InMemoryDataset is object:
+            raise ImportError(
+                "OpenBiomedNetBenchPyG requires PyTorch and PyG, at least one of "
+                "is currently missing.\nPlease follow the installation instructions "
+                "on https://pytorch-geometric.readthedocs.io to install first.",
+            )
+
         self.network = network
         self.label = label
         self.name = f"{network}-{label}"
-        self.version = __data_version__ if version == "current" else version
+        self.version = obnb.__data_version__ if version == "current" else version
         self.log_level = log_level
 
         super().__init__(root, transform, pre_transform, log=verbose(log_level))
@@ -61,11 +71,11 @@ class OpenBiomedNetBenchPyG(InMemoryDataset):
         return "data.pt"
 
     def process(self):
-        dataset = default_constructor(
-            self.root,
-            version=self.version,
+        dataset = OpenBiomedNetBench(
+            root=self.root,
             graph_name=self.network,
             label_name=self.label,
+            version=self.version,
             log_level=self.log_level,
         )
         data = dataset.to_pyg_data()
