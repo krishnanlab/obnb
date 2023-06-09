@@ -17,7 +17,7 @@ fi
 
 # Torch related dependency versions
 PYTORCH_VERSION=2.0.1
-PYG_VERSION=2.3.1
+PYG_VERSION=2.3.0
 DGL_VERSION=1.1.0
 
 # Set CUDA variable (use CPU if not set)
@@ -53,6 +53,9 @@ conda install dgl=${DGL_VERSION} -c ${DGL_OPT} -y
 
 # Finally, install obnb
 pip install -e .
+
+# Clean up
+conda clean --all -y
 
 printf "Successfully installed obnb, be sure to activate the obnb conda environment via:\n"
 printf "\n    \$ conda activate obnb\n"
