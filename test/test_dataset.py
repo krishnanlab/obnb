@@ -120,7 +120,7 @@ def test_get_feat_from_idxs(subtests, data):
     # Index out of range
     pytest.raises(IndexError, dataset.get_feat, [3, 5])
 
-    dataset = Dataset(graph=data.graph, label=data.lsc)
+    dataset = Dataset(graph=data.graph, label=data.lsc, auto_generate_feature=None)
     with pytest.raises(ValueError, match="feature not set"):
         dataset.get_feat([0, 1])
 

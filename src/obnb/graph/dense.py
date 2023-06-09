@@ -100,6 +100,29 @@ class DenseGraph(BaseGraph):
         else:
             return sorted(in_nbrs_idxs | out_nbrs_idxs)
 
+    def degree(self, weighted: bool = False, direction: str = "out") -> np.ndarray:
+        """Return node degrees.
+
+        Args:
+            weighted: Whether or not consider edge weights.
+            direction: 'in' or 'out' degrees. This option is only relevant for
+                directed graphs.
+
+        """
+        adj = self.mat.copy()
+
+        if not weighted:
+            adj = adj != 0
+
+        if direction == "in":
+            axis = 0
+        elif direction == "out":
+            axis = 1
+        else:
+            raise ValueError(f"direction must be 'in' or 'out', got {direction!r}")
+
+        return adj.sum(axis)
+
     def propagate(self, seed: np.ndarray) -> np.ndarray:
         """Propagate label informmation.
 

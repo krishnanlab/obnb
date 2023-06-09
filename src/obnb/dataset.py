@@ -1,7 +1,8 @@
 """Dataset object."""
 import numpy as np
+from sklearn.preprocessing import KBinsDiscretizer
 
-from obnb.feature import MultiFeatureVec
+from obnb.feature import FeatureVec, MultiFeatureVec
 from obnb.feature.base import BaseFeature
 from obnb.graph.base import BaseGraph
 from obnb.label.collection import LabelsetCollection
@@ -12,7 +13,21 @@ from obnb.util.idhandler import IDmap
 
 
 class Dataset:
-    """Dataset object."""
+    """Dataset object.
+
+    Args:
+        graph: Graph object.
+        feature: Feature object.
+        label: Label set collection object.
+        auto_generate_feature: Automatically generate features from the input
+            graph if it is graph is available. If specified as None, then do
+            not generate features from the graph automatically.
+        dual: If set to True, consider each feature dimension as a sample.
+        splitter: Splitter object that determins train/val/test split.
+        split_kwargs: Keyword arguments for calling the split function of the
+            splitter.
+
+    """
 
     def __init__(
         self,
@@ -20,6 +35,7 @@ class Dataset:
         graph: Optional[BaseGraph] = None,
         feature: Optional[BaseFeature] = None,
         label: Optional[LabelsetCollection] = None,
+        auto_generate_feature: Optional[str] = "OneHotLogDeg",
         dual: bool = False,
         splitter: Optional[BaseSplit] = None,
         **split_kwargs,
@@ -28,6 +44,9 @@ class Dataset:
         self.set_idmap(graph, feature)
         self.graph = graph
         self.feature = feature
+
+        if self.feature is None and auto_generate_feature:
+            self.generate_features(auto_generate_feature)
 
         self.label = label
         self.splitter = splitter
@@ -247,6 +266,27 @@ class Dataset:
         for mask_name in self.masks:
             yield mask_name, self.get_split(mask_name, split_idx)
 
+    def generate_features(self, name: str = "OneHotLogDeg", overwrite: bool = False):
+        if self.graph is None:
+            raise ValueError("Missing graph in the dataset object")
+
+        if self.feature is not None and not overwrite:
+            raise ValueError(
+                "Feature already exists. Set overwrite to True to force "
+                "overwrite the original feature in the dataset object.",
+            )
+
+        if name == "OneHotLogDeg":
+            deg = self.graph.degree(weighted=False)[:, None]
+            feat = KBinsDiscretizer(
+                n_bins=32,
+                encode="onehot-dense",
+                strategy="uniform",
+            ).fit_transform(np.log(deg))
+            self._feature = FeatureVec.from_mat(feat, list(self.graph.node_ids))
+        else:
+            raise NotImplementedError(f"{name} feature is not implemented yet.")
+
     def to_pyg_data(
         self,
         *,
@@ -261,11 +301,10 @@ class Dataset:
         device = torch.device(device)
         num_nodes = self.size
 
-        # Use trivial feature if feature not available
-        x = np.ones((num_nodes, 1)) if self.feature is None else self.feature.mat
+        x = self.feature.mat
         edge_index, edge_weight = self.graph.to_coo()  # TODO: empty graph?
 
-        x = torch.FloatTensor(x)
+        x = torch.FloatTensor(self.feature.mat)
         edge_index = torch.LongTensor(edge_index)
         edge_weight = None if edge_weight is None else torch.FloatTensor(edge_weight)
 
@@ -316,7 +355,7 @@ class Dataset:
         num_nodes = self.size
 
         # Use trivial feature if feature not available
-        x = np.ones((num_nodes, 1)) if self.feature is None else self.feature.mat
+        x = self.feature.mat
         (edges_src, edges_dst), edge_weight = self.graph.to_coo()  # TODO: empty graph?
 
         dglgraph = dgl.graph(

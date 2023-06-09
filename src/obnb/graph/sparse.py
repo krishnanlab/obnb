@@ -94,6 +94,26 @@ class SparseGraph(BaseGraph):
             raise NotImplementedError("Use DirectedSparseGraph instead.")
         return sorted(self.edge_data[node_idx])
 
+    def degree(self, weighted: bool = False, direction: str = "out") -> np.ndarray:
+        """Return node degrees.
+
+        Args:
+            weighted: Whether or not consider edge weights.
+            direction: 'in' or 'out' degrees. This option is only relevant for
+                directed graphs.
+
+        """
+        if (not weighted) and (direction == "out"):
+            deg = np.array([len(i) for i in self._edge_data])
+        elif weighted and (direction == "out"):
+            deg = np.array([sum(i.values()) for i in self._edge_data])
+        elif direction == "in":
+            deg = np.zeros(self.size)
+            for _, dst_data in enumerate(self._edge_data):
+                for dst, weight in dst_data.items():
+                    deg[dst] += weight if weighted else 1
+        return deg
+
     def induced_subgraph(self, node_ids: List[str]):
         """Return a subgraph induced by a subset of nodes.
 
@@ -796,14 +816,16 @@ class DirectedSparseGraph(SparseGraph):
     def __init__(
         self,
         weighted: bool = True,
+        directed: bool = True,
         log_level: LogLevel = "WARNING",
         verbose: bool = False,
         logger: Optional[logging.Logger] = None,
     ):
         """Initialize the directed sparse graoh."""
+        assert directed, "DirectedSparseGraph must have directed=True"
         super().__init__(
             weighted=weighted,
-            directed=True,
+            directed=directed,
             log_level=log_level,
             verbose=verbose,
             logger=logger,
@@ -834,6 +856,23 @@ class DirectedSparseGraph(SparseGraph):
             return sorted(out_nbrs_idxs)
         else:
             return sorted(in_nbrs_idxs | out_nbrs_idxs)
+
+    def degree(self, weighted: bool = False, direction: str = "out") -> np.ndarray:
+        """Return node degrees.
+
+        Args:
+            weighted: Whether or not consider edge weights.
+            direction: 'in' or 'out' degrees. This option is only relevant for
+                directed graphs.
+
+        """
+        if direction == "out":
+            deg = super().degree(weighted=weighted, direction=direction)
+        elif not weighted:
+            deg = np.array([len(i) for i in self._rev_edge_data])
+        else:
+            deg = np.array([sum(i.values()) for i in self._rev_edge_data])
+        return deg
 
     def _new_node_data(self):
         self._edge_data.append({})
