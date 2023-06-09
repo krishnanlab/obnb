@@ -49,7 +49,7 @@ conda activate obnb
 # Install CUDA enabled dependencies
 conda install pytorch=${PYTORCH_VERSION} torchvision torchaudio ${TORCH_OPT} -y
 conda install pyg=${PYG_VERSION} -c pyg -y
-conda install dgl=${DGL_VERSION} -c ${DGL_OPT}
+conda install dgl=${DGL_VERSION} -c ${DGL_OPT} -y
 
 # Finally, install obnb
 pip install -e .
