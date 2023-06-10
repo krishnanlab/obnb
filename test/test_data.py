@@ -173,6 +173,7 @@ def test_dataset_constructor(subtests, tmpdir):
                 label_name="DisGeNET",
                 graph_as_feature=graph_as_feature,
                 use_dense_graph=use_dense_graph,
+                auto_generate_feature=None,
                 **opts,
             )
 
