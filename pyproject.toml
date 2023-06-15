@@ -43,7 +43,7 @@ dependencies = [
     "scikit-learn>=1.0.0",
     "scipy",
     "tqdm",
-    "check_outdated",
+    "outdated",
 ]
 
 [project.urls]
