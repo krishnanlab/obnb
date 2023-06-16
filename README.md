@@ -11,8 +11,8 @@
 # Open Biomedical Network Benchmark
 
 The Open Biomedical Network Benchmark (OBNB) is a comprehensive resource for setting up benchmarking graph datasets using _biomedical networks_ and _gene annotations_.
-Our goal is to leverage advanced graph machine learning techniques, such as graph neural networks and graph embeddings, to accelerate the development of network biology for gaining insights into genes' function, trait, and disease associations using biological networks.
-OBNB additionally provides dataset objects compatible with popular graph deep learning frameworks, including [PyTorch Geometric (PyG)](https://github.com/pyg-team/pytorch_geometric) and [Deep Graph Library (DGL)](https://github.com/dmlc/dgl).
+Our goal is to accelerate the adoption of advanced graph machine learning techniques, such as graph neural networks and graph embeddings, in network biology for gaining novel insights into genes' function, trait, and disease associations using biological networks.
+To make this adoption convenient, OBNB also provides dataset objects compatible with popular graph deep learning frameworks, including [PyTorch Geometric (PyG)](https://github.com/pyg-team/pytorch_geometric) and [Deep Graph Library (DGL)](https://github.com/dmlc/dgl).
 
 A comprehensive benchmarking study with a wide-range of graph neural networks and graph embedding methods on OBNB datasets can be found in our benchmarking repository [`obnbench`](https://github.com/krishnanlab/obnbench).
 
