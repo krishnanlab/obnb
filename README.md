@@ -44,15 +44,15 @@ pip install torch-geometric==2.0.4 torch-scatter torch-sparse torch-cluster -f h
 source install.sh cu117  # other options are [cpu,cu118]
 ```
 
-## Quick Demonstration
+## Package usage
 
 ### Construct default datasets
 
-We provide a high-level dataset constructor to help user effortlessly set up a ML-ready dataset
+We provide a high-level dataset constructor to help users easily set up benchmarking graph datasets
 for a combination of network and label. In particular, the dataset will be set up with study-bias
-holdout split (6/2/2), where 60% of the most well studied genes according to the number of
+holdout split (6/2/2), where 60% of the most well-studied genes according to the number of
 associated PubMed publications are used for training, 20% of the least studied genes are used for
-testing, and rest of the 20% genes are used for validation. For more customizable data loading
+testing, and the rest of the 20% genes are used for validation. For more customizable data loading
 and processing options, see the [customized dataset construction](#customized-dataset-construction)
 section below.
 
@@ -69,6 +69,26 @@ version = __data_version__  # use the last archived version (same as setting to 
 dataset = OpenBiomedNetBench(root=root, graph_name="BioGRID", label_name="DisGeNET",
                              version=version, graph_as_feature=True, use_dense_graph=True)
 ```
+
+Users can also load the dataset objects into ones that are compatible with PyG or DGL (see below).
+
+#### PyG dataset
+
+```python
+from obnb.dataset import OpenBiomedNetBenchPyG
+dataset = OpenBiomedNetBenchPyG(root, "BioGRID", "DisGeNET")
+```
+
+**Note**: requires installing PyG first (see [installation instructions](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html))
+
+#### DGL dataset
+
+```python
+from obnb.dataset import OpenBiomedNetBenchDGL
+dataset = OpenBiomedNetBenchDGL(root, "BioGRID", "DisGeNET")
+```
+
+**Note**: requires installing DGL first (see [installation instructions](https://www.dgl.ai/pages/start.html))
 
 ### Evaluating standard models
 
