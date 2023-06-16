@@ -31,14 +31,15 @@ __all__ = [
 
 def checkVersion(version: str):
     """Check if the current version is up to date."""
-    is_outdated, latest_version = check_outdated("obnb", version)
-    if is_outdated:
-        warnings.warn(
-            f"A new OBNB version {latest_version!r} is available "
-            f"(current version: {version!r}).",
-            UserWarning,
-            stacklevel=2,
-        )
+    if "dev" not in version:
+        is_outdated, latest_version = check_outdated("obnb", version)
+        if is_outdated:
+            warnings.warn(
+                f"A new OBNB version {latest_version!r} is available "
+                f"(current version: {version!r}).",
+                UserWarning,
+                stacklevel=2,
+            )
 
 
 def checkValuePositive(name, val):
