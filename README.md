@@ -14,36 +14,6 @@ The Open Biomedical Network Benchmark (OBNB) is a comprehensive resource for set
 Our goal is to leverage advanced graph machine learning techniques, such as graph neural networks and graph embeddings, to accelerate the development of network biology for gaining insights into genes' function, trait, and disease associations using biological networks.
 OBNB additionally provides dataset objects compatible with popular graph deep learning frameworks, including [PyTorch Geometric (PyG)](https://github.com/pyg-team/pytorch_geometric) and [Deep Graph Library (DGL)](https://github.com/dmlc/dgl).
 
-## Installation
-
-Clone the repository first and then install via `pip`
-
-```bash
-git clone https://github.com/krishnanlab/obnb && cd obnb
-pip install -e .
-```
-
-The `-e` option means 'editable', i.e. no need to reinstall the library if you make changes to the source code.
-Feel free to not use the `-e` option and simply do `pip install .` if you do not plan on modifying the source code.
-
-### Optional Pytorch Geometric installation
-
-User need to install [Pytorch Geomtric](https://github.com/pyg-team/pytorch_geometric) to enable some GNN related features.
-To install PyG, first need to install [PyTorch](https://pytorch.org).
-For full details about installation instructions, visit the links above.
-Assuming the system has Python3.8 or above installed, with CUDA10.2, use the following to install both PyTorch and PyG.
-
-```bash
-conda install pytorch=1.12.1 torchvision cudatoolkit=10.2 -c pytorch
-pip install torch-geometric==2.0.4 torch-scatter torch-sparse torch-cluster -f https://data.pyg.org/whl/torch-1.12.1+cu102.html
-```
-
-### Quick install using the installation script
-
-```bash
-source install.sh cu117  # other options are [cpu,cu118]
-```
-
 ## Package usage
 
 ### Construct default datasets
@@ -183,6 +153,36 @@ lsc.iapply(
 ```python
 from obnb import Dataset
 dataset = Dataset(graph=g, feature=g.to_dense_graph().to_feature(), label=lsc, splitter=splitter)
+```
+
+## Installation
+
+
+OBNB can be installed easily via pip from [PyPI](https://pypi.org/project/obnb/):
+
+```bash
+pip install obnb
+```
+
+### Install with extension modules (optional)
+
+OBNB provides interfaces with several other packages for network feature extractions, such as
+[PecanPy](https://github.com/krishnanlab/PecanPy) and [GraPE](https://github.com/AnacletoLAB/grape).
+To enable those extensions, install `obnb` with the `ext` extra option enabled:
+
+```bash
+pip install obnb[ext]
+```
+
+### Install graph deep learning libraries (optional)
+
+Follow installation instructions for [PyG]((https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html)) or [DGL](https://www.dgl.ai/pages/start.html) to set up the graph deep learning library of your choice.
+
+Alternatively, we also provide an [installation script](install.sh) that helps you installthe graph deep-learning dependencies in a new conda environment `obnb`:
+
+```bash
+git clone https://github.com/krishnanlab/obnb && cd obnb
+source install.sh cu117  # other options are [cpu,cu118]
 ```
 
 ## Data preparation and releasing notes
