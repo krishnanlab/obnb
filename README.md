@@ -30,7 +30,7 @@ section below.
 
 ```python
 from obnb.dataset import OpenBiomedNetBench
-from obnb.util.version import get_available_versions
+from obnb.util.version import get_available_data_versions
 
 root = "datasets"  # save dataset and cache under the datasets/ directory
 version = "current"  # use the last archived version
@@ -44,8 +44,8 @@ dataset = OpenBiomedNetBench(root=root, graph_name="BioGRID", label_name="DisGeN
 # Check the specific archive data version used
 print(dataset.version)
 
-# Check other stable archive data version available
-print(get_available_versions())
+# Check all available stable archive data versions
+print(get_available_data_versions())
 ```
 
 Users can also load the dataset objects into ones that are compatible with PyG or DGL (see below).
