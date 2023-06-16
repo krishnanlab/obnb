@@ -10,61 +10,63 @@
 
 # Open Biomedical Network Benchmark
 
-## Installation
+The Open Biomedical Network Benchmark (OBNB) is a comprehensive resource for setting up benchmarking graph datasets using _biomedical networks_ and _gene annotations_.
+Our goal is to accelerate the adoption of advanced graph machine learning techniques, such as graph neural networks and graph embeddings, in network biology for gaining novel insights into genes' function, trait, and disease associations using biological networks.
+To make this adoption convenient, OBNB also provides dataset objects compatible with popular graph deep learning frameworks, including [PyTorch Geometric (PyG)](https://github.com/pyg-team/pytorch_geometric) and [Deep Graph Library (DGL)](https://github.com/dmlc/dgl).
 
-Clone the repository first and then install via `pip`
+A comprehensive benchmarking study with a wide-range of graph neural networks and graph embedding methods on OBNB datasets can be found in our benchmarking repository [`obnbench`](https://github.com/krishnanlab/obnbench).
 
-```bash
-git clone https://github.com/krishnanlab/obnb && cd obnb
-pip install -e .
-```
-
-The `-e` option means 'editable', i.e. no need to reinstall the library if you make changes to the source code.
-Feel free to not use the `-e` option and simply do `pip install .` if you do not plan on modifying the source code.
-
-### Optional Pytorch Geometric installation
-
-User need to install [Pytorch Geomtric](https://github.com/pyg-team/pytorch_geometric) to enable some GNN related features.
-To install PyG, first need to install [PyTorch](https://pytorch.org).
-For full details about installation instructions, visit the links above.
-Assuming the system has Python3.8 or above installed, with CUDA10.2, use the following to install both PyTorch and PyG.
-
-```bash
-conda install pytorch=1.12.1 torchvision cudatoolkit=10.2 -c pytorch
-pip install torch-geometric==2.0.4 torch-scatter torch-sparse torch-cluster -f https://data.pyg.org/whl/torch-1.12.1+cu102.html
-```
-
-### Quick install using the installation script
-
-```bash
-source install.sh cu117  # other options are [cpu,cu118]
-```
-
-## Quick Demonstration
+## Package usage
 
 ### Construct default datasets
 
-We provide a high-level dataset constructor to help user effortlessly set up a ML-ready dataset
+We provide a high-level dataset constructor to help users easily set up benchmarking graph datasets
 for a combination of network and label. In particular, the dataset will be set up with study-bias
-holdout split (6/2/2), where 60% of the most well studied genes according to the number of
+holdout split (6/2/2), where 60% of the most well-studied genes according to the number of
 associated PubMed publications are used for training, 20% of the least studied genes are used for
-testing, and rest of the 20% genes are used for validation. For more customizable data loading
+testing, and the rest of the 20% genes are used for validation. For more customizable data loading
 and processing options, see the [customized dataset construction](#customized-dataset-construction)
 section below.
 
 ```python
-from obnb import __data_version__
 from obnb.dataset import OpenBiomedNetBench
+from obnb.util.version import get_available_data_versions
 
 root = "datasets"  # save dataset and cache under the datasets/ directory
-version = __data_version__  # use the last archived version (same as setting to "current")
+version = "current"  # use the last archived version
 # Optionally, set version to the specific data version number
 # Or, set version to "latest" to download the latest data from source and process it from scratch
 
 # Download and process network/label data. Use the adjacency matrix as the ML feature
 dataset = OpenBiomedNetBench(root=root, graph_name="BioGRID", label_name="DisGeNET",
                              version=version, graph_as_feature=True, use_dense_graph=True)
+
+# Check the specific archive data version used
+print(dataset.version)
+
+# Check all available stable archive data versions
+print(get_available_data_versions())
 ```
+
+Users can also load the dataset objects into ones that are compatible with PyG or DGL (see below).
+
+#### PyG dataset
+
+```python
+from obnb.dataset import OpenBiomedNetBenchPyG
+dataset = OpenBiomedNetBenchPyG(root, "BioGRID", "DisGeNET")
+```
+
+**Note**: requires installing PyG first (see [installation instructions](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html))
+
+#### DGL dataset
+
+```python
+from obnb.dataset import OpenBiomedNetBenchDGL
+dataset = OpenBiomedNetBenchDGL(root, "BioGRID", "DisGeNET")
+```
+
+**Note**: requires installing DGL first (see [installation instructions](https://www.dgl.ai/pages/start.html))
 
 ### Evaluating standard models
 
@@ -118,8 +120,6 @@ gcn_results = gcn_trainer.train(gcn_mdl, dataset)
 ```python
 from obnb import data
 
-root = "datasets"  # save dataset and cache under the datasets/ directory
-
 # Load processed BioGRID data from archive.
 g = data.BioGRID(root, version=version)
 
@@ -161,26 +161,31 @@ from obnb import Dataset
 dataset = Dataset(graph=g, feature=g.to_dense_graph().to_feature(), label=lsc, splitter=splitter)
 ```
 
-## Data preparation and releasing notes
+## Installation
 
-First, bump data version in `__init__.py` to the next data release version, e.g., `obnbdata-v0.1.0 -> obnbdata-v0.1.1-dev`.
-Then, download and process all latest data by running
+OBNB can be installed easily via pip from [PyPI](https://pypi.org/project/obnb/):
 
 ```bash
-python script/release_data.py
+pip install obnb
 ```
 
-By default, the data ready to be uploaded (e.g., to [Zenodo](zenodo.org)) is saved under `data_release/archived`.
-After some necessary inspection and checking, if everything looks good, upload and publish the new archived data.
+### Install with extension modules (optional)
 
-**Note:** `dev` data should be uploaded to the [sandbox](https://sandbox.zenodo.org/record/1097545#.YxYrqezMJzV) instead.
+OBNB provides interfaces with several other packages for network feature extractions, such as
+[PecanPy](https://github.com/krishnanlab/PecanPy) and [GraPE](https://github.com/AnacletoLAB/grape).
+To enable those extensions, install `obnb` with the `ext` extra option enabled:
 
-Check items:
+```bash
+pip install obnb[ext]
+```
 
-- [ ] Update `__data_version__`
-- [ ] Run [`release_data.py`](script/release_data.py)
-- [ ] Upload archived data to Zenodo (be sure to edit the data version there also)
-- [ ] Update url dict in config (will improve in the future to get info from Zenodo directly)
-- [ ] Update network stats in data [test](test/test_data.py)
+### Install graph deep learning libraries (optional)
 
-Finally, commit and push the bumped version.
+Follow installation instructions for [PyG](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html) or [DGL](https://www.dgl.ai/pages/start.html) to set up the graph deep learning library of your choice.
+
+Alternatively, we also provide an [installation script](install.sh) that helps you installthe graph deep-learning dependencies in a new conda environment `obnb`:
+
+```bash
+git clone https://github.com/krishnanlab/obnb && cd obnb
+source install.sh cu117  # other options are [cpu,cu118]
+```

@@ -94,3 +94,27 @@ and [linting](#linting) to check the changes against out dev guidelines.
    ```
 
 You can now view the documentation page by opening `docs/build/html/index.html`
+
+## Data preparation and releasing notes
+
+First, bump data version in `__init__.py` to the next data release version, e.g., `obnbdata-v0.1.0 -> obnbdata-v0.1.1-dev`.
+Then, download and process all latest data by running
+
+```bash
+python script/release_data.py
+```
+
+By default, the data ready to be uploaded (e.g., to [Zenodo](zenodo.org)) is saved under `data_release/archived`.
+After some necessary inspection and checking, if everything looks good, upload and publish the new archived data.
+
+**Note:** `dev` data should be uploaded to the [sandbox](https://sandbox.zenodo.org/record/1097545#.YxYrqezMJzV) instead.
+
+Check items:
+
+- [ ] Update `__data_version__`
+- [ ] Run [`release_data.py`](script/release_data.py)
+- [ ] Upload archived data to Zenodo (be sure to edit the data version there also)
+- [ ] Update url dict in config (will improve in the future to get info from Zenodo directly)
+- [ ] Update network stats in data [test](test/test_data.py)
+
+Finally, commit and push the bumped version.
