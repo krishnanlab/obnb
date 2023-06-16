@@ -9,10 +9,10 @@ try:
 except (ModuleNotFoundError, OSError):
     DGLDataset = object
 
-import obnb
 from obnb.dataset import OpenBiomedNetBench
 from obnb.typing import Callable, LogLevel, Optional
 from obnb.util.logger import verbose
+from obnb.util.version import parse_data_version
 
 
 class OpenBiomedNetBenchDGL(DGLDataset):
@@ -51,7 +51,7 @@ class OpenBiomedNetBenchDGL(DGLDataset):
         self.root = root
         self.network = network
         self.label = label
-        self.version = obnb.__data_version__ if version == "current" else version
+        self.version = parse_data_version(version)
         self.log_level = log_level
         super().__init__(
             name=f"{network}-{label}",

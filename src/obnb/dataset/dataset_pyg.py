@@ -7,10 +7,10 @@ try:
 except (ModuleNotFoundError, OSError):
     InMemoryDataset = object
 
-import obnb
 from obnb.dataset import OpenBiomedNetBench
 from obnb.typing import Callable, LogLevel, Optional
 from obnb.util.logger import verbose
+from obnb.util.version import parse_data_version
 
 
 class OpenBiomedNetBenchPyG(InMemoryDataset):
@@ -51,7 +51,7 @@ class OpenBiomedNetBenchPyG(InMemoryDataset):
         self.network = network
         self.label = label
         self.name = f"{network}-{label}"
-        self.version = obnb.__data_version__ if version == "current" else version
+        self.version = parse_data_version(version)
         self.log_level = log_level
 
         super().__init__(root, transform, pre_transform, log=verbose(log_level))

@@ -5,6 +5,7 @@ from obnb.dataset.base import Dataset
 from obnb.label import filters
 from obnb.typing import List, LogLevel, Optional
 from obnb.util.converter import GenePropertyConverter
+from obnb.util.version import parse_data_version
 
 
 class OpenBiomedNetBench(Dataset):
@@ -57,9 +58,11 @@ class OpenBiomedNetBench(Dataset):
         log_level: LogLevel = "INFO",
     ):
         """Initialize OpenBiomedNetBench object."""
+        self.version = parse_data_version(version)
+
         # Download network data
         graph_cls = getattr(obnb.data, graph_name)
-        graph = graph_cls(root, version=version, log_level=log_level)
+        graph = graph_cls(root, version=self.version, log_level=log_level)
 
         # Set up study-bias holdout data splitter
         train_ratio = round(1 - val_ratio - test_ratio, 4)
@@ -95,7 +98,7 @@ class OpenBiomedNetBench(Dataset):
         # Download and process the label data
         label = getattr(obnb.data, label_name)(
             root,
-            version=version,
+            version=self.version,
             transform=filters.Compose(
                 filters.EntityExistenceFilter(genes_to_use),
                 filters.LabelsetRangeFilterSize(min_val=min_size),
