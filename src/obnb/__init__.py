@@ -4,7 +4,7 @@ from obnb.dataset import Dataset, OpenBiomedNetBench
 from obnb.util.checkers import checkVersion
 from obnb.util.logger import config_logger, get_logger
 
-__version__ = "0.1.0-dev1"
+__version__ = "0.1.0"
 __data_version__ = "obnbdata-0.1.0"
 __all__ = [
     "Dataset",

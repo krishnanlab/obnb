@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "obnb"
-version = "0.1.0-dev1"
+version = "0.1.0"
 description = "A Python toolkit for biological network learning evaluation"
 readme = "README.md"
 
