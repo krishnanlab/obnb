@@ -157,7 +157,6 @@ dataset = Dataset(graph=g, feature=g.to_dense_graph().to_feature(), label=lsc, s
 
 ## Installation
 
-
 OBNB can be installed easily via pip from [PyPI](https://pypi.org/project/obnb/):
 
 ```bash
@@ -176,7 +175,7 @@ pip install obnb[ext]
 
 ### Install graph deep learning libraries (optional)
 
-Follow installation instructions for [PyG]((https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html)) or [DGL](https://www.dgl.ai/pages/start.html) to set up the graph deep learning library of your choice.
+Follow installation instructions for [PyG](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html) or [DGL](https://www.dgl.ai/pages/start.html) to set up the graph deep learning library of your choice.
 
 Alternatively, we also provide an [installation script](install.sh) that helps you installthe graph deep-learning dependencies in a new conda environment `obnb`:
 
@@ -184,27 +183,3 @@ Alternatively, we also provide an [installation script](install.sh) that helps y
 git clone https://github.com/krishnanlab/obnb && cd obnb
 source install.sh cu117  # other options are [cpu,cu118]
 ```
-
-## Data preparation and releasing notes
-
-First, bump data version in `__init__.py` to the next data release version, e.g., `obnbdata-v0.1.0 -> obnbdata-v0.1.1-dev`.
-Then, download and process all latest data by running
-
-```bash
-python script/release_data.py
-```
-
-By default, the data ready to be uploaded (e.g., to [Zenodo](zenodo.org)) is saved under `data_release/archived`.
-After some necessary inspection and checking, if everything looks good, upload and publish the new archived data.
-
-**Note:** `dev` data should be uploaded to the [sandbox](https://sandbox.zenodo.org/record/1097545#.YxYrqezMJzV) instead.
-
-Check items:
-
-- [ ] Update `__data_version__`
-- [ ] Run [`release_data.py`](script/release_data.py)
-- [ ] Upload archived data to Zenodo (be sure to edit the data version there also)
-- [ ] Update url dict in config (will improve in the future to get info from Zenodo directly)
-- [ ] Update network stats in data [test](test/test_data.py)
-
-Finally, commit and push the bumped version.
