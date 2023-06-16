@@ -120,8 +120,6 @@ gcn_results = gcn_trainer.train(gcn_mdl, dataset)
 ```python
 from obnb import data
 
-root = "datasets"  # save dataset and cache under the datasets/ directory
-
 # Load processed BioGRID data from archive.
 g = data.BioGRID(root, version=version)
 
