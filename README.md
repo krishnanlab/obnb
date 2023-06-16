@@ -29,17 +29,23 @@ and processing options, see the [customized dataset construction](#customized-da
 section below.
 
 ```python
-from obnb import __data_version__
 from obnb.dataset import OpenBiomedNetBench
+from obnb.util.version import get_available_versions
 
 root = "datasets"  # save dataset and cache under the datasets/ directory
-version = __data_version__  # use the last archived version (same as setting to "current")
+version = "current"  # use the last archived version
 # Optionally, set version to the specific data version number
 # Or, set version to "latest" to download the latest data from source and process it from scratch
 
 # Download and process network/label data. Use the adjacency matrix as the ML feature
 dataset = OpenBiomedNetBench(root=root, graph_name="BioGRID", label_name="DisGeNET",
                              version=version, graph_as_feature=True, use_dense_graph=True)
+
+# Check the specific archive data version used
+print(dataset.version)
+
+# Check other stable archive data version available
+print(get_available_versions())
 ```
 
 Users can also load the dataset objects into ones that are compatible with PyG or DGL (see below).
