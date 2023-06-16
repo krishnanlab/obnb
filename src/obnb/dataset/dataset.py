@@ -116,4 +116,10 @@ class OpenBiomedNetBench(Dataset):
         graph = dense_graph if use_dense_graph else graph
         feature = dense_graph.to_feature() if graph_as_feature else None
 
-        super().__init__(graph=graph, feature=feature, label=label, splitter=splitter)
+        super().__init__(
+            graph=graph,
+            feature=feature,
+            label=label,
+            splitter=splitter,
+            auto_generate_feature=auto_generate_feature,
+        )
