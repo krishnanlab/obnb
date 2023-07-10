@@ -1,5 +1,7 @@
+import numpy as np
+
 from obnb.model_trainer.base import StandardTrainer
-from obnb.typing import LogLevel, Optional
+from obnb.typing import Callable, Dict, LogLevel, Optional
 
 
 class SupervisedLearningTrainer(StandardTrainer):
@@ -21,7 +23,7 @@ class SupervisedLearningTrainer(StandardTrainer):
 
     def __init__(
         self,
-        metrics,
+        metrics: Optional[Dict[str, Callable[[np.ndarray, np.ndarray], float]]] = None,
         train_on="train",
         log_level: LogLevel = "WARNING",
         log_path: Optional[str] = None,
