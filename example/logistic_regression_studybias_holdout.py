@@ -21,18 +21,19 @@ metrics = {"auroc": auroc}
 trainer = SupervisedLearningTrainer(metrics, log_level="INFO")
 
 # Train a single model
+# FIX: fix consider_negative
 dataset = Dataset(
     feature=feature,
     label=lsc,
     splitter=splitter,
     labelset_name=lsc.label_ids[0],
-    consider_negative=True,
+    consider_negative=False,
 )
 print(trainer.train(mdl, dataset))
 
 # Evaluate the model for all tasks
 dataset = Dataset(feature=feature, label=lsc, splitter=splitter)
-results = trainer.fit_and_eval(mdl, dataset, consider_negative=True, reduce="mean")
+results = trainer.fit_and_eval(mdl, dataset, consider_negative=False, reduce="mean")
 print(f"Average train score = {results['train_auroc']:.4f}")
 print(f"Average test score = {results['test_auroc']:.4f}")
 

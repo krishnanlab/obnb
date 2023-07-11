@@ -1,3 +1,4 @@
+import warnings
 from functools import lru_cache
 
 import numpy as np
@@ -425,6 +426,16 @@ class LabelsetCollection(idhandler.IDprop):
             masks[mask_name] = mask
 
         if consider_negative:
+            warnings.warn(
+                "consider_negative option in LabelsetCollection.split is "
+                "deprecated and will be removed very soon. The usage of this "
+                "option is likely to cause subtle bugs.\nThe consider_negative"
+                "option is replaced by the implicit construction of negatives, "
+                "e.g., by NegativeGeneratorHypergeom. It will be used in the "
+                "form of y_mask from the return of LabelsetCollection.get_y",
+                DeprecationWarning,
+                stacklevel=2,
+            )
             if labelset_name is None:
                 # TODO: option for consider negatives with multiple labelsets
                 raise ValueError(
