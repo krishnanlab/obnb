@@ -104,8 +104,9 @@ Training and evaluation of Graph Neural Network (GNN) models can be done in a ve
 from torch_geometric.nn import GCN
 from obnb.model_trainer.gnn import SimpleGNNTrainer
 
-# Use 1-dimensional trivial node feature by default
-dataset = OpenBiomedNetBench(root=root, graph_name="BioGRID", label_name="DisGeNET", version=version)
+# Use onehot encoded log degress as node feature by default
+dataset = OpenBiomedNetBench(root=root, graph_name="BioGRID", label_name="DisGeNET",
+                             auto_generate_feature="OneHotLogDeg", version=version)
 
 # Train and evaluate a GCN
 gcn_mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=n_tasks)
