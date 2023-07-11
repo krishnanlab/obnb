@@ -132,11 +132,13 @@ lsc = data.DisGeNET(root, version=version)
 
 ```python
 from obnb.util.converter import GenePropertyConverter
-from obnb.label.split import RatioHoldout
+from obnb.label.split import RatioPartition
 
-# Load PubMed count gene property converter and use it to set up study-bias holdout split
+# Load PubMed count gene property converter and use it to set up
+# 6/2/2 study-bias based train/val/test splits
 pubmedcnt_converter = GenePropertyConverter(root, name="PubMedCount")
-splitter = RatioHoldout(0.6, 0.4, ascending=False, property_converter=pubmedcnt_converter)
+splitter = RatioPartition(0.6, 0.2, 0.2, ascending=False,
+                          property_converter=pubmedcnt_converter)
 ```
 
 #### Filter labeled data based on network genes and splits
