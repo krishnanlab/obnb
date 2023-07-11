@@ -139,8 +139,8 @@ class StandardTrainer(BaseTrainer):
         x = None if dataset.feature is None else dataset.feature.mat
 
         _, _, get_predictions, compute_results = self._setup(dataset, split_idx)
-        pbar = tqdm(enumerate(dataset.label.label_ids), disable=not progress)
-        for i, label_id in pbar:
+        pbar = tqdm(dataset.label.label_ids, disable=not progress)
+        for i, label_id in enumerate(pbar):
             y, masks = dataset.label.split(
                 splitter=dataset.splitter,
                 target_ids=tuple(dataset.idmap.lst),
