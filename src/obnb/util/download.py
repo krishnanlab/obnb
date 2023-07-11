@@ -140,7 +140,10 @@ def retry_download(download_func):
 
         for _ in range(MAX_DOWNLOAD_RETRIES):
             r, content = download_func(
-                url, log_level=log_level, logger=logger, **kwargs
+                url,
+                log_level=log_level,
+                logger=logger,
+                **kwargs,
             )
 
             if r.ok:
