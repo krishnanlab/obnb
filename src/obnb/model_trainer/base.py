@@ -2,6 +2,7 @@ import time
 from copy import deepcopy
 
 import numpy as np
+from tqdm.auto import tqdm
 
 import obnb.metric
 from obnb.typing import Any, Callable, Dict, LogLevel, Optional
@@ -125,6 +126,7 @@ class StandardTrainer(BaseTrainer):
         split_idx: int = 0,
         consider_negative: bool = False,
         reduce: str = "none",
+        progress: bool = True,
     ) -> Dict[str, float]:
         """Fit model and evaluate.
 
@@ -137,7 +139,8 @@ class StandardTrainer(BaseTrainer):
         x = None if dataset.feature is None else dataset.feature.mat
 
         _, _, get_predictions, compute_results = self._setup(dataset, split_idx)
-        for i, label_id in enumerate(dataset.label.label_ids):
+        pbar = tqdm(enumerate(dataset.label.label_ids), disable=not progress)
+        for i, label_id in pbar:
             y, masks = dataset.label.split(
                 splitter=dataset.splitter,
                 target_ids=tuple(dataset.idmap.lst),
