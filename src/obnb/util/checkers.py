@@ -4,11 +4,11 @@ This module contains a collection of checkers to ensure that the input value to
 a function call is valid.
 
 """
+import os
 import warnings
 from typing import get_args
 
 import numpy as np
-from outdated import check_outdated
 
 from obnb.typing import INT_TYPE, NUMERIC_TYPE, Iterable, List, Optional, Tuple
 
@@ -32,6 +32,10 @@ __all__ = [
 def checkVersion(version: str):
     """Check if the current version is up to date."""
     if "dev" not in version:
+        os.environ.setdefault("OUTDATED_IGNORE", "1")
+
+        from outdated import check_outdated
+
         is_outdated, latest_version = check_outdated("obnb", version)
         if is_outdated:
             warnings.warn(
