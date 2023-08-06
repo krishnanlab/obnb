@@ -11,6 +11,7 @@ from tqdm import tqdm
 from obnb import logger
 from obnb.feature import FeatureVec
 from obnb.graph import SparseGraph
+from obnb.util.io import sparse_graph_to_nx
 
 
 def orbital_feat_extract(
@@ -33,11 +34,7 @@ def orbital_feat_extract(
             object.
 
     """
-    # TODO: make utils for networkx conversion
-    nx_g = nx.Graph()
-    for u, v, _ in g.edge_gen():
-        nx_g.add_edge(u, v)
-
+    nx_g = sparse_graph_to_nx(g, weighted=False)
     orb = OrbitCountingMachine(nx_g, graphlet_size=graphlet_size, progress=verbose)
     feat_df = orb.extract_features()
 
