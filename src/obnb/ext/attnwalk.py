@@ -34,7 +34,7 @@ def attnwalk_embed(
     walk_length: int = 80,
     window_size: int = 5,
     beta: float = 0.5,
-    gamma: float = 0.5,
+    gamma: float = 0.0,
     epochs: int = 200,
     lr: float = 0.01,
     verbose: bool = False,
@@ -50,7 +50,7 @@ def attnwalk_embed(
         walk_length: Random walk length.
         window_size: Wiindow size.
         beta: Attention l2 regularization parameter.
-        gamma: Embedding l2 regularization parameter.
+        gamma: Embedding l1 regularization parameter.
         epochs: Training epochs.
         lr: Learning rate.
         device: Compute device.
@@ -153,7 +153,7 @@ class AttentionWalkEmbedding(nn.Module):
         where the first dimension is the powering number.
 
         """
-        adj_mat = nx.adjacency_matrix(self.g, dtype=np.float32).toarray()
+        adj_mat = nx.to_scipy_sparse_array(self.g, dtype=np.float32).toarray()
 
         inv_sqrt_degs = 1 / np.sqrt(adj_mat.sum(0, keepdims=True))
         norm_adj_mat = adj_mat * inv_sqrt_degs * inv_sqrt_degs.T
@@ -192,14 +192,17 @@ class AttentionWalkEmbedding(nn.Module):
         target_mat = (target_tensor * attn).sum(0)
 
         pred = torch.mm(self.left, self.right).sigmoid().clamp(EPS, 1 - EPS)
-        pos_loss = -(target_mat * torch.log(pred))
-        neg_loss = -(adj_opposite * torch.log(1 - pred))
-        nlgl = (self.walk_length * target_mat.shape[0] * pos_loss + neg_loss).mean()
+        pos_loss = -(target_mat * torch.log(pred)).mean()
+        neg_loss = -(adj_opposite * torch.log(1 - pred)).mean()
+        nlgl = self.walk_length * target_mat.shape[0] * pos_loss + neg_loss
 
-        attn_reg = self.beta * self.attn_weights.norm(2).pow(2)
-        emb_reg = self.gamma * (self.left.abs().mean() + self.right.abs().mean())
+        attn_reg = self.attn_weights.norm(2).pow(2)
 
-        loss = nlgl + attn_reg + emb_reg
+        if self.gamma > 0:
+            loss = nlgl + self.beta * attn_reg
+        else:
+            emb_reg = self.left.abs().mean() + self.right.abs().mean()
+            loss = nlgl + self.beta * attn_reg + self.gamma * emb_reg
 
         return loss
 
