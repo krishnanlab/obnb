@@ -382,6 +382,10 @@ class Dataset:
                 data.masks.append(attrname := mask_name + mask_suffix)
                 setattr(data, attrname, torch.BoolTensor(mask))
 
+        # Extra data
+        for key, val in self.extras.items():
+            setattr(data, key, torch.tensor(val))
+
         data.to(device)
 
         return data
@@ -431,6 +435,10 @@ class Dataset:
         if self.masks is not None:
             for mask_name, mask in self.masks.items():
                 dglgraph.ndata[mask_name + mask_suffix] = torch.BoolTensor(mask)
+
+        # Extra data
+        for key, val in self.extras.items():
+            dglgraph.ndata[key] = torch.tensor(val)
 
         dglgraph = dglgraph.to(device)
 
