@@ -1,3 +1,4 @@
+"""Node feature transformation module."""
 import warnings
 from abc import ABC, abstractmethod
 
@@ -17,6 +18,13 @@ from obnb.util.misc import get_num_workers
 
 
 class BaseNodeFeatureTransform(BaseDatasetTransform, ABC):
+    """Base node feature transformation abstract class.
+
+    Specific implementation should overwrite the :meth:`_prepare_feat` method,
+    which computes the node features given the constructed dataset object.
+
+    """
+
     NAME_PREFIX = "nodefeat"
 
     def __init__(self, dim: int, as_feature: bool = False, **kwargs):
@@ -48,6 +56,8 @@ class BaseNodeFeatureTransform(BaseDatasetTransform, ABC):
 
 @register_nodefeat
 class OneHotLogDeg(BaseNodeFeatureTransform):
+    """One-hot log degree feature."""
+
     def _prepare_feat(self, dataset):
         log_deg = np.log(dataset.get_adj().sum(axis=1, keepdims=True))
         feat = KBinsDiscretizer(
@@ -61,6 +71,8 @@ class OneHotLogDeg(BaseNodeFeatureTransform):
 
 @register_nodefeat
 class Constant(BaseNodeFeatureTransform):
+    """Constant feature."""
+
     def _prepare_feat(self, dataset):
         if self.dim != 1:
             warnings.warn(
@@ -75,6 +87,8 @@ class Constant(BaseNodeFeatureTransform):
 
 @register_nodefeat
 class RandomNormal(BaseNodeFeatureTransform):
+    """Random features drawn from standard normal distribution."""
+
     def _prepare_feat(self, dataset):
         rng = np.random.default_rng(self.random_state)
         return rng.random((dataset.size, self.dim))
@@ -82,6 +96,8 @@ class RandomNormal(BaseNodeFeatureTransform):
 
 @register_nodefeat
 class Orbital(BaseNodeFeatureTransform):
+    """Graphlet feature."""
+
     def __init__(
         self,
         *args,
@@ -106,25 +122,30 @@ class Orbital(BaseNodeFeatureTransform):
 
 @register_nodefeat
 class SVD(BaseNodeFeatureTransform):
+    """Adjacency matrix SVD feature."""
+
     def _prepare_feat(self, dataset):
-        A = sp.csr_matrix(dataset.get_adj())
-        feat, _, _ = sp.linalg.svds(A, k=self.dim, which="LM")
+        sparse_adj = sp.csr_matrix(dataset.get_adj())
+        feat, _, _ = sp.linalg.svds(sparse_adj, k=self.dim, which="LM")
         return feat
 
 
 @register_nodefeat
 class LapEigMap(BaseNodeFeatureTransform):
+    """Graph Laplacian eigenmap feature."""
+
     def _prepare_feat(self, dataset):
         adj = dataset.get_adj()
 
-        L = sp.csr_matrix(np.diag(adj.sum(1)) - adj)
-        assert (L != L.T).sum() == 0, "The input network must be undirected."
+        sparse_lap = sp.csr_matrix(np.diag(adj.sum(1)) - adj)
+        if (sparse_lap != sparse_lap.T).sum() != 0:
+            raise ValueError("The input network must be undirected.")
 
         # Symmetric normalized graph Laplacian
-        D_inv_sqrt = sp.diags(1 / np.sqrt(adj.sum(1)))
-        L = D_inv_sqrt @ L @ D_inv_sqrt
+        deg_inv_sqrt = sp.diags(1 / np.sqrt(adj.sum(1)))
+        sparse_lap = deg_inv_sqrt @ sparse_lap @ deg_inv_sqrt
 
-        eigvals, eigvecs = sp.linalg.eigsh(L, which="SM", k=self.dim + 1)
+        eigvals, eigvecs = sp.linalg.eigsh(sparse_lap, which="SM", k=self.dim + 1)
         sorted_idx = eigvals.argsort()
         eigvals = eigvals[sorted_idx]
         eigvecs = eigvecs[:, sorted_idx]
@@ -139,14 +160,16 @@ class LapEigMap(BaseNodeFeatureTransform):
 
 @register_nodefeat
 class RandomWalkDiag(BaseNodeFeatureTransform):
+    """Random walk diagonals feature."""
+
     def _prepare_feat(self, dataset):
         adj = dataset.get_adj()
 
-        P = adj / adj.sum(0)
+        p_mat = adj / adj.sum(0)
         feat = np.zeros((adj.shape[0], self.dim))
         vec = np.ones(adj.shape[0])
         for i in range(self.dim):
-            vec = P @ vec
+            vec = p_mat @ vec
             feat[:, i] = vec
 
         return feat
@@ -154,6 +177,8 @@ class RandomWalkDiag(BaseNodeFeatureTransform):
 
 @register_nodefeat
 class RandProjGaussian(BaseNodeFeatureTransform):
+    """Adjacency matrix gaussian random projection feature."""
+
     def _prepare_feat(self, dataset):
         grp = GaussianRandomProjection(
             n_components=self.dim,
@@ -164,6 +189,8 @@ class RandProjGaussian(BaseNodeFeatureTransform):
 
 @register_nodefeat
 class RandProjSparse(BaseNodeFeatureTransform):
+    """Adjacency matrix sparse random projection feature."""
+
     def _prepare_feat(self, dataset):
         srp = SparseRandomProjection(
             n_components=self.dim,
@@ -175,6 +202,8 @@ class RandProjSparse(BaseNodeFeatureTransform):
 
 @register_nodefeat
 class LINE1(BaseNodeFeatureTransform):
+    """First order LINE embedding feature."""
+
     def _prepare_feat(self, dataset):
         from obnb.ext.grape import grape_embed
 
@@ -191,6 +220,8 @@ class LINE1(BaseNodeFeatureTransform):
 
 @register_nodefeat
 class LINE2(BaseNodeFeatureTransform):
+    """Second order LINE embedding feature."""
+
     def _prepare_feat(self, dataset):
         from obnb.ext.grape import grape_embed
 
@@ -207,6 +238,8 @@ class LINE2(BaseNodeFeatureTransform):
 
 @register_nodefeat
 class Node2vec(BaseNodeFeatureTransform):
+    """Node2vec(+) embedding feature."""
+
     def __init__(
         self,
         *args,
@@ -256,6 +289,8 @@ class Node2vec(BaseNodeFeatureTransform):
 
 @register_nodefeat
 class Walklets(BaseNodeFeatureTransform):
+    """Walklets embedding feature."""
+
     def __init__(
         self,
         *args,
@@ -299,6 +334,8 @@ class Walklets(BaseNodeFeatureTransform):
 
 @register_nodefeat
 class AttnWalk(BaseNodeFeatureTransform):
+    """Attention walk embedding feature."""
+
     def __init__(
         self,
         *args,
@@ -344,6 +381,8 @@ class AttnWalk(BaseNodeFeatureTransform):
 
 @register_nodefeat
 class Adj(BaseNodeFeatureTransform):
+    """Adjacency matrix feature."""
+
     def __init__(self, *args, dim: Optional[int] = None, **kwargs):
         super().__init__(*args, dim=dim, **kwargs)
         if dim is not None:
