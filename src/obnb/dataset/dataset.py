@@ -3,7 +3,7 @@ import obnb.data
 import obnb.label.split
 from obnb.dataset.base import Dataset
 from obnb.label import filters
-from obnb.typing import List, LogLevel, Optional
+from obnb.typing import Any, Callable, Dict, List, LogLevel, Optional
 from obnb.util.converter import GenePropertyConverter
 from obnb.util.version import parse_data_version
 
@@ -35,6 +35,9 @@ class OpenBiomedNetBench(Dataset):
             gene ids for filtering. More specifically, only genes that are
             present in the network and in the provided selected gene list will
             be used. Only use network genes if this is list is not provided.
+        transform: Transform function or name of the transform class.
+        transform_kwargs: Keyword arguments for initializing the transform
+            function. Only effective when transform is passed as a string.
         log_level: Logging level.
 
     """
@@ -55,6 +58,8 @@ class OpenBiomedNetBench(Dataset):
         val_ratio: float = 0.2,
         test_ratio: float = 0.2,
         selected_genes: Optional[List[str]] = None,
+        transform: Optional[Callable] = None,
+        transform_kwargs: Optional[Dict[str, Any]] = None,
         log_level: LogLevel = "INFO",
     ):
         """Initialize OpenBiomedNetBench object."""
@@ -125,4 +130,6 @@ class OpenBiomedNetBench(Dataset):
             label=label,
             splitter=splitter,
             auto_generate_feature=auto_generate_feature,
+            transform=transform,
+            transform_kwargs=transform_kwargs,
         )
