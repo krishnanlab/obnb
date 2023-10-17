@@ -9,6 +9,7 @@ __data_version__ = "obnbdata-0.1.0"
 __all__ = [
     "Dataset",
     "OpenBiomedNetBench",
+    "REGISTRIES",
     "graph",
     "label",
     "model_trainer",
@@ -19,3 +20,8 @@ checkVersion(__version__)
 # Configure logger setting and create global logger
 config_logger()
 logger = get_logger(None, "obnb", log_level="INFO")
+
+
+# Register modules to REGISTRIES
+from obnb.registry import REGISTRIES  # noqa: E402
+from obnb.transform import node_feature  # noqa: E402
