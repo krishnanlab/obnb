@@ -11,28 +11,30 @@ import obnb
 from obnb.feature import FeatureVec
 from obnb.registry import register_nodefeat
 from obnb.transform.base import BaseDatasetTransform
+from obnb.typing import Optional
 from obnb.util.logger import display_pbar
 from obnb.util.misc import get_num_workers
 
 
 class BaseNodeFeatureTransform(BaseDatasetTransform, ABC):
+    NAME_PREFIX = "nodefeat"
+
     def __init__(self, dim: int, as_feature: bool = False, **kwargs):
         super().__init__(**kwargs)
         self.dim = dim
         self.as_feature = as_feature
 
     def __call__(self, dataset):
-        name = self.__class__.__name__
-        self.logger.info(f"Computing {name} features")
+        self.logger.info(f"Computing {self.name} features")
         feat = self._prepare_feat(dataset)
-        dataset.update_extras(name, feat)
+        dataset.update_extras(self.fullname, feat)
 
         if self.as_feature:
             if dataset.feature is not None:
                 warnings.warn(
                     "Node features already exist in dataset, overwritting "
-                    f"with {name}. Please make sure node features is empty "
-                    "to resolve this message.",
+                    f"with {self.name}. Please make sure node features is "
+                    "empty to suppress this message.",
                     RuntimeWarning,
                     stacklevel=2,
                 )
@@ -342,5 +344,15 @@ class AttnWalk(BaseNodeFeatureTransform):
 
 @register_nodefeat
 class Adj(BaseNodeFeatureTransform):
+    def __init__(self, *args, dim: Optional[int] = None, **kwargs):
+        super().__init__(*args, dim=dim, **kwargs)
+        if dim is not None:
+            warnings.warn(
+                "Adj node features do not use the dim argument. "
+                "Please remove to suppress this message.",
+                UserWarning,
+                stacklevel=2,
+            )
+
     def _prepare_feat(self, dataset):
         return dataset.get_adj().copy()
