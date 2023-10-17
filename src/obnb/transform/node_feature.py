@@ -127,7 +127,9 @@ class SVD(BaseNodeFeatureTransform):
     def _prepare_feat(self, dataset):
         sparse_adj = sp.csr_matrix(dataset.get_adj())
         feat, _, _ = sp.linalg.svds(sparse_adj, k=self.dim, which="LM")
-        return feat
+        # Work around for potential negative strides by making a copy of the array
+        # https://discuss.pytorch.org/t/negative-strides-in-tensor-error/134287/2
+        return feat.copy()
 
 
 @register_nodefeat
