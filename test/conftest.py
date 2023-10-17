@@ -16,7 +16,7 @@ def commonvar():
     return CommonVar()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def toy_graph_1():
     data = [
         ["a", "b", 0.3],
