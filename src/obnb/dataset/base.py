@@ -62,7 +62,7 @@ class Dataset:
         self.set_idmap(graph, feature)
         self.graph = graph
         self.feature = feature
-        self.extras = {}
+        self.extras: Dict[str, np.ndarray] = {}
 
         # TODO: replace by transform
         if self.feature is None and auto_generate_feature:

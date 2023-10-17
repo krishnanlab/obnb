@@ -384,7 +384,6 @@ class Adj(BaseNodeFeatureTransform):
     """Adjacency matrix feature."""
 
     def __init__(self, *args, dim: Optional[int] = None, **kwargs):
-        super().__init__(*args, dim=dim, **kwargs)
         if dim is not None:
             warnings.warn(
                 "Adj node features do not use the dim argument. "
@@ -392,6 +391,11 @@ class Adj(BaseNodeFeatureTransform):
                 UserWarning,
                 stacklevel=2,
             )
+        super().__init__(
+            *args,
+            dim=0,
+            **kwargs,
+        )  # type: ignore  # incorrect diagnostic of multiple dim input
 
     def _prepare_feat(self, dataset):
         return dataset.get_adj().copy()

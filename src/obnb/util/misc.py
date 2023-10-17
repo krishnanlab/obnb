@@ -8,9 +8,9 @@ from obnb.typing import Any, Optional
 
 
 class DotDict(dict):
-    __getattr__ = dict.__getitem__
-    __setattr__ = dict.__setitem__
-    __delattr__ = dict.__delitem__
+    __getattr__ = dict.__getitem__  # type: ignore
+    __setattr__ = dict.__setitem__  # type: ignore
+    __delattr__ = dict.__delitem__  # type: ignore
 
 
 def set_seed(seed: Optional[int] = None):
@@ -32,9 +32,8 @@ def default(val: Any, default_val: Any):
 
 def default_random_state() -> Optional[int]:
     seed = os.environ.get("OBNB_GLOBAL_SEED")
-    if seed is not None:
-        seed = int(seed)
-    return seed
+    int_seed = int(seed) if seed is not None else None
+    return int_seed
 
 
 def get_random_state(seed: Optional[int]) -> Optional[int]:
