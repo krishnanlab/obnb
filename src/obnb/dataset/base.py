@@ -4,12 +4,25 @@ from sklearn.preprocessing import KBinsDiscretizer
 
 from obnb.feature import FeatureVec, MultiFeatureVec
 from obnb.feature.base import BaseFeature
+from obnb.graph import DenseGraph, SparseGraph
 from obnb.graph.base import BaseGraph
 from obnb.label.collection import LabelsetCollection
 from obnb.label.split.base import BaseSplit
-from obnb.typing import Iterable, Iterator, Literal, Optional, PyG_Data, Tuple, Union
+from obnb.typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    Literal,
+    Optional,
+    PyG_Data,
+    Tuple,
+    Union,
+)
 from obnb.util.checkers import checkLiteral, checkNumpyArrayShape, checkType
 from obnb.util.idhandler import IDmap
+from obnb.util.resolver import resolve_transform
 
 
 class Dataset:
@@ -23,6 +36,9 @@ class Dataset:
             graph if it is graph is available. If specified as None, then do
             not generate features from the graph automatically.
         dual: If set to True, consider each feature dimension as a sample.
+        transform: Transform function or name of the transform class.
+        transform_kwargs: Keyword arguments for initializing the transform
+            function. Only effective when transform is passed as a string.
         splitter: Splitter object that determins train/val/test split.
         split_kwargs: Keyword arguments for calling the split function of the
             splitter.
@@ -35,8 +51,10 @@ class Dataset:
         graph: Optional[BaseGraph] = None,
         feature: Optional[BaseFeature] = None,
         label: Optional[LabelsetCollection] = None,
-        auto_generate_feature: Optional[str] = "OneHotLogDeg",
+        auto_generate_feature: Optional[str] = "OneHotLogDeg",  # TODO: deprecate
         dual: bool = False,
+        transform: Optional[Callable] = None,
+        transform_kwargs: Optional[Dict[str, Any]] = None,
         splitter: Optional[BaseSplit] = None,
         **split_kwargs,
     ):
@@ -44,7 +62,9 @@ class Dataset:
         self.set_idmap(graph, feature)
         self.graph = graph
         self.feature = feature
+        self.extras = {}
 
+        # TODO: replace by transform
         if self.feature is None and auto_generate_feature:
             self.generate_features(auto_generate_feature)
 
@@ -67,6 +87,10 @@ class Dataset:
             target_ids=tuple(self.idmap.lst),
             return_y_mask=True,
         )
+
+        transform = resolve_transform(transform, transform_kwargs)
+        if transform is not None:
+            transform(self)
 
     def get_adj(self) -> np.ndarray:
         """Get dense adjacency matrix."""
@@ -303,6 +327,11 @@ class Dataset:
             self._feature = FeatureVec.from_mat(feat, list(self.graph.node_ids))
         else:
             raise NotImplementedError(f"{name} feature is not implemented yet.")
+
+    def update_extras(self, key, val):
+        if key in self.extras:
+            raise KeyError(f"{key} extras already exist")
+        self.extras[key] = val
 
     def to_pyg_data(
         self,
