@@ -1,7 +1,6 @@
 import os
 import random
 
-import numba
 import numpy as np
 
 from obnb.typing import Any, Optional
@@ -43,11 +42,22 @@ def get_random_state(seed: Optional[int]) -> Optional[int]:
 def get_num_workers(num_workers: int = 1) -> int:
     if not isinstance(num_workers, int):
         raise TypeError(f"num_workers must be an integer, got {type(num_workers)}")
+
     elif num_workers == -1:
-        num_workers = numba.config.NUMBA_DEFAULT_NUM_THREADS
+        try:
+            import numba
+
+            num_workers = numba.config.NUMBA_DEFAULT_NUM_THREADS
+
+        except ImportError:
+            import multiprocessing
+
+            num_workers = multiprocessing.cpu_count()
+
     elif num_workers < 1:
         raise ValueError(
             f"num_workers must be positive integer (or exactly -1 for using "
             f"all available threads), got {num_workers}",
         )
+
     return num_workers
