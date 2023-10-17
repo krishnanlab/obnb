@@ -68,6 +68,23 @@ class Dataset:
             return_y_mask=True,
         )
 
+    def get_adj(self) -> np.ndarray:
+        """Get dense adjacency matrix."""
+        assert self.graph is not None
+        return self.get_dense_graph().mat
+
+    def get_sparse_graph(self) -> SparseGraph:
+        """Get sparse graph object."""
+        assert self.graph is not None
+        is_sparse = isinstance(self.graph, SparseGraph)
+        return self.graph if is_sparse else self.graph.to_sparse_graph()
+
+    def get_dense_graph(self) -> DenseGraph:
+        """Get dense graph object."""
+        assert self.graph is not None
+        is_dense = isinstance(self.graph, DenseGraph)
+        return self.graph if is_dense else self.graph.to_dense_graph()
+
     @property
     def idmap(self) -> IDmap:
         """Map instance IDs to indexes."""
