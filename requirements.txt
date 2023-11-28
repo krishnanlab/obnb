@@ -2,7 +2,7 @@ class-resolver==0.4.2
 matplotlib<3.9  # https://github.com/scverse/scanpy/issues/2411
 mygene==3.2.2
 ndex2==3.5.1
-numpy==1.23.3
+numpy==1.26.2
 outdated==0.2.2
 pandas==2.0.3
 pyroe==0.9.0
