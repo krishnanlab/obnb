@@ -109,7 +109,7 @@ dataset = OpenBiomedNetBench(root=root, graph_name="BioGRID", label_name="DisGeN
                              auto_generate_feature="OneHotLogDeg", version=version)
 
 # Train and evaluate a GCN
-gcn_mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=n_tasks)
+gcn_mdl = GCN(in_channels=1, hidden_channels=64, num_layers=5, out_channels=dataest.num_tasks)
 gcn_trainer = SimpleGNNTrainer(device="cuda", metric_best="apop")
 gcn_results = gcn_trainer.train(gcn_mdl, dataset)
 ```

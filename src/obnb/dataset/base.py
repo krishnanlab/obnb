@@ -124,6 +124,14 @@ class Dataset:
         """Map multifeature IDs to indexes."""
         return self._fset_idmap
 
+    @property
+    def num_nodes(self) -> int:
+        return self.graph.size if self.graph is not None else self.feature.size
+
+    @property
+    def num_tasks(self) -> int:
+        return 0 if self.label is None else self.label.size
+
     def set_idmap(
         self,
         graph: Optional[BaseGraph],
