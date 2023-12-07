@@ -5,6 +5,7 @@ from obnb.dataset.base import Dataset
 from obnb.label import filters
 from obnb.typing import Any, Callable, Dict, List, LogLevel, Optional
 from obnb.util.converter import GenePropertyConverter
+from obnb.util.misc import default
 from obnb.util.version import parse_data_version
 
 
@@ -15,6 +16,8 @@ class OpenBiomedNetBench(Dataset):
         root: Directory where the data will be saved.
         graph_name: Name of the biological network to use.
         label_name: Name of the label sets to use.
+        graph_kwargs: Keyword arguments for the corresponding graph data obj.
+        label_kwargs: Keyword arguments for the corresponding label data obj.
         version: Archive data version to use. "current" uses the most recent
             processed archive data. "latest" download the latest data from
             source direction and process it from scratch.
@@ -48,6 +51,8 @@ class OpenBiomedNetBench(Dataset):
         graph_name: str,
         label_name: str,
         *,
+        graph_kwargs: Optional[Dict[str, Any]] = None,
+        label_kwargs: Optional[Dict[str, Any]] = None,
         version: str = "current",
         auto_generate_feature: Optional[str] = "OneHotLogDeg",
         graph_as_feature: bool = False,
@@ -63,11 +68,18 @@ class OpenBiomedNetBench(Dataset):
         log_level: LogLevel = "INFO",
     ):
         """Initialize OpenBiomedNetBench object."""
+        self.graph_kwargs = default(graph_kwargs, {})
+        self.label_kwargs = default(label_kwargs, {})
         self.version = parse_data_version(version)
 
         # Download network data
         graph_cls = getattr(obnb.data, graph_name)
-        graph = graph_cls(root, version=self.version, log_level=log_level)
+        graph = graph_cls(
+            root,
+            version=self.version,
+            log_level=log_level,
+            **self.graph_kwargs,
+        )
 
         # Set up study-bias holdout data splitter
         train_ratio = round(1 - val_ratio - test_ratio, 4)
@@ -116,6 +128,7 @@ class OpenBiomedNetBench(Dataset):
                 log_level=log_level,
             ),
             log_level=log_level,
+            **self.label_kwargs,
         )
 
         # Perform necessary data conversion
