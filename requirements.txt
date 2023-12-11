@@ -4,7 +4,7 @@ mygene==3.2.2
 ndex2==3.5.1
 numpy==1.23.3
 outdated==0.2.2
-pandas==2.0.3
+pandas==2.1.4
 pyroe==0.9.0
 pyyaml==6.0.1
 requests==2.31.0
