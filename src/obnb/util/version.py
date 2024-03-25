@@ -1,4 +1,5 @@
 """Version utility module for obnb."""
+
 from obnb import config
 from obnb.typing import List
 

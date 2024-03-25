@@ -1,4 +1,5 @@
 """Dataset object."""
+
 import numpy as np
 from sklearn.preprocessing import KBinsDiscretizer
 

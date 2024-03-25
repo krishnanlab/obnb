@@ -33,5 +33,4 @@ class BaseTransform(ABC):
 
 class BaseDatasetTransform(BaseTransform, ABC):
     @abstractmethod
-    def __call__(self, dataset):
-        ...
+    def __call__(self, dataset): ...

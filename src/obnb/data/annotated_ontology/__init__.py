@@ -1,4 +1,5 @@
 """Annotated ontology data."""
+
 from obnb.data.annotated_ontology.diseases import (
     DISEASES,
     DISEASES_ExperimentsFiltered,

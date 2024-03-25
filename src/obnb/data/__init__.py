@@ -1,4 +1,5 @@
 """Interface with various databases to retrieve data."""
+
 from obnb.data import annotated_ontology, annotation, network, ontology
 from obnb.data.annotated_ontology import (
     DISEASES,

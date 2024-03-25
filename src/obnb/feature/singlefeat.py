@@ -1,4 +1,5 @@
 """Single modality feature objects."""
+
 import numpy as np
 
 from obnb.feature.base import BaseFeature
