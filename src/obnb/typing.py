@@ -1,4 +1,5 @@
 """Collection of types used in obnb."""
+
 from typing import (
     Any,
     Callable,

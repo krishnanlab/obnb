@@ -1,4 +1,5 @@
 """Multi modality feature objects."""
+
 from itertools import chain
 
 import numpy as np

@@ -1,4 +1,5 @@
 """Filter objecst for preprocessing the labelset collection."""
+
 from obnb.label.filters.base import Compose
 from obnb.label.filters.existence_filter import (
     EntityExistenceFilter,

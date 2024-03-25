@@ -1,4 +1,5 @@
 """Node feature transformation module."""
+
 import warnings
 from abc import ABC, abstractmethod
 
@@ -50,8 +51,7 @@ class BaseNodeFeatureTransform(BaseDatasetTransform, ABC):
             dataset.feature = FeatureVec.from_mat(feat, node_ids)
 
     @abstractmethod
-    def _prepare_feat(self, dataset) -> np.ndarray:
-        ...
+    def _prepare_feat(self, dataset) -> np.ndarray: ...
 
 
 @register_nodefeat

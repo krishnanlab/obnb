@@ -1,4 +1,5 @@
 """Network data."""
+
 from obnb.data.network.biogrid import BioGRID
 from obnb.data.network.bioplex import BioPlex
 from obnb.data.network.comppi import ComPPIHumanInt
