@@ -23,10 +23,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install packages
-        run:
+        run: |
           python -m pip install --upgrade pip
           pip install -e .[dev]
 
       - name: Run data tests
-        run:
+        run: |
           pytest test/test_data.py -m "(longruns or not longruns) and not highmemory" -s -v
