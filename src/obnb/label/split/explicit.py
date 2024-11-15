@@ -60,8 +60,8 @@ class ByTermSplit(BaseSplit):
             value_name="Value"
         ).dropna(subset=["Value"])
 
-        # group by the integer value and aggregate names into a set, making
-        # it possible to retrieve all the terms for a given gene ID
+        # group gene id and aggregate terms into a set, which makes
+        # it faster to retrieve all the terms for a given gene ID
         self.gene_id_to_terms = (
             self.long_df.groupby("Value")["Name"]
             .apply(set)
