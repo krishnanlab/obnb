@@ -1,4 +1,5 @@
 """Genearting data splits from the labelset collection."""
+from obnb.label.split.explicit import ByTermSplit
 from obnb.label.split.holdout import (
     AllHoldout,
     RandomRatioHoldout,
@@ -9,9 +10,6 @@ from obnb.label.split.partition import (
     RandomRatioPartition,
     RatioPartition,
     ThresholdPartition,
-)
-from obnb.label.split.explicit import (
-    ByTermSplit
 )
 
 __all__ = classes = [
