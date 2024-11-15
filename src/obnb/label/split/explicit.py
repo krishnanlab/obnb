@@ -37,6 +37,10 @@ class ByTermSplit(BaseSplit):
         self.labelset = labelset
         self.split_terms = [set(x) for x in split_terms]
 
+        # verify that there's only one catch-all split
+        if sum(1 for x in self.split_terms if x == {"*"}) > 1:
+            raise ValueError("Only one catch-all '*' split is allowed")
+
         # convert labelset into a dataframe where one can search for
         # the terms associated with each gene ID like so:
         # self.long_df[self.long_df["Value"] == str(gene_id)]["Name"]
