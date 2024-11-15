@@ -1,4 +1,4 @@
-from typing import Any, Iterator, List, Tuple
+from typing import Iterable, Iterator, List, Tuple
 
 import numpy
 
@@ -23,7 +23,11 @@ class ByTermSplit(BaseSplit):
     splits at all.
     """
 
-    def __init__(self, labelset:LabelsetCollection, split_terms: Tuple[set[str]]) -> None:
+    def __init__(
+            self, labelset: LabelsetCollection,
+            split_terms: Iterable[Iterable[str]],
+            exclusive: bool = False
+        ) -> None:
         """
         Initialize ByTermSplit object with reference labels and terms into
         which to create splits.
@@ -31,11 +35,16 @@ class ByTermSplit(BaseSplit):
         Args:
             labelset: LabelsetCollection object containing terms for each
                 gene ID.
-            split_terms: Tuple of sets of terms. Each set of terms will
-                correspond to a split
+            split_terms: a nested collection. The first level of nesting
+                indicates the splits; the second level within each identifies
+                terms that should be matched to place a gene in that split.
+            exclusive: if True, a gene can occur only once across all the
+                splits; it will belong to the first split in which it occurs.
         """
+
         self.labelset = labelset
         self.split_terms = [set(x) for x in split_terms]
+        self.exclusive = exclusive
 
         # verify that there's only one catch-all split
         if sum(1 for x in self.split_terms if x == {"*"}) > 1:
@@ -78,7 +87,7 @@ class ByTermSplit(BaseSplit):
         # term in the split
         result = [
             (
-                numpy.asarray([
+                set([
                     id for id in ids
                     if gdf[gdf["GeneID"] == str(id)]["Terms"].values[0] & terms
                 ]) if terms != {"*"} else None
@@ -89,14 +98,26 @@ class ByTermSplit(BaseSplit):
         # if one of the resulting splits ended up as 'None', we need to
         # fill in that split with any gene that wasn't matched by any of
         # the other splits
-        for idx, x in enumerate(result):
-            if x is None:
-                result[idx] = numpy.asarray([
+        for idx in range(len(result)):
+            if result[idx] is None:
+                result[idx] = set([
                     id for id in ids
                     if not any(
-                        gdf[gdf["GeneID"] == str(id)]["Terms"].isin(terms).any()
+                        gdf[gdf["GeneID"] == str(id)]["Terms"].values[0] & terms
                         for terms in self.split_terms
                     )
                 ])
 
-        yield tuple(result)
+        if self.exclusive:
+            # if exclusive, remove genes in the current split that occurred
+            # in any previous split
+            # (we skip the first split since there's nothing with which to
+            # compare it)
+            for idx in range(1, len(result)):
+                result[idx] = result[idx] - set.union(*result[:idx])
+
+        # yield it in the format returned by other splitters, e.g. a tuple of
+        # numpy arrays. we cast to list because leaving it as a set would cause
+        # numpy.asarray() to create an array with a single element, the set,
+        # rather than an array with the elements of the list
+        yield tuple([ numpy.asarray(list(x)) for x in result ])
