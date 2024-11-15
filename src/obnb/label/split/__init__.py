@@ -10,6 +10,9 @@ from obnb.label.split.partition import (
     RatioPartition,
     ThresholdPartition,
 )
+from obnb.label.split.explicit import (
+    ByTermSplit
+)
 
 __all__ = classes = [
     "AllHoldout",
@@ -19,4 +22,5 @@ __all__ = classes = [
     "RandomRatioPartition",
     "RatioPartition",
     "ThresholdPartition",
+    "ByTermSplit",
 ]
