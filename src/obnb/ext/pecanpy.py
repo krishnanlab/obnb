@@ -5,7 +5,7 @@ from pecanpy import pecanpy
 
 from obnb.feature import FeatureVec
 from obnb.graph import DenseGraph, SparseGraph
-from obnb.typing import Literal, Optional, Union
+from obnb.alltypes import Literal, Optional, Union
 
 PECANPY_MODES = Literal[
     "PreComp",

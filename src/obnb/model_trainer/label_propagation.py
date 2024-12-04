@@ -1,7 +1,7 @@
 import numpy as np
 
 from obnb.model_trainer.base import StandardTrainer
-from obnb.typing import Callable, Dict, LogLevel, Optional
+from obnb.alltypes import Callable, Dict, LogLevel, Optional
 
 
 class LabelPropagationTrainer(StandardTrainer):

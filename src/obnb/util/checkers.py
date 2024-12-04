@@ -10,7 +10,7 @@ from typing import get_args
 
 import numpy as np
 
-from obnb.typing import INT_TYPE, NUMERIC_TYPE, Iterable, List, Optional, Tuple
+from obnb.alltypes import INT_TYPE, NUMERIC_TYPE, Iterable, List, Optional, Tuple
 
 __all__ = [
     "checkConfig",

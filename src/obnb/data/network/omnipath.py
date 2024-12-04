@@ -4,7 +4,7 @@ import pandas as pd
 import requests
 
 from obnb.data.network.base import BaseURLSparseGraphData
-from obnb.typing import List, Mapping, Optional, Union
+from obnb.alltypes import List, Mapping, Optional, Union
 from obnb.util.download import stream_download
 
 

@@ -5,7 +5,7 @@ from scipy.stats import hypergeom
 from tqdm import tqdm
 
 from obnb.label.filters.base import BaseFilter
-from obnb.typing import List
+from obnb.alltypes import List
 
 
 class NegativeGeneratorHypergeom(BaseFilter):

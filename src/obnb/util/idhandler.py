@@ -5,7 +5,7 @@ from copy import deepcopy
 import numpy as np
 
 from obnb.exception import IDExistsError, IDNotExistError
-from obnb.typing import Dict, Iterable, List
+from obnb.alltypes import Dict, Iterable, List
 from obnb.util import checkers
 
 __all__ = ["IDlst", "IDmap", "IDprop"]

@@ -7,7 +7,7 @@ from tqdm import trange
 
 from obnb.exception import EdgeNotExistError, IDNotExistError
 from obnb.graph.base import BaseGraph
-from obnb.typing import (
+from obnb.alltypes import (
     EdgeData,
     EdgeDir,
     Iterator,

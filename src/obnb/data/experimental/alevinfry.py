@@ -5,7 +5,7 @@ except ImportError:
 
 from obnb.data.base import BaseData
 from obnb.feature import FeatureVec
-from obnb.typing import Dict, List, Optional
+from obnb.alltypes import Dict, List, Optional
 
 
 class AlevinFry(BaseData, FeatureVec):

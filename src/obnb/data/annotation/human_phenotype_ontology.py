@@ -3,7 +3,7 @@ import pprint
 import pandas as pd
 
 from obnb.data.annotation.base import BaseAnnotationData
-from obnb.typing import List, Optional
+from obnb.alltypes import List, Optional
 
 
 class HumanPhenotypeOntologyAnnotation(BaseAnnotationData):

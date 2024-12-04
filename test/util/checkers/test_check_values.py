@@ -1,6 +1,6 @@
 import pytest
 
-from obnb.typing import Literal
+from obnb.alltypes import Literal
 from obnb.util.checkers import checkLiteral
 
 

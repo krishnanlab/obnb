@@ -8,7 +8,7 @@ from obnb.graph import DenseGraph, SparseGraph
 from obnb.graph.base import BaseGraph
 from obnb.label.collection import LabelsetCollection
 from obnb.label.split.base import BaseSplit
-from obnb.typing import (
+from obnb.alltypes import (
     Any,
     Callable,
     Dict,

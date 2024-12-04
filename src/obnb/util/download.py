@@ -20,7 +20,7 @@ from obnb.config import (
     STREAM_BLOCK_SIZE,
 )
 from obnb.exception import DataNotFoundError, ExceededMaxNumRetries
-from obnb.typing import LogLevel, Optional, Tuple, ZipType
+from obnb.alltypes import LogLevel, Optional, Tuple, ZipType
 from obnb.util.logger import display_pbar, get_logger
 
 native_logger = get_logger(None, log_level="INFO")

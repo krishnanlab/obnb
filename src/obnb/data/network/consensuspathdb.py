@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 from obnb.data.network.base import BaseURLSparseGraphData
-from obnb.typing import List, Literal, Mapping, Optional, Union
+from obnb.alltypes import List, Literal, Mapping, Optional, Union
 from obnb.util.download import download_unzip
 
 

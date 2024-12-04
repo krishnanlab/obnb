@@ -1,5 +1,5 @@
 from obnb.data.network.base import BaseURLSparseGraphData
-from obnb.typing import Converter
+from obnb.alltypes import Converter
 
 
 class HumanBaseTopGlobal(BaseURLSparseGraphData):

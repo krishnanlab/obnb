@@ -5,7 +5,7 @@ import sknetwork.embedding
 
 from obnb.feature import FeatureVec
 from obnb.graph import DenseGraph, SparseGraph
-from obnb.typing import Literal, Union
+from obnb.alltypes import Literal, Union
 
 SKNETWORK_EMBEDDINGS = Literal[
     "Spectral",

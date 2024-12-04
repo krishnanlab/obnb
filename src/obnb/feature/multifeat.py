@@ -4,7 +4,7 @@ from itertools import chain
 import numpy as np
 
 from obnb.feature.base import BaseFeature
-from obnb.typing import Iterable, List, LogLevel, Optional, Tuple, Union
+from obnb.alltypes import Iterable, List, LogLevel, Optional, Tuple, Union
 from obnb.util.idhandler import IDmap
 
 

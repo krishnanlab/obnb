@@ -3,7 +3,7 @@
 Helps interface with user defined modules for OBNB pipelines.
 
 """
-from obnb.typing import Any
+from obnb.alltypes import Any
 from obnb.util.misc import DotDict
 
 REGISTRIES = DotDict()

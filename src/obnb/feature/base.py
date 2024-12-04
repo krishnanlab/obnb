@@ -4,7 +4,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from obnb.typing import INT_TYPE, Iterable, List, LogLevel, Optional, Tuple, Union
+from obnb.alltypes import INT_TYPE, Iterable, List, LogLevel, Optional, Tuple, Union
 from obnb.util import checkers
 from obnb.util.idhandler import IDmap
 from obnb.util.logger import get_logger

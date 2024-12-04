@@ -2,7 +2,7 @@ import numpy as np
 
 from obnb.label.collection import Splitter
 from obnb.label.filters.base import BaseFilter
-from obnb.typing import List, Optional
+from obnb.alltypes import List, Optional
 
 
 class BaseRangeFilter(BaseFilter):

@@ -2,7 +2,7 @@ import typing
 
 import numpy as np
 
-from obnb.typing import Any, Iterator, List, Mapping, Optional, Tuple, Union
+from obnb.alltypes import Any, Iterator, List, Mapping, Optional, Tuple, Union
 from obnb.util.converter import BaseConverter
 
 

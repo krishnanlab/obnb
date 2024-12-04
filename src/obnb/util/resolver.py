@@ -2,7 +2,7 @@ import warnings
 from pprint import pformat
 
 from obnb.registry import REGISTRIES
-from obnb.typing import Any, Dict, Optional, Union
+from obnb.alltypes import Any, Dict, Optional, Union
 
 
 def resolve_registry(name: str, scope: Optional[str] = None, verbose: bool = True):

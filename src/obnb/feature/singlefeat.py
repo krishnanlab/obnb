@@ -2,7 +2,7 @@
 import numpy as np
 
 from obnb.feature.base import BaseFeature
-from obnb.typing import Iterable, LogLevel, Optional, Union
+from obnb.alltypes import Iterable, LogLevel, Optional, Union
 
 
 class FeatureVec(BaseFeature):

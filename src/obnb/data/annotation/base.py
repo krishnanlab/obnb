@@ -1,5 +1,5 @@
 from obnb.data.base import BaseData
-from obnb.typing import List, Optional, ZipType
+from obnb.alltypes import List, Optional, ZipType
 from obnb.util.download import download_unzip
 
 

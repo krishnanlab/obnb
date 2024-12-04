@@ -12,7 +12,7 @@ import obnb
 from obnb.feature import FeatureVec
 from obnb.registry import register_nodefeat
 from obnb.transform.base import BaseDatasetTransform
-from obnb.typing import Optional
+from obnb.alltypes import Optional
 from obnb.util.logger import display_pbar
 from obnb.util.misc import get_num_workers
 

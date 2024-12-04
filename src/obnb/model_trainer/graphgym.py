@@ -19,7 +19,7 @@ from torch_geometric.graphgym.utils.comp_budget import params_count
 from torch_geometric.graphgym.utils.device import auto_select_device
 
 from obnb.model_trainer.gnn import GNNTrainer
-from obnb.typing import Any, Dict, List, Optional
+from obnb.alltypes import Any, Dict, List, Optional
 
 
 def _patch_gg_makedirs_rm_exist(dir_):  # patch for PyG<2.1.0

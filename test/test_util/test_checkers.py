@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from obnb.typing import FLOAT_TYPE, INT_TYPE, Iterable
+from obnb.alltypes import FLOAT_TYPE, INT_TYPE, Iterable
 from obnb.util import checkers
 
 

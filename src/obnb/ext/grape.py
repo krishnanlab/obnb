@@ -10,7 +10,7 @@ from ensmallen import Graph, GraphBuilder
 
 from obnb.feature import FeatureVec
 from obnb.graph.sparse import SparseGraph
-from obnb.typing import Type, Union
+from obnb.alltypes import Type, Union
 
 # Tested methods, see test/ext/test_grape.py
 VALIDATED_EMBEDDERS = [

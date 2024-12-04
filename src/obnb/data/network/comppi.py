@@ -4,7 +4,7 @@ import pandas as pd
 import requests
 
 from obnb.data.network.base import BaseURLSparseGraphData
-from obnb.typing import Any, Dict, List, Mapping, Optional, Union
+from obnb.alltypes import Any, Dict, List, Mapping, Optional, Union
 
 
 class ComPPI(BaseURLSparseGraphData):
