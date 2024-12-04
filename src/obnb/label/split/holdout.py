@@ -1,7 +1,7 @@
 import numpy as np
 
+from obnb.alltypes import Tuple
 from obnb.label.split.base import BaseRandomSplit, BaseSortedSplit
-from obnb.typing import Tuple
 from obnb.util.checkers import checkType
 
 

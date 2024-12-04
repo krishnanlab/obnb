@@ -1,14 +1,9 @@
 """Dataset object."""
+
 import numpy as np
 from sklearn.preprocessing import KBinsDiscretizer
 
-from obnb.feature import FeatureVec, MultiFeatureVec
-from obnb.feature.base import BaseFeature
-from obnb.graph import DenseGraph, SparseGraph
-from obnb.graph.base import BaseGraph
-from obnb.label.collection import LabelsetCollection
-from obnb.label.split.base import BaseSplit
-from obnb.typing import (
+from obnb.alltypes import (
     Any,
     Callable,
     Dict,
@@ -20,6 +15,12 @@ from obnb.typing import (
     Tuple,
     Union,
 )
+from obnb.feature import FeatureVec, MultiFeatureVec
+from obnb.feature.base import BaseFeature
+from obnb.graph import DenseGraph, SparseGraph
+from obnb.graph.base import BaseGraph
+from obnb.label.collection import LabelsetCollection
+from obnb.label.split.base import BaseSplit
 from obnb.util.checkers import checkLiteral, checkNumpyArrayShape, checkType
 from obnb.util.idhandler import IDmap
 from obnb.util.resolver import resolve_transform

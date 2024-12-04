@@ -1,8 +1,8 @@
 import ndex2
 
+from obnb.alltypes import Any, Dict, List, Mapping, Optional, Union
 from obnb.data.base import BaseData
 from obnb.graph import SparseGraph
-from obnb.typing import Any, Dict, List, Mapping, Optional, Union
 from obnb.util.download import download_unzip
 from obnb.util.logger import display_pbar
 

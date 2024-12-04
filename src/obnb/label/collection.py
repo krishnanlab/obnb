@@ -4,10 +4,10 @@ from functools import lru_cache
 import numpy as np
 import pandas as pd
 
+from obnb.alltypes import Dict, Iterator, List, Optional, Set, Splitter, Tuple, Union
 from obnb.exception import IDExistsError
 from obnb.graph import OntologyGraph
 from obnb.label.filters.base import BaseFilter
-from obnb.typing import Dict, Iterator, List, Optional, Set, Splitter, Tuple, Union
 from obnb.util import checkers, idhandler
 
 

@@ -1,11 +1,11 @@
 from tqdm import tqdm
 
+from obnb.alltypes import Any, Dict, List, Optional, Type
 from obnb.data.annotation.base import BaseAnnotationData
 from obnb.data.base import BaseData
 from obnb.data.ontology.base import BaseOntologyData
 from obnb.exception import IDNotExistError
 from obnb.label import LabelsetCollection
-from obnb.typing import Any, Dict, List, Optional, Type
 from obnb.util.logger import display_pbar
 
 

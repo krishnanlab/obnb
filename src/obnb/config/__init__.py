@@ -1,5 +1,6 @@
 """Configurations used by obnb."""
-from obnb.typing import Dict
+
+from obnb.alltypes import Dict
 
 __all__ = [
     "DEFAULT_RETRY_DELAY",

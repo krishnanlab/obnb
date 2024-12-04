@@ -1,4 +1,5 @@
 """Network data."""
+
 from obnb.data.network.biogrid import BioGRID
 from obnb.data.network.bioplex import BioPlex
 from obnb.data.network.comppi import ComPPIHumanInt
@@ -13,7 +14,7 @@ from obnb.data.network.omnipath import OmniPath
 from obnb.data.network.pcnet import PCNet
 from obnb.data.network.proteomehd import ProteomeHD
 from obnb.data.network.signor import SIGNOR
-from obnb.data.network.string import STRING
+from obnb.data.network.stringprot import STRING
 
 __all__ = [
     "BioGRID",

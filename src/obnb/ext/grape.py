@@ -8,9 +8,9 @@ from embiggen.utils.abstract_models.abstract_embedding_model import (
 )
 from ensmallen import Graph, GraphBuilder
 
+from obnb.alltypes import Type, Union
 from obnb.feature import FeatureVec
 from obnb.graph.sparse import SparseGraph
-from obnb.typing import Type, Union
 
 # Tested methods, see test/ext/test_grape.py
 VALIDATED_EMBEDDERS = [

@@ -8,7 +8,7 @@ from io import BytesIO
 import mygene
 import pandas as pd
 
-from obnb.typing import Any, Dict, Iterator, List, LogLevel, Optional
+from obnb.alltypes import Any, Dict, Iterator, List, LogLevel, Optional
 from obnb.util.checkers import checkType
 from obnb.util.logger import get_logger
 

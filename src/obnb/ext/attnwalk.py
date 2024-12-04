@@ -11,6 +11,7 @@ Implementation adapted from https://github.com/benedekrozemberczki/AttentionWalk
 }
 
 """
+
 from typing import Union
 
 import networkx as nx

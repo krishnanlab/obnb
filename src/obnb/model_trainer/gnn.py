@@ -3,8 +3,8 @@ from copy import deepcopy
 import numpy as np
 import torch
 
+from obnb.alltypes import Any, Callable, Dict, List, LogLevel, Optional, Tuple
 from obnb.model_trainer.base import BaseTrainer
-from obnb.typing import Any, Callable, Dict, List, LogLevel, Optional, Tuple
 
 
 class GNNTrainer(BaseTrainer):

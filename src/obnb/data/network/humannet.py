@@ -1,5 +1,5 @@
+from obnb.alltypes import Converter, List
 from obnb.data.network.base import BaseURLSparseGraphData
-from obnb.typing import Converter, List
 from obnb.util.registers import overload_class
 
 

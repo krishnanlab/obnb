@@ -5,9 +5,7 @@ import logging
 import numpy as np
 from tqdm import trange
 
-from obnb.exception import EdgeNotExistError, IDNotExistError
-from obnb.graph.base import BaseGraph
-from obnb.typing import (
+from obnb.alltypes import (
     EdgeData,
     EdgeDir,
     Iterator,
@@ -18,6 +16,8 @@ from obnb.typing import (
     Tuple,
     Union,
 )
+from obnb.exception import EdgeNotExistError, IDNotExistError
+from obnb.graph.base import BaseGraph
 from obnb.util import checkers
 from obnb.util.cx_explorer import CXExplorer
 from obnb.util.idhandler import IDmap

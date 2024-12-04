@@ -3,9 +3,9 @@ from typing import get_args
 import numpy as np
 from pecanpy import pecanpy
 
+from obnb.alltypes import Literal, Optional, Union
 from obnb.feature import FeatureVec
 from obnb.graph import DenseGraph, SparseGraph
-from obnb.typing import Literal, Optional, Union
 
 PECANPY_MODES = Literal[
     "PreComp",

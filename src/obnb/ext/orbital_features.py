@@ -1,4 +1,5 @@
 """Grpahlet orbital feature extraction."""
+
 import itertools
 import multiprocessing
 from functools import partial
@@ -132,7 +133,7 @@ class OrbitCountingMachine:
         """Count orbital degrees."""
         logger.info("Counting orbital roles.")
         self.features = {
-            node: {i: 0 for i in range(self.unique_motif_count)}
+            node: dict.fromkeys(range(self.unique_motif_count), 0)
             for node in self.graph.nodes()
         }
         for size, node_lists in self.edge_subsets.items():

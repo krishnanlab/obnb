@@ -7,7 +7,7 @@ from pprint import pformat
 import yaml
 
 import obnb
-from obnb.typing import Any, Converter, Dict, List, LogLevel, Mapping, Optional
+from obnb.alltypes import Any, Converter, Dict, List, LogLevel, Mapping, Optional
 from obnb.util.checkers import checkConfig
 from obnb.util.converter import MyGeneInfoConverter
 from obnb.util.download import download_unzip, get_data_url

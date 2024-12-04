@@ -1,5 +1,5 @@
+from obnb.alltypes import List
 from obnb.label.filters.base import BaseFilter
-from obnb.typing import List
 
 
 class BaseExistenceFilter(BaseFilter):

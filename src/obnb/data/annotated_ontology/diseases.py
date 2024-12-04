@@ -1,8 +1,8 @@
+from obnb.alltypes import Mapping, Optional, Union
 from obnb.data.annotated_ontology.base import BaseAnnotatedOntologyData
 from obnb.data.annotation import DISEASESAnnotation
 from obnb.data.ontology import MondoDiseaseOntology
 from obnb.label.filters import Compose, LabelsetNonRedFilter, LabelsetRangeFilterSize
-from obnb.typing import Mapping, Optional, Union
 from obnb.util.registers import overload_class
 
 
