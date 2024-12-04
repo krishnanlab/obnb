@@ -87,7 +87,7 @@ class ByTermSplit(BaseSplit):
                 {
                     gene_id
                     for gene_id in ids
-                    if gdf[gdf["GeneID"] == str(id)]["Terms"].values[0] & terms
+                    if gdf[gdf["GeneID"] == str(gene_id)]["Terms"].values[0] & terms
                 }
                 if terms != {"*"}
                 else None
