@@ -1,4 +1,5 @@
 """Generating data splits from the labelset collection."""
+
 from obnb.label.split.explicit import ByTermSplit
 from obnb.label.split.holdout import (
     AllHoldout,
