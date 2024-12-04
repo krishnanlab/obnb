@@ -119,7 +119,10 @@ class ByTermSplit(BaseSplit):
                 result[idx] = result[idx] - set.union(*result[:idx])
 
         # yield it in the format returned by other splitters, e.g. a tuple of
-        # numpy arrays. we cast to list because leaving it as a set would cause
-        # numpy.asarray() to create an array with a single element, the set,
-        # rather than an array with the elements of the list
-        yield tuple([numpy.asarray(list(x)) for x in result])
+        # numpy arrays, each of which contain indices into the 'ids' array
+        # passed into the splitter.
+        yield tuple([
+            numpy.asarray([
+                ids.index(v) for v in x
+            ]) for x in result
+        ])
