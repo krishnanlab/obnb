@@ -1,7 +1,7 @@
 import numpy as np
 
-from obnb.label.filters.range_filter import BaseRangeFilter
 from obnb.alltypes import Set
+from obnb.label.filters.range_filter import BaseRangeFilter
 
 
 class BaseLabelsetPairwiseFilter(BaseRangeFilter):

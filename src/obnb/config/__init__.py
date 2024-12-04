@@ -1,4 +1,5 @@
 """Configurations used by obnb."""
+
 from obnb.alltypes import Dict
 
 __all__ = [

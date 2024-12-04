@@ -2,11 +2,11 @@ import logging
 
 import numpy as np
 
+from obnb.alltypes import EdgeDir, List, LogLevel, Optional, Union
 from obnb.exception import IDNotExistError
 from obnb.feature import FeatureVec
 from obnb.graph.base import BaseGraph
 from obnb.graph.sparse import SparseGraph
-from obnb.alltypes import EdgeDir, List, LogLevel, Optional, Union
 from obnb.util import checkers
 from obnb.util.idhandler import IDmap
 

@@ -1,5 +1,5 @@
-from obnb.data.network.base import BaseURLSparseGraphData
 from obnb.alltypes import Converter
+from obnb.data.network.base import BaseURLSparseGraphData
 
 
 class HuMAP(BaseURLSparseGraphData):

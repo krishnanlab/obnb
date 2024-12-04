@@ -1,5 +1,5 @@
-from obnb.label.filters.base import BaseFilter
 from obnb.alltypes import List
+from obnb.label.filters.base import BaseFilter
 
 
 class BaseValueFilter(BaseFilter):

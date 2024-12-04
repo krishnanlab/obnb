@@ -1,4 +1,5 @@
 import obnb.data
+from obnb.alltypes import LogLevel
 from obnb.label.filters import (
     Compose,
     EntityExistenceFilter,
@@ -7,7 +8,6 @@ from obnb.label.filters import (
     NegativeGeneratorHypergeom,
 )
 from obnb.label.split import RatioPartition
-from obnb.alltypes import LogLevel
 from obnb.util.converter import GenePropertyConverter
 
 

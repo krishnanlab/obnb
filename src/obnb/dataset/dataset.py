@@ -1,9 +1,10 @@
 """Helper functions to construct processed datasets."""
+
 import obnb.data
 import obnb.label.split
+from obnb.alltypes import Any, Callable, Dict, List, LogLevel, Optional
 from obnb.dataset.base import Dataset
 from obnb.label import filters
-from obnb.alltypes import Any, Callable, Dict, List, LogLevel, Optional
 from obnb.util.converter import GenePropertyConverter
 from obnb.util.misc import default
 from obnb.util.version import parse_data_version

@@ -6,8 +6,6 @@ from contextlib import contextmanager
 
 from tqdm import trange
 
-from obnb.exception import OboTermIncompleteError
-from obnb.graph.sparse import DirectedSparseGraph
 from obnb.alltypes import (
     Dict,
     Iterable,
@@ -20,6 +18,8 @@ from obnb.alltypes import (
     TextIO,
     Union,
 )
+from obnb.exception import OboTermIncompleteError
+from obnb.graph.sparse import DirectedSparseGraph
 from obnb.util import idhandler
 
 

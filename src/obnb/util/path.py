@@ -1,4 +1,5 @@
 """Path utilities."""
+
 import hashlib
 import os.path as osp
 

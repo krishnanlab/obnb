@@ -12,6 +12,7 @@ from zipfile import ZipFile
 import requests
 from tqdm import tqdm
 
+from obnb.alltypes import LogLevel, Optional, Tuple, ZipType
 from obnb.config import (
     DEFAULT_RETRY_DELAY,
     MAX_DOWNLOAD_RETRIES,
@@ -20,7 +21,6 @@ from obnb.config import (
     STREAM_BLOCK_SIZE,
 )
 from obnb.exception import DataNotFoundError, ExceededMaxNumRetries
-from obnb.alltypes import LogLevel, Optional, Tuple, ZipType
 from obnb.util.logger import display_pbar, get_logger
 
 native_logger = get_logger(None, log_level="INFO")

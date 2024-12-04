@@ -1,4 +1,5 @@
 """Node feature transformation module."""
+
 import warnings
 from abc import ABC, abstractmethod
 
@@ -9,10 +10,10 @@ from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.random_projection import GaussianRandomProjection, SparseRandomProjection
 
 import obnb
+from obnb.alltypes import Optional
 from obnb.feature import FeatureVec
 from obnb.registry import register_nodefeat
 from obnb.transform.base import BaseDatasetTransform
-from obnb.alltypes import Optional
 from obnb.util.logger import display_pbar
 from obnb.util.misc import get_num_workers
 
@@ -50,8 +51,7 @@ class BaseNodeFeatureTransform(BaseDatasetTransform, ABC):
             dataset.feature = FeatureVec.from_mat(feat, node_ids)
 
     @abstractmethod
-    def _prepare_feat(self, dataset) -> np.ndarray:
-        ...
+    def _prepare_feat(self, dataset) -> np.ndarray: ...
 
 
 @register_nodefeat

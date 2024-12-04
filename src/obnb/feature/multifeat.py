@@ -1,10 +1,11 @@
 """Multi modality feature objects."""
+
 from itertools import chain
 
 import numpy as np
 
-from obnb.feature.base import BaseFeature
 from obnb.alltypes import Iterable, List, LogLevel, Optional, Tuple, Union
+from obnb.feature.base import BaseFeature
 from obnb.util.idhandler import IDmap
 
 

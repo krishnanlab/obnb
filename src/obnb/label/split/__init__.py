@@ -1,4 +1,5 @@
 """Genearting data splits from the labelset collection."""
+
 from obnb.label.split.holdout import (
     AllHoldout,
     RandomRatioHoldout,

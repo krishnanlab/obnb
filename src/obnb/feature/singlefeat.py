@@ -1,8 +1,9 @@
 """Single modality feature objects."""
+
 import numpy as np
 
-from obnb.feature.base import BaseFeature
 from obnb.alltypes import Iterable, LogLevel, Optional, Union
+from obnb.feature.base import BaseFeature
 
 
 class FeatureVec(BaseFeature):

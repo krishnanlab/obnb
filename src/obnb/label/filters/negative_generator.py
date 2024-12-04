@@ -4,8 +4,8 @@ import numpy as np
 from scipy.stats import hypergeom
 from tqdm import tqdm
 
-from obnb.label.filters.base import BaseFilter
 from obnb.alltypes import List
+from obnb.label.filters.base import BaseFilter
 
 
 class NegativeGeneratorHypergeom(BaseFilter):

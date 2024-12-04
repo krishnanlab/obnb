@@ -1,11 +1,12 @@
 """Logger utils."""
+
 import logging
 import logging.config
 import os
 from contextlib import contextmanager
 
-from obnb.config.logger_config import LOGGER_CONFIG
 from obnb.alltypes import List, LogLevel, Optional, Union
+from obnb.config.logger_config import LOGGER_CONFIG
 
 
 def verbose(level: Union[int, str], threshold="INFO") -> bool:

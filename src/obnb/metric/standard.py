@@ -1,4 +1,5 @@
 """Standard metric extending those available in sklearn."""
+
 from functools import wraps
 
 try:

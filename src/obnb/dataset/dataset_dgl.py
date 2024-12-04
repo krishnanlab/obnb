@@ -1,4 +1,5 @@
 """DGL dataset object."""
+
 import os.path as osp
 
 try:
@@ -9,8 +10,8 @@ try:
 except (ModuleNotFoundError, OSError):
     DGLDataset = object
 
-from obnb.dataset import OpenBiomedNetBench
 from obnb.alltypes import Callable, LogLevel, Optional
+from obnb.dataset import OpenBiomedNetBench
 from obnb.util.logger import verbose
 from obnb.util.version import parse_data_version
 

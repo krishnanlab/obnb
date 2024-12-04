@@ -2,8 +2,8 @@ from collections import Counter
 
 import numpy as np
 
-from obnb.label.split.base import BaseRandomSplit, BaseSortedSplit
 from obnb.alltypes import List, Tuple
+from obnb.label.split.base import BaseRandomSplit, BaseSortedSplit
 from obnb.util.checkers import checkTypesInIterableErrEmpty
 
 

@@ -1,8 +1,8 @@
 import numpy as np
 
+from obnb.alltypes import List, Optional
 from obnb.label.collection import Splitter
 from obnb.label.filters.base import BaseFilter
-from obnb.alltypes import List, Optional
 
 
 class BaseRangeFilter(BaseFilter):
@@ -164,7 +164,7 @@ class LabelsetRangeFilterSplit(BaseRangeFilter):
         def val_getter(label_id):
             y_all, masks = lsc.split(self.splitter, **self.kwargs)
             neg_idx = lsc.entity[lsc.get_negative(label_id)]
-            self.logger.debug(f"{label_id = } {neg_idx = }")
+            self.logger.debug(f"{label_id =} {neg_idx =}")
             # TODO: make label_ids to index mapping?
             y = y_all[:, lsc.label_ids.index(label_id)]
             min_num_pos = min_num_neg = np.inf
@@ -175,7 +175,7 @@ class LabelsetRangeFilterSplit(BaseRangeFilter):
                     min_num_pos = min(min_num_pos, num_pos)
                     if self.count_negatives:
                         num_neg = np.intersect1d(neg_idx, masked_idx).size
-                        self.logger.debug(f"{num_neg = }, {masked_idx = }")
+                        self.logger.debug(f"{num_neg =}, {masked_idx =}")
                         min_num_neg = min(min_num_neg, num_neg)
             self.logger.info(f"{label_id}, {min_num_pos=}, {min_num_neg=}")
             return min(min_num_pos, min_num_neg)

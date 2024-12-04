@@ -1,5 +1,5 @@
-from obnb.data.network.base import BaseNDExData
 from obnb.alltypes import Converter
+from obnb.data.network.base import BaseNDExData
 
 
 class HIPPIE(BaseNDExData):

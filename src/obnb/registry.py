@@ -3,6 +3,7 @@
 Helps interface with user defined modules for OBNB pipelines.
 
 """
+
 from obnb.alltypes import Any
 from obnb.util.misc import DotDict
 
