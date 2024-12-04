@@ -2,7 +2,7 @@ import multiprocessing as mp
 
 from tqdm import tqdm
 
-from obnb.typing import Any, Iterator, List, Tuple
+from obnb.alltypes import Any, Iterator, List, Tuple
 from obnb.util import checkers
 
 mp.set_start_method("fork")

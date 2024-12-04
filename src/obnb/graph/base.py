@@ -1,8 +1,8 @@
 import logging
 from copy import deepcopy
 
+from obnb.alltypes import EdgeDir, Iterable, List, LogLevel, Optional, Tuple, Union
 from obnb.exception import IDExistsError
-from obnb.typing import EdgeDir, Iterable, List, LogLevel, Optional, Tuple, Union
 from obnb.util import checkers, idhandler
 from obnb.util.checkers import checkLiteral
 from obnb.util.logger import get_logger

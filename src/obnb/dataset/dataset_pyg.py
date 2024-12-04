@@ -1,4 +1,5 @@
 """PyTorch Geometric dataset object."""
+
 import os.path as osp
 
 try:
@@ -7,8 +8,8 @@ try:
 except (ModuleNotFoundError, OSError):
     InMemoryDataset = object
 
+from obnb.alltypes import Callable, LogLevel, Optional
 from obnb.dataset import OpenBiomedNetBench
-from obnb.typing import Callable, LogLevel, Optional
 from obnb.util.logger import verbose
 from obnb.util.version import parse_data_version
 

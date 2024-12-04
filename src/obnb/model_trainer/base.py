@@ -5,7 +5,7 @@ import numpy as np
 from tqdm.auto import tqdm
 
 import obnb.metric
-from obnb.typing import Any, Callable, Dict, LogLevel, Optional
+from obnb.alltypes import Any, Callable, Dict, LogLevel, Optional
 from obnb.util.logger import attach_file_handler, get_logger
 
 

@@ -1,4 +1,5 @@
 """Standard metric extending those available in sklearn."""
+
 from functools import wraps
 
 try:
@@ -8,7 +9,7 @@ except (ModuleNotFoundError, OSError):
 import numpy as np
 import sklearn.metrics
 
-from obnb.typing import Optional, Tensor, Union
+from obnb.alltypes import Optional, Tensor, Union
 
 
 def cast_ndarray_type(x: Union[np.ndarray, Tensor]) -> np.ndarray:

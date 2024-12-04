@@ -1,4 +1,5 @@
 """Utility for exploring NDEx CX data."""
+
 import itertools
 import json
 from collections import defaultdict
@@ -8,7 +9,7 @@ from typing import no_type_check
 import ndex2
 from requests import RequestException
 
-from obnb.typing import Dict, List, Optional, Set
+from obnb.alltypes import Dict, List, Optional, Set
 
 
 class CXExplorer:

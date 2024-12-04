@@ -1,6 +1,6 @@
 from tqdm import tqdm
 
-from obnb.typing import Any, Dict, List, LogLevel
+from obnb.alltypes import Any, Dict, List, LogLevel
 from obnb.util.logger import get_logger
 
 

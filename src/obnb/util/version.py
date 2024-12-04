@@ -1,6 +1,7 @@
 """Version utility module for obnb."""
+
 from obnb import config
-from obnb.typing import List
+from obnb.alltypes import List
 
 
 def parse_data_version(version: str = "current") -> str:

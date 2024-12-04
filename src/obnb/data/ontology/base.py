@@ -1,6 +1,6 @@
+from obnb.alltypes import List, Optional
 from obnb.data.base import BaseData
 from obnb.graph import OntologyGraph
-from obnb.typing import List, Optional
 from obnb.util.download import stream_download
 
 

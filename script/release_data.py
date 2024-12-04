@@ -13,9 +13,9 @@ from tqdm import tqdm
 
 import obnb.data
 from obnb import logger
+from obnb.alltypes import Dict, List, Tuple
 from obnb.config import OBNB_DATA_URL_DICT
 from obnb.data.base import BaseData
-from obnb.typing import Dict, List, Tuple
 from obnb.util.converter import GenePropertyConverter
 
 HOMEDIR = Path(__file__).resolve().parent

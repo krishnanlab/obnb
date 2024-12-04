@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 # from obnb.dataset.base import Dataset
-from obnb.typing import LogLevel, Optional
+from obnb.alltypes import LogLevel, Optional
 from obnb.util.logger import get_logger
 from obnb.util.misc import get_random_state
 
@@ -33,5 +33,4 @@ class BaseTransform(ABC):
 
 class BaseDatasetTransform(BaseTransform, ABC):
     @abstractmethod
-    def __call__(self, dataset):
-        ...
+    def __call__(self, dataset): ...

@@ -1,11 +1,12 @@
 """Custom metrics compatible with GraphGym logger."""
+
 from functools import wraps
 
 import torch
 from torch import Tensor
 
+from obnb.alltypes import List, Metric
 from obnb.metric.standard import auroc, log2_auprc_prior, precision_at_topk
-from obnb.typing import List, Metric
 
 __all__ = [
     "graphgym_auroc",

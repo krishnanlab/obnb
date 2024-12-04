@@ -1,6 +1,6 @@
 import typing
 
-from obnb.typing import Optional, Type
+from obnb.alltypes import Optional, Type
 
 
 @typing.no_type_check  # issue with Type

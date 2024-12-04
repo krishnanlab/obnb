@@ -3,7 +3,7 @@ import random
 
 import numpy as np
 
-from obnb.typing import Any, Optional
+from obnb.alltypes import Any, Optional
 
 
 class DotDict(dict):
