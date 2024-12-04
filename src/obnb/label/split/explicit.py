@@ -90,16 +90,16 @@ class ByTermSplit(BaseSplit):
                     if gdf[gdf["GeneID"] == str(gene_id)]["Terms"].values[0] & terms
                 }
                 if terms != {"*"}
-                else None
+                else {"*"}
             )
             for terms in self.split_terms
         ]
 
-        # if one of the resulting splits ended up as 'None', we need to
+        # if one of the resulting splits ended up as the wildcard, we need to
         # fill in that split with any gene that wasn't matched by any of
         # the other splits
         for idx in range(len(result)):
-            if result[idx] is None:
+            if result[idx] == {"*"}:
                 result[idx] = {
                     gene_id
                     for gene_id in ids
@@ -115,7 +115,7 @@ class ByTermSplit(BaseSplit):
             # (we skip the first split since there's nothing with which to
             # compare it)
             for idx in range(1, len(result)):
-                result[idx] = result[idx] - set.union(*result[:idx])
+                result[idx] = result[idx] - set().union(*result[:idx])
 
         # yield it in the format returned by other splitters, e.g. a tuple of
         # numpy arrays, each of which contain indices into the 'ids' array
