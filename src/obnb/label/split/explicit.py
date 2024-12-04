@@ -8,17 +8,17 @@ from obnb.label.split.base import BaseSplit
 
 
 class ByTermSplit(BaseSplit):
-    """Produces splits based on an explicit list of terms. Genes which match each term
-    will be placed in the split corresponding to that term.
+    """
+    Produces splits based on an explicit list of terms.
 
-    A split with a single term '*' will act as a catch-all for any genes that
-    weren't matched by any of the other splits. This would allow you to, e.g.,
-    only retain a specific set of genes in the training set, and place all
-    others in the test set.
+    Genes which match each term will be placed in the split corresponding to
+    that term. A split with a single term '*' will act as a catch-all for any
+    genes that weren't matched by any of the other splits. This would allow you
+    to, e.g., only retain a specific set of genes in the training set, and place
+    all others in the test set.
 
     Note that if the '*' split is not provided, any genes that don't match any
     of the other splits will not be present in the returned splits at all.
-
     """
 
     def __init__(
@@ -27,8 +27,8 @@ class ByTermSplit(BaseSplit):
         split_terms: Iterable[Iterable[str]],
         exclusive: bool = False,
     ) -> None:
-        """Initialize ByTermSplit object with reference labels and terms into which to
-        create splits.
+        """
+        Initialize ByTermSplit object with reference labels and terms for splits.
 
         Args:
             labelset: LabelsetCollection object containing terms for each
@@ -38,9 +38,7 @@ class ByTermSplit(BaseSplit):
                 terms that should be matched to place a gene in that split.
             exclusive: if True, a gene can occur only once across all the
                 splits; it will belong to the first split in which it occurs.
-
         """
-
         self.labelset = labelset
         self.split_terms = [set(x) for x in split_terms]
         self.exclusive = exclusive
@@ -71,13 +69,14 @@ class ByTermSplit(BaseSplit):
         super().__init__()
 
     def __call__(self, ids: List[str], y: ndarray) -> Iterator[Tuple[ndarray, ...]]:
-        """For each gene ID, look up the term it's associated with in the labelset, and
-        place it in the corresponding split.
+        """
+        Produce splits based on the terms associated with each gene ID.
+
+        For each gene ID, look up the term it's associated with in the labelset,
+        and place it in the corresponding split.
 
         Returns as many splits as there are elements in the split_terms tuple.
-
         """
-
         # alias field to shorten the code below
         gdf = self.gene_id_to_terms
 
@@ -86,8 +85,8 @@ class ByTermSplit(BaseSplit):
         result = [
             (
                 {
-                    id
-                    for id in ids
+                    gene_id
+                    for gene_id in ids
                     if gdf[gdf["GeneID"] == str(id)]["Terms"].values[0] & terms
                 }
                 if terms != {"*"}
@@ -102,10 +101,10 @@ class ByTermSplit(BaseSplit):
         for idx in range(len(result)):
             if result[idx] is None:
                 result[idx] = {
-                    id
-                    for id in ids
+                    gene_id
+                    for gene_id in ids
                     if not any(
-                        gdf[gdf["GeneID"] == str(id)]["Terms"].values[0] & terms
+                        gdf[gdf["GeneID"] == str(gene_id)]["Terms"].values[0] & terms
                         for terms in self.split_terms
                     )
                 }
