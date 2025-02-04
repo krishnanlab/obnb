@@ -6,7 +6,7 @@ repos:
         args: [-c=.yamllint.yml]
 
   - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
+    rev: 6.0.0
     hooks:
       - id: isort
 
@@ -25,25 +25,25 @@ repos:
       - id: add-trailing-comma
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.19.0
+    rev: v3.19.1
     hooks:
       - id: pyupgrade
 
   - repo: https://github.com/psf/black
-    rev: 24.10.0
+    rev: 25.1.0
     hooks:
       - id: black
         args: ["--safe"]
 
   - repo: https://github.com/PyCQA/docformatter
-    rev: eb1df347edd128b30cd3368dddc3aa65edcfac38 # v1.7.5
+    rev: v1.7.5 # v1.7.5
     hooks:
       - id: docformatter
         name: Format docstring
         args: [--in-place, --wrap-summaries, "88", --wrap-descriptions, "80", --blank]
 
   - repo: https://github.com/executablebooks/mdformat
-    rev: 0.7.19
+    rev: 0.7.22
     hooks:
       - id: mdformat
         name: Format markdown
