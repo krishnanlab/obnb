@@ -36,6 +36,32 @@ class BaseSplit:
 
         return f"{self.__class__.__name__}({', '.join(attrs)})"
 
+    def __call__(
+        self,
+        ids: List[str],
+        y: np.ndarray,
+    ) -> Iterator[Tuple[np.ndarray, ...]]:
+        """Split the input ids into multiple splits, e.g. a test, train, validation
+        split. The means by which this splitting occurs should be defined by classes
+        that inherit from this base class.
+
+        Note:
+            Inheriting classes should yield the value instead of returning it,
+            to make it compatible with the sklearn split methods. See the
+            implementation of the BaseSortedSplit class for an example.
+
+        Args:
+            ids: List of entity IDs to put in each split.
+            y: Labels for each entity(?)
+
+        Yields:
+            Iterator of splits. Each split is a tuple of numpy arrays, where
+            each array contains the IDs of the entities in the split.
+
+        """
+
+        raise NotImplementedError
+
 
 class BaseSortedSplit(BaseSplit):
     """BaseSortedSplit object for splitting dataset based on sorting."""

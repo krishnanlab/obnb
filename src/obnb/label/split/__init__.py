@@ -1,5 +1,6 @@
-"""Genearting data splits from the labelset collection."""
+"""Generating data splits from the labelset collection."""
 
+from obnb.label.split.explicit import ByTermSplit
 from obnb.label.split.holdout import (
     AllHoldout,
     RandomRatioHoldout,
@@ -20,4 +21,5 @@ __all__ = classes = [
     "RandomRatioPartition",
     "RatioPartition",
     "ThresholdPartition",
+    "ByTermSplit",
 ]
