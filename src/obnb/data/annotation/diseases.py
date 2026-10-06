@@ -14,7 +14,8 @@ class DISEASESAnnotation(BaseAnnotationData):
     This is the ``integrated`` disease annotation channel from the Jensen Lab
     DISEASES annotation database, which combines evidences from *text-mining*,
     *knowledge*, and *experiment* channels. See  the
-    `DISEASES <https://diseases.jensenlab.org/About>`_ webpage for more
+    `DISEASES <https://diseases.jensenlab.org/About>`_
+    webpage for more
     information
 
     """
