@@ -1079,21 +1079,11 @@ class TestOntologyGraph(unittest.TestCase):
         self.assertEqual(graph.ancestors("f"), {"a", "c", "d"})
 
     def test_restrict_to_branch(self):
-        r"""
+        r"""A | \ b   d |   |     \ c   e [z]   f [x, y]
 
-        a
-        | \
-        b   d
-        |   |     \
-        c   e [z]   f [x, y]
+        | V
 
-        |
-        V
-
-        d
-        |    \
-        e [z]  f [x, y]
-
+        d |    \ e [z]  f [x, y]
 
         """
         graph = OntologyGraph()
