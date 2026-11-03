@@ -26,11 +26,11 @@ from obnb.util import idhandler
 class OntologyGraph(DirectedSparseGraph):
     """Ontology graph.
 
-    An ontology graph is a directed acyclic graph (DAG). Here, we represent
-    this data type using DirectedSparseGraph, which keeps track of both the
-    forward direction of edges (``_edge_data``) and the reversed direction of
-    edges (``_rev_edge_data``). This bidirectional awareness is useful in the
-    context of propagating information "upwards" or "downloads".
+    An ontology graph is a directed acyclic graph (DAG). Here, we represent this
+    data type using DirectedSparseGraph, which keeps track of both the forward
+    direction of edges (``_edge_data``) and the reversed direction of edges
+    (``_rev_edge_data``). This bidirectional awareness is useful in the context
+    of propagating information "upwards" or "downloads".
 
     The ``idmap`` attribute is swapped with a more functional ``IDProp`` object
     that allows the storing of node information such as the name and the node
